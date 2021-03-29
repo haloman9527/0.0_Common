@@ -239,13 +239,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1122091064}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48b1b8eed6441a24c8c996b3b2978ba2, type: 3}
+  m_Script: {fileID: 11500000, guid: efb5101583547884dbb6208b418f3830, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pool:
     template: {fileID: 1819074433}
     maxCount: 10
-    group: 1
+    group: 0
 --- !u!4 &1122091066
 Transform:
   m_ObjectHideFlags: 0
