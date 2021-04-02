@@ -16,6 +16,7 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Singletons
 {
+    [DefaultExecutionOrder(0)]
 #if ODIN_INSPECTOR
     public class CZMonoSingleton<T> : Sirenix.OdinInspector.SerializedMonoBehaviour where T : CZMonoSingleton<T>
 #else

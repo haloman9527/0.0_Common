@@ -72,6 +72,11 @@ namespace CZToolKit.Core.Blackboards
             if (data.ContainsKey(_name))
                 data.Remove(_name);
         }
+
+        public virtual void Clear()
+        {
+            data.Clear();
+        }
     }
 
     public interface IBlackboardProperty
