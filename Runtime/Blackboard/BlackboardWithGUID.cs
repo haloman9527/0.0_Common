@@ -5,12 +5,13 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Blackboards
 {
+    [Serializable]
     public class BlackboardWithGUID : Blackboard
     {
         /// <summary> Name与GUID映射表 </summary>
         [SerializeField]
         [HideInInspector]
-        protected Dictionary<string, string> guidMap = new Dictionary<string, string>();
+        protected Dictionary<string,string> guidMap = new Dictionary<string, string>();
 
         #region GetData
         public override bool TryGetData<T>(string _name, out T _data, T _fallback = default)
@@ -170,16 +171,13 @@ namespace CZToolKit.Core.Blackboards
             if (blackboard.ContainsKey(_guid))
                 blackboard.Remove(_guid);
         }
-
-        public void Clean()
-        {
-            foreach (var item in guidMap.ToArray())
-            {
-                if (!blackboard.ContainsKey(item.Value))
-                    guidMap.Remove(item.Key);
-            }
-        }
         #endregion
+
+        public override void Clear()
+        {
+            base.Clear();
+            guidMap.Clear();
+        }
     }
 
     public interface IBlackboardPropertyGUID : IBlackboardProperty

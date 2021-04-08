@@ -4,9 +4,7 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Blackboards
 {
-#if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.HideReferenceObjectPicker]
-#endif
+    [Serializable]
     public class Blackboard
     {
         [SerializeField]
