@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CZToolKit.Core.Blackboards
@@ -8,6 +9,7 @@ namespace CZToolKit.Core.Blackboards
     {
         /// <summary> Name与GUID映射表 </summary>
         [SerializeField]
+        [HideInInspector]
         protected Dictionary<string, string> guidMap = new Dictionary<string, string>();
 
         #region GetData
@@ -15,7 +17,7 @@ namespace CZToolKit.Core.Blackboards
         {
             if (guidMap.TryGetValue(_name, out string guid))
             {
-                if (TrygetDataFromGUID(guid, out _data, _fallback))
+                if (TryGetDataFromGUID(guid, out _data, _fallback))
                     return true;
             }
 
@@ -23,13 +25,29 @@ namespace CZToolKit.Core.Blackboards
             return false;
         }
 
-        public bool TrygetDataFromGUID<T>(string _guid, out T _data, T _fallback = default)
+        public override bool TryGetParam(string _name, out IBlackboardProperty _param)
         {
-            if (data.TryGetValue(_guid, out IBlackboardProperty property))
+            if (guidMap.TryGetValue(_name, out string guid))
+            {
+                if (blackboard.TryGetValue(guid, out _param))
+                    return true;
+            }
+            _param = null;
+            return false;
+        }
+
+        public bool TryGetParamFromGUID(string _guid, out IBlackboardProperty _param)
+        {
+            return blackboard.TryGetValue(_guid, out _param);
+        }
+
+        public bool TryGetDataFromGUID<T>(string _guid, out T _data, T _fallback = default)
+        {
+            if (blackboard.TryGetValue(_guid, out IBlackboardProperty property))
             {
                 if (property is BlackboardPropertyGUID<T> tProperty)
                 {
-                    _data = tProperty.Value;
+                    _data = tProperty.TValue;
                     return true;
                 }
             }
@@ -49,7 +67,7 @@ namespace CZToolKit.Core.Blackboards
 
         public bool ContainsGUID(string _guid)
         {
-            return data.ContainsKey(_guid);
+            return blackboard.ContainsKey(_guid);
         }
 
         public override bool Contains<T>(string _name)
@@ -61,7 +79,7 @@ namespace CZToolKit.Core.Blackboards
 
         public bool ContainsGUID<T>(string _guid)
         {
-            if (data.TryGetValue(_guid, out IBlackboardProperty property))
+            if (blackboard.TryGetValue(_guid, out IBlackboardProperty property))
             {
                 if (property is BlackboardPropertyGUID<T> tProperty)
                     return true;
@@ -74,36 +92,44 @@ namespace CZToolKit.Core.Blackboards
         public override void SetData<T>(string _name, T _data)
         {
             if (guidMap.TryGetValue(_name, out string guid))
-            {
-                SetDataFromGUID(guid, _data);
-            }
+                SetDataFromGUID(_name, guid, _data);
             else
             {
                 BlackboardPropertyGUID<T> tProperty = new BlackboardPropertyGUID<T>();
-                tProperty.Value = _data;
-                SetData(tProperty);
-                guidMap[_name] = tProperty.GUID;
+                tProperty.TValue = _data;
+                tProperty.Name = _name;
+                SetData(_name, tProperty.GUID, tProperty);
             }
         }
 
-        private void SetDataFromGUID<T>(string _guid, T _data)
+        private void SetDataFromGUID<T>(string _name, string _guid, T _data)
         {
-            if (data.TryGetValue(_guid, out IBlackboardProperty property))
+            if (blackboard.TryGetValue(_guid, out IBlackboardProperty property))
             {
                 if (property is BlackboardPropertyGUID<T> tProperty)
-                    tProperty.Value = _data;
+                    tProperty.TValue = _data;
             }
             else
             {
                 BlackboardPropertyGUID<T> tProperty = new BlackboardPropertyGUID<T>();
-                tProperty.Value = _data;
-                SetData(tProperty);
+                tProperty.TValue = _data;
+                SetData(_name, _guid, tProperty);
             }
         }
 
-        private void SetData<T>(BlackboardPropertyGUID<T> _tProperty)
+        private void SetData(string _name, string _guid, IBlackboardProperty _tProperty)
         {
-            data[_tProperty.GUID] = _tProperty;
+            guidMap[_name] = _guid;
+            blackboard[_guid] = _tProperty;
+        }
+
+        public bool AddProperty(IBlackboardPropertyGUID _property)
+        {
+            if (guidMap.TryGetValue(_property.Name, out string guid) && guid == _property.GUID && blackboard.ContainsKey(_property.GUID))
+                return false;
+            guidMap[_property.Name] = _property.GUID;
+            blackboard[_property.GUID] = _property;
+            return true;
         }
         #endregion
 
@@ -114,11 +140,13 @@ namespace CZToolKit.Core.Blackboards
 
         public override bool Rename(string _oldName, string _newName)
         {
-            if (!guidMap.ContainsKey(_oldName)) { Debug.LogError($"{_oldName}不被包含在黑板数据内"); return false; }
+            if (!guidMap.TryGetValue(_oldName, out string guid)) { Debug.LogWarning($"{_oldName}不被包含在黑板数据内"); return false; }
             if (string.IsNullOrEmpty(_newName)) return false;
-            if (guidMap.ContainsKey(_newName)) { Debug.LogError($"黑板内已存在同名数据{_newName}"); return false; }
+            if (guidMap.ContainsKey(_newName)) { Debug.LogWarning($"黑板内已存在同名数据{_newName}"); return false; }
 
             guidMap[_newName] = guidMap[_oldName];
+            if (blackboard.TryGetValue(guid, out IBlackboardProperty property))
+                property.Name = _newName;
             guidMap.Remove(_oldName);
             return true;
         }
@@ -139,22 +167,31 @@ namespace CZToolKit.Core.Blackboards
         {
             if (string.IsNullOrEmpty(_guid)) return;
 
-            if (data.ContainsKey(_guid))
-                data.Remove(_guid);
+            if (blackboard.ContainsKey(_guid))
+                blackboard.Remove(_guid);
+        }
+
+        public void Clean()
+        {
+            foreach (var item in guidMap.ToArray())
+            {
+                if (!blackboard.ContainsKey(item.Value))
+                    guidMap.Remove(item.Key);
+            }
         }
         #endregion
     }
 
-    public class BlackboardPropertyGUID<T> : BlackboardProperty<T>
+    public interface IBlackboardPropertyGUID : IBlackboardProperty
     {
-        string name;
-        readonly string guid;
+        string GUID { get; }
+    }
 
-        public string Name
-        {
-            get { return name; }
-            set { if (!string.IsNullOrEmpty(value)) name = value; }
-        }
+    [Serializable]
+    public class BlackboardPropertyGUID<T> : BlackboardProperty<T>, IBlackboardPropertyGUID
+    {
+        [SerializeField]
+        readonly string guid;
         public string GUID { get { return guid; } }
 
         public BlackboardPropertyGUID()
