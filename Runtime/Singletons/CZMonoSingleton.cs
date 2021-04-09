@@ -112,5 +112,7 @@ namespace CZToolKit.Core.Singletons
                 m_Instance = null;
             }
         }
+
+        public static bool NotNull { get { return m_Instance != null; } }
     }
 }

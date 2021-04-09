@@ -6,5 +6,9 @@ namespace CZToolKit.Core.RX
 {
     public class MainThreadDispatcher : CZMonoSingleton<MainThreadDispatcher>
     {
+        protected override void OnClean()
+        {
+            StopAllCoroutines();
+        }
     }
 }

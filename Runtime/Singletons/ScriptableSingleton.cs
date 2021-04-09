@@ -16,15 +16,20 @@ namespace CZToolKit.Core.Singletons
             {
                 if (m_Instance == null)
                 {
-                    T[] ts = Resources.LoadAll<T>("");
-                    if (ts.Length > 0)
+                    m_Instance = Resources.Load<T>(typeof(T).Name);
+                    if (m_Instance == null)
                     {
+                        T[] ts = Resources.LoadAll<T>(typeof(T).Name);
+                        if (ts.Length > 0)
+                        {
 #if UNITY_EDITOR
-                        Debug.Log("Created:" + typeof(T).Name);
+                            Debug.Log("Created:" + typeof(T).Name);
 #endif
-                        m_Instance = ts[0];
-                        m_Instance.OnInitialize();
+                            m_Instance = ts[0];
+                        }
                     }
+
+                    m_Instance.OnInitialize();
                 }
                 return m_Instance;
             }
@@ -47,6 +52,7 @@ namespace CZToolKit.Core.Singletons
                 m_Instance = null;
             }
         }
+        public static bool NotNull { get { return m_Instance != null; } }
     }
 }
 

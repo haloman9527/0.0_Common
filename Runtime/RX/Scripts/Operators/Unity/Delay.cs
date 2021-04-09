@@ -27,7 +27,8 @@ namespace CZToolKit.Core.RX
 
         public override void OnDispose()
         {
-            MainThreadDispatcher.Instance.StopCoroutine(coroutine);
+            if (MainThreadDispatcher.NotNull)
+                MainThreadDispatcher.Instance.StopCoroutine(coroutine);
         }
     }
     public class SelfDelay<T> : Operator<T> where T : MonoBehaviour

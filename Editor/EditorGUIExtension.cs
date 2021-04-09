@@ -35,7 +35,7 @@ namespace CZToolKit.Core.Editors
 #if UNITY_2019_1_OR_NEWER
                 return GUI.HorizontalSlider(_rect, _value, _minLimit, _maxLimit, EditorStylesExtension.Transparent, EditorStylesExtension.Transparent, EditorStylesExtension.Transparent);
 #else
-                return GUI.HorizontalSlider(rect, _value, _leftValue, _rightValue, EditorStylesExtension.Transparent, EditorStylesExtension.Transparent);
+                return GUI.HorizontalSlider(_rect, _value, _minLimit, _maxLimit, EditorStylesExtension.Transparent, EditorStylesExtension.Transparent);
 #endif
             return _value;
         }
