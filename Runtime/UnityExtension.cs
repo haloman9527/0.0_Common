@@ -67,6 +67,24 @@ public static class UnityExtension
         return;
     }
 
+    /// <summary> 获取颜色明度 </summary>
+    public static float GetLuminance(this Color _color)
+    {
+        return 0.299f * _color.r + 0.587f * _color.g + 0.114f * _color.b;
+    }
+
+    public static string GetRelativePath(this Transform _transform, Transform _parent)
+    {
+        string path = _transform.name;
+        Transform trans = _transform.parent;
+        while (trans != null && trans != _parent)
+        {
+            path = trans.name + "/" + path;
+            trans = trans.parent;
+        }
+        return path;
+    }
+
     /// <summary> 快速排序 </summary>
     //public static IEnumerable<T> Sort<T>(this IEnumerable<T> _original, Func<T, T, bool> _func)
     //{
