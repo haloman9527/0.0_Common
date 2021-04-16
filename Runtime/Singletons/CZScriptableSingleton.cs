@@ -3,7 +3,7 @@
 namespace CZToolKit.Core.Singletons
 {
 #if ODIN_INSPECTOR
-    public abstract class ScriptableSingleton<T> : Sirenix.OdinInspector.SerializedScriptableObject where T : ScriptableSingleton<T>
+    public abstract class CZScriptableSingleton<T> : Sirenix.OdinInspector.SerializedScriptableObject where T : CZScriptableSingleton<T>
 #else
     public abstract class ScriptableSingleton<T> : ScriptableObject where T : ScriptableSingleton<T>
 #endif
@@ -35,14 +35,9 @@ namespace CZToolKit.Core.Singletons
             }
         }
 
-        public static T Initialize()
-        {
-            return Instance;
-        }
+        public static bool IsNull { get { return m_Instance == null; } }
 
-        protected virtual void OnInitialize() { }
-
-        protected virtual void OnClean() { }
+        public static T Initialize() { return Instance; }
 
         public static void Clean()
         {
@@ -52,7 +47,11 @@ namespace CZToolKit.Core.Singletons
                 m_Instance = null;
             }
         }
-        public static bool NotNull { get { return m_Instance != null; } }
+
+        protected virtual void OnInitialize() { }
+
+        protected virtual void OnClean() { }
+
     }
 }
 

@@ -18,19 +18,13 @@ namespace CZToolKit.Core.Singletons
 {
     public class CZNormalSingleton<T> where T : CZNormalSingleton<T>, new()
     {
-        /// <summary>
-        /// 线程锁
-        /// </summary>
+        /// <summary> 线程锁 </summary>
         private static readonly object m_Lock = new object();
 
-        /// <summary>
-        /// 单例对象
-        /// </summary>
+        /// <summary> 单例对象 </summary>
         private static T m_Instance;
 
-        /// <summary>
-        /// 单例对象属性
-        /// </summary>
+        /// <summary> 单例对象属性 </summary>
         public static T Instance
         {
             get
@@ -47,20 +41,7 @@ namespace CZToolKit.Core.Singletons
             }
         }
 
-        public CZNormalSingleton()
-        {
-            m_Instance = this as T;
-            m_Instance.OnInitialize();
-        }
-
-        public static T Initialize()
-        {
-            return Instance;
-        }
-
-        protected virtual void OnInitialize() { }
-
-        protected virtual void OnClean() { }
+        public static T Initialize() { return Instance; }
 
         public static void Clean()
         {
@@ -71,6 +52,16 @@ namespace CZToolKit.Core.Singletons
             }
         }
 
-        public static bool NotNull { get { return m_Instance != null; } }
+        public static bool IsNull { get { return m_Instance == null; } }
+
+        public CZNormalSingleton()
+        {
+            m_Instance = this as T;
+            m_Instance.OnInitialize();
+        }
+
+        protected virtual void OnInitialize() { }
+
+        protected virtual void OnClean() { }
     }
 }

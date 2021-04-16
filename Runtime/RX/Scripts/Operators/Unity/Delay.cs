@@ -27,7 +27,7 @@ namespace CZToolKit.Core.RX
 
         public override void OnDispose()
         {
-            if (MainThreadDispatcher.NotNull)
+            if (!MainThreadDispatcher.IsNull)
                 MainThreadDispatcher.Instance.StopCoroutine(coroutine);
         }
     }

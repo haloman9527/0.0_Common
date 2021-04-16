@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -6,20 +7,25 @@ using Sirenix.OdinInspector;
 
 namespace CZToolKit.Core.Blackboards
 {
-    [Serializable]
 #if ODIN_INSPECTOR
     [HideLabel]
     [HideReferenceObjectPicker]
 #endif
+    public interface ICZType
+    {
+        Type PropertyType { get; }
+
+    }
+
+    [Serializable]
     public class CZType<T> : ICZType
     {
-#if UNITY_EDITOR
-        [UnityEngine.SerializeField]
-#endif
 #if ODIN_INSPECTOR
         [HideLabel]
         [HideReferenceObjectPicker]
+        [SuffixLabel("@PropertyType.Name")]
 #endif
+        [SerializeField]
         protected T value;
         public Type PropertyType => typeof(T);
         public T Value { get { return value; } set { this.value = value; } }

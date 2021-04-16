@@ -23,22 +23,17 @@ namespace CZToolKit.Core.Singletons
     public class CZMonoSingleton<T> : MonoBehaviour where T : CZMonoSingleton<T>
 #endif
     {
-        /// <summary>
-        /// 线程锁
-        /// </summary>
+        /// <summary> 线程锁 </summary>
         private static readonly object m_Lock = new object();
 
         public static GameObject mgrParent;
 
-        /// <summary>
-        /// 单例对象
-        /// </summary>
+        /// <summary> 单例对象 </summary>
         private static T m_Instance;
 
         public virtual bool DontDestoryOnLoad { get { return true; } }
-        /// <summary>
-        /// 单例对象属性
-        /// </summary>
+
+        /// <summary> 单例对象属性 </summary>
         public static T Instance
         {
             get
@@ -73,6 +68,8 @@ namespace CZToolKit.Core.Singletons
             }
         }
 
+        public static bool IsNull { get { return m_Instance == null; } }
+
         protected virtual void Awake()
         {
             m_Instance = this as T;
@@ -99,10 +96,6 @@ namespace CZToolKit.Core.Singletons
             return Instance;
         }
 
-        protected virtual void OnInitialize() { }
-
-        protected virtual void OnClean() { }
-
         public static void Clean()
         {
             if (m_Instance != null)
@@ -113,6 +106,8 @@ namespace CZToolKit.Core.Singletons
             }
         }
 
-        public static bool NotNull { get { return m_Instance != null; } }
+        protected virtual void OnInitialize() { }
+
+        protected virtual void OnClean() { }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using CZToolKit.Core.Blackboards;
 using System.Collections.Generic;
-using ICZType = CZToolKit.Core.Blackboards.ICZType;
-
-#if UNITY_EDITOR
 using UnityEngine;
-#endif
+
+using ICZType = CZToolKit.Core.Blackboards.ICZType;
 
 public static class CZBlackboardExtension
 {
@@ -46,12 +44,15 @@ public static class CZBlackboardExtension
         }
     }
 
-    public static void RemoveData<C>(this Dictionary<string, ICZType> _self, string _name) where C : ICZType
+    public static void RemoveData<T>(this Dictionary<string, ICZType> _self, string _name) where T : ICZType
     {
         if (string.IsNullOrEmpty(_name)) return;
 
-        if (_self.ContainsKey(_name))
-            _self.Remove(_name);
+        if (_self.TryGetValue(_name, out ICZType property))
+        {
+            if (property is CZType<T> tProperty)
+                _self.Remove(_name);
+        }
     }
 
     public static bool Rename(this Dictionary<string, ICZType> _self, string _oldName, string _newName)
