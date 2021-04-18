@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using CZToolKit.Core;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public static class UnityExtension
@@ -85,52 +84,29 @@ public static class UnityExtension
         return path;
     }
 
-    /// <summary> 快速排序 </summary>
-    //public static IEnumerable<T> Sort<T>(this IEnumerable<T> _original, Func<T, T, bool> _func)
-    //{
-    //    int count = _original.Count();
-    //    if (count == 1)
-    //        yield return _original.ElementAt(0);
-
-    //    // 抽取一个数据作为中间值
-    //    int index = UnityEngine.Random.Range(0, count);
-    //    T rN = _original.ElementAt(index);
-
-    //    // 声明小于中间值的列表
-    //    List<T> left = new List<T>(Mathf.Max(4, count / 2));
-    //    // 声明大于中间值的列表
-    //    List<T> right = new List<T>(Mathf.Max(4, count / 2));
-
-    //    int i = 0;
-    //    foreach (var item in _original)
-    //    {
-    //        if (i == index) continue;
-    //        if (_func(item, rN))
-    //            left.Add(item);
-    //        else
-    //            right.Add(item);
-    //        i++;
-    //    }
-
-    //    // 如果左列表元素个数不为0，就把左列表也排序
-    //    if (left.Count != 0)
-    //    {
-    //        foreach (var item in left.Sort(_func))
-    //        {
-    //            Debug.Log(item);
-    //            yield return item;
-    //        }
-    //    }
-
-    //    yield return rN;
-
-    //    // 如果右列表元素个数不为0，就把右列表也排序
-    //    if (right.Count != 0)
-    //    {
-    //        foreach (var item in right.Sort(_func))
-    //        {
-    //            yield return item;
-    //        }
-    //    }
-    //}
+    public static Rect GetSide(this Rect _rect, UIDirections _sideDirection, float _side, float _offset = 0)
+    {
+        switch (_sideDirection)
+        {
+            case UIDirections.MiddleCenter:
+                return new Rect(_rect.x + _side / 2, _rect.y + _side / 2, _rect.width - _side, _rect.height - _side);
+            case UIDirections.Top:
+                return new Rect(_rect.x + _side / 2, _rect.y - _side / 2 + _offset, _rect.width - _side, _side);
+            case UIDirections.Bottom:
+                return new Rect(_rect.x + _side / 2, _rect.y + _rect.height - _side / 2 + _offset, _rect.width - _side, _side);
+            case UIDirections.Left:
+                return new Rect(_rect.x - _side / 2 + _offset, _rect.y + _side / 2, _side, _rect.height - _side);
+            case UIDirections.Right:
+                return new Rect(_rect.x + _rect.width - _side / 2 + _offset, _rect.y + _side / 2, _side, _rect.height - _side);
+            case UIDirections.TopLeft:
+                return new Rect(_rect.x - _side / 2 + _offset, _rect.y - _side / 2 + _offset, _side, _side);
+            case UIDirections.TopRight:
+                return new Rect(_rect.x + _rect.width - _side / 2 + _offset, _rect.y - _side / 2 + _offset, _side, _side);
+            case UIDirections.BottomLeft:
+                return new Rect(_rect.x - _side / 2 + _offset, _rect.y + _rect.height - _side / 2 + _offset, _side, _side);
+            case UIDirections.BottomRight:
+                return new Rect(_rect.x + _rect.width - _side / 2 + _offset, _rect.y + _rect.height - _side / 2 + _offset, _side, _side);
+        }
+        return new Rect();
+    }
 }

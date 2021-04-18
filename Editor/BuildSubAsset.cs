@@ -5,10 +5,11 @@ using UnityEditorInternal;
 using System.Linq;
 using Object = UnityEngine.Object;
 using System;
+using UnityEditor.IMGUI.Controls;
 
 namespace CZToolKit.Core.Editors
 {
-    public class BuildSubAsset : EditorWindow
+    public class BuildSubAsset : BasicEditorWindow<BuildSubAsset>
     {
         [MenuItem("Tools/CZToolKit/Build SubAsset")]
         public static void Open()
@@ -28,13 +29,15 @@ namespace CZToolKit.Core.Editors
 
         SerializedObject serializedObject;
         ReorderableList reorderableList;
+
         private void OnEnable()
         {
             titleContent = new GUIContent("Build SubAsset");
-            this.minSize = new Vector2(200, 300);
+            minSize = new Vector2(200, 300);
 
             serializedObject = new SerializedObject(this);
-            reorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("childrens"), true, true, true, true);
+            reorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("childrens"), false, true, false, false);
+            reorderableList.footerHeight = 5;
             reorderableList.drawElementCallback += DrawElement;
             reorderableList.drawHeaderCallback += DrawHeader;
 
@@ -67,19 +70,26 @@ namespace CZToolKit.Core.Editors
             GUILayout.BeginHorizontal();
             Rect r = rect;
 
+            // 绘制名称
             r.width = 100;
             ObjectInfo objectInfo = childrens[index];
             objectInfo.name = EditorGUI.TextField(r, "", objectInfo.name);
 
-            r.x = 125;
-            r.width = rect.width - 100;
-            Object tempParent = EditorGUI.ObjectField(r, objectInfo.children, typeof(Object), false);
-            if (objectInfo.children != tempParent)
+            // 绘制资源
+            r.x += 105;
+            r.width = rect.width - 130;
+            Object tempObj = EditorGUI.ObjectField(r, objectInfo.children, typeof(Object), false);
+            if (parent != tempObj && objectInfo.children != tempObj)
             {
-                objectInfo.children = tempParent;
+                objectInfo.children = tempObj;
                 if (objectInfo.children != null)
                     objectInfo.name = objectInfo.children.name;
             }
+
+            r.x += r.width + 5;
+            r.width = 25;
+            if (GUI.Button(r, EditorGUIUtility.IconContent("winbtn_mac_close_h")))
+                childrens.RemoveAt(index); Repaint();
 
             GUILayout.EndHorizontal();
         }
@@ -89,34 +99,66 @@ namespace CZToolKit.Core.Editors
             EditorGUILayout.HelpBox("构建SubAsset", MessageType.Warning, true);
 
             EditorGUI.BeginChangeCheck();
-
             GUILayout.BeginHorizontal();
+            // 绘制父级资源
             Object tempParent = EditorGUILayout.ObjectField(parent, typeof(Object), false);
-            if (parent != tempParent)
-            {
-                parent = tempParent;
-                LoadAsset(parent);
-            }
-            if (GUILayout.Button(EditorGUIUtility.IconContent("Refresh"), GUILayout.Width(30)))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Refresh"), GUILayout.Width(25)))
                 LoadAsset(parent);
             GUILayout.EndHorizontal();
 
+            // 绘制一个拖拽区域，接受拖进来的资源
+            Rect dragDropArea = GUILayoutUtility.GetRect(position.width, 40);
+            dragDropArea.x += 3;
+            dragDropArea.width -= 6;
+            GUI.Box(dragDropArea, "拖拽资源到此区域", (GUIStyle)"GroupBox");
+            Object t = EditorGUIExtension.DragDropAreaSingle(dragDropArea);
+            if (t != null)
+                tempParent = t;
 
+            // 不接受子级资源
+            if (tempParent == null || AssetDatabase.IsMainAsset(tempParent))
+            {
+                if (parent != tempParent)
+                {
+                    parent = tempParent;
+                    LoadAsset(parent);
+                }
+            }
+
+            // 绘制所有子级资源
             GUILayout.Space(15);
             reorderableList.DoLayoutList();
 
+
+            // 绘制一个拖拽区域，接受拖进来的资源
+            Rect dragDropAreaM = GUILayoutUtility.GetRect(position.width, 40);
+            dragDropAreaM.x += 3;
+            dragDropAreaM.width -= 6;
+            GUI.Box(dragDropAreaM, "批量添加子级", (GUIStyle)"GroupBox");
+            Object[] objs = EditorGUIExtension.DragDropAreaMulti(dragDropAreaM);
+            if (objs != null)
+            {
+                foreach (var obj in objs)
+                {
+                    if (obj == parent) continue;
+
+                    childrens.Add(new ObjectInfo() { name = obj.name, children = obj });
+                }
+            }
+
+
             GUILayout.FlexibleSpace();
+            // 点击按钮开始构建
             if (GUILayout.Button("Build", GUILayout.Height(50)) && parent != null)
             {
                 List<Object> rawChildrens = AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetDatabase.GetAssetPath(parent)).ToList();
 
+                // 添加列表中新增加的资源到子级
                 foreach (var child in childrens)
                 {
                     if (rawChildrens.Contains(child.children))
                     {
                         child.children.name = child.name;
-                        AssetDatabase.RemoveObjectFromAsset(child.children);
-                        AssetDatabase.AddObjectToAsset(child.children, parent);
                         continue;
                     }
 
@@ -125,6 +167,7 @@ namespace CZToolKit.Core.Editors
                     AssetDatabase.AddObjectToAsset(obj, parent);
                 }
 
+                // 把列表中删除的资源从子级移除
                 foreach (var child in rawChildrens)
                 {
                     if (childrens.Find(c => c.children == child) != null) continue;
@@ -132,9 +175,9 @@ namespace CZToolKit.Core.Editors
                     AssetDatabase.RemoveObjectFromAsset(child);
                 }
 
+                // 保存
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-
+                // 重载
                 LoadAsset(parent);
             }
 
