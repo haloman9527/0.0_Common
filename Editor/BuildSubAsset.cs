@@ -9,7 +9,7 @@ using UnityEditor.IMGUI.Controls;
 
 namespace CZToolKit.Core.Editors
 {
-    public class BuildSubAsset : BasicEditorWindow<BuildSubAsset>
+    public class BuildSubAsset : BasicEditorWindow
     {
         [MenuItem("Tools/CZToolKit/Build SubAsset")]
         public static void Open()
@@ -102,8 +102,10 @@ namespace CZToolKit.Core.Editors
             GUILayout.BeginHorizontal();
             // 绘制父级资源
             Object tempParent = EditorGUILayout.ObjectField(parent, typeof(Object), false);
-            if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Refresh"), GUILayout.Width(25)))
+            if (GUILayout.Button(EditorGUIUtility.FindTexture("Refresh"), GUILayout.Width(25)))
                 LoadAsset(parent);
+            if (GUILayout.Button(EditorGUIUtility.FindTexture("winbtn_mac_close_h"), GUILayout.Width(25)))
+                tempParent = null;
             GUILayout.EndHorizontal();
 
             // 绘制一个拖拽区域，接受拖进来的资源
@@ -145,7 +147,6 @@ namespace CZToolKit.Core.Editors
                     childrens.Add(new ObjectInfo() { name = obj.name, children = obj });
                 }
             }
-
 
             GUILayout.FlexibleSpace();
             // 点击按钮开始构建

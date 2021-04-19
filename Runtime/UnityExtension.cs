@@ -84,27 +84,27 @@ public static class UnityExtension
         return path;
     }
 
-    public static Rect GetSide(this Rect _rect, UIDirections _sideDirection, float _side, float _offset = 0)
+    public static Rect GetSide(this Rect _rect, UIDirection _sideDirection, float _side, float _offset = 0)
     {
         switch (_sideDirection)
         {
-            case UIDirections.MiddleCenter:
+            case UIDirection.MiddleCenter:
                 return new Rect(_rect.x + _side / 2, _rect.y + _side / 2, _rect.width - _side, _rect.height - _side);
-            case UIDirections.Top:
+            case UIDirection.Top:
                 return new Rect(_rect.x + _side / 2, _rect.y - _side / 2 + _offset, _rect.width - _side, _side);
-            case UIDirections.Bottom:
+            case UIDirection.Bottom:
                 return new Rect(_rect.x + _side / 2, _rect.y + _rect.height - _side / 2 + _offset, _rect.width - _side, _side);
-            case UIDirections.Left:
+            case UIDirection.Left:
                 return new Rect(_rect.x - _side / 2 + _offset, _rect.y + _side / 2, _side, _rect.height - _side);
-            case UIDirections.Right:
+            case UIDirection.Right:
                 return new Rect(_rect.x + _rect.width - _side / 2 + _offset, _rect.y + _side / 2, _side, _rect.height - _side);
-            case UIDirections.TopLeft:
+            case UIDirection.TopLeft:
                 return new Rect(_rect.x - _side / 2 + _offset, _rect.y - _side / 2 + _offset, _side, _side);
-            case UIDirections.TopRight:
+            case UIDirection.TopRight:
                 return new Rect(_rect.x + _rect.width - _side / 2 + _offset, _rect.y - _side / 2 + _offset, _side, _side);
-            case UIDirections.BottomLeft:
+            case UIDirection.BottomLeft:
                 return new Rect(_rect.x - _side / 2 + _offset, _rect.y + _rect.height - _side / 2 + _offset, _side, _side);
-            case UIDirections.BottomRight:
+            case UIDirection.BottomRight:
                 return new Rect(_rect.x + _rect.width - _side / 2 + _offset, _rect.y + _rect.height - _side / 2 + _offset, _side, _side);
         }
         return new Rect();

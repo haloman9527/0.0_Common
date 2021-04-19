@@ -1,7 +1,7 @@
 ﻿
 namespace CZToolKit.Core
 {
-    public enum UIDirections
+    public enum UIDirection
     {
         None = 0,
         Left = 1,

@@ -62,6 +62,7 @@ namespace CZToolKit.Core.Editors
         public override void OnInspectorGUI()
         {
             EditorGUI.BeginChangeCheck();
+
             SerializedProperty iterator = serializedObject.GetIterator();
             iterator.NextVisible(true);
             do

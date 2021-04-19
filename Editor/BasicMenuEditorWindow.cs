@@ -6,35 +6,28 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
-    [System.Serializable]
-    public class BasicMenuEditorWindow : BasicEditorWindow<BasicMenuEditorWindow>
+    [Serializable]
+    public abstract class BasicMenuEditorWindow : BasicEditorWindow
     {
-        [MenuItem("Tools/1")]
-        public static void Open()
-        {
-            GetWindow<BasicMenuEditorWindow>();
-        }
-
         [SerializeField]
-        ResizableArea resizableArea;
+        ResizableArea resizableArea = new ResizableArea();
+        protected Rect resizableAreaRect = new Rect(0, 0, 150, 150);
+
         string searchText;
         SearchField searchField;
         CZMenuTreeView menuTreeView;
-        TreeViewState treeViewState;
+        TreeViewState treeViewState = new TreeViewState();
 
-        void OnEnable()
+        protected virtual float LeftMinWidth { get { return 50; } }
+        protected virtual float RightMinWidth { get { return 500; } }
+
+        protected virtual void OnEnable()
         {
-            if (resizableArea == null)
-            {
-                resizableArea = new ResizableArea(new Rect(0, 0, 150, position.height));
-                resizableArea.minSize = new Vector2(50, 50);
-                resizableArea.side = 10;
-                resizableArea.EnableSide(UIDirections.Right);
-            }
-            resizableArea.SideOffset[UIDirections.Right] = resizableArea.side / 2;
-
-            if (treeViewState == null)
-                treeViewState = new TreeViewState();
+            resizableArea = new ResizableArea();
+            resizableArea.minSize = new Vector2(LeftMinWidth, 50);
+            resizableArea.side = 10;
+            resizableArea.EnableSide(UIDirection.Right);
+            resizableArea.SideOffset[UIDirection.Right] = resizableArea.side / 2;
 
             searchField = new SearchField();
             menuTreeView = BuildMenuTree(treeViewState);
@@ -44,16 +37,15 @@ namespace CZToolKit.Core.Editors
         void OnGUI()
         {
             resizableArea.maxSize = position.size;
-            Rect r = resizableArea.Position;
-            r.height = position.height;
-            resizableArea.Position = r;
-            resizableArea.OnGUI();
 
-            Rect searchFieldRect = resizableArea.Position;
+            resizableAreaRect.height = position.height;
+            resizableAreaRect = resizableArea.OnGUI(resizableAreaRect);
+
+            Rect searchFieldRect = resizableAreaRect;
             searchFieldRect.height = 20;
             searchFieldRect.y += 3;
             searchFieldRect.x += 5;
-            searchFieldRect.width -=10;
+            searchFieldRect.width -= 10;
             string tempSearchText = searchField.OnGUI(searchFieldRect, searchText);
             if (tempSearchText != searchText)
             {
@@ -61,97 +53,64 @@ namespace CZToolKit.Core.Editors
                 menuTreeView.searchString = searchText;
             }
 
-            Rect r2 = resizableArea.Position;
-            r2.y += 20;
-            r2.height -= 20;
-            menuTreeView.OnGUI(r2);
+            Rect treeviewRect = resizableAreaRect;
+            treeviewRect.y += 20;
+            treeviewRect.height -= 20;
+            menuTreeView.OnGUI(treeviewRect);
 
-            Rect sideRect = resizableArea.Position;
+            Rect sideRect = resizableAreaRect;
             sideRect.x += sideRect.width;
             sideRect.width = 1;
             EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
 
-            Rect rightRect = new Rect(resizableArea.Position.width + 2, 0, position.width - resizableArea.Position.width - 4, position.height);
-            rightRect.width = Mathf.Max(rightRect.width, 500);
+            Rect rightRect = new Rect(resizableAreaRect.width + 2, 0, position.width - resizableAreaRect.width - 4, position.height);
+            rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
             GUILayout.BeginArea(rightRect);
-            OnRightGUI();
+            IList<int> selection = menuTreeView.GetSelection();
+            if (selection.Count > 0)
+                OnRightGUI(rightRect, menuTreeView.Find(selection[0]));
             GUILayout.EndArea();
         }
 
-        protected virtual CZMenuTreeView BuildMenuTree(TreeViewState _treeViewState)
+        protected abstract CZMenuTreeView BuildMenuTree(TreeViewState _treeViewState);
+
+        protected virtual void OnRightGUI(Rect _rect, CZMenuTreeViewItem _selectedItem)
         {
-            CZMenuTreeView menuTreeView = new CZMenuTreeView(_treeViewState);
-
-            menuTreeView.AddMenuItem("1", EditorGUIUtility.FindTexture("GameManager Icon"));
-            menuTreeView.AddMenuItem("1/2", EditorGUIUtility.FindTexture("BuildSettings.Xbox360"));
-            menuTreeView.AddMenuItem("1/2/3").itemDrawer += rect =>
-            {
-                rect.x += rect.width - 50;
-                rect.width = 50;
-                GUI.Button(rect, "哈哈哈");
-            };
-            menuTreeView.AddMenuItem("1/2/3/4").itemDrawer += rect =>
-            {
-                rect.x += rect.width - 50;
-                rect.width = 50;
-                GUI.Button(rect, "哈哈哈");
-            };
-            menuTreeView.AddMenuItem("1/2/3/4/5");
-            menuTreeView.AddMenuItem("1/2/3/4/5/6");
-            menuTreeView.AddMenuItem("1/2/3/4/5/6/7");
-
-            menuTreeView.AddMenuItem("2");
-            menuTreeView.AddMenuItem("2/2");
-
-            return menuTreeView;
-        }
-
-        protected virtual void OnRightGUI()
-        {
-
+            _selectedItem.rightDrawer?.Invoke(_rect);
         }
     }
 
     public class CZMenuTreeView : TreeView
     {
-        List<CZMenuTreeViewItem> treeViewItems = new List<CZMenuTreeViewItem>();
+        public static GUIStyle labelStyle;
+        public static GUIStyle LabelStype
+        {
+            get
+            {
+                if (labelStyle == null)
+                {
+                    labelStyle = new GUIStyle(GUI.skin.label);
+                    labelStyle.alignment = TextAnchor.MiddleLeft;
+                }
+                return labelStyle;
+            }
+        }
+
+        List<TreeViewItem> items = new List<TreeViewItem>();
+        Dictionary<int, CZMenuTreeViewItem> treeViewItemMap = new Dictionary<int, CZMenuTreeViewItem>();
 
         public CZMenuTreeView(TreeViewState state) : base(state)
         {
             rowHeight = 30;
+#if !UNITY_2019_1_OR_NEWER
+            customFoldoutYOffset = rowHeight / 2 - 8;
+#endif
         }
 
         protected override TreeViewItem BuildRoot()
         {
             TreeViewItem root = new TreeViewItem(-1, -1, "Root");
-            root.children = new List<TreeViewItem>();
-
-            int id = 0;
-            foreach (var item in treeViewItems)
-            {
-                string[] path = item.Path.Split('/');
-                TreeViewItem currentLayer = root;
-                if (path.Length > 1)
-                {
-                    for (int i = 0; i < path.Length - 1; i++)
-                    {
-                        TreeViewItem child = currentLayer.children.Find(l => l.displayName == path[i]);
-                        if (child == null)
-                        {
-                            child = new CZMenuTreeViewItem(id, i, path[i]);
-                            child.children = new List<TreeViewItem>();
-                            id++;
-                            currentLayer.AddChild(child);
-                        }
-                        currentLayer = child;
-                    }
-                }
-                item.depth = path.Length;
-                item.id = id;
-                id++;
-                item.displayName = path[path.Length - 1];
-                currentLayer.AddChild(item);
-            }
+            root.children = items;
 
             SetupDepthsFromParentsAndChildren(root);
             return root;
@@ -162,12 +121,53 @@ namespace CZToolKit.Core.Editors
             return AddMenuItem(_path, null);
         }
 
+        int itemCount = 0;
         public CZMenuTreeViewItem AddMenuItem(string _path, Texture2D _icon)
         {
             if (string.IsNullOrEmpty(_path)) return null;
-            CZMenuTreeViewItem item = new CZMenuTreeViewItem(_path);
+            List<TreeViewItem> current = items;
+            string[] path = _path.Split('/');
+            if (path.Length > 1)
+            {
+                for (int i = 0; i < path.Length - 1; i++)
+                {
+                    CZMenuTreeViewItem currentParent = current.Find(t => t.displayName == path[i]) as CZMenuTreeViewItem;
+                    if (currentParent == null)
+                    {
+                        currentParent = new CZMenuTreeViewItem();
+                        currentParent.children = new List<TreeViewItem>();
+                        currentParent.displayName = path[i];
+                        currentParent.id = itemCount;
+                        current.Add(currentParent);
+                        treeViewItemMap[itemCount] = currentParent;
+                        itemCount++;
+                    }
+                    current = currentParent.children;
+                }
+            }
+
+            CZMenuTreeViewItem item = new CZMenuTreeViewItem();
+            item.id = itemCount;
+            item.displayName = path[path.Length - 1];
+            item.children = new List<TreeViewItem>();
             item.icon = _icon;
-            treeViewItems.Add(item);
+            current.Add(item);
+            treeViewItemMap[itemCount] = item;
+            itemCount++;
+            return item;
+        }
+
+        public string GetParentPath(string _path)
+        {
+            int index = _path.LastIndexOf('/');
+            if (index == -1) return null;
+            return _path.Substring(0, index);
+        }
+
+        public CZMenuTreeViewItem Find(int id)
+        {
+            CZMenuTreeViewItem item = null;
+            treeViewItemMap.TryGetValue(id, out item);
             return item;
         }
 
@@ -195,27 +195,20 @@ namespace CZToolKit.Core.Editors
             CZMenuTreeViewItem item = args.item as CZMenuTreeViewItem;
 
             Rect labelRect = args.rowRect;
-            labelRect.x += item.depth * depthIndentWidth + depthIndentWidth;
-            GUI.Label(labelRect, new GUIContent(item.displayName, item.icon));
+            if (hasSearch)
+                labelRect.x += depthIndentWidth;
+            else
+                labelRect.x += item.depth * depthIndentWidth + depthIndentWidth;
+            GUI.Label(labelRect, new GUIContent(item.displayName, item.icon), LabelStype);
             item.itemDrawer?.Invoke(args.rowRect);
         }
     }
 
     public class CZMenuTreeViewItem : TreeViewItem
     {
-        string path;
         public Action<Rect> itemDrawer;
+        public Action<Rect> rightDrawer;
 
-        public string Path { get { return path; } }
-
-        public CZMenuTreeViewItem(string _path) : base()
-        {
-            path = _path;
-        }
-
-        public CZMenuTreeViewItem(int id, int depth, string displayName) : base(id, depth, displayName)
-        {
-
-        }
+        public CZMenuTreeViewItem() : base() { }
     }
 }

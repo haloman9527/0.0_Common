@@ -10,85 +10,78 @@ namespace CZToolKit.Core.Editors
     {
         public const float DefaultSide = 10;
 
-        Rect position;
         bool isDragging;
 
-        UIDirections[] directions;
-        UIDirections sideDirection;
-        UIDirections enabledSides;
-        Dictionary<UIDirections, Rect> sides;
-        Dictionary<UIDirections, float> sideOffset;
+        UIDirection[] directions;
+        UIDirection sideDirection;
+        UIDirection enabledSides;
+        Dictionary<UIDirection, Rect> sides;
+        Dictionary<UIDirection, float> sideOffset;
 
         public Vector2 minSize = Vector2.zero;
         public Vector2 maxSize = Vector2.zero;
         public float side = DefaultSide;
 
-        Dictionary<UIDirections, Rect> Sides
+        Dictionary<UIDirection, Rect> Sides
         {
             get
             {
                 if (sides == null)
-                {
-                    sides = new Dictionary<UIDirections, Rect>();
-                    Reload();
-                }
+                    sides = new Dictionary<UIDirection, Rect>();
                 return sides;
             }
         }
 
-        public Dictionary<UIDirections, float> SideOffset
+        public Dictionary<UIDirection, float> SideOffset
         {
             get
             {
                 if (sideOffset == null)
-                    sideOffset = new Dictionary<UIDirections, float>();
+                    sideOffset = new Dictionary<UIDirection, float>();
                 return sideOffset;
             }
         }
-        UIDirections[] Directions
+        UIDirection[] Directions
         {
             get
             {
                 if (directions == null)
                 {
-                    Array array = Enum.GetValues(typeof(UIDirections));
-                    directions = new UIDirections[array.Length];
+                    Array array = Enum.GetValues(typeof(UIDirection));
+                    directions = new UIDirection[array.Length];
                     for (int i = 0; i < directions.Length; i++)
                     {
-                        UIDirections direction = (UIDirections)(array.GetValue(i));
+                        UIDirection direction = (UIDirection)(array.GetValue(i));
                         directions[i] = direction;
-                        DisableSide(direction);
                     }
                 }
                 return directions;
             }
         }
-        public Rect Position
+
+        public ResizableArea()
         {
-            get { return position; }
-            set { position = value; }
+            directions = Directions;
         }
 
-        public ResizableArea(Rect _position)
-        {
-            Position = _position;
-            Reload();
-        }
-
-        public void EnableSide(UIDirections _direction)
+        public void EnableSide(UIDirection _direction)
         {
             enabledSides |= _direction;
         }
 
-
-        public void DisableSide(UIDirections _direction)
+        public void DisableSide(UIDirection _direction)
         {
             enabledSides &= ~_direction;
             if (Sides.ContainsKey(_direction))
                 Sides.Remove(_direction);
         }
 
-        void Reload()
+        public bool IsEnabled(UIDirection _direction)
+        {
+            return enabledSides.HasFlag(_direction);
+        }
+
+        void Reload(Rect _rect)
         {
             foreach (var direction in Directions)
             {
@@ -96,46 +89,45 @@ namespace CZToolKit.Core.Editors
                 {
                     float offset = 0;
                     SideOffset.TryGetValue(direction, out offset);
-                    Sides[direction] = Position.GetSide(direction, side, offset);
+                    Sides[direction] = _rect.GetSide(direction, side, offset);
                 }
             }
         }
 
-        public virtual void OnGUI()
+        public virtual Rect OnGUI(Rect _rect)
         {
-            Reload();
+            Reload(_rect);
             Event evt = Event.current;
             switch (evt.type)
             {
                 case EventType.Repaint:
-                    if (enabledSides.HasFlag(UIDirections.Top))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirections.Top], MouseCursor.ResizeVertical);
-                    if (enabledSides.HasFlag(UIDirections.Bottom))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirections.Bottom], MouseCursor.ResizeVertical);
+                    if (IsEnabled(UIDirection.Top))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Top], MouseCursor.ResizeVertical);
+                    if (IsEnabled(UIDirection.Bottom))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Bottom], MouseCursor.ResizeVertical);
 
-                    if (enabledSides.HasFlag(UIDirections.Left))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirections.Left], MouseCursor.ResizeHorizontal);
-                    if (enabledSides.HasFlag(UIDirections.Right))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirections.Right], MouseCursor.ResizeHorizontal);
+                    if (IsEnabled(UIDirection.Left))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Left], MouseCursor.ResizeHorizontal);
+                    if (IsEnabled(UIDirection.Right))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Right], MouseCursor.ResizeHorizontal);
 
-                    if (enabledSides.HasFlag(UIDirections.TopLeft))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirections.TopLeft], MouseCursor.ResizeUpLeft);
-                    if (enabledSides.HasFlag(UIDirections.TopRight))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirections.TopRight], MouseCursor.ResizeUpRight);
+                    if (IsEnabled(UIDirection.TopLeft))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.TopLeft], MouseCursor.ResizeUpLeft);
+                    if (IsEnabled(UIDirection.TopRight))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.TopRight], MouseCursor.ResizeUpRight);
 
-                    if (enabledSides.HasFlag(UIDirections.BottomLeft))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirections.BottomLeft], MouseCursor.ResizeUpRight);
-                    if (enabledSides.HasFlag(UIDirections.BottomRight))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirections.BottomRight], MouseCursor.ResizeUpLeft);
+                    if (IsEnabled(UIDirection.BottomLeft))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.BottomLeft], MouseCursor.ResizeUpRight);
+                    if (IsEnabled(UIDirection.BottomRight))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.BottomRight], MouseCursor.ResizeUpLeft);
 
-                    if (enabledSides.HasFlag(UIDirections.MiddleCenter) && isDragging && sideDirection == UIDirections.MiddleCenter)
-                        EditorGUIUtility.AddCursorRect(Position.GetSide(UIDirections.MiddleCenter, side), MouseCursor.MoveArrow);
+                    if (IsEnabled(UIDirection.MiddleCenter) && isDragging && sideDirection == UIDirection.MiddleCenter)
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.MiddleCenter], MouseCursor.MoveArrow);
                     break;
                 case EventType.MouseDown:
                     foreach (var direction in Directions)
                     {
-                        if (enabledSides.HasFlag(direction)
-                            && Sides[direction].Contains(evt.mousePosition))
+                        if (IsEnabled(direction) && Sides[direction].Contains(evt.mousePosition))
                         {
                             sideDirection = direction;
                             isDragging = true;
@@ -145,131 +137,98 @@ namespace CZToolKit.Core.Editors
                     break;
                 case EventType.MouseUp:
                     isDragging = false;
-                    sideDirection = UIDirections.None;
+                    sideDirection = UIDirection.None;
                     break;
                 case EventType.MouseDrag:
                     if (isDragging)
                     {
                         switch (sideDirection)
                         {
-                            case UIDirections.Top:
-                                if (enabledSides.HasFlag(sideDirection))
+                            case UIDirection.Top:
+                                if (IsEnabled(sideDirection))
                                 {
-                                    float deltaY = evt.delta.y;
-                                    if (Position.y + deltaY > Position.y + Position.height)
-                                        deltaY = 0;
-                                    position.y += deltaY;
-                                    position.height -= deltaY;
+                                    _rect.y += evt.delta.y;
+                                    _rect.height -= evt.delta.y;
                                 }
                                 break;
-                            case UIDirections.Bottom:
-                                if (enabledSides.HasFlag(sideDirection))
+                            case UIDirection.Bottom:
+                                if (IsEnabled(sideDirection))
                                 {
-                                    float deltaY = evt.delta.y;
-                                    if (Position.height + deltaY < minSize.y)
-                                        deltaY = 0;
-                                    position.height += deltaY;
+                                    _rect.height += evt.delta.y;
                                 }
                                 break;
-                            case UIDirections.Left:
-                                if (enabledSides.HasFlag(sideDirection))
+                            case UIDirection.Left:
+                                if (IsEnabled(sideDirection))
                                 {
-                                    float deltaX = evt.delta.x;
-                                    if (position.x + deltaX > position.x + position.width)
-                                        deltaX = 0;
-                                    position.x += deltaX;
-                                    position.width -= deltaX;
+                                    _rect.x += evt.delta.x;
+                                    _rect.width -= evt.delta.x;
                                 }
                                 break;
-                            case UIDirections.Right:
-                                if (enabledSides.HasFlag(sideDirection))
+                            case UIDirection.Right:
+                                if (IsEnabled(sideDirection))
                                 {
-                                    float deltaX = evt.delta.x;
-                                    if (position.width + deltaX < minSize.x)
-                                        deltaX = 0;
-                                    position.width += deltaX;
+                                    _rect.width += evt.delta.x;
                                 }
                                 break;
-                            case UIDirections.TopLeft:
-                                if (enabledSides.HasFlag(sideDirection))
+                            case UIDirection.TopLeft:
+                                if (IsEnabled(sideDirection))
                                 {
-                                    float deltaY = evt.delta.y;
-                                    if (Position.y + deltaY > Position.y + Position.height)
-                                        deltaY = 0;
-                                    position.y += deltaY;
-                                    position.height -= deltaY;
+                                    _rect.y += evt.delta.y;
+                                    _rect.height -= evt.delta.y;
 
-                                    float deltaX = evt.delta.x;
-                                    if (position.x + deltaX > position.x + position.width)
-                                        deltaX = 0;
-                                    position.x += deltaX;
-                                    position.width -= deltaX;
+                                    _rect.x += evt.delta.x;
+                                    _rect.width -= evt.delta.x;
                                 }
                                 break;
-                            case UIDirections.TopRight:
-                                if (enabledSides.HasFlag(sideDirection))
+                            case UIDirection.TopRight:
+                                if (IsEnabled(sideDirection))
                                 {
-                                    float deltaY = evt.delta.y;
-                                    if (Position.y + deltaY > Position.y + Position.height)
-                                        deltaY = 0;
-                                    position.y += deltaY;
-                                    position.height -= deltaY;
+                                    _rect.y += evt.delta.y;
+                                    _rect.height -= evt.delta.y;
 
-                                    float deltaX = evt.delta.x;
-                                    if (position.width + deltaX < minSize.x)
-                                        deltaX = 0;
-                                    position.width += deltaX;
+                                    _rect.width += evt.delta.x;
                                 }
                                 break;
-                            case UIDirections.BottomLeft:
-                                if (enabledSides.HasFlag(sideDirection))
+                            case UIDirection.BottomLeft:
+                                if (IsEnabled(sideDirection))
                                 {
-                                    float deltaY = evt.delta.y;
-                                    if (Position.height + deltaY < minSize.y)
-                                        deltaY = 0;
-                                    position.height += deltaY;
+                                    _rect.height += evt.delta.y;
 
-                                    float deltaX = evt.delta.x;
-                                    if (position.x + deltaX > position.x + position.width)
-                                        deltaX = 0;
-                                    position.x += deltaX;
-                                    position.width -= deltaX;
+                                    _rect.x += evt.delta.x;
+                                    _rect.width -= evt.delta.x;
                                 }
                                 break;
-                            case UIDirections.BottomRight:
-                                if (enabledSides.HasFlag(sideDirection))
+                            case UIDirection.BottomRight:
+                                if (IsEnabled(sideDirection))
                                 {
-                                    float deltaY = evt.delta.y;
-                                    if (Position.height + deltaY < minSize.y)
-                                        deltaY = 0;
-                                    position.height += deltaY;
+                                    _rect.height += evt.delta.y;
 
-                                    float deltaX = evt.delta.x;
-                                    if (position.width + deltaX < minSize.x)
-                                        deltaX = 0;
-                                    position.width += deltaX;
+                                    _rect.width += evt.delta.x;
                                 }
                                 break;
-                            case UIDirections.MiddleCenter:
-                                if (enabledSides.HasFlag(sideDirection))
-                                    position.position += evt.delta;
+                            case UIDirection.MiddleCenter:
+                                if (IsEnabled(sideDirection))
+                                    _rect.position += evt.delta;
                                 break;
 
                         }
-
                         evt.Use();
-                        Reload();
                     }
                     break;
                 default:
                     break;
             }
 
+            _rect.width = Mathf.Max(_rect.width, minSize.x);
+            _rect.height = Mathf.Max(_rect.height, minSize.y);
+
             if (maxSize != Vector2.zero)
             {
-                position.width = Mathf.Min(position.width, maxSize.x);
-                position.height = Mathf.Min(position.height, maxSize.y);
+                _rect.width = Mathf.Min(_rect.width, maxSize.x);
+                _rect.height = Mathf.Min(_rect.height, maxSize.y);
             }
+
+            return _rect;
         }
     }
 }

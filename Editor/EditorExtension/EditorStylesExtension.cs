@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace CZToolKit.Core.Editors
@@ -89,6 +90,21 @@ namespace CZToolKit.Core.Editors
             result.SetPixels(pix);
             result.Apply();
             return result;
+        }
+
+        static Dictionary<string, GUISkin> GUISkins = new Dictionary<string, GUISkin>();
+
+        /// <summary> Default:GUI.skin </summary>
+        public static GUISkin GetGUISkin(string _path)
+        {
+            GUISkin guiSkin;
+            if (GUISkins.TryGetValue(_path, out guiSkin)) return guiSkin;
+
+            guiSkin = AssetDatabase.LoadAssetAtPath<GUISkin>(_path);
+            if (guiSkin == null) return GUI.skin;
+
+            GUISkins[_path] = guiSkin;
+            return guiSkin;
         }
     }
 }

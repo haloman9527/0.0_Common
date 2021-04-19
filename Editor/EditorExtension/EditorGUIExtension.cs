@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
-    public class EditorGUIExtension
+    public static class EditorGUIExtension
     {
         /// <summary> 绘制一个ProgressBar </summary>
         public static float ProgressBar(Rect _rect, float _value, float _minLimit, float _maxLimit, string _text, bool _dragable = true, bool _drawMinMax = false)
@@ -31,8 +31,11 @@ namespace CZToolKit.Core.Editors
             return _value;
         }
 
-        static readonly DragAndDropVisualMode DropVisualMode = DragAndDropVisualMode.Copy;
-        static readonly Color DragDropHighlightColor = new Color(0f, 1f, 1f, 0.3f);
+        static readonly DragAndDropVisualMode dropVisualMode = DragAndDropVisualMode.Copy;
+        static readonly Color dragDropHighlightColor = new Color(0f, 1f, 1f, 0.3f);
+
+        public static DragAndDropVisualMode DropVisualMode { get { return dropVisualMode; } }
+        public static Color DragDropHighlightColor { get { return dragDropHighlightColor; } }
 
         /// <summary> 绘制一个可接收拖拽资源的区域 </summary>
         public static Object[] DragDropAreaMulti(Rect _rect)

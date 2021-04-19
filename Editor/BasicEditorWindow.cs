@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
-    public abstract class BasicEditorWindow<T> : EditorWindow where T : BasicEditorWindow<T>, new()
+    public abstract class BasicEditorWindow : EditorWindow
     {
 
         static GUIStyle csIconStyle;
