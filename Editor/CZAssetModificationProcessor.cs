@@ -1,10 +1,10 @@
-﻿using System.IO;
+﻿using System;
 using UnityEditor;
 using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
-    public class CZAssetModProcessor : UnityEditor.AssetModificationProcessor
+    public class CZAssetModificationProcessor : UnityEditor.AssetModificationProcessor
     {
         ///// <summary> 改名Bug补救方案 </summary>
         //static AssetMoveResult OnWillMoveAsset(string sourcePath, string destinationPath)
@@ -23,5 +23,11 @@ namespace CZToolKit.Core.Editors
 
         //    return AssetMoveResult.DidNotMove;
         //}
+
+        public static Action<string> onWillCreateAsset;
+        static void OnWillCreateAsset(string _newFile)
+        {
+            onWillCreateAsset?.Invoke(_newFile);
+        }
     }
 }

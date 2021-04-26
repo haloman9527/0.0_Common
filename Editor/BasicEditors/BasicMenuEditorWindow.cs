@@ -23,7 +23,7 @@ namespace CZToolKit.Core.Editors
 
         protected virtual void OnEnable()
         {
-            resizableArea = new ResizableArea();
+            //resizableArea = new ResizableArea();
             resizableArea.minSize = new Vector2(LeftMinWidth, 50);
             resizableArea.side = 10;
             resizableArea.EnableSide(UIDirection.Right);

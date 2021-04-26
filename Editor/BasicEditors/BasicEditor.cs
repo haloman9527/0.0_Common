@@ -49,6 +49,11 @@ namespace CZToolKit.Core.Editors
             return coroutine;
         }
 
+        public void StopCoroutine(EditorCoroutine _coroutine)
+        {
+            _coroutine.Stop();
+        }
+
         protected void RegisterDrawer(string propertyPath, UnityAction<SerializedProperty> drawer)
         {
             customDrawers[propertyPath] = drawer;

@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using UnityEditor;
 
-namespace CZToolKit.Core
+namespace CZToolKit.Core.Editors
 {
     public class EditorCoroutine
     {
-        private IEnumerator enumerator;
+        IEnumerator enumerator;
 
         public bool IsRunning { get; private set; } = true;
         public double TimeSinceStartup { get; private set; }
@@ -23,5 +23,6 @@ namespace CZToolKit.Core
         }
 
         public void Stop() { IsRunning = false; }
+
     }
 }

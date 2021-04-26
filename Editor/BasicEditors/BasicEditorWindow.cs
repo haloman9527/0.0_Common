@@ -81,5 +81,10 @@ namespace CZToolKit.Core.Editors
             coroutineStack.Push(coroutine);
             return coroutine;
         }
+
+        public void StopCoroutine(EditorCoroutine _coroutine)
+        {
+            _coroutine.Stop();
+        }
     }
 }

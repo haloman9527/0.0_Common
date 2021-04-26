@@ -20,11 +20,11 @@ namespace CZToolKit.Core.Editors
         }
     }
 
-    public class WaitForUntil_E : ICondition
+    public class WaitUntil_E : ICondition
     {
         readonly Func<bool> predicate;
 
-        public WaitForUntil_E(Func<bool> _predicate) { predicate = _predicate; }
+        public WaitUntil_E(Func<bool> _predicate) { predicate = _predicate; }
 
         public bool Result(EditorCoroutine _coroutine)
         {

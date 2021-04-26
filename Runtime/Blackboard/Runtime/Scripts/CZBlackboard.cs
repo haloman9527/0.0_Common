@@ -8,7 +8,7 @@ using Sirenix.OdinInspector;
 
 namespace CZToolKit.Core.Blackboards
 {
-    [CreateAssetMenu(fileName = "Blackboard")]
+    [CreateAssetMenu(menuName = "CZToolKit/New Blackboard", fileName = "New Blackboard")]
 #if ODIN_INSPECTOR
     public class CZBlackboard : SerializedScriptableObject
 #else
@@ -23,7 +23,7 @@ public class CZBlackboard : ScriptableObject
         [SerializeField]
         Dictionary<string, ICZType> blackboard = new Dictionary<string, ICZType>();
 
-        public Dictionary<string,ICZType> Blackboard { get { return blackboard; } }
+        public Dictionary<string, ICZType> Blackboard { get { return blackboard; } }
     }
 
 }
