@@ -23,8 +23,8 @@ public static class UnityExtension
         return Vector3.up * characterController.radius + Vector3.down * characterController.GetRealHeight() / 2 + characterController.center;
     }
 
-    /// <summary> 快速排序 </summary>
-    public static void Sort<T>(this List<T> _original, Func<T, T, bool> _func)
+    /// <summary> 快速排序(第二个参数是中间值) </summary>
+    public static void QuickSort<T>(this List<T> _original, Func<T, T, bool> _func)
     {
         if (_original.Count == 1)
             return;
@@ -53,14 +53,14 @@ public static class UnityExtension
         // 如果左列表元素个数不为0，就把左列表也排序
         if (left.Count != 0)
         {
-            left.Sort(_func);
+            left.QuickSort(_func);
             _original.AddRange(left);
         }
         _original.Add(rN);
         // 如果右列表元素个数不为0，就把右列表也排序
         if (right.Count != 0)
         {
-            right.Sort(_func);
+            right.QuickSort(_func);
             _original.AddRange(right);
         }
         return;

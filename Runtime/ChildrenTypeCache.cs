@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace CZToolKit.Core
 {
@@ -23,24 +24,26 @@ namespace CZToolKit.Core
                 }
                 yield break;
             }
-            childrenTypes = BuildCache(baseType);
-            TypeCache[baseType] = childrenTypes;
+
+            TypeCache[baseType] = childrenTypes = BuildCache(baseType);
             foreach (var type in childrenTypes)
             {
                 yield return type;
             }
         }
 
-        private static IEnumerable<Type> BuildCache(Type baseType)
+        private static IEnumerable<Type> BuildCache(Type _baseType)
         {
-            var selfAssembly = Assembly.GetAssembly(baseType);
+            var selfAssembly = Assembly.GetAssembly(_baseType);
             if (selfAssembly.FullName.StartsWith("Assembly-CSharp") && !selfAssembly.FullName.Contains("-firstpass"))
             {
                 // If is not used as a DLL, check only CSharp (fast)
                 foreach (var type in selfAssembly.GetTypes())
                 {
-                    if (!type.IsAbstract && baseType.IsAssignableFrom(type))
+                    if (!type.IsAbstract && _baseType.IsAssignableFrom(type))
+                    {
                         yield return type;
+                    }
                 }
             }
             else
@@ -55,7 +58,7 @@ namespace CZToolKit.Core
                     if (!assembly.FullName.Contains("Version=0.0.0")) continue;
                     foreach (var type in assembly.GetTypes())
                     {
-                        if (type != null && type.IsAbstract && baseType.IsAssignableFrom(type))
+                        if (type != null && !type.IsAbstract && _baseType.IsAssignableFrom(type))
                             yield return type;
                     }
                 }
