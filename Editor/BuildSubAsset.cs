@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
+using CZToolKit.Core.Blackboards;
 
 namespace CZToolKit.Core.Editors
 {
@@ -70,13 +71,13 @@ namespace CZToolKit.Core.Editors
             Rect r = rect;
 
             // 绘制名称
-            r.width = 100;
+            r.width = rect.width * 0.3f;
             ObjectInfo objectInfo = childrens[index];
             objectInfo.name = EditorGUI.TextField(r, "", objectInfo.name);
 
             // 绘制资源
-            r.x += 105;
-            r.width = rect.width - 130;
+            r.x += r.width + 5;
+            r.width = rect.width * 0.7f - 30;
             Object tempObj = EditorGUI.ObjectField(r, objectInfo.children, typeof(Object), false);
             if (parent != tempObj && objectInfo.children != tempObj)
             {
@@ -93,8 +94,10 @@ namespace CZToolKit.Core.Editors
             GUILayout.EndHorizontal();
         }
 
+        Vector2 scroll;
         private void OnGUI()
         {
+            scroll = GUILayout.BeginScrollView(scroll, false, false);
             EditorGUILayout.HelpBox("构建SubAsset", MessageType.Warning, true);
 
             EditorGUI.BeginChangeCheck();
@@ -130,7 +133,6 @@ namespace CZToolKit.Core.Editors
             GUILayout.Space(15);
             reorderableList.DoLayoutList();
 
-
             // 绘制一个拖拽区域，接受拖进来的资源
             Rect dragDropAreaM = GUILayoutUtility.GetRect(position.width, 40);
             dragDropAreaM.x += 3;
@@ -146,6 +148,7 @@ namespace CZToolKit.Core.Editors
                     childrens.Add(new ObjectInfo() { name = obj.name, children = obj });
                 }
             }
+            GUILayout.EndScrollView();
 
             GUILayout.FlexibleSpace();
             // 点击按钮开始构建

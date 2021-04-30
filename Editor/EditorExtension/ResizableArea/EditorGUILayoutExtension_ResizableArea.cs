@@ -1,9 +1,15 @@
-﻿using UnityEditor;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using UnityEditor;
 using UnityEngine;
+
+using Object = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
-    public static class EditorGUILayoutExtension
+    public static partial class EditorGUILayoutExtension
     {
         /// <summary> 绘制一个可接收拖拽资源的区域 </summary>
         public static Object[] DragDropAreaMulti(params GUILayoutOption[] _options)

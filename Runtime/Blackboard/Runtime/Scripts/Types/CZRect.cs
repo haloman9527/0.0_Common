@@ -7,6 +7,10 @@ namespace CZToolKit.Core.Blackboards
     public class CZRect : CZType<Rect>
     {
         public CZRect() : base()
-        { value = new Rect(); }
+        { Value = new Rect(); }
+
+        public CZRect(Rect _value) : base(_value) { }
+
+        public static implicit operator CZRect(Rect _other) { return new CZRect(_other); }
     }
 }

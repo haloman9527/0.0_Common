@@ -7,6 +7,10 @@ namespace CZToolKit.Core.Blackboards
     public class CZVector2 : CZType<Vector2>
     {
         public CZVector2() : base()
-        { value = Vector2.zero; }
+        { Value = Vector2.zero; }
+
+        public CZVector2(Vector2 _value) : base(_value) { }
+
+        public static implicit operator CZVector2(Vector2 _other) { return new CZVector2(_other); }
     }
 }

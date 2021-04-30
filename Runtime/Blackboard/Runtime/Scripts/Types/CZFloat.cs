@@ -6,6 +6,10 @@ namespace CZToolKit.Core.Blackboards
     public class CZFloat : CZType<float>
     {
         public CZFloat() : base()
-        { value = 0; }
+        { Value = 0; }
+
+        public CZFloat(float _value) : base(_value) { }
+
+        public static implicit operator CZFloat(float _other) { return new CZFloat(_other); }
     }
 }

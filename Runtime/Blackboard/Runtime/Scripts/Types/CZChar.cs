@@ -6,6 +6,10 @@ namespace CZToolKit.Core.Blackboards
     public class CZChar : CZType<char>
     {
         public CZChar() : base()
-        { value = ' '; }
+        { Value = ' '; }
+
+        public CZChar(char _value) : base(_value) { }
+
+        public static implicit operator CZChar(char _other) { return new CZChar(_other); }
     }
 }

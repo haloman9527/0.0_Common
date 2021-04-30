@@ -7,6 +7,10 @@ namespace CZToolKit.Core.Blackboards
     public class CZAnimationCurve : CZType<AnimationCurve>
     {
         public CZAnimationCurve() : base()
-        { value = new AnimationCurve(); }
+        { Value = new AnimationCurve(); }
+
+        public CZAnimationCurve(AnimationCurve _value) : base(_value) { }
+
+        public static implicit operator CZAnimationCurve(AnimationCurve _other) { return new CZAnimationCurve(_other); }
     }
 }

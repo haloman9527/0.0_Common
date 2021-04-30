@@ -7,6 +7,10 @@ namespace CZToolKit.Core.Blackboards
     public class CZGradient : CZType<Gradient>
     {
         public CZGradient() : base()
-        { value = new Gradient(); }
+        { Value = new Gradient(); }
+
+        public CZGradient(Gradient _value) : base(_value) { }
+
+        public static implicit operator CZGradient(Gradient _other) { return new CZGradient(_other); }
     }
 }

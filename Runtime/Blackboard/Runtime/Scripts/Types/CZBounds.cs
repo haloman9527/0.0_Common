@@ -7,6 +7,10 @@ namespace CZToolKit.Core.Blackboards
     public class CZBounds : CZType<Bounds>
     {
         public CZBounds() : base()
-        { value = new Bounds(); }
+        { Value = new Bounds(); }
+
+        public CZBounds(Bounds _value) : base(_value) { }
+
+        public static implicit operator CZBounds(Bounds _other) { return new CZBounds(_other); }
     }
 }

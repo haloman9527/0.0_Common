@@ -7,6 +7,10 @@ namespace CZToolKit.Core.Blackboards
     public class CZBlackboardType : CZType<CZBlackboard>
     {
         public CZBlackboardType() : base()
-        { value = null; }
+        { Value = null; }
+
+        public CZBlackboardType(CZBlackboard _value) : base(_value) { }
+
+        public static implicit operator CZBlackboardType(CZBlackboard _other) { return new CZBlackboardType(_other); }
     }
 }

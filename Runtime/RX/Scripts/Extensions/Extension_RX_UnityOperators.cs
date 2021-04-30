@@ -1,11 +1,10 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace CZToolKit.Core.RX
 {
-    public static class ObservableExtensions_Unity
+    public static partial class Extension
     {
         public static IObservable<T> EveryUpdate<T>(this IObservable<T> _src, UpdateType _updateType = UpdateType.Update)
         {
@@ -13,16 +12,10 @@ namespace CZToolKit.Core.RX
         }
 
         /// <summary> 通过协程实现的延迟 </summary>
-        /// <param name="delayTime"></param>
         public static IObservable<T> Delay<T>(this IObservable<T> _src, float delayTime)
         {
             return new Delay<T>(_src, delayTime);
         }
-
-        //public static IObservable<T> SelfEveryUpdate(this IObservable<T> _src)
-        //{
-        //    return 
-        //}
 
         public static IObservable<T> SelfDelay<T>(this IObservable<T> _src, float delayTime) where T : MonoBehaviour
         {

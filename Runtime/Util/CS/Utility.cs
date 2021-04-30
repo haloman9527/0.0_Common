@@ -2,7 +2,7 @@
 
 namespace CZToolKit.Core
 {
-    public class UnityUtility
+    public static partial class Utility
     {
         public static string GetLocalIp()
         {

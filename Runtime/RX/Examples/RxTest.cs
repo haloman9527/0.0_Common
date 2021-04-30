@@ -10,7 +10,6 @@ public class RxTest : MonoBehaviour, IOnDestory
 
     private void Start()
     {
-
         List<int> nums = new List<int> { 10, 20, 30 };
         nums.ToObservable()
             .Foreach()

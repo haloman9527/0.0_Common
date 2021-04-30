@@ -6,6 +6,10 @@ namespace CZToolKit.Core.Blackboards
     public class CZLong : CZType<long>
     {
         public CZLong() : base()
-        { value = 0; }
+        { Value = 0; }
+
+        public CZLong(long _value) : base(_value) { }
+
+        public static implicit operator CZLong(long _other) { return new CZLong(_other); }
     }
 }

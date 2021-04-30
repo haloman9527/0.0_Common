@@ -1,13 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 
 namespace CZToolKit.Core
 {
-    public static class ChildrenTypeCache
+    public static partial class Utility
     {
         static readonly Dictionary<Type, IEnumerable<Type>> TypeCache = new Dictionary<Type, IEnumerable<Type>>();
+
+        public static List<Type> GetBaseClasses(Type _type)
+        {
+            List<Type> list = new List<Type>();
+            while (_type != null)
+            {
+                list.Add(_type);
+                _type = _type.BaseType;
+            }
+            return list;
+        }
 
         public static IEnumerable<Type> GetChildrenTypes<T>()
         {
