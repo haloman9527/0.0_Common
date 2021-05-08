@@ -70,9 +70,7 @@ namespace CZToolKit.Core.Editors
             ObjectDrawer objectDrawer = null;
             Type type = null;
             if (!ObjectDrawerUtility.ObjectDrawerForType(attribute.GetType(), ref objectDrawer, ref type, attribute.GetHashCode()))
-            {
                 return null;
-            }
             if (objectDrawer != null)
                 return objectDrawer;
             objectDrawer = (Activator.CreateInstance(type) as ObjectDrawer);

@@ -1,35 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace CZToolKit.Core
 {
     public static partial class Utility
     {
         #region GetMemberInfo
-        static Dictionary<Type, FieldInfo[]> TypeFieldInfoCache = new Dictionary<Type, FieldInfo[]>();
+        static Dictionary<Type, List<FieldInfo>> TypeFieldInfoCache = new Dictionary<Type, List<FieldInfo>>();
 
         /// <summary> 获取字段，包括基类的私有字段 </summary>
         public static FieldInfo GetFieldInfo(Type _type, string _fieldName)
         {
-            // 如果第一次没有找到，那么这个变量可能是基类的私有字段
-            FieldInfo field = _type.GetField(_fieldName,
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            // 只搜索基类的私有字段
-            while (field == null && (_type = _type.BaseType) != null)
-            {
-                field = _type.GetField(_fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-            }
-
-            return field;
+            return GetFieldInfos(_type).Find(f => f.Name == _fieldName);
         }
 
         public static List<FieldInfo> GetFieldInfos(Type _type)
         {
-            List<FieldInfo> fieldInfos =
-                new List<FieldInfo>(
-                    _type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
-
+            if (TypeFieldInfoCache.TryGetValue(_type, out List<FieldInfo> fieldInfos))
+                return fieldInfos;
+            TypeFieldInfoCache[_type] = fieldInfos = new List<FieldInfo>(_type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
             // 获取类包含的所有字段(包含私有)
             while ((_type = _type.BaseType) != null)
             {
@@ -47,7 +38,7 @@ namespace CZToolKit.Core
             // 只搜索基类的私有方法
             while (method == null && (_type = _type.BaseType) != null)
             {
-                method = _type.GetMethod(_methodName, BindingFlags.NonPublic | BindingFlags.Instance| BindingFlags.DeclaredOnly);
+                method = _type.GetMethod(_methodName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
             }
 
             return method;

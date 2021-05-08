@@ -73,14 +73,14 @@ namespace CZToolKit.Core.Editors
         {
             if (typeof(IList).IsAssignableFrom(_fieldInfo.FieldType))
                 return EditorGUILayoutExtension.DrawArrayField(_content, _fieldInfo, _fieldInfo.FieldType, _value);
-            return EditorGUILayoutExtension.DrawSingleField(_content, _fieldInfo.FieldType, _value);
+            return EditorGUILayoutExtension.DrawSingleField(_content, _fieldInfo, _fieldInfo.FieldType, _value);
         }
 
         public static object DrawField(GUIContent _content, Type _fieldType, object _value)
         {
             if (typeof(IList).IsAssignableFrom(_fieldType))
                 return EditorGUILayoutExtension.DrawArrayField(_content, null, _fieldType, _value);
-            return EditorGUILayoutExtension.DrawSingleField(_content, _fieldType, _value);
+            return EditorGUILayoutExtension.DrawSingleField(_content, null, _fieldType, _value);
         }
 
         private static object DrawArrayField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
@@ -232,8 +232,21 @@ namespace CZToolKit.Core.Editors
             return list;
         }
 
-        private static object DrawSingleField(GUIContent _content, Type _fieldType, object _value)
+        private static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
         {
+            if ((Utility.TryGetFieldInfoAttribute(_fieldInfo, out ObjectDrawerAttribute att)
+                || Utility.TryGetTypeAttribute(_fieldType, out att)))
+            {
+                ObjectDrawer objectDrawer;
+                if ((objectDrawer = ObjectDrawerUtility.GetObjectDrawer(att)) != null)
+                {
+                    objectDrawer.Value = _value;
+                    objectDrawer.FieldInfo = _fieldInfo;
+                    objectDrawer.OnGUI(_content);
+                    return _value;
+                }
+            }
+
             if (_fieldType.Equals(typeof(int)))
             {
                 return EditorGUILayout.IntField(_content, (int)_value);
@@ -393,6 +406,104 @@ namespace CZToolKit.Core.Editors
             return null;
         }
 
+        //// Token: 0x0600019C RID: 412 RVA: 0x0000F118 File Offset: 0x0000D318
+        //public static SharedVariable DrawSharedVariable(GUIContent guiContent, FieldInfo fieldInfo, Type fieldType, SharedVariable sharedVariable)
+        //{
+        //    if (!fieldType.Equals(typeof(SharedVariable)) && sharedVariable == null)
+        //    {
+        //        sharedVariable = (Activator.CreateInstance(fieldType, true) as SharedVariable);
+        //        if (TaskUtility.HasAttribute(fieldInfo, typeof(RequiredFieldAttribute)) || TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
+        //        {
+        //            sharedVariable.IsShared = true;
+        //        }
+        //        GUI.changed = true;
+        //    }
+        //    if (sharedVariable != null && sharedVariable.IsDynamic)
+        //    {
+        //        sharedVariable.Name = EditorGUILayout.TextField(guiContent, sharedVariable.Name, new GUILayoutOption[0]);
+        //        if (!TaskUtility.HasAttribute(fieldInfo, typeof(RequiredFieldAttribute)) && !TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
+        //        {
+        //            sharedVariable = EditorGUILayoutExtension.DrawSharedVariableToggleSharedButton(sharedVariable);
+        //        }
+        //    }
+        //    else if (sharedVariable == null || sharedVariable.IsShared)
+        //    {
+        //        GUILayout.BeginHorizontal(new GUILayoutOption[0]);
+        //        string[] array = null;
+        //        int num = -1;
+        //        int num2 = EditorGUILayoutExtension.GetVariablesOfType((sharedVariable == null) ? null : sharedVariable.GetType().GetProperty("Value").PropertyType, sharedVariable != null && sharedVariable.IsGlobal, (sharedVariable == null) ? string.Empty : sharedVariable.Name, EditorGUILayoutExtension.behaviorSource, out array, ref num, fieldType.Equals(typeof(SharedVariable)), true);
+        //        Color backgroundColor = GUI.backgroundColor;
+        //        if (num2 == 0 && !TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
+        //        {
+        //            GUI.backgroundColor = Color.red;
+        //        }
+        //        int num3 = num2;
+        //        num2 = EditorGUILayout.Popup(guiContent.text, num2, array, BehaviorDesignerUtility.SharedVariableToolbarPopup, new GUILayoutOption[0]);
+        //        GUI.backgroundColor = backgroundColor;
+        //        if (num2 != num3)
+        //        {
+        //            if (num2 == 0)
+        //            {
+        //                if (fieldType.Equals(typeof(SharedVariable)))
+        //                {
+        //                    sharedVariable = null;
+        //                }
+        //                else
+        //                {
+        //                    sharedVariable = (Activator.CreateInstance(fieldType, true) as SharedVariable);
+        //                    sharedVariable.IsShared = true;
+        //                }
+        //            }
+        //            else if (num2 < array.Length - 1)
+        //            {
+        //                if (num != -1 && num2 >= num)
+        //                {
+        //                    sharedVariable = GlobalVariables.Instance.GetVariable(array[num2].Substring(8, array[num2].Length - 8));
+        //                }
+        //                else
+        //                {
+        //                    sharedVariable = FieldInspector.behaviorSource.GetVariable(array[num2]);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                sharedVariable = (Activator.CreateInstance(fieldType, true) as SharedVariable);
+        //                sharedVariable.IsShared = true;
+        //                sharedVariable.IsDynamic = true;
+        //            }
+        //            GUI.changed = true;
+        //        }
+        //        if (!fieldType.Equals(typeof(SharedVariable)) && !TaskUtility.HasAttribute(fieldInfo, typeof(RequiredFieldAttribute)) && !TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
+        //        {
+        //            sharedVariable = EditorGUILayoutExtension.DrawSharedVariableToggleSharedButton(sharedVariable);
+        //            GUILayout.Space(-3f);
+        //        }
+        //        GUILayout.EndHorizontal();
+        //        GUILayout.Space(3f);
+        //    }
+        //    else
+        //    {
+        //        GUILayout.BeginHorizontal(new GUILayoutOption[0]);
+        //        ObjectDrawerAttribute[] array2;
+        //        ObjectDrawer objectDrawer;
+        //        if (fieldInfo != null && (array2 = (fieldInfo.GetCustomAttributes(typeof(ObjectDrawerAttribute), true) as ObjectDrawerAttribute[])).Length > 0 && (objectDrawer = ObjectDrawerUtility.GetObjectDrawer(task, array2[0])) != null)
+        //        {
+        //            objectDrawer.Value = sharedVariable;
+        //            objectDrawer.OnGUI(guiContent);
+        //        }
+        //        else
+        //        {
+        //            EditorGUILayoutExtension.DrawFields(task, sharedVariable, guiContent);
+        //        }
+        //        if (!TaskUtility.HasAttribute(fieldInfo, typeof(RequiredFieldAttribute)) && !TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
+        //        {
+        //            sharedVariable = EditorGUILayoutExtension.DrawSharedVariableToggleSharedButton(sharedVariable);
+        //        }
+        //        GUILayout.EndHorizontal();
+        //    }
+        //    return sharedVariable;
+        //}
+
         private static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, object _value)
         {
             ObjectDrawer objectDrawer;
@@ -415,7 +526,7 @@ namespace CZToolKit.Core.Editors
                 }
                 return _value;
             }
-            return DrawSingleField(_content, _fieldInfo.FieldType, _value);
+            return DrawSingleField(_content, _fieldInfo, _fieldInfo.FieldType, _value);
         }
 
         private static LayerMask DrawLayerMask(GUIContent guiContent, LayerMask layerMask)

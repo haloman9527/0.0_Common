@@ -3,17 +3,28 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.Events;
 
+//#if ODIN_INSPECTOR
+//using Sirenix.OdinInspector.Editor;
+//#endif
+
 namespace CZToolKit.Core.Editors
 {
     public abstract class BasicEditor : UnityEditor.Editor
     {
-        protected Dictionary<string, UnityAction<SerializedProperty>> customDrawers;
+        Dictionary<string, UnityAction<SerializedProperty>> customDrawers;
+//#if ODIN_INSPECTOR
+//        PropertyTree tree;
+//#endif
 
         protected virtual void OnEnable()
         {
             EditorApplication.update += Update;
             customDrawers = new Dictionary<string, UnityAction<SerializedProperty>>();
             RegisterDrawers();
+
+//#if ODIN_INSPECTOR
+//            tree = PropertyTree.Create(serializedObject);
+//#endif
         }
 
         private void OnDisable()
@@ -64,6 +75,14 @@ namespace CZToolKit.Core.Editors
 
         public override void OnInspectorGUI()
         {
+//#if ODIN_INSPECTOR
+//            if (tree != null)
+//            {
+//                tree.BeginDraw(true);
+//                tree.Draw(true);
+//                tree.EndDraw();
+//            }
+//#else
             EditorGUI.BeginChangeCheck();
 
             SerializedProperty iterator = serializedObject.GetIterator();
@@ -80,6 +99,7 @@ namespace CZToolKit.Core.Editors
             if (EditorGUI.EndChangeCheck())
                 serializedObject.ApplyModifiedProperties();
             serializedObject.Update();
+//#endif
         }
 
         private void DrawScript(SerializedProperty _serializedProperty)

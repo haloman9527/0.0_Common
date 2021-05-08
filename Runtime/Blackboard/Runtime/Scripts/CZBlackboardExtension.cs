@@ -30,7 +30,7 @@ public static class CZBlackboardExtension
         return false;
     }
 
-    public static void SaveData<T>(this Dictionary<string, ICZType> _self, string _name, T _data)
+    public static void SetData<T>(this Dictionary<string, ICZType> _self, string _name, T _data)
     {
         if (_self.TryGetValue(_name, out ICZType property))
         {
