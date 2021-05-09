@@ -2,7 +2,6 @@
 
 namespace CZToolKit.Core
 {
-
     public enum EasingType
     {
         Linear,

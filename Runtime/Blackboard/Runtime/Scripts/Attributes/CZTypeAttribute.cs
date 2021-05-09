@@ -1,5 +1,5 @@
 ﻿
 namespace CZToolKit.Core
 {
-    public class CZTypeAttribute : ObjectDrawerAttribute { }
+    public class CZTypeAttribute : FieldAttribute { }
 }

@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
-using CZToolKit.Core.Blackboards;
 
 namespace CZToolKit.Core.Editors
 {
@@ -151,6 +150,7 @@ namespace CZToolKit.Core.Editors
             GUILayout.EndScrollView();
 
             GUILayout.FlexibleSpace();
+
             // 点击按钮开始构建
             if (GUILayout.Button("Build", GUILayout.Height(50)) && parent != null)
             {

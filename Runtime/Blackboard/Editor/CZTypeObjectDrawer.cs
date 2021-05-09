@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Blackboards.Editors
 {
-    [CustomObjectDrawerAttribute(typeof(CZTypeAttribute))]
-    public class CZTypeObjectDrawer : ObjectDrawer
+    [CustomFieldDrawerAttribute(typeof(CZTypeAttribute))]
+    public class CZTypeObjectDrawer : FieldDrawer
     {
         public override void OnGUI(GUIContent label)
         {

@@ -56,14 +56,24 @@ namespace CZToolKit.Core.Editors
                 AssetDatabase.OpenAsset(MonoScript);
         }
 
-        Stack<EditorCoroutine> coroutineStack = new Stack<EditorCoroutine>();
+        Stack<EditorCoroutine> coroutineStack;
+        Stack<EditorCoroutine> CoroutineStack
+        {
+            get
+            {
+                if (coroutineStack == null)
+                    coroutineStack = new Stack<EditorCoroutine>();
+                return coroutineStack;
+            }
+        }
+
 
         protected virtual void Update()
         {
-            int count = coroutineStack.Count;
+            int count = CoroutineStack.Count;
             while (count-- > 0)
             {
-                EditorCoroutine coroutine = coroutineStack.Pop();
+                EditorCoroutine coroutine = CoroutineStack.Pop();
                 if (!coroutine.IsRunning) continue;
                 ICondition condition = coroutine.Current as ICondition;
                 if (condition == null || condition.Result(coroutine))
@@ -71,14 +81,15 @@ namespace CZToolKit.Core.Editors
                     if (!coroutine.MoveNext())
                         continue;
                 }
-                coroutineStack.Push(coroutine);
+                CoroutineStack.Push(coroutine);
             }
         }
+
 
         public EditorCoroutine StartCoroutine(IEnumerator _coroutine)
         {
             EditorCoroutine coroutine = new EditorCoroutine(_coroutine);
-            coroutineStack.Push(coroutine);
+            CoroutineStack.Push(coroutine);
             return coroutine;
         }
 

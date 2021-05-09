@@ -20,8 +20,8 @@ namespace CZToolKit.Core.Editors
                     {
                         foreach (Type type in assembly.GetExportedTypes())
                         {
-                            CustomObjectDrawerAttribute[] array;
-                            if (typeof(ObjectDrawer).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract && (array = (type.GetCustomAttributes(typeof(CustomObjectDrawerAttribute), false) as CustomObjectDrawerAttribute[])).Length > 0)
+                            CustomFieldDrawerAttribute[] array;
+                            if (typeof(FieldDrawer).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract && (array = (type.GetCustomAttributes(typeof(CustomFieldDrawerAttribute), false) as CustomFieldDrawerAttribute[])).Length > 0)
                             {
                                 ObjectDrawerUtility.objectDrawerTypeMap.Add(array[0].Type, type);
                             }
@@ -35,7 +35,7 @@ namespace CZToolKit.Core.Editors
             ObjectDrawerUtility.mapBuilt = true;
         }
 
-        private static bool ObjectDrawerForType(Type type, ref ObjectDrawer objectDrawer, ref Type objectDrawerType, int hash)
+        private static bool ObjectDrawerForType(Type type, ref FieldDrawer objectDrawer, ref Type objectDrawerType, int hash)
         {
             ObjectDrawerUtility.BuildObjectDrawers();
             if (!ObjectDrawerUtility.objectDrawerTypeMap.ContainsKey(type))
@@ -50,30 +50,30 @@ namespace CZToolKit.Core.Editors
             return true;
         }
 
-        public static ObjectDrawer GetObjectDrawer(FieldInfo _fieldInfo)
+        public static FieldDrawer GetObjectDrawer(FieldInfo _fieldInfo)
         {
-            ObjectDrawer objectDrawer = null;
+            FieldDrawer objectDrawer = null;
             Type type = null;
             if (!ObjectDrawerUtility.ObjectDrawerForType(_fieldInfo.FieldType, ref objectDrawer, ref type, _fieldInfo.GetHashCode()))
                 return null;
             if (objectDrawer == null)
             {
-                objectDrawer = (Activator.CreateInstance(type) as ObjectDrawer);
+                objectDrawer = (Activator.CreateInstance(type) as FieldDrawer);
                 ObjectDrawerUtility.objectDrawerMap.Add(_fieldInfo.GetHashCode(), objectDrawer);
             }
             objectDrawer.FieldInfo = _fieldInfo;
             return objectDrawer;
         }
 
-        public static ObjectDrawer GetObjectDrawer(ObjectDrawerAttribute attribute)
+        public static FieldDrawer GetObjectDrawer(FieldAttribute attribute)
         {
-            ObjectDrawer objectDrawer = null;
+            FieldDrawer objectDrawer = null;
             Type type = null;
             if (!ObjectDrawerUtility.ObjectDrawerForType(attribute.GetType(), ref objectDrawer, ref type, attribute.GetHashCode()))
                 return null;
             if (objectDrawer != null)
                 return objectDrawer;
-            objectDrawer = (Activator.CreateInstance(type) as ObjectDrawer);
+            objectDrawer = (Activator.CreateInstance(type) as FieldDrawer);
             objectDrawer.Attribute = attribute;
             ObjectDrawerUtility.objectDrawerMap.Add(attribute.GetHashCode(), objectDrawer);
             return objectDrawer;
@@ -81,7 +81,7 @@ namespace CZToolKit.Core.Editors
 
         private static Dictionary<Type, Type> objectDrawerTypeMap = new Dictionary<Type, Type>();
 
-        private static Dictionary<int, ObjectDrawer> objectDrawerMap = new Dictionary<int, ObjectDrawer>();
+        private static Dictionary<int, FieldDrawer> objectDrawerMap = new Dictionary<int, FieldDrawer>();
 
         private static bool mapBuilt = false;
     }

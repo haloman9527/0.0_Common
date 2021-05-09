@@ -52,7 +52,6 @@ namespace CZToolKit.Core.Singletons
                             {
                                 mgrTrans = new GameObject(typeof(T).Name).transform;
                                 m_Instance = mgrTrans.gameObject.AddComponent<T>();
-                                m_Instance.OnInitialize();
                                 mgrTrans.transform.SetParent(mgrParent.transform);
                             }
                             else
@@ -61,6 +60,8 @@ namespace CZToolKit.Core.Singletons
                                 if (m_Instance == null)
                                     m_Instance = mgrTrans.gameObject.AddComponent<T>();
                             }
+                            if (m_Instance != null)
+                                m_Instance.OnInitialize();
                         }
                     }
                 }

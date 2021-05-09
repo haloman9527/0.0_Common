@@ -1,7 +1,7 @@
 ﻿using CZToolKit.Core;
 using UnityEngine;
 
-public static class UnityExtension
+public static partial class Extension
 {
     /// <summary> 获取CC的真实高度 </summary>
     public static float GetRealHeight(this CharacterController characterController)
