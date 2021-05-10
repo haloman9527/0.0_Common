@@ -64,6 +64,10 @@ namespace CZToolKit.Core.Editors
 
         private void DrawElement(Rect rect, int index, bool isActive, bool isFocused)
         {
+
+            GUILayout.Button(new GUIContent("Button", "Tip"));
+
+
             if (index >= childrens.Count) return;
 
             GUILayout.BeginHorizontal();

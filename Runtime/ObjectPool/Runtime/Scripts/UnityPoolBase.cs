@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CZToolKit.Core.ObjectPool
 {
     [Serializable]
-    public abstract class UnityPoolBase<T> : Pool<T> where T : UnityEngine.Object
+    public abstract class UnityPoolBase<T> : PoolBase<T> where T : UnityEngine.Object
     {
         public int maxCount = 10;
 

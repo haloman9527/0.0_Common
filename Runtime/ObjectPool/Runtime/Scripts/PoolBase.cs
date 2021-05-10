@@ -29,7 +29,7 @@ namespace CZToolKit.Core.ObjectPool
     }
 
     [Serializable]
-    public abstract class Pool<T> : PoolBase where T : class
+    public abstract class PoolBase<T> : PoolBase where T : class
     {
         [SerializeField] protected T template;
         List<T> workList = new List<T>(16);
