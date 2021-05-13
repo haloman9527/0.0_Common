@@ -8,6 +8,8 @@ public static partial class Extension
     /// <summary> 快速排序(第二个参数是中间值) </summary>
     public static void QuickSort<T>(this List<T> _original, Func<T, T, bool> _func)
     {
+        if (_original.Count == 0)
+            return;
         if (_original.Count == 1)
             return;
 

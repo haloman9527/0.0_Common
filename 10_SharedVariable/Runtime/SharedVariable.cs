@@ -1,0 +1,141 @@
+#region 注 释
+/***
+ *
+ *  Title:
+ *  
+ *  Description:
+ *  
+ *  Date:
+ *  Version:
+ *  Writer: 
+ *
+ */
+#endregion
+using System;
+using UnityEngine;
+
+namespace CZToolKit.Core.SharedVariable
+{
+    [Serializable]
+    [SharedVariable]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.HideReferenceObjectPicker]
+#endif
+    public abstract class SharedVariable : ICloneable
+    {
+        [SerializeField, HideInInspector]
+        protected string guid;
+
+        [SerializeField]
+        IVariableOwner variableOwner;
+
+        public string GUID
+        {
+            get { return this.guid; }
+            protected set { this.guid = value; }
+        }
+
+        public IVariableOwner VariableOwner
+        {
+            get { return variableOwner; }
+            protected set { variableOwner = value; }
+        }
+
+        public SharedVariable() { guid = Guid.NewGuid().ToString(); }
+
+        public SharedVariable(string _guid) { guid = _guid; }
+
+        public virtual void InitializePropertyMapping(IVariableOwner _variableOwner) { }
+
+        public abstract object GetValue();
+
+        public abstract void SetValue(object value);
+
+        public abstract Type GetValueType();
+
+        public abstract object Clone();
+    }
+
+    [Serializable]
+    public abstract class SharedVariable<T> : SharedVariable
+    {
+        [SerializeField]
+        protected T value;
+
+        Func<T> getter;
+        Action<T> setter;
+
+        public T Value
+        {
+            get
+            {
+                return this.getter == null ? this.value : this.getter();
+            }
+            set
+            {
+                if (this.setter != null)
+                    this.setter(value);
+                else
+                    this.value = value;
+            }
+        }
+
+        protected SharedVariable() : base() { value = default; }
+
+        public SharedVariable(string _guid) : base(_guid) { value = default; }
+
+        public SharedVariable(T _value) : base() { value = _value; }
+
+        public override void InitializePropertyMapping(IVariableOwner _variableOwner)
+        {
+            VariableOwner = _variableOwner;
+            getter = () =>
+            {
+                SharedVariable variable = _variableOwner.GetVariable(GUID);
+                if (variable != null) return (T)variable.GetValue();
+                return value;
+            };
+            setter = _value =>
+            {
+                SharedVariable variable = _variableOwner.GetVariable(GUID);
+                if (variable == null)
+                {
+                    variable = this.Clone() as SharedVariable;
+                    _variableOwner.SetVariable(variable);
+                }
+                variable.SetValue(_value);
+            };
+        }
+
+        public override object GetValue()
+        {
+            if (getter != null)
+                return getter();
+            else
+                return value;
+        }
+
+        public override void SetValue(object _value)
+        {
+            if (setter != null)
+                setter((T)_value);
+            else
+                value = (T)_value;
+        }
+
+        public override Type GetValueType() { return typeof(T); }
+
+        public override string ToString()
+        {
+            string result;
+            if (Value == null)
+                result = "(null)";
+            else
+            {
+                T value = this.Value;
+                result = value.ToString();
+            }
+            return result;
+        }
+    }
+}
