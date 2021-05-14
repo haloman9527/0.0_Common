@@ -1,10 +1,34 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
     public static partial class EditorGUIExtension
     {
+        static Dictionary<string, GUIContent> GUIContentsCache = new Dictionary<string, GUIContent>();
+        public static GUIContent GetGUIContent(string _name)
+        {
+            GUIContent content;
+            if (!GUIContentsCache.TryGetValue(_name, out content))
+                content = new GUIContent(_name);
+            return content;
+        }
+
+        static Dictionary<string, bool> FoldoutCache = new Dictionary<string, bool>();
+        public static bool GetBool(string _key, bool _fallback = false)
+        {
+            bool result;
+            if (!FoldoutCache.TryGetValue(_key, out result))
+                result = _fallback;
+            return result;
+        }
+
+        public static void SetBool(string _key, bool _value)
+        {
+            FoldoutCache[_key] = _value;
+        }
+
         /// <summary> 绘制一个ProgressBar </summary>
         public static float ProgressBar(Rect _rect, float _value, float _minLimit, float _maxLimit, string _text, bool _dragable = true, bool _drawMinMax = false)
         {

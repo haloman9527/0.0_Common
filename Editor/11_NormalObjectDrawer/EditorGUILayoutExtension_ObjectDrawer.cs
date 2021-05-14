@@ -39,10 +39,10 @@ namespace CZToolKit.Core.Editors
                 ".",
                 guiContent.text
             });
-            bool @bool = EditorPrefs.GetBool(text, false);
+            bool @bool = EditorGUIExtension.GetBool(text, false);
             bool flag = EditorGUILayout.Foldout(@bool, guiContent, true);
             if (flag != @bool)
-                EditorPrefs.SetBool(text, flag);
+                EditorGUIExtension.SetBool(text, flag);
             return flag;
         }
 
@@ -443,10 +443,8 @@ namespace CZToolKit.Core.Editors
             }
             if (_fieldType.IsClass || (_fieldType.IsValueType && !_fieldType.IsPrimitive))
             {
-                if (typeof(Delegate).IsAssignableFrom(_fieldType))
-                {
-                    return null;
-                }
+                if (typeof(Delegate).IsAssignableFrom(_fieldType)) return null;
+                if (typeof(object).IsAssignableFrom(_fieldType) && _value == null) return null;
                 int hashCode = _value.GetHashCode();
                 if (EditorGUILayoutExtension.drawnObjects.Contains(hashCode))
                 {

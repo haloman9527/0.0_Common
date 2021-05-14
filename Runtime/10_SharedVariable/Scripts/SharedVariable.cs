@@ -26,7 +26,6 @@ namespace CZToolKit.Core.SharedVariable
         [SerializeField, HideInInspector]
         protected string guid;
 
-        [SerializeField]
         IVariableOwner variableOwner;
 
         public string GUID
