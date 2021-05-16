@@ -8,18 +8,18 @@ namespace CZToolKit.Core.SimpleFSM
         private Dictionary<string, IFSMState> states = new Dictionary<string, IFSMState>();
         private IFSMState currentState;
 
-        public void Update()
+        public virtual void Update()
         {
             if (currentState != null)
                 currentState.OnUpdate();
         }
 
-        public void PushState(string stateName, IFSMState state)
+        public virtual void PushState(string stateName, IFSMState state)
         {
             states[stateName] = state;
         }
 
-        public void ChangeTo(string stateName)
+        public virtual void ChangeTo(string stateName)
         {
             if (currentState == states[stateName])
                 return;
@@ -35,6 +35,8 @@ namespace CZToolKit.Core.SimpleFSM
 
     public interface IFSMState
     {
+        FSM Owner { get; }
+
         void OnStart();
 
         void OnUpdate();

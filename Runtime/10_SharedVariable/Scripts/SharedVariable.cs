@@ -90,8 +90,8 @@ namespace CZToolKit.Core.SharedVariable
             VariableOwner = _variableOwner;
             getter = () =>
             {
-                SharedVariable variable = _variableOwner.GetVariable(GUID);
-                if (variable != null) return (T)variable.GetValue();
+                SharedVariable<T> variable = _variableOwner.GetVariable(GUID) as SharedVariable<T>;
+                if (variable != null) return variable.Value;
                 return value;
             };
             setter = _value =>
