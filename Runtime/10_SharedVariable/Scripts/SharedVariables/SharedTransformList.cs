@@ -18,7 +18,7 @@ using UnityEngine;
 namespace CZToolKit.Core.SharedVariable
 {
     [Serializable]
-    public class SharedTransformList : SharedVariable<List<Transform>>
+    public class SharedTransformList : SharedObjectList<Transform>
     {
         public SharedTransformList() : base() { }
 

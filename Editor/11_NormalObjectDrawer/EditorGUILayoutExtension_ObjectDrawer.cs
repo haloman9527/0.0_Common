@@ -39,7 +39,7 @@ namespace CZToolKit.Core.Editors
                 ".",
                 guiContent.text
             });
-            bool @bool = EditorGUIExtension.GetBool(text, false);
+            bool @bool = EditorGUIExtension.GetBool(text);
             bool flag = EditorGUILayout.Foldout(@bool, guiContent, true);
             if (flag != @bool)
                 EditorGUIExtension.SetBool(text, flag);
