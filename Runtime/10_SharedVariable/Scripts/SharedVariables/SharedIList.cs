@@ -26,13 +26,10 @@ namespace CZToolKit.Core.SharedVariable
         IList GetList();
 
         void FillList(List<Object> _other);
-
-        void Clear();
     }
 
     public abstract class SharedObjectList<T> : SharedVariable<List<T>>, ISharedObjectList where T : Object
     {
-
         protected SharedObjectList() { }
 
         protected SharedObjectList(string _guid) : base(_guid) { }
@@ -51,16 +48,11 @@ namespace CZToolKit.Core.SharedVariable
 
         public void FillList(List<Object> _other)
         {
-            Clear();
+            Value.Clear();
             foreach (var item in _other)
             {
                 Value.Add(item as T);
             }
-        }
-
-        public void Clear()
-        {
-            value.Clear();
         }
     }
 }

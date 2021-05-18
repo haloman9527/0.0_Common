@@ -30,7 +30,7 @@ namespace CZToolKit.Core.SharedVariable
 
         void SetVariableValue(string _guid, object _value);
 
-        IList<SharedVariable> GetVariables();
+        IReadOnlyList<SharedVariable> GetVariables();
 
         void SetVariables(List<SharedVariable> _variables);
     }

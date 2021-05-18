@@ -28,6 +28,15 @@ namespace CZToolKit.Core
             return fieldInfos;
         }
 
+        public static IEnumerable<FieldInfo> GetFieldInfos(Type _type, Func<FieldInfo, bool> _patern)
+        {
+            foreach (var field in GetFieldInfos(_type))
+            {
+                if (_patern(field))
+                    yield return field;
+            }
+        }
+
         /// <summary> 获取方法，包括基类的私有方法 </summary>
         public static MethodInfo GetMethodInfo(Type _type, string _methodName)
         {

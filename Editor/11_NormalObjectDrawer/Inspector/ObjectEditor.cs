@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -57,15 +58,16 @@ namespace CZToolKit.Core.Editors
             return objectEditor;
         }
 
-        public object Target { get; set; }
+        protected IReadOnlyList<FieldInfo> Fields { get; private set; }
 
-        public Editor Editor { get; set; }
+        public object Target { get; private set; }
 
         protected ObjectEditor() { }
 
         public void Initialize(object _target)
         {
             Target = _target;
+            Fields = Utility.GetFieldInfos(Target.GetType()).FindAll(field => EditorGUILayoutExtension.CanDraw(field));
         }
 
         public string GetTitle() { return string.Empty; }
@@ -76,7 +78,17 @@ namespace CZToolKit.Core.Editors
 
         public virtual void OnInspectorGUI()
         {
-            EditorGUILayoutExtension.DrawFields(ObjectInspector.Instance.targetObject);
+            //EditorGUILayoutExtension.DrawFields(ObjectInspector.Instance.targetObject);
+            foreach (var field in Fields)
+            {
+                EditorGUI.BeginChangeCheck();
+                object value = EditorGUILayoutExtension.DrawField(field, field.GetValue(Target));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    field.SetValue(Target, value);
+                    GUI.changed = true;
+                }
+            }
         }
 
         public virtual bool HasPreviewGUI() { return false; }

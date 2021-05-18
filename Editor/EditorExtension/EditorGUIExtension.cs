@@ -12,11 +12,19 @@ namespace CZToolKit.Core.Editors
             GUIContent content;
             if (!GUIContentsCache.TryGetValue(_name, out content))
                 content = new GUIContent(_name);
+            content.tooltip = string.Empty;
+            return content;
+        }
+
+        public static GUIContent GetGUIContent(string _name, string _tooltip)
+        {
+            GUIContent content = GetGUIContent(_name);
+            content.tooltip = _tooltip;
             return content;
         }
 
         static Dictionary<string, bool> FoldoutCache = new Dictionary<string, bool>();
-        public static bool GetBool(string _key, bool _fallback = false)
+        public static bool GetFoldoutBool(string _key, bool _fallback = false)
         {
             bool result;
             if (!FoldoutCache.TryGetValue(_key, out result))
@@ -24,7 +32,7 @@ namespace CZToolKit.Core.Editors
             return result;
         }
 
-        public static void SetBool(string _key, bool _value)
+        public static void SetFoldoutBool(string _key, bool _value)
         {
             FoldoutCache[_key] = _value;
         }
@@ -35,7 +43,7 @@ namespace CZToolKit.Core.Editors
             float progress = (_value - _minLimit) / (_maxLimit - _minLimit);
 
             Rect r = _rect;
-            GUI.Box(r, "");
+            GUI.Box(r, string.Empty);
             r.width = _rect.width * progress;
             EditorGUI.DrawRect(r, new Color(0.07f, 0.56f, 0.9f, 1));
 

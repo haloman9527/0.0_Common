@@ -21,6 +21,63 @@ namespace CZToolKit.Core.Editors
             }
         }
 
+        static GUIStyle labelStyle;
+        public static GUIStyle LabelStyle
+        {
+            get
+            {
+                if (labelStyle == null)
+                {
+                    labelStyle = new GUIStyle(EditorStyles.label);
+                    labelStyle.richText = true;
+                }
+                return labelStyle;
+            }
+        }
+
+
+        static GUIStyle foldoutStyle;
+        public static GUIStyle FoldoutStyle
+        {
+            get
+            {
+                if (foldoutStyle == null)
+                {
+                    foldoutStyle = new GUIStyle(EditorStyles.foldout);
+                    foldoutStyle.richText = true;
+                }
+                return foldoutStyle;
+            }
+        }
+
+        static GUIStyle textFieldStyle;
+        public static GUIStyle TextFieldStyle
+        {
+            get
+            {
+                if (textFieldStyle == null)
+                {
+                    textFieldStyle = new GUIStyle(EditorStyles.textField);
+                    textFieldStyle.richText = true;
+                }
+                return textFieldStyle;
+            }
+        }
+
+        static GUIStyle numberFieldStyle;
+        public static GUIStyle NumberFieldStyle
+        {
+            get
+            {
+                if (numberFieldStyle == null)
+                {
+                    numberFieldStyle = new GUIStyle(EditorStyles.numberField);
+                    numberFieldStyle.richText = true;
+                }
+                return numberFieldStyle;
+            }
+        }
+
         static GUIStyle middleLabelStyle;
         /// <summary> 居中Label </summary>
         public static GUIStyle MiddleLabelStyle
