@@ -46,9 +46,10 @@ namespace CZToolKit.Core.Editors
 
         public static ObjectEditor CreateEditor(object _targetObject)
         {
+            if (_targetObject == null) return null;
             Type objectEditorType;
             ObjectEditor objectEditor;
-            if (ObjectEditorTypeCache.TryGetValue(ObjectInspector.Instance.targetObject.GetType(), out objectEditorType))
+            if (ObjectEditorTypeCache.TryGetValue(_targetObject.GetType(), out objectEditorType))
                 objectEditor = Activator.CreateInstance(objectEditorType, true) as ObjectEditor;
             else if ((objectEditorType = ObjectEditorTypeCache.FirstOrDefault(kv => kv.Key.IsAssignableFrom(_targetObject.GetType())).Value) != null)
                 objectEditor = Activator.CreateInstance(objectEditorType, true) as ObjectEditor;

@@ -15,13 +15,18 @@ using CZToolKit.Core.Singletons;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
+using System;
 
 namespace CZToolKit.Core.Editors
 {
     public class ObjectInspector : CZScriptableSingleton<ObjectInspector>
     {
         [SerializeField]
-        public object targetObject;
+        object targetObject;
+
+        public Action onTargetObjectChanged;
+
+        public object TargetObject { get { return targetObject; } set { targetObject = value; onTargetObjectChanged?.Invoke(); } }
     }
 
     [CustomEditor(typeof(ObjectInspector))]
@@ -31,21 +36,28 @@ namespace CZToolKit.Core.Editors
 
         private void OnEnable()
         {
-            if (ObjectInspector.Instance.targetObject == null)
+            OnEnable(ObjectInspector.Instance.TargetObject);
+            ObjectInspector.Instance.onTargetObjectChanged = () =>
             {
-                Selection.activeObject = null;
-                return;
-            }
-            if (objectEditor != null)
-            {
-                string title = objectEditor.GetTitle();
-                if (!string.IsNullOrEmpty(title))
-                    target.name = title;
-            }
+                //if (ObjectInspector.Instance.TargetObject == null)
+                //{
+                //    Selection.activeObject = null;
+                //    return;
+                //}
+                OnEnable(ObjectInspector.Instance.TargetObject);
+            };
 
-            objectEditor = ObjectEditor.CreateEditor(ObjectInspector.Instance.targetObject);
-            if (objectEditor != null)
-                objectEditor.OnEnable();
+            void OnEnable(object _targetObject)
+            {
+                objectEditor = ObjectEditor.CreateEditor(_targetObject);
+                if (objectEditor != null)
+                {
+                    string title = objectEditor.GetTitle();
+                    if (!string.IsNullOrEmpty(title))
+                        target.name = title;
+                    objectEditor.OnEnable();
+                }
+            }
         }
 
         protected override void OnHeaderGUI()

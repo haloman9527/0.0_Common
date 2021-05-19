@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-using Object = UnityEngine.Object;
+using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
@@ -13,14 +13,14 @@ namespace CZToolKit.Core.Editors
     {
         public static void DrawFieldsInInspector(object _targetObject)
         {
-            if (_targetObject is Object)
+            if (_targetObject is UnityObject)
             {
-                Selection.activeObject = _targetObject as Object;
+                Selection.activeObject = _targetObject as UnityObject;
             }
             else
             {
-                ObjectInspector.Instance.targetObject = _targetObject;
                 Selection.activeObject = ObjectInspector.Instance;
+                ObjectInspector.Instance.TargetObject = _targetObject;
             }
         }
 
@@ -243,7 +243,7 @@ namespace CZToolKit.Core.Editors
                             else
                             {
                                 Type type = list.Count > 0 ? list[list.Count - 1].GetType() : elementType;
-                                if (!typeof(Object).IsAssignableFrom(type))
+                                if (!typeof(UnityObject).IsAssignableFrom(type))
                                 {
                                     for (int i = currentCount; i < newCount; i++)
                                         list.Add(Activator.CreateInstance(type, true));
@@ -441,9 +441,9 @@ namespace CZToolKit.Core.Editors
             {
                 return EditorGUILayoutExtension.DrawLayerMask(_content, (LayerMask)_value);
             }
-            if (typeof(Object).IsAssignableFrom(_fieldType))
+            if (typeof(UnityObject).IsAssignableFrom(_fieldType))
             {
-                return EditorGUILayout.ObjectField(_content, (Object)_value, _fieldType, true);
+                return EditorGUILayout.ObjectField(_content, (UnityObject)_value, _fieldType, true);
             }
             if (_fieldType.IsEnum)
             {
