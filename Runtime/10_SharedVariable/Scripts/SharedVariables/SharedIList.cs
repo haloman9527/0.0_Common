@@ -48,6 +48,8 @@ namespace CZToolKit.Core.SharedVariable
 
         public void FillList(List<UnityObject> _other)
         {
+            if (VariableOwner != null && VariableOwner.GetVariable(GUID) == null)
+                VariableOwner.SetVariable(this.Clone() as SharedVariable);
             Value.Clear();
             foreach (var item in _other)
             {
