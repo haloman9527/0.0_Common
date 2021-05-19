@@ -15,7 +15,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Object = UnityEngine.Object;
+using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.SharedVariable
 {
@@ -25,14 +25,11 @@ namespace CZToolKit.Core.SharedVariable
 
         IList GetList();
 
-        void FillList(List<Object> _other);
-
-        void Clear();
+        void FillList(List<UnityObject> _other);
     }
 
-    public abstract class SharedObjectList<T> : SharedVariable<List<T>>, ISharedObjectList where T : Object
+    public abstract class SharedObjectList<T> : SharedVariable<List<T>>, ISharedObjectList where T : UnityObject
     {
-
         protected SharedObjectList() { }
 
         protected SharedObjectList(string _guid) : base(_guid) { }
@@ -49,18 +46,13 @@ namespace CZToolKit.Core.SharedVariable
             return Value;
         }
 
-        public void FillList(List<Object> _other)
+        public void FillList(List<UnityObject> _other)
         {
-            Clear();
+            Value.Clear();
             foreach (var item in _other)
             {
                 Value.Add(item as T);
             }
-        }
-
-        public void Clear()
-        {
-            value.Clear();
         }
     }
 }

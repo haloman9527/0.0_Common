@@ -12,7 +12,8 @@
  */
 #endregion
 using System.Collections.Generic;
-using Object = UnityEngine.Object;
+
+using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.SharedVariable
 {
@@ -22,7 +23,7 @@ namespace CZToolKit.Core.SharedVariable
 
         int GetInstanceID();
 
-        Object GetObject();
+        UnityObject GetObject();
 
         SharedVariable GetVariable(string _guid);
 
@@ -30,7 +31,7 @@ namespace CZToolKit.Core.SharedVariable
 
         void SetVariableValue(string _guid, object _value);
 
-        IList<SharedVariable> GetVariables();
+        IReadOnlyList<SharedVariable> GetVariables();
 
         void SetVariables(List<SharedVariable> _variables);
     }

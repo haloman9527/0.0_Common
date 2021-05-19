@@ -15,17 +15,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Object = UnityEngine.Object;
+using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.SharedVariable
 {
     public interface ISharedObject
     {
-        Object GetObject();
-        void SetObject(Object _object);
+        UnityObject GetObject();
+        void SetObject(UnityObject _object);
     }
 
-    public abstract class SharedObject<T> : SharedVariable<T>, ISharedObject where T : Object
+    public abstract class SharedObject<T> : SharedVariable<T>, ISharedObject where T : UnityObject
     {
         protected SharedObject() { }
 
@@ -33,12 +33,12 @@ namespace CZToolKit.Core.SharedVariable
 
         protected SharedObject(T _value) : base(_value) { }
 
-        public Object GetObject()
+        public UnityObject GetObject()
         {
             return Value;
         }
 
-        public void SetObject(Object _object)
+        public void SetObject(UnityObject _object)
         {
             Value = _object as T;
         }

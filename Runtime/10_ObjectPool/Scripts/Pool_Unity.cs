@@ -14,12 +14,12 @@
 using System;
 using UnityEngine;
 
-using Object = UnityEngine.Object;
+using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.ObjectPool
 {
     [Serializable]
-    public abstract class Pool_Unity<T> : PoolBase<T> where T : Object
+    public abstract class Pool_Unity<T> : PoolBase<T> where T : UnityObject
     {
         public override T Spawn()
         {

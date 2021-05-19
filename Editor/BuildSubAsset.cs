@@ -4,7 +4,7 @@ using UnityEditorInternal;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Object = UnityEngine.Object;
+using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
@@ -20,10 +20,10 @@ namespace CZToolKit.Core.Editors
         public class ObjectInfo
         {
             public string name;
-            public Object children;
+            public UnityObject children;
         }
 
-        public Object parent;
+        public UnityObject parent;
         public List<ObjectInfo> childrens = new List<ObjectInfo>();
 
         SerializedObject serializedObject;
@@ -43,7 +43,7 @@ namespace CZToolKit.Core.Editors
             LoadAsset(parent);
         }
 
-        private void LoadAsset(Object _parent)
+        private void LoadAsset(UnityObject _parent)
         {
             if (_parent != null)
             {
@@ -81,7 +81,7 @@ namespace CZToolKit.Core.Editors
             // 绘制资源
             r.x += r.width + 5;
             r.width = rect.width * 0.7f - 30;
-            Object tempObj = EditorGUI.ObjectField(r, objectInfo.children, typeof(Object), false);
+            UnityObject tempObj = EditorGUI.ObjectField(r, objectInfo.children, typeof(UnityObject), false);
             if (parent != tempObj && objectInfo.children != tempObj)
             {
                 objectInfo.children = tempObj;
@@ -106,7 +106,7 @@ namespace CZToolKit.Core.Editors
             EditorGUI.BeginChangeCheck();
             GUILayout.BeginHorizontal();
             // 绘制父级资源
-            Object tempParent = EditorGUILayout.ObjectField(parent, typeof(Object), false);
+            UnityObject tempParent = EditorGUILayout.ObjectField(parent, typeof(UnityObject), false);
             if (GUILayout.Button(EditorGUIUtility.FindTexture("Refresh"), GUILayout.Width(25)))
                 LoadAsset(parent);
             if (GUILayout.Button(EditorGUIUtility.FindTexture("winbtn_mac_close_h"), GUILayout.Width(25)))
@@ -118,7 +118,7 @@ namespace CZToolKit.Core.Editors
             dragDropArea.x += 3;
             dragDropArea.width -= 6;
             GUI.Box(dragDropArea, "拖拽资源到此区域", (GUIStyle)"GroupBox");
-            Object t = EditorGUIExtension.DragDropAreaSingle(dragDropArea);
+            UnityObject t = EditorGUIExtension.DragDropAreaSingle(dragDropArea);
             if (t != null)
                 tempParent = t;
 
@@ -141,7 +141,7 @@ namespace CZToolKit.Core.Editors
             dragDropAreaM.x += 3;
             dragDropAreaM.width -= 6;
             GUI.Box(dragDropAreaM, "批量添加子级", (GUIStyle)"GroupBox");
-            Object[] objs = EditorGUIExtension.DragDropAreaMulti(dragDropAreaM);
+            UnityObject[] objs = EditorGUIExtension.DragDropAreaMulti(dragDropAreaM);
             if (objs != null)
             {
                 foreach (var obj in objs)
@@ -158,7 +158,7 @@ namespace CZToolKit.Core.Editors
             // 点击按钮开始构建
             if (GUILayout.Button("Build", GUILayout.Height(50)) && parent != null)
             {
-                List<Object> rawChildrens = AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetDatabase.GetAssetPath(parent)).ToList();
+                List<UnityObject> rawChildrens = AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetDatabase.GetAssetPath(parent)).ToList();
 
                 // 添加列表中新增加的资源到子级
                 foreach (var child in childrens)
@@ -169,7 +169,7 @@ namespace CZToolKit.Core.Editors
                         continue;
                     }
 
-                    Object obj = Instantiate(child.children);
+                    UnityObject obj = Instantiate(child.children);
                     obj.name = child.name;
                     AssetDatabase.AddObjectToAsset(obj, parent);
                 }

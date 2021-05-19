@@ -25,8 +25,10 @@ namespace CZToolKit.Core.SharedVariable.Editors
             SharedVariable variable = Value as SharedVariable;
             IVariableOwner variableOwner = variable.VariableOwner;
             if (variableOwner == null) { EditorGUILayout.HelpBox("没有VariableOwner", MessageType.Error); return; }
-            EditorGUILayout.HelpBox("ReferenceType:" + variable.GUID, MessageType.Info);
-            variable.SetValue(EditorGUILayoutExtension.DrawField(label, variable.GetValueType(), variable.GetValue()));
+            //EditorGUILayout.HelpBox("ReferenceType:" + variable.GUID, MessageType.Info);
+            object value = EditorGUILayoutExtension.DrawField(label, variable.GetValueType(), variable.GetValue());
+            if (!value.Equals(variable.GetValue()))
+                variable.SetValue(value);
             if (GUI.changed)
                 EditorUtility.SetDirty(variableOwner.GetObject());
         }
