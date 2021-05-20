@@ -26,6 +26,7 @@ namespace CZToolKit.Core.SharedVariable
         [SerializeField, HideInInspector]
         protected string guid;
 
+        [NonSerialized]
         IVariableOwner variableOwner;
 
         public string GUID
@@ -61,7 +62,9 @@ namespace CZToolKit.Core.SharedVariable
         [SerializeField]
         protected T value;
 
+        [NonSerialized]
         Func<T> getter;
+        [NonSerialized]
         Action<T> setter;
 
         public T Value
@@ -88,20 +91,25 @@ namespace CZToolKit.Core.SharedVariable
         public override void InitializePropertyMapping(IVariableOwner _variableOwner)
         {
             VariableOwner = _variableOwner;
+            if (VariableOwner == null)
+            {
+                getter = null;
+                setter = null;
+                return;
+            }
             getter = () =>
             {
                 SharedVariable<T> variable = _variableOwner.GetVariable(GUID) as SharedVariable<T>;
-            
                 if (variable != null) return variable.Value;
                 return value;
             };
             setter = _value =>
             {
-                SharedVariable variable = _variableOwner.GetVariable(GUID);
+                SharedVariable variable = VariableOwner.GetVariable(GUID);
                 if (variable == null)
                 {
                     variable = this.Clone() as SharedVariable;
-                    _variableOwner.SetVariable(variable);
+                    VariableOwner.SetVariable(variable);
                 }
                 variable.SetValue(_value);
             };
