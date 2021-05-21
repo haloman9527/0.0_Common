@@ -13,6 +13,13 @@ namespace CZToolKit.Core.Editors
             if (!GUIContentsCache.TryGetValue(_name, out content))
                 content = new GUIContent(_name);
             content.tooltip = string.Empty;
+            content.image = null;
+            return content;
+        }
+        public static GUIContent GetGUIContent(string _name, Texture2D _image)
+        {
+            GUIContent content = GetGUIContent(_name);
+            content.image = _image;
             return content;
         }
 
@@ -20,6 +27,14 @@ namespace CZToolKit.Core.Editors
         {
             GUIContent content = GetGUIContent(_name);
             content.tooltip = _tooltip;
+            return content;
+        }
+
+        public static GUIContent GetGUIContent(string _name, string _tooltip, Texture2D _image)
+        {
+            GUIContent content = GetGUIContent(_name);
+            content.tooltip = _tooltip;
+            content.image = _image;
             return content;
         }
 

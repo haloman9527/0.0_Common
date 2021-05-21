@@ -3,6 +3,31 @@ using UnityEngine;
 
 public static partial class Extension
 {
+    public static bool IsZero(this Vector2 v2)
+    {
+        return v2 == Vector2.zero;
+    }
+
+    public static bool IsZero(this Vector2Int v2Int)
+    {
+        return v2Int == Vector2Int.zero;
+    }
+
+    public static bool IsZero(this Vector3 v3)
+    {
+        return v3 == Vector3.zero;
+    }
+
+    public static bool IsZero(this Vector3Int v3Int)
+    {
+        return v3Int == Vector3Int.zero;
+    }
+
+    public static bool IsZero(this Vector4 v4)
+    {
+        return v4 == Vector4.zero;
+    }
+
     /// <summary> 获取CC的真实高度 </summary>
     public static float GetRealHeight(this CharacterController characterController)
     {

@@ -23,7 +23,6 @@ namespace CZToolKit.Core.Editors
 
         protected virtual void OnEnable()
         {
-            //resizableArea = new ResizableArea();
             resizableArea.minSize = new Vector2(LeftMinWidth, 50);
             resizableArea.side = 10;
             resizableArea.EnableSide(UIDirection.Right);
@@ -63,42 +62,29 @@ namespace CZToolKit.Core.Editors
             sideRect.width = 1;
             EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
 
-            Rect rightRect = new Rect(resizableAreaRect.width + 2, 0, position.width - resizableAreaRect.width - 4, position.height);
+            Rect rightRect = sideRect;
+            rightRect.x += rightRect.width + 1;
+            rightRect.width = position.width - resizableAreaRect.width - 3;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
+
             GUILayout.BeginArea(rightRect);
+            rightRect.x = 0;
+            rightRect.y = 0;
             IList<int> selection = menuTreeView.GetSelection();
             if (selection.Count > 0)
-                OnRightGUI(rightRect, menuTreeView.Find(selection[0]));
+            {
+                OnRightGUI(rightRect, menuTreeView.Find(selection[0]) as CZMenuTreeViewItem);
+            }
             GUILayout.EndArea();
         }
 
         protected abstract CZMenuTreeView BuildMenuTree(TreeViewState _treeViewState);
 
-        protected virtual void OnRightGUI(Rect _rect, CZMenuTreeViewItem _selectedItem)
-        {
-            _selectedItem.rightDrawer?.Invoke(_rect);
-        }
+        protected virtual void OnRightGUI(Rect _rect, CZMenuTreeViewItem _selectedItem) { }
     }
 
-    public class CZMenuTreeView : TreeView
+    public class CZMenuTreeView : CZTreeView
     {
-        public static GUIStyle labelStyle;
-        public static GUIStyle LabelStype
-        {
-            get
-            {
-                if (labelStyle == null)
-                {
-                    labelStyle = new GUIStyle(GUI.skin.label);
-                    labelStyle.alignment = TextAnchor.MiddleLeft;
-                }
-                return labelStyle;
-            }
-        }
-
-        List<TreeViewItem> items = new List<TreeViewItem>();
-        Dictionary<int, CZMenuTreeViewItem> treeViewItemMap = new Dictionary<int, CZMenuTreeViewItem>();
-
         public CZMenuTreeView(TreeViewState state) : base(state)
         {
             rowHeight = 30;
@@ -107,53 +93,16 @@ namespace CZToolKit.Core.Editors
 #endif
         }
 
-        protected override TreeViewItem BuildRoot()
+        public T AddMenuItem<T>(string _path) where T : CZMenuTreeViewItem, new()
         {
-            TreeViewItem root = new TreeViewItem(-1, -1, "Root");
-            root.children = items;
-
-            SetupDepthsFromParentsAndChildren(root);
-            return root;
+            return AddMenuItem<T>(_path, (Texture2D)null);
         }
 
-        public CZMenuTreeViewItem AddMenuItem(string _path)
-        {
-            return AddMenuItem(_path, null);
-        }
-
-        int itemCount = 0;
-        public CZMenuTreeViewItem AddMenuItem(string _path, Texture2D _icon)
+        public T AddMenuItem<T>(string _path, Texture2D _icon) where T : CZMenuTreeViewItem, new()
         {
             if (string.IsNullOrEmpty(_path)) return null;
-            List<TreeViewItem> current = items;
-            string[] path = _path.Split('/');
-            if (path.Length > 1)
-            {
-                for (int i = 0; i < path.Length - 1; i++)
-                {
-                    CZMenuTreeViewItem currentParent = current.Find(t => t.displayName == path[i]) as CZMenuTreeViewItem;
-                    if (currentParent == null)
-                    {
-                        currentParent = new CZMenuTreeViewItem();
-                        currentParent.children = new List<TreeViewItem>();
-                        currentParent.displayName = path[i];
-                        currentParent.id = itemCount;
-                        current.Add(currentParent);
-                        treeViewItemMap[itemCount] = currentParent;
-                        itemCount++;
-                    }
-                    current = currentParent.children;
-                }
-            }
-
-            CZMenuTreeViewItem item = new CZMenuTreeViewItem();
-            item.id = itemCount;
-            item.displayName = path[path.Length - 1];
-            item.children = new List<TreeViewItem>();
+            T item = new T();
             item.icon = _icon;
-            current.Add(item);
-            treeViewItemMap[itemCount] = item;
-            itemCount++;
             return item;
         }
 
@@ -162,13 +111,6 @@ namespace CZToolKit.Core.Editors
             int index = _path.LastIndexOf('/');
             if (index == -1) return null;
             return _path.Substring(0, index);
-        }
-
-        public CZMenuTreeViewItem Find(int id)
-        {
-            CZMenuTreeViewItem item = null;
-            treeViewItemMap.TryGetValue(id, out item);
-            return item;
         }
 
         protected override bool CanRename(TreeViewItem item)
@@ -196,19 +138,23 @@ namespace CZToolKit.Core.Editors
 
             Rect labelRect = args.rowRect;
             if (hasSearch)
+            {
                 labelRect.x += depthIndentWidth;
+                labelRect.width -= labelRect.x;
+            }
             else
+            {
                 labelRect.x += item.depth * depthIndentWidth + depthIndentWidth;
-            GUI.Label(labelRect, new GUIContent(item.displayName, item.icon), LabelStype);
-            item.itemDrawer?.Invoke(args.rowRect);
+                labelRect.width -= labelRect.x;
+            }
+            GUI.Label(labelRect, EditorGUIExtension.GetGUIContent(item.displayName, item.icon), EditorStylesExtension.LeftLabelStyle);
+            item.itemDrawer?.Invoke(args.rowRect, item);
         }
     }
 
-    public class CZMenuTreeViewItem : TreeViewItem
+    public class CZMenuTreeViewItem : CZTreeViewItem
     {
-        public Action<Rect> itemDrawer;
-        public Action<Rect> rightDrawer;
-
+        public Action<Rect, CZMenuTreeViewItem> itemDrawer;
         public CZMenuTreeViewItem() : base() { }
     }
 }
