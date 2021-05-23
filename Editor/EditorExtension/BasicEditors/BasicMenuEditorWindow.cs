@@ -129,25 +129,8 @@ namespace CZToolKit.Core.Editors
 
         protected override void RowGUI(RowGUIArgs args)
         {
-            Rect lineRect = args.rowRect;
-            lineRect.y += lineRect.height;
-            lineRect.height = 1;
-            EditorGUI.DrawRect(lineRect, new Color(0.5f, 0.5f, 0.5f, 1));
-
+            base.RowGUI(args);
             CZMenuTreeViewItem item = args.item as CZMenuTreeViewItem;
-
-            Rect labelRect = args.rowRect;
-            if (hasSearch)
-            {
-                labelRect.x += depthIndentWidth;
-                labelRect.width -= labelRect.x;
-            }
-            else
-            {
-                labelRect.x += item.depth * depthIndentWidth + depthIndentWidth;
-                labelRect.width -= labelRect.x;
-            }
-            GUI.Label(labelRect, EditorGUIExtension.GetGUIContent(item.displayName, item.icon), EditorStylesExtension.LeftLabelStyle);
             item.itemDrawer?.Invoke(args.rowRect, item);
         }
     }

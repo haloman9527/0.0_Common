@@ -12,7 +12,9 @@
  */
 #endregion
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
@@ -28,12 +30,13 @@ namespace CZToolKit.Core.Editors
         protected List<TreeViewItem> items = new List<TreeViewItem>();
         protected Dictionary<int, CZTreeViewItem> treeViewItemMap = new Dictionary<int, CZTreeViewItem>();
 
+        public float RowHeight { get => rowHeight; set => rowHeight = value; }
+        public bool ShowBoder { get => showBorder; set => showBorder = value; }
+        public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
+
         public CZTreeView(TreeViewState state) : base(state) { }
 
         public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader) { }
-
-        public bool ShowBoder { get => showBorder; set => showBorder = value; }
-        public bool ShowAlternatingRowBackgrounds  { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
 
         protected override TreeViewItem BuildRoot()
         {
@@ -42,6 +45,29 @@ namespace CZToolKit.Core.Editors
 
             SetupDepthsFromParentsAndChildren(root);
             return root;
+        }
+
+        protected override void RowGUI(RowGUIArgs args)
+        {
+            Rect rowRect = args.rowRect;
+            rowRect.y += rowRect.height;
+            rowRect.height = 1;
+            EditorGUI.DrawRect(rowRect, new Color(0.5f, 0.5f, 0.5f, 1));
+
+            CZTreeViewItem item = args.item as CZTreeViewItem;
+
+            Rect labelRect = args.rowRect;
+            if (hasSearch)
+            {
+                labelRect.x += depthIndentWidth;
+                labelRect.width -= labelRect.x;
+            }
+            else
+            {
+                labelRect.x += item.depth * depthIndentWidth + depthIndentWidth;
+                labelRect.width -= labelRect.x;
+            }
+            GUI.Label(labelRect, EditorGUIExtension.GetGUIContent(item.displayName, item.icon), EditorStylesExtension.LeftLabelStyle);
         }
 
         public void AddMenuItem<T>(string _path, T _treeViewItem) where T : CZTreeViewItem

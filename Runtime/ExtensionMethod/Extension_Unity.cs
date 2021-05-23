@@ -18,6 +18,15 @@ public static partial class Extension
         return v3 == Vector3.zero;
     }
 
+    /// <summary> 检查向量是否在允许范围内存在小幅度误差 </summary>
+    public static bool IsExceeding(this Vector3 vector3, float magnitude)
+    {
+        // 允许百分之1的误差
+        const float errorTolerance = 1.01f;
+        return vector3.sqrMagnitude > magnitude * magnitude * errorTolerance;
+    }
+
+
     public static bool IsZero(this Vector3Int v3Int)
     {
         return v3Int == Vector3Int.zero;

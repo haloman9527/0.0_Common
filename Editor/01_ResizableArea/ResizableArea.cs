@@ -87,7 +87,7 @@ namespace CZToolKit.Core.Editors
             {
                 if (enabledSides.HasFlag(direction))
                 {
-                    float offset = 0;
+                    float offset;
                     SideOffset.TryGetValue(direction, out offset);
                     Sides[direction] = _rect.GetSide(direction, side, offset);
                 }
