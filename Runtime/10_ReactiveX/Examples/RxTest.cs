@@ -4,7 +4,7 @@ using CZToolKit.Core.ReactiveX;
 using System.Threading;
 using System;
 using System.Linq;
-
+using System.Collections;
 
 public class RxTest : MonoBehaviour, IOnDestory
 {

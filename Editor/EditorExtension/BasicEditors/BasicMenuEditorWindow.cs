@@ -18,8 +18,11 @@ namespace CZToolKit.Core.Editors
         CZMenuTreeView menuTreeView;
         TreeViewState treeViewState = new TreeViewState();
 
+        Rect rightRect;
+
         protected virtual float LeftMinWidth { get { return 50; } }
         protected virtual float RightMinWidth { get { return 500; } }
+        protected Rect RightRect { get { return rightRect; } }
 
         protected virtual void OnEnable()
         {
@@ -62,7 +65,7 @@ namespace CZToolKit.Core.Editors
             sideRect.width = 1;
             EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
 
-            Rect rightRect = sideRect;
+            rightRect = sideRect;
             rightRect.x += rightRect.width + 1;
             rightRect.width = position.width - resizableAreaRect.width - 3;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
@@ -73,14 +76,14 @@ namespace CZToolKit.Core.Editors
             IList<int> selection = menuTreeView.GetSelection();
             if (selection.Count > 0)
             {
-                OnRightGUI(rightRect, menuTreeView.Find(selection[0]) as CZMenuTreeViewItem);
+                OnRightGUI(menuTreeView.Find(selection[0]) as CZMenuTreeViewItem);
             }
             GUILayout.EndArea();
         }
 
         protected abstract CZMenuTreeView BuildMenuTree(TreeViewState _treeViewState);
 
-        protected virtual void OnRightGUI(Rect _rect, CZMenuTreeViewItem _selectedItem) { }
+        protected virtual void OnRightGUI(CZMenuTreeViewItem _selectedItem) { }
     }
 
     public class CZMenuTreeView : CZTreeView
