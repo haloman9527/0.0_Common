@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace CZToolKit.Core
 {
@@ -41,7 +42,7 @@ namespace CZToolKit.Core
 
     public static class Easing
     {
-        private static System.Func<float, float, float, float>[] _tweens;
+        private static Func<float, float, float, float>[] _tweens;
 
         static Easing()
         {
@@ -84,7 +85,7 @@ namespace CZToolKit.Core
 
         public static float Tween(float start, float end, float t, EasingType easingType)
         {
-            return _tweens[(int)easingType].Invoke(start, end, t);
+            return _tweens[(int)easingType](start, end, t);
         }
 
         public static float Linear(float start, float end, float t)
@@ -347,8 +348,6 @@ namespace CZToolKit.Core
             return end * 0.5f * ((t) * t * (((s) + 1) * t + s) + 2) + start;
         }
 
-
-
         /* GFX47 MOD START */
         public static float EaseInElastic(float start, float end, float t)
         {
@@ -378,7 +377,6 @@ namespace CZToolKit.Core
         /* GFX47 MOD END */
 
         /* GFX47 MOD START */
-        //public static float elastic(float start, float end, float t){
         public static float EaseOutElastic(float start, float end, float t)
         {
             /* GFX47 MOD END */
@@ -451,6 +449,5 @@ namespace CZToolKit.Core
             s = period / (2 * Mathf.PI) * Mathf.Asin(0);
             return (amplitude * Mathf.Pow(2, -10 * t) * Mathf.Sin((t * 1 - s) * (2 * Mathf.PI) / period));
         }
-
     }
 }

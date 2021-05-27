@@ -6,6 +6,33 @@ namespace CZToolKit.Core
 {
     public static partial class Utility
     {
+        static Dictionary<string, Assembly> AssemblyCache = new Dictionary<string, Assembly>();
+        static Dictionary<string, Type> FullNameTypeCache = new Dictionary<string, Type>();
+
+        public static Assembly LoadAssembly(string _assemblyString)
+        {
+            Assembly assembly;
+            if (!AssemblyCache.TryGetValue(_assemblyString, out assembly))
+                AssemblyCache[_assemblyString] = assembly = Assembly.Load(_assemblyString);
+            return assembly;
+        }
+
+        public static Type GetType(string _fullName, string _assemblyString)
+        {
+            Type type;
+            if (FullNameTypeCache.TryGetValue(_fullName, out type))
+                return type;
+            Assembly assembly = LoadAssembly(_assemblyString);
+            if (assembly == null) return null;
+            foreach (var tempType in assembly.GetTypes())
+            {
+                FullNameTypeCache[tempType.FullName] = tempType;
+            }
+            if (FullNameTypeCache.TryGetValue(_fullName, out type))
+                return type;
+            return null;
+        }
+
         #region GetMemberInfo
         static Dictionary<Type, List<FieldInfo>> TypeFieldInfoCache = new Dictionary<Type, List<FieldInfo>>();
 

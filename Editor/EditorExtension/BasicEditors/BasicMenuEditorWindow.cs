@@ -20,9 +20,27 @@ namespace CZToolKit.Core.Editors
 
         Rect rightRect;
 
-        protected virtual float LeftMinWidth { get { return 50; } }
-        protected virtual float RightMinWidth { get { return 500; } }
-        protected Rect RightRect { get { return rightRect; } }
+        protected virtual float LeftMinWidth
+        {
+            get
+            {
+                return 50;
+            }
+        }
+        protected virtual float RightMinWidth
+        {
+            get
+            {
+                return 500;
+            }
+        }
+        protected Rect RightRect
+        {
+            get
+            {
+                return rightRect;
+            }
+        }
 
         protected virtual void OnEnable()
         {
@@ -38,11 +56,6 @@ namespace CZToolKit.Core.Editors
 
         void OnGUI()
         {
-            resizableArea.maxSize = position.size;
-
-            resizableAreaRect.height = position.height;
-            resizableAreaRect = resizableArea.OnGUI(resizableAreaRect);
-
             Rect searchFieldRect = resizableAreaRect;
             searchFieldRect.height = 20;
             searchFieldRect.y += 3;
@@ -55,9 +68,13 @@ namespace CZToolKit.Core.Editors
                 menuTreeView.searchString = searchText;
             }
 
+            resizableArea.maxSize = position.size;
+            resizableAreaRect.height = position.height;
+            resizableAreaRect = resizableArea.OnGUI(resizableAreaRect);
+
             Rect treeviewRect = resizableAreaRect;
-            treeviewRect.y += 20;
-            treeviewRect.height -= 20;
+            treeviewRect.y += searchFieldRect.height;
+            treeviewRect.height -= searchFieldRect.height;
             menuTreeView.OnGUI(treeviewRect);
 
             Rect sideRect = resizableAreaRect;
@@ -67,7 +84,7 @@ namespace CZToolKit.Core.Editors
 
             rightRect = sideRect;
             rightRect.x += rightRect.width + 1;
-            rightRect.width = position.width - resizableAreaRect.width - 3;
+            rightRect.width = position.width - resizableAreaRect.width - sideRect.width - 2;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
 
             GUILayout.BeginArea(rightRect);
@@ -75,9 +92,7 @@ namespace CZToolKit.Core.Editors
             rightRect.y = 0;
             IList<int> selection = menuTreeView.GetSelection();
             if (selection.Count > 0)
-            {
                 OnRightGUI(menuTreeView.Find(selection[0]) as CZMenuTreeViewItem);
-            }
             GUILayout.EndArea();
         }
 
@@ -103,7 +118,8 @@ namespace CZToolKit.Core.Editors
 
         public T AddMenuItem<T>(string _path, Texture2D _icon) where T : CZMenuTreeViewItem, new()
         {
-            if (string.IsNullOrEmpty(_path)) return null;
+            if (string.IsNullOrEmpty(_path))
+                return null;
             T item = new T();
             item.icon = _icon;
             return item;
@@ -112,7 +128,8 @@ namespace CZToolKit.Core.Editors
         public string GetParentPath(string _path)
         {
             int index = _path.LastIndexOf('/');
-            if (index == -1) return null;
+            if (index == -1)
+                return null;
             return _path.Substring(0, index);
         }
 

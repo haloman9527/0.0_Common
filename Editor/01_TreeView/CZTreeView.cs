@@ -23,7 +23,7 @@ namespace CZToolKit.Core.Editors
         public object userData;
     }
 
-    public class CZTreeView : TreeView
+    public abstract class CZTreeView : TreeView
     {
         int itemCount = 0;
 

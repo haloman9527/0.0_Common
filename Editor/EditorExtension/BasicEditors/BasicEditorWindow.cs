@@ -8,7 +8,6 @@ namespace CZToolKit.Core.Editors
 {
     public abstract class BasicEditorWindow : EditorWindow
     {
-
         static GUIStyle csIconStyle;
         static GUIContent csIcon;
 
