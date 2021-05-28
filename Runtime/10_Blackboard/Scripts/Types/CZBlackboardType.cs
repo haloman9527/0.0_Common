@@ -4,13 +4,13 @@ using UnityEngine;
 namespace CZToolKit.Core.Blackboards
 {
     [Serializable]
-    public class CZBlackboardType : CZType<CZBlackboard>
+    public class CZBlackboardType : CZType<CZBlackboardAsset>
     {
         public CZBlackboardType() : base()
         { Value = null; }
 
-        public CZBlackboardType(CZBlackboard _value) : base(_value) { }
+        public CZBlackboardType(CZBlackboardAsset _value) : base(_value) { }
 
-        public static implicit operator CZBlackboardType(CZBlackboard _other) { return new CZBlackboardType(_other); }
+        public static implicit operator CZBlackboardType(CZBlackboardAsset _other) { return new CZBlackboardType(_other); }
     }
 }

@@ -4,10 +4,26 @@ using CZToolKit.Core.ReactiveX;
 using System.Threading;
 using System;
 using System.Linq;
+using CZToolKit.Core.SharedVariable;
+using OdinSerializer;
+using System.Text;
 
 public class RxTest : MonoBehaviour, IOnDestory
 {
     public Action onDistroy { get; set; }
+
+    List<UnityEngine.Object> objects;
+
+    private void Awake()
+    {
+
+        List<SharedVariable> variables = new List<SharedVariable>();
+        variables.Add(new SharedTransform(transform));
+        variables.Add(new SharedFloat(123));
+        string s = Encoding.UTF8.GetString(SerializationUtility.SerializeValue(variables, DataFormat.JSON, out objects));
+        variables = SerializationUtility.DeserializeValue<List<SharedVariable>>(Encoding.UTF8.GetBytes(s), DataFormat.JSON, objects);
+        Debug.Log(variables.Count);
+    }
 
     private void Start()
     {

@@ -12,7 +12,7 @@ namespace CZToolKit.Core.Blackboards
 #endif
     public interface ICZType
     {
-        Type PropertyType { get; }
+        Type ValueType { get; }
 
         object GetValue();
         void SetValue(object _value);
@@ -23,11 +23,12 @@ namespace CZToolKit.Core.Blackboards
     {
         [SerializeField]
         T value;
-        public Type PropertyType => typeof(T);
 
         public T Value { get { return value; } set { this.value = value; } }
 
-        public CZType() { }
+        public Type ValueType => typeof(T);
+
+        public CZType() {  }
 
         public CZType(T _value) { value = _value; }
 
