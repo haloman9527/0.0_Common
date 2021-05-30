@@ -30,6 +30,12 @@ namespace CZToolKit.Core.Blackboards
         public IReadOnlyDictionary<string, ICZType> DataMap { get { return dataMap; } }
         public IReadOnlyDictionary<string, string> GUIDMap { get { return guidMap; } }
 
+        //public CZBlackboard()
+        //{
+        //    dataMap = new Dictionary<string, ICZType>()
+        //    guidMap = new Dictionary<string, string>();
+        //}
+
         public bool ContainsName(string _name)
         {
             return guidMap.ContainsKey(_name);
@@ -109,6 +115,14 @@ namespace CZToolKit.Core.Blackboards
             guidMap.Remove(_oldName);
             guidMap[_newName] = guid;
             return true;
+        }
+
+        public void Fixed()
+        {
+            if (dataMap == null)
+                dataMap = new Dictionary<string, ICZType>();
+            if (guidMap == null)
+                guidMap = new Dictionary<string, string>();
         }
     }
 }

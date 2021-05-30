@@ -26,9 +26,16 @@ namespace CZToolKit.Core.Blackboards
 
         public T Value { get { return value; } set { this.value = value; } }
 
-        public Type ValueType => typeof(T);
+        public Type ValueType
+        {
+            get
+            {
+                if (value == null) return typeof(T);
+                return value.GetType();
+            }
+        } 
 
-        public CZType() {  }
+        public CZType() { }
 
         public CZType(T _value) { value = _value; }
 
