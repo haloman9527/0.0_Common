@@ -39,7 +39,7 @@ namespace CZToolKit.Core.Singletons
 #if UNITY_EDITOR
                             string path = null;
                             // 查找特性
-                            if (Utility.TryGetTypeAttribute(typeof(T), out DefaultAssetPathAttribute defaultAssetPath))
+                            if (Utility_Attribute.TryGetTypeAttribute(typeof(T), out DefaultAssetPathAttribute defaultAssetPath))
                             {
                                 m_Instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(defaultAssetPath.DefaultAssetPath);
                                 path = defaultAssetPath.DefaultAssetPath;

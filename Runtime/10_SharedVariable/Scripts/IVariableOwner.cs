@@ -23,7 +23,7 @@ namespace CZToolKit.Core.SharedVariable
 
         int GetInstanceID();
 
-        UnityObject GetObject();
+        UnityObject Self();
 
         SharedVariable GetVariable(string _guid);
 

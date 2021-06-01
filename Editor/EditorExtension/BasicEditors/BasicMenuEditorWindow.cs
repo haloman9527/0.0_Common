@@ -4,11 +4,15 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
+using UnityObject = UnityEngine.Object;
+
 namespace CZToolKit.Core.Editors
 {
     [Serializable]
     public abstract class BasicMenuEditorWindow : BasicEditorWindow
     {
+        static readonly Dictionary<UnityObject, Editor> EditorCache = new Dictionary<UnityObject, Editor>();
+
         [SerializeField]
         ResizableArea resizableArea = new ResizableArea();
         protected Rect resizableAreaRect = new Rect(0, 0, 150, 150);
@@ -19,6 +23,7 @@ namespace CZToolKit.Core.Editors
         TreeViewState treeViewState = new TreeViewState();
 
         Rect rightRect;
+        Vector2 rightScroll;
 
         protected virtual float LeftMinWidth
         {
@@ -92,13 +97,26 @@ namespace CZToolKit.Core.Editors
             rightRect.y = 0;
             IList<int> selection = menuTreeView.GetSelection();
             if (selection.Count > 0)
+            {
+                rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
                 OnRightGUI(menuTreeView.Find(selection[0]) as CZMenuTreeViewItem);
+                GUILayout.EndScrollView();
+            }
             GUILayout.EndArea();
         }
 
         protected abstract CZMenuTreeView BuildMenuTree(TreeViewState _treeViewState);
 
-        protected virtual void OnRightGUI(CZMenuTreeViewItem _selectedItem) { }
+        protected virtual void OnRightGUI(CZMenuTreeViewItem _selectedItem)
+        {
+            if (_selectedItem.userData is UnityObject unityObject)
+            {
+                if (!EditorCache.TryGetValue(unityObject, out Editor editor))
+                    EditorCache[unityObject] = editor = Editor.CreateEditor(unityObject);
+                editor.OnInspectorGUI();
+                Repaint();
+            }
+        }
     }
 
     public class CZMenuTreeView : CZTreeView

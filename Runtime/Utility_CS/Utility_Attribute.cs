@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace CZToolKit.Core
 {
-    public static partial class Utility
+    public static partial class Utility_Attribute
     {
         #region Class
         /// <summary> 保存类的特性，在编译时重载 </summary>
@@ -69,7 +69,7 @@ namespace CZToolKit.Core
             out AttributeType _attribute)
             where AttributeType : Attribute
         {
-            return TryGetFieldInfoAttribute(GetFieldInfo(_type, _fieldName), out _attribute);
+            return TryGetFieldInfoAttribute(Utility_Refelection.GetFieldInfo(_type, _fieldName), out _attribute);
         }
 
         /// <summary> 尝试获取目标类型的目标字段的所有特性 </summary>
@@ -126,7 +126,7 @@ namespace CZToolKit.Core
             out AttributeType _attribute)
             where AttributeType : Attribute
         {
-            return TryGetMethodInfoAttribute(GetMethodInfo(_type, _methodName), out _attribute);
+            return TryGetMethodInfoAttribute(Utility_Refelection.GetMethodInfo(_type, _methodName), out _attribute);
         }
 
         /// <summary> 尝试获取目标类型的目标字段的所有特性 </summary>
@@ -158,7 +158,7 @@ namespace CZToolKit.Core
         public static bool TryGetMethodAttributes(Type _type, string _methodName,
             out Attribute[] _attributes)
         {
-            return TryGetMethodInfoAttributes(GetMethodInfo(_type, _methodName), out _attributes);
+            return TryGetMethodInfoAttributes(Utility_Refelection.GetMethodInfo(_type, _methodName), out _attributes);
         }
         #endregion
     }

@@ -4,10 +4,80 @@ using System.Reflection;
 
 namespace CZToolKit.Core
 {
-    public static partial class Utility
+
+    public static partial class Utility_Refelection
     {
-        static Dictionary<string, Assembly> AssemblyCache = new Dictionary<string, Assembly>();
-        static Dictionary<string, Type> FullNameTypeCache = new Dictionary<string, Type>();
+        static readonly Dictionary<string, Assembly> AssemblyCache = new Dictionary<string, Assembly>();
+        static readonly Dictionary<string, Type> FullNameTypeCache = new Dictionary<string, Type>();
+        static readonly List<Type> AllTypeCache = new List<Type>();
+        static readonly Dictionary<Type, IEnumerable<Type>> ChildrenTypeCache = new Dictionary<Type, IEnumerable<Type>>();
+
+        static Utility_Refelection()
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (assembly.FullName.StartsWith("Unity")) continue;
+                if (!assembly.FullName.Contains("Version=0.0.0")) continue;
+                AllTypeCache.AddRange(assembly.GetTypes());
+            }
+        }
+
+        public static IEnumerable<Type> GetChildrenTypes<T>()
+        {
+            return GetChildrenTypes(typeof(T));
+        }
+
+        public static IEnumerable<Type> GetChildrenTypes(Type baseType)
+        {
+            if (ChildrenTypeCache.TryGetValue(baseType, out IEnumerable<Type> childrenTypes))
+            {
+                foreach (var item in childrenTypes)
+                {
+                    yield return item;
+                }
+                yield break;
+            }
+
+            ChildrenTypeCache[baseType] = childrenTypes = BuildCache(baseType);
+            foreach (var type in childrenTypes)
+            {
+                yield return type;
+            }
+        }
+
+        private static IEnumerable<Type> BuildCache(Type _baseType)
+        {
+            foreach (var type in AllTypeCache)
+            {
+                if (_baseType.IsAssignableFrom(type))
+                    yield return type;
+            }
+            //var selfAssembly = Assembly.GetAssembly(_baseType);
+            //if (selfAssembly.FullName.StartsWith("Assembly-CSharp") && !selfAssembly.FullName.Contains("-firstpass"))
+            //{
+            //    foreach (var type in selfAssembly.GetTypes())
+            //    {
+            //        if (!type.IsAbstract && _baseType.IsAssignableFrom(type))
+            //        {
+            //            yield return type;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            //    foreach (Assembly assembly in assemblies)
+            //    {
+            //        if (assembly.FullName.StartsWith("Unity")) continue;
+            //        if (!assembly.FullName.Contains("Version=0.0.0")) continue;
+            //        foreach (var type in assembly.GetTypes())
+            //        {
+            //            if (type != null && !type.IsAbstract && _baseType.IsAssignableFrom(type))
+            //                yield return type;
+            //        }
+            //    }
+            //}
+        }
 
         public static Assembly LoadAssembly(string _assemblyString)
         {

@@ -39,7 +39,7 @@ namespace CZToolKit.Core.Editors
 
             foreach (var type in TypeCache.GetTypesDerivedFrom<ObjectEditor>())
             {
-                if (Utility.TryGetTypeAttribute(type, out CustomObjectEditorAttribute att))
+                if (Utility_Attribute.TryGetTypeAttribute(type, out CustomObjectEditorAttribute att))
                     ObjectEditorTypeCache[att.targetType] = type;
             }
         }
@@ -68,7 +68,7 @@ namespace CZToolKit.Core.Editors
         public void Initialize(object _target)
         {
             Target = _target;
-            Fields = Utility.GetFieldInfos(Target.GetType()).FindAll(field => EditorGUILayoutExtension.CanDraw(field));
+            Fields = Utility_Refelection.GetFieldInfos(Target.GetType()).FindAll(field => EditorGUILayoutExtension.CanDraw(field));
         }
 
         public string GetTitle() { return string.Empty; }

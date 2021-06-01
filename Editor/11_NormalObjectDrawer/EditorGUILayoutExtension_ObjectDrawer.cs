@@ -60,9 +60,9 @@ namespace CZToolKit.Core.Editors
 
         public static bool CanDraw(FieldInfo _fieldInfo)
         {
-            return !Utility.TryGetTypeAttribute(_fieldInfo.DeclaringType, out NonSerializedAttribute nonAtt)
-                    && !Utility.TryGetFieldInfoAttribute(_fieldInfo, out HideInInspector hideAtt)
-                    && ((!_fieldInfo.IsPrivate && !_fieldInfo.IsFamily) || Utility.TryGetFieldInfoAttribute(_fieldInfo, out SerializeField serAtt));
+            return !Utility_Attribute.TryGetTypeAttribute(_fieldInfo.DeclaringType, out NonSerializedAttribute nonAtt)
+                    && !Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out HideInInspector hideAtt)
+                    && ((!_fieldInfo.IsPrivate && !_fieldInfo.IsFamily) || Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out SerializeField serAtt));
         }
 
         /// <summary> 绘制内部所有字段 </summary>
@@ -70,7 +70,7 @@ namespace CZToolKit.Core.Editors
         {
             if (_object == null) return null;
 
-            List<FieldInfo> fields = Utility.GetFieldInfos(_object.GetType());
+            List<FieldInfo> fields = Utility_Refelection.GetFieldInfos(_object.GetType());
             for (int j = 0; j < fields.Count; j++)
             {
                 if (CanDraw(fields[j]))
@@ -102,7 +102,7 @@ namespace CZToolKit.Core.Editors
         public static object DrawField(FieldInfo _fieldInfo, object _value)
         {
             GUIContent content = null;
-            if (Utility.TryGetFieldInfoAttribute(_fieldInfo, out TooltipAttribute tooltipAtt))
+            if (Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out TooltipAttribute tooltipAtt))
                 content = EditorGUIExtension.GetGUIContent(ObjectNames.NicifyVariableName(_fieldInfo.Name), tooltipAtt.tooltip);
             else
                 content = EditorGUIExtension.GetGUIContent(ObjectNames.NicifyVariableName(_fieldInfo.Name));
@@ -287,8 +287,8 @@ namespace CZToolKit.Core.Editors
                 }
 
                 if (_fieldInfo != null
-                    && (Utility.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
-                    || Utility.TryGetTypeAttribute(elementType, out att)))
+                    && (Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
+                    || Utility_Attribute.TryGetTypeAttribute(elementType, out att)))
                 {
                     for (int k = 0; k < list.Count; k++)
                     {
@@ -321,8 +321,8 @@ namespace CZToolKit.Core.Editors
 
         private static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
         {
-            if (Utility.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
-                || Utility.TryGetTypeAttribute(_fieldType, out att))
+            if (Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
+                || Utility_Attribute.TryGetTypeAttribute(_fieldType, out att))
             {
                 FieldDrawer objectDrawer;
                 if ((objectDrawer = ObjectDrawerUtility.GetObjectDrawer(att)) != null)

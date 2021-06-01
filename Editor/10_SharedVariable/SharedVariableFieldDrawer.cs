@@ -33,7 +33,7 @@ namespace CZToolKit.Core.SharedVariable.Editors
             if (EditorGUI.EndChangeCheck())
             {
                 variable.SetValue(value);
-                EditorUtility.SetDirty(variableOwner.GetObject());
+                EditorUtility.SetDirty(variableOwner.Self());
             }
         }
     }
