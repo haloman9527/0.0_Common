@@ -3,28 +3,17 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.Events;
 
-//#if ODIN_INSPECTOR
-//using Sirenix.OdinInspector.Editor;
-//#endif
-
 namespace CZToolKit.Core.Editors
 {
-    public abstract class BasicEditor : UnityEditor.Editor
+    public abstract class BasicEditor : Editor
     {
         Dictionary<string, UnityAction<SerializedProperty>> customDrawers;
-        //#if ODIN_INSPECTOR
-        //        PropertyTree tree;
-        //#endif
 
         protected virtual void OnEnable()
         {
             EditorApplication.update += Update;
             customDrawers = new Dictionary<string, UnityAction<SerializedProperty>>();
             RegisterDrawers();
-
-            //#if ODIN_INSPECTOR
-            //            tree = PropertyTree.Create(serializedObject);
-            //#endif
         }
 
         private void OnDisable()
@@ -75,15 +64,7 @@ namespace CZToolKit.Core.Editors
 
         public override void OnInspectorGUI()
         {
-            //#if ODIN_INSPECTOR
-            //            if (tree != null)
-            //            {
-            //                tree.BeginDraw(true);
-            //                tree.Draw(true);
-            //                tree.EndDraw();
-            //            }
-            //#else
-            EditorGUI.BeginChangeCheck();
+            //EditorGUI.BeginChangeCheck();
 
             SerializedProperty iterator = serializedObject.GetIterator();
             iterator.NextVisible(true);
@@ -98,13 +79,11 @@ namespace CZToolKit.Core.Editors
                 }
             } while (iterator.NextVisible(false));
 
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(target);
-            }
-            serializedObject.Update();
-            //#endif
+            //if (EditorGUI.EndChangeCheck())
+            //{
+            //    serializedObject.ApplyModifiedProperties();
+            //    EditorUtility.SetDirty(target);
+            //}
         }
 
         private void DrawScript(SerializedProperty _serializedProperty)
