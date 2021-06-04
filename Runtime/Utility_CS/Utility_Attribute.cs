@@ -8,9 +8,9 @@ namespace CZToolKit.Core
     {
         #region Class
         /// <summary> 保存类的特性，在编译时重载 </summary>
-        private static readonly Dictionary<Type, Attribute[]> TypeAttributes = new Dictionary<Type, Attribute[]>();
+        static readonly Dictionary<Type, Attribute[]> TypeAttributes = new Dictionary<Type, Attribute[]>();
 
-        /// <summary> 尝试获取目标类型的目标特性 </summary>
+        /// <summary> 获取类型的特定特性 </summary>
         public static bool TryGetTypeAttribute<AttributeType>(Type _type, out AttributeType _attribute)
             where AttributeType : Attribute
         {
@@ -28,7 +28,7 @@ namespace CZToolKit.Core
             return false;
         }
 
-        /// <summary> 尝试获取目标类型的所有特性 </summary>
+        /// <summary> 获取类型的所有特性 </summary>
         public static bool TryGetTypeAttributes(Type _type, out Attribute[] _attributes)
         {
             if (TypeAttributes.TryGetValue(_type, out _attributes))
@@ -42,10 +42,10 @@ namespace CZToolKit.Core
 
         #region Field
         /// <summary> 保存字段的特性，在编译时重载 </summary>
-        private static readonly Dictionary<Type, Dictionary<string, Attribute[]>> TypeFieldAttributes =
+        static readonly Dictionary<Type, Dictionary<string, Attribute[]>> TypeFieldAttributes =
             new Dictionary<Type, Dictionary<string, Attribute[]>>();
 
-        /// <summary> 尝试获取目标类型的目标字段的目标特性 </summary>
+        /// <summary> 根据<paramref name="_fieldInfo"/>获取特定类型特性 </summary>
         public static bool TryGetFieldInfoAttribute<AttributeType>(FieldInfo _fieldInfo,
             out AttributeType _attribute)
             where AttributeType : Attribute
@@ -64,7 +64,7 @@ namespace CZToolKit.Core
             return false;
         }
 
-        /// <summary> 尝试获取目标类型的目标字段的目标特性 </summary>
+        /// <summary> 根据类型和字段名获取特定类型特性 </summary>
         public static bool TryGetFieldAttribute<AttributeType>(Type _type, string _fieldName,
             out AttributeType _attribute)
             where AttributeType : Attribute
@@ -72,7 +72,7 @@ namespace CZToolKit.Core
             return TryGetFieldInfoAttribute(Utility_Refelection.GetFieldInfo(_type, _fieldName), out _attribute);
         }
 
-        /// <summary> 尝试获取目标类型的目标字段的所有特性 </summary>
+        /// <summary> 根据<paramref name="_fieldInfo"/>获取所有特性 </summary>
         public static bool TryGetFieldInfoAttributes(FieldInfo _fieldInfo,
             out Attribute[] _attributes)
         {
@@ -100,7 +100,7 @@ namespace CZToolKit.Core
 
         #region Method
         /// <summary> 保存方法的特性，在编译时重载 </summary>
-        private static readonly Dictionary<Type, Dictionary<string, Attribute[]>> TypeMethodAttributes =
+        static readonly Dictionary<Type, Dictionary<string, Attribute[]>> TypeMethodAttributes =
             new Dictionary<Type, Dictionary<string, Attribute[]>>();
 
         public static bool TryGetMethodInfoAttribute<AttributeType>(MethodInfo _methodInfo,
@@ -121,7 +121,7 @@ namespace CZToolKit.Core
             return false;
         }
 
-        /// <summary> 尝试获取目标类型的目标字段的目标特性 </summary>
+        /// <summary> 根据类型和方法名获取特定类型特性 </summary>
         public static bool TryGetMethodAttribute<AttributeType>(Type _type, string _methodName,
             out AttributeType _attribute)
             where AttributeType : Attribute
@@ -129,7 +129,7 @@ namespace CZToolKit.Core
             return TryGetMethodInfoAttribute(Utility_Refelection.GetMethodInfo(_type, _methodName), out _attribute);
         }
 
-        /// <summary> 尝试获取目标类型的目标字段的所有特性 </summary>
+        /// <summary> 根据<paramref name="_methodInfo"/>获取所有特性 </summary>
         public static bool TryGetMethodInfoAttributes(MethodInfo _methodInfo,
             out Attribute[] _attributes)
         {
@@ -154,7 +154,7 @@ namespace CZToolKit.Core
             return false;
         }
 
-        /// <summary> 尝试获取目标类型的目标字段的所有特性 </summary>
+        /// <summary> 根据类型和方法名获取所有特性 </summary>
         public static bool TryGetMethodAttributes(Type _type, string _methodName,
             out Attribute[] _attributes)
         {

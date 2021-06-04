@@ -4,7 +4,6 @@ using System.Reflection;
 
 namespace CZToolKit.Core
 {
-
     public static partial class Utility_Refelection
     {
         static readonly Dictionary<string, Assembly> AssemblyCache = new Dictionary<string, Assembly>();
@@ -18,6 +17,7 @@ namespace CZToolKit.Core
             {
                 if (assembly.FullName.StartsWith("Unity")) continue;
                 if (!assembly.FullName.Contains("Version=0.0.0")) continue;
+                AssemblyCache[assembly.FullName] = assembly;
                 AllTypeCache.AddRange(assembly.GetTypes());
             }
         }
@@ -139,11 +139,11 @@ namespace CZToolKit.Core
         {
             // 如果第一次没有找到，那么这个变量可能是基类的私有字段
             MethodInfo method = _type.GetMethod(_methodName,
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
             // 只搜索基类的私有方法
             while (method == null && (_type = _type.BaseType) != null)
             {
-                method = _type.GetMethod(_methodName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                method = _type.GetMethod(_methodName, BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
             }
 
             return method;
