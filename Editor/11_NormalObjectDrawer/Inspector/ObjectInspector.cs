@@ -39,11 +39,6 @@ namespace CZToolKit.Core.Editors
             OnEnable(ObjectInspector.Instance.TargetObject);
             ObjectInspector.Instance.onTargetObjectChanged = () =>
             {
-                //if (ObjectInspector.Instance.TargetObject == null)
-                //{
-                //    Selection.activeObject = null;
-                //    return;
-                //}
                 OnEnable(ObjectInspector.Instance.TargetObject);
             };
 
