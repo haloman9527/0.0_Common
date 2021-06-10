@@ -25,24 +25,45 @@ namespace CZToolKit.Core.Editors
 
     public abstract class CZTreeView : TreeView
     {
+        private static void SplitMenuPath(string _menuPath, out string _path, out string _name)
+        {
+            _menuPath = _menuPath.Trim('/');
+            int num = _menuPath.LastIndexOf('/');
+            if (num == -1)
+            {
+                _path = "";
+                _name = _menuPath;
+                return;
+            }
+            _path = _menuPath.Substring(0, num);
+            _name = _menuPath.Substring(num + 1);
+        }
+
         int itemCount = 0;
 
-        protected List<TreeViewItem> items = new List<TreeViewItem>();
-        protected Dictionary<int, CZTreeViewItem> treeViewItemMap = new Dictionary<int, CZTreeViewItem>();
+        List<TreeViewItem> items = new List<TreeViewItem>();
+        Dictionary<int, CZTreeViewItem> treeViewItemIDMap = new Dictionary<int, CZTreeViewItem>();
 
         public float RowHeight { get => rowHeight; set => rowHeight = value; }
         public bool ShowBoder { get => showBorder; set => showBorder = value; }
         public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
+        public IReadOnlyList<TreeViewItem> Items { get => items; }
+        public IReadOnlyDictionary<int, CZTreeViewItem> TreeViewIDMap { get => treeViewItemIDMap; }
 
-        public CZTreeView(TreeViewState state) : base(state) { }
+        public CZTreeView(TreeViewState state) : base(state)
+        {
 
-        public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader) { }
+        }
+
+        public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
+        {
+
+        }
 
         protected override TreeViewItem BuildRoot()
         {
             TreeViewItem root = new TreeViewItem(-1, -1, "Root");
             root.children = items;
-
             SetupDepthsFromParentsAndChildren(root);
             return root;
         }
@@ -73,9 +94,9 @@ namespace CZToolKit.Core.Editors
         public void AddMenuItem<T>(string _path, T _treeViewItem) where T : CZTreeViewItem
         {
             if (string.IsNullOrEmpty(_path)) return;
-
             List<TreeViewItem> current = items;
             string[] path = _path.Split('/');
+            SplitMenuPath(_path, out string par, out string name);
             if (path.Length > 1)
             {
                 for (int i = 0; i < path.Length - 1; i++)
@@ -88,7 +109,7 @@ namespace CZToolKit.Core.Editors
                         currentParent.displayName = path[i];
                         currentParent.id = itemCount;
                         current.Add(currentParent);
-                        treeViewItemMap[itemCount] = currentParent;
+                        treeViewItemIDMap[itemCount] = currentParent;
                         itemCount++;
                     }
                     current = currentParent.children;
@@ -98,29 +119,28 @@ namespace CZToolKit.Core.Editors
             _treeViewItem.id = itemCount;
             _treeViewItem.displayName = path[path.Length - 1];
             _treeViewItem.children = new List<TreeViewItem>();
-
             current.Add(_treeViewItem);
-            treeViewItemMap[itemCount] = _treeViewItem;
+            treeViewItemIDMap[itemCount] = _treeViewItem;
             itemCount++;
         }
 
         public void Remove(CZTreeViewItem _treeViewItem)
         {
-            items.Remove(_treeViewItem as TreeViewItem);
-            treeViewItemMap.Remove(_treeViewItem.id);
+            items.Remove(_treeViewItem);
+            treeViewItemIDMap.Remove(_treeViewItem.id);
         }
 
-        public CZTreeViewItem Find(int id)
+        public CZTreeViewItem Find(int _id)
         {
-            CZTreeViewItem item = null;
-            treeViewItemMap.TryGetValue(id, out item);
+            CZTreeViewItem item;
+            TreeViewIDMap.TryGetValue(_id, out item);
             return item;
         }
 
         public void Clear()
         {
             items.Clear();
-            treeViewItemMap.Clear();
+            treeViewItemIDMap.Clear();
         }
     }
 }

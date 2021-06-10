@@ -12,6 +12,7 @@ namespace CZToolKit.Core.Editors
     public abstract class BasicMenuEditorWindow : BasicEditorWindow
     {
         static readonly Dictionary<UnityObject, Editor> EditorCache = new Dictionary<UnityObject, Editor>();
+        static readonly Dictionary<object, ObjectEditor> ObjectEditorCache = new Dictionary<object, ObjectEditor>();
 
         [SerializeField]
         ResizableArea resizableArea = new ResizableArea();
@@ -93,6 +94,7 @@ namespace CZToolKit.Core.Editors
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
 
             GUILayout.BeginArea(rightRect);
+
             rightRect.x = 0;
             rightRect.y = 0;
             IList<int> selection = menuTreeView.GetSelection();
@@ -109,12 +111,21 @@ namespace CZToolKit.Core.Editors
 
         protected virtual void OnRightGUI(CZMenuTreeViewItem _selectedItem)
         {
-            if (_selectedItem.userData is UnityObject unityObject)
+            switch (_selectedItem.userData)
             {
-                if (!EditorCache.TryGetValue(unityObject, out Editor editor))
-                    EditorCache[unityObject] = editor = Editor.CreateEditor(unityObject);
-                editor.OnInspectorGUI();
-                Repaint();
+                case UnityObject unityObject:
+                    if (!EditorCache.TryGetValue(unityObject, out Editor editor))
+                        EditorCache[unityObject] = editor = Editor.CreateEditor(unityObject);
+                    editor.OnInspectorGUI();
+                    Repaint();
+                    break;
+                case null:
+                    break;
+                default:
+                    if (!ObjectEditorCache.TryGetValue(_selectedItem.userData, out ObjectEditor objectEditor))
+                        ObjectEditorCache[_selectedItem.userData] = objectEditor = ObjectEditor.CreateEditor(_selectedItem.userData);
+                    objectEditor.OnInspectorGUI();
+                    break;
             }
         }
     }
@@ -149,6 +160,11 @@ namespace CZToolKit.Core.Editors
             if (index == -1)
                 return null;
             return _path.Substring(0, index);
+        }
+
+        protected override void DoubleClickedItem(int id)
+        {
+            SetExpanded(id, !IsExpanded(id));
         }
 
         protected override bool CanRename(TreeViewItem item)

@@ -44,6 +44,7 @@ namespace CZToolKit.Core.Editors
             }
         }
 
+
         public static ObjectEditor CreateEditor(object _targetObject)
         {
             if (_targetObject == null) return null;
@@ -62,12 +63,14 @@ namespace CZToolKit.Core.Editors
         protected IReadOnlyList<FieldInfo> Fields { get; private set; }
 
         public object Target { get; private set; }
+        public MonoScript Script { get; private set; }
 
         protected ObjectEditor() { }
 
         public void Initialize(object _target)
         {
             Target = _target;
+            Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
             Fields = Utility_Refelection.GetFieldInfos(Target.GetType()).FindAll(field => EditorGUILayoutExtension.CanDraw(field));
         }
 
@@ -80,6 +83,9 @@ namespace CZToolKit.Core.Editors
         public virtual void OnInspectorGUI()
         {
             //EditorGUILayoutExtension.DrawFields(ObjectInspector.Instance.targetObject);
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField("Script", Script, typeof(MonoScript), false);
+            EditorGUI.EndDisabledGroup();
             foreach (var field in Fields)
             {
                 EditorGUI.BeginChangeCheck();

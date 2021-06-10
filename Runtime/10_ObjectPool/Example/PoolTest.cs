@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using CZToolKit.Core.ObjectPool;
 
@@ -15,7 +14,7 @@ public class PoolTest : MonoBehaviour
 
     private void OnGUI()
     {
-        if (GUILayout.Button("创建对象",GUILayout.Height(50),GUILayout.Width(200)))
+        if (GUILayout.Button("创建对象", GUILayout.Height(50), GUILayout.Width(200)))
         {
             GameObject go = pool.Spawn();
             go.transform.position = Random.insideUnitSphere * 3;
@@ -27,5 +26,10 @@ public class PoolTest : MonoBehaviour
     {
         yield return new WaitForSeconds(3);
         pool.Recycle(go);
+    }
+
+    public void AnimationEvent()
+    {
+        Debug.Log(1);
     }
 }
