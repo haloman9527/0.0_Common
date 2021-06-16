@@ -172,55 +172,9 @@ namespace CZToolKit.Core.Editors
                 if (flag && EditorGUILayoutExtension.editingArray && (GUIUtility.keyboardControl != EditorGUILayoutExtension.currentKeyboardControl
                     || (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return)))
                 {
-                    //if (newCount != list.Count)
-                    //{
-                    //    Array array2 = Array.CreateInstance(_fieldType, newCount);
-                    //    int num3 = -1;
-                    //    for (int i = 0; i < newCount; i++)
-                    //    {
-                    //        if (i < list.Count)
-                    //        {
-                    //            num3 = i;
-                    //        }
-                    //        if (num3 == -1)
-                    //        {
-                    //            break;
-                    //        }
-                    //        object value2 = list[num3];
-                    //        if (i >= list.Count && !typeof(UnityEngine.Object).IsAssignableFrom(elementType) && !typeof(string).IsAssignableFrom(elementType))
-                    //        {
-                    //            value2 = Activator.CreateInstance(list[num3].GetType(), true);
-                    //        }
-                    //        array2.SetValue(value2, i);
-                    //    }
-                    //    if (_fieldType.IsArray)
-                    //    {
-                    //        list = array2;
-                    //    }
-                    //    else
-                    //    {
-                    //        if (_fieldType.IsGenericType)
-                    //        {
-                    //            list = (Activator.CreateInstance(typeof(List<>).MakeGenericType(new Type[]
-                    //            {
-                    //                elementType
-                    //            }), true) as IList);
-                    //        }
-                    //        else
-                    //        {
-                    //            list = (Activator.CreateInstance(_fieldType, true) as IList);
-                    //        }
-                    //        for (int j = 0; j < array2.Length; j++)
-                    //        {
-                    //            list.Add(array2.GetValue(j));
-                    //        }
-                    //    }
-                    //    SetFoldout(list.GetHashCode(), true, _content);
-                    //}
                     if (newCount != list.Count)
                     {
                         int currentCount = list.Count;
-
                         if (newCount > currentCount)
                         {
                             if (_fieldType.IsArray)
