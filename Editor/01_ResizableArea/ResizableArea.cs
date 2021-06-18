@@ -41,6 +41,7 @@ namespace CZToolKit.Core.Editors
                 return sideOffset;
             }
         }
+
         UIDirection[] Directions
         {
             get

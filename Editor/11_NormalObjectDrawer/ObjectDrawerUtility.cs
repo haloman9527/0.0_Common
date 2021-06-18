@@ -35,17 +35,17 @@ namespace CZToolKit.Core.Editors
             ObjectDrawerUtility.mapBuilt = true;
         }
 
-        private static bool ObjectDrawerForType(Type type, ref FieldDrawer objectDrawer, ref Type objectDrawerType, int hash)
+        private static bool ObjectDrawerForType(Type _fieldType, ref FieldDrawer _fieldDrawer, ref Type _fieldDrawerType, int _hash)
         {
             ObjectDrawerUtility.BuildObjectDrawers();
-            if (!ObjectDrawerUtility.objectDrawerTypeMap.ContainsKey(type))
+            if (!ObjectDrawerUtility.objectDrawerTypeMap.ContainsKey(_fieldType))
             {
                 return false;
             }
-            objectDrawerType = ObjectDrawerUtility.objectDrawerTypeMap[type];
-            if (ObjectDrawerUtility.objectDrawerMap.ContainsKey(hash))
+            _fieldDrawerType = ObjectDrawerUtility.objectDrawerTypeMap[_fieldType];
+            if (ObjectDrawerUtility.objectDrawerMap.ContainsKey(_hash))
             {
-                objectDrawer = ObjectDrawerUtility.objectDrawerMap[hash];
+                _fieldDrawer = ObjectDrawerUtility.objectDrawerMap[_hash];
             }
             return true;
         }

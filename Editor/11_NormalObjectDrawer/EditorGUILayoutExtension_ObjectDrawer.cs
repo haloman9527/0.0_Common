@@ -58,11 +58,13 @@ namespace CZToolKit.Core.Editors
             EditorPrefs.SetBool(text, value);
         }
 
+        /// <summary> 不是<see cref="private"/>、或者标记了<see cref="SerializeField"/>特性，并且没有标记<see cref="NonSerializedAttribute"/>特性，并且没有标记<see cref="HideInInspector"/>特性。 </summary>
+        /// <returns> 满足以上条件返回<see cref="true"/> </returns>
         public static bool CanDraw(FieldInfo _fieldInfo)
         {
-            return !Utility_Attribute.TryGetTypeAttribute(_fieldInfo.DeclaringType, out NonSerializedAttribute nonAtt)
-                    && !Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out HideInInspector hideAtt)
-                    && ((!_fieldInfo.IsPrivate && !_fieldInfo.IsFamily) || Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out SerializeField serAtt));
+            return ((!_fieldInfo.IsPrivate && !_fieldInfo.IsFamily) || Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out SerializeField serAtt))
+                    && !Utility_Attribute.TryGetTypeAttribute(_fieldInfo.DeclaringType, out NonSerializedAttribute nonAtt)
+                    && !Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out HideInInspector hideAtt);
         }
 
         /// <summary> 绘制内部所有字段 </summary>
@@ -211,11 +213,7 @@ namespace CZToolKit.Core.Editors
                         }
                         else
                         {
-                            if (_fieldType.IsArray)
-                            {
-
-                            }
-                            else
+                            if (!_fieldType.IsArray)
                             {
                                 while (list.Count > newCount)
                                 {

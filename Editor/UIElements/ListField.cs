@@ -78,7 +78,6 @@ namespace CZToolKit.Core.Editors
             }
         }
 
-        [UnityEditor.MenuItem(]
         void ChangeCount(KeyDownEvent evt)
         {
             if (evt.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return)

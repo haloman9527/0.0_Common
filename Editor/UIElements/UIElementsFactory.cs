@@ -87,11 +87,8 @@ namespace CZToolKit.Core.Editors
                 _onValueChanged(e.newValue);
             });
 
-            // 设置样式
             BaseField<F> tDrawer = fieldDrawer as BaseField<F>;
             tDrawer.label = _label;
-            //tDrawer.labelElement.style.minWidth = 48;
-            //tDrawer.labelElement.style.width = 54;
             return fieldDrawer;
         }
 
@@ -117,8 +114,6 @@ namespace CZToolKit.Core.Editors
                 {
                     _onValueChanged(new LayerMask { value = e.newValue });
                 });
-                //layerField.labelElement.style.minWidth = 48;
-                //layerField.labelElement.style.width = 54;
                 return layerField;
             }
 

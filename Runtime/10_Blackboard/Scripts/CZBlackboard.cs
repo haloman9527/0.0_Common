@@ -18,23 +18,23 @@ using UnityEngine;
 namespace CZToolKit.Core.Blackboards
 {
     [Serializable]
+    public class CZDataDictionary : Dictionary<string, ICZType> { }
+
+    [Serializable]
+    public class CZGUIDMapDictionary : Dictionary<string, string> { }
+
+    [Serializable]
     public class CZBlackboard
     {
         /// <summary> key是guid </summary>
         [SerializeField]
-        Dictionary<string, ICZType> dataMap = new Dictionary<string, ICZType>();
+        CZDataDictionary dataMap = new CZDataDictionary();
         /// <summary> 名称和GUID的映射 </summary>
         [SerializeField, HideInInspector]
-        Dictionary<string, string> guidMap = new Dictionary<string, string>();
+        CZGUIDMapDictionary guidMap = new CZGUIDMapDictionary();
 
         public IReadOnlyDictionary<string, ICZType> DataMap { get { return dataMap; } }
         public IReadOnlyDictionary<string, string> GUIDMap { get { return guidMap; } }
-
-        //public CZBlackboard()
-        //{
-        //    dataMap = new Dictionary<string, ICZType>()
-        //    guidMap = new Dictionary<string, string>();
-        //}
 
         public bool ContainsName(string _name)
         {
@@ -120,9 +120,9 @@ namespace CZToolKit.Core.Blackboards
         public void Fixed()
         {
             if (dataMap == null)
-                dataMap = new Dictionary<string, ICZType>();
+                dataMap = new CZDataDictionary();
             if (guidMap == null)
-                guidMap = new Dictionary<string, string>();
+                guidMap = new CZGUIDMapDictionary();
         }
     }
 }

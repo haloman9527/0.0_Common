@@ -7,12 +7,13 @@ using System.Linq;
 
 public class RxTest : MonoBehaviour, IOnDestory
 {
-    public Action onDistroy { get; set; }
+    public event Action onDestroy;
 
     private void Start()
     {
         List<int> nums = new List<int> { 10, 20, 30 };
-        nums.ToObservable()
+        Observable<List<int>> numsObs = nums.ToObservable();
+        numsObs
             .Foreach()
             .TaskRun()
             .Execute(() => { Thread.Sleep(1000); })
@@ -69,7 +70,6 @@ public class RxTest : MonoBehaviour, IOnDestory
                 Debug.Log("loop");
             });
 
-
         Observable<RxTest> observable = this.ToObservable();
         observable
             .TaskRun()
@@ -78,12 +78,12 @@ public class RxTest : MonoBehaviour, IOnDestory
                 Thread.Sleep(10000);
                 Debug.Log("NewTask");
             })
-            .OnDestroy(() => { observable.Dispose(); })
+            .OnDestroy(() => { observable.Dispose(); numsObs.Dispose(); })
             .Subscribe();
     }
 
     private void OnDestroy()
     {
-        onDistroy?.Invoke();
+        onDestroy?.Invoke();
     }
 }

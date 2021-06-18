@@ -13,7 +13,7 @@ namespace CZToolKit.Core.ReactiveX
 
         public override void OnNext(TIn _onDestroy)
         {
-            _onDestroy.onDistroy += action;
+            _onDestroy.onDestroy += action;
             observer.OnNext(_onDestroy as TOut);
         }
 

@@ -43,6 +43,7 @@ namespace CZToolKit.Core.Blackboards
 
         public void SetValue(object _value) { value = (T)_value; }
 
+
         public static implicit operator CZType<T>(T _other) { return new CZType<T>(_other); }
 
     }

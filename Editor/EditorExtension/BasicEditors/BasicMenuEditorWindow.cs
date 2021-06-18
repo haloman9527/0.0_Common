@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -20,11 +21,12 @@ namespace CZToolKit.Core.Editors
 
         string searchText;
         SearchField searchField;
-        CZMenuTreeView menuTreeView;
         TreeViewState treeViewState = new TreeViewState();
 
         Rect rightRect;
         Vector2 rightScroll;
+
+        public CZMenuTreeView MenuTreeView { get; private set; }
 
         protected virtual float LeftMinWidth
         {
@@ -56,8 +58,8 @@ namespace CZToolKit.Core.Editors
             resizableArea.SideOffset[UIDirection.Right] = resizableArea.side / 2;
 
             searchField = new SearchField();
-            menuTreeView = BuildMenuTree(treeViewState);
-            menuTreeView.Reload();
+            MenuTreeView = BuildMenuTree(treeViewState);
+            MenuTreeView.Reload();
         }
 
         void OnGUI()
@@ -71,7 +73,7 @@ namespace CZToolKit.Core.Editors
             if (tempSearchText != searchText)
             {
                 searchText = tempSearchText;
-                menuTreeView.searchString = searchText;
+                MenuTreeView.searchString = searchText;
             }
 
             resizableArea.maxSize = position.size;
@@ -81,7 +83,8 @@ namespace CZToolKit.Core.Editors
             Rect treeviewRect = resizableAreaRect;
             treeviewRect.y += searchFieldRect.height;
             treeviewRect.height -= searchFieldRect.height;
-            menuTreeView.OnGUI(treeviewRect);
+            EditorGUI.DrawRect(treeviewRect, new Color(0.5f, 0.5f, 0.5f, 1));
+            MenuTreeView.OnGUI(treeviewRect);
 
             Rect sideRect = resizableAreaRect;
             sideRect.x += sideRect.width;
@@ -97,14 +100,17 @@ namespace CZToolKit.Core.Editors
 
             rightRect.x = 0;
             rightRect.y = 0;
-            IList<int> selection = menuTreeView.GetSelection();
+            IList<int> selection = MenuTreeView.GetSelection();
+
+
             if (selection.Count > 0)
             {
                 rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
-                OnRightGUI(menuTreeView.Find(selection[0]) as CZMenuTreeViewItem);
+                OnRightGUI(MenuTreeView.Find(selection[0]) as CZMenuTreeViewItem);
                 GUILayout.EndScrollView();
             }
             GUILayout.EndArea();
+
         }
 
         protected abstract CZMenuTreeView BuildMenuTree(TreeViewState _treeViewState);
@@ -132,6 +138,8 @@ namespace CZToolKit.Core.Editors
 
     public class CZMenuTreeView : CZTreeView
     {
+        public event Action<IList<int>> onSelectionChanged;
+
         public CZMenuTreeView(TreeViewState state) : base(state)
         {
             rowHeight = 30;
@@ -164,7 +172,7 @@ namespace CZToolKit.Core.Editors
 
         protected override void DoubleClickedItem(int id)
         {
-            SetExpanded(id, !IsExpanded(id));
+
         }
 
         protected override bool CanRename(TreeViewItem item)
@@ -186,6 +194,12 @@ namespace CZToolKit.Core.Editors
             base.RowGUI(args);
             CZMenuTreeViewItem item = args.item as CZMenuTreeViewItem;
             item.itemDrawer?.Invoke(args.rowRect, item);
+        }
+
+        protected override void SelectionChanged(IList<int> selectedIds)
+        {
+            base.SelectionChanged(selectedIds);
+            onSelectionChanged?.Invoke(selectedIds);
         }
     }
 

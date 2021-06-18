@@ -37,6 +37,7 @@ namespace CZToolKit.Core.Editors
             }
             _path = _menuPath.Substring(0, num);
             _name = _menuPath.Substring(num + 1);
+
         }
 
         int itemCount = 0;
@@ -52,12 +53,11 @@ namespace CZToolKit.Core.Editors
 
         public CZTreeView(TreeViewState state) : base(state)
         {
-
+            
         }
 
         public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
         {
-
         }
 
         protected override TreeViewItem BuildRoot()

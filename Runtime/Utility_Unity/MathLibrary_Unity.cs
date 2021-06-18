@@ -47,5 +47,13 @@ namespace CZToolKit.Core
         {
             return new Vector4(-Mathf.Abs(_targetValue.x), -Mathf.Abs(_targetValue.y), -Mathf.Abs(_targetValue.z), -Mathf.Abs(_targetValue.w));
         }
+
+        public static Rect Scale(Rect _targetValue, float _scale, Vector2 _pivot)
+        {
+            Vector2 absPosition = _targetValue.position + _targetValue.size * _pivot;
+            _targetValue.size *= _scale;
+            _targetValue.position = absPosition - _targetValue.size * _pivot;
+            return _targetValue;
+        }
     }
 }
