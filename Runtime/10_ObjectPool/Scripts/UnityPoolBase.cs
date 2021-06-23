@@ -22,10 +22,10 @@ namespace CZToolKit.Core.ObjectPool
             return this;
         }
 
-        /// <summary> 获取 </summary>
-        public override T Spawn()
+        /// <summary> 生成 </summary>
+        /// 重写以使用Object的判空
+        public new T Spawn()
         {
-            //重写是为了使用被Unity重写过的判空
             T unit = null;
             while (IdleList.Count > 0 && unit == null)
             {
@@ -37,33 +37,33 @@ namespace CZToolKit.Core.ObjectPool
                 unit = CreateNewUnit();
 
             WorkList.Add(unit);
+            OnBeforeSpawn(unit);
+
             IPoolable recyclable;
             if ((recyclable = unit as IPoolable) != null)
-                recyclable.OnSpawn();
+                recyclable.OnSpawned();
+            OnAfterSpawn(unit);
             return unit;
         }
 
         /// <summary> 回收 </summary>
-        /// <param name="unit"></param>
-        public override void Recycle(T unit)
+        public new void Recycle(T _unit)
         {
-            //重写是为了使用被Unity重写过的判空
-            if (!WorkList.Contains(unit))
-                return;
-            WorkList.Remove(unit);
-            if (unit != null)
+            WorkList.Remove(_unit);
+            if (_unit != null)
             {
-                IdleList.Add(unit);
+                IdleList.Add(_unit);
+                OnBeforeRecycle(_unit);
                 IPoolable recyclable;
-                if ((recyclable = unit as IPoolable) != null)
-                    recyclable.OnRecycle();
+                if ((recyclable = _unit as IPoolable) != null)
+                    recyclable.OnRecycled();
+                OnAfterRecycle(_unit);
             }
         }
 
         protected override T CreateNewUnit()
         {
-            T go = GameObject.Instantiate(template);
-            return go;
+            return GameObject.Instantiate(template);
         }
     }
 }

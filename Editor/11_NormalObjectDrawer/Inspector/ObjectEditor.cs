@@ -71,7 +71,7 @@ namespace CZToolKit.Core.Editors
         {
             Target = _target;
             Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
-            Fields = Utility_Refelection.GetFieldInfos(Target.GetType()).FindAll(field => EditorGUILayoutExtension.CanDraw(field));
+            Fields = Utility_Reflection.GetFieldInfos(Target.GetType()).FindAll(field => EditorGUILayoutExtension.CanDraw(field));
         }
 
         public string GetTitle() { return string.Empty; }

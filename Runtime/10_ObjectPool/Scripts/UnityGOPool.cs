@@ -8,6 +8,7 @@ namespace CZToolKit.Core.ObjectPool
     public class UnityGOPool : UnityPoolBase<GameObject>
     {
         public bool group;
+        [SerializeField]
         private Transform groupParent;
 
         public Transform GroupParent
@@ -21,7 +22,6 @@ namespace CZToolKit.Core.ObjectPool
         }
 
         public UnityGOPool() { }
-        public UnityGOPool(GameObject _template) : base(_template) { }
 
         public UnityGOPool(GameObject _template, bool _group) : base(_template) { group = _group; }
 
@@ -31,31 +31,24 @@ namespace CZToolKit.Core.ObjectPool
                 return;
             for (int i = 0; i < maxCount; i++)
             {
-                GameObject unit = CreateNewUnit(group ? GroupParent : null);
+                GameObject unit = CreateNewUnit();
                 unit.SetActive(false);
+                unit.transform.SetParent(groupParent);
                 IdleList.Add(unit);
             }
         }
 
-        public override GameObject Spawn()
+        protected override void OnBeforeSpawn(GameObject _unit)
         {
-            GameObject go = base.Spawn();
-            go.SetActive(true);
-            return go;
+            base.OnBeforeSpawn(_unit);
+            _unit.SetActive(true);
+            _unit.transform.SetParent(groupParent, true);
         }
 
-        public virtual GameObject Spawn(Transform _parent)
+        protected override void OnAfterRecycle(GameObject _unit)
         {
-            GameObject go = Spawn();
-            go.transform.SetParent(_parent, true);
-            return go;
-        }
-
-        public override void Recycle(GameObject _unit)
-        {
-            base.Recycle(_unit);
+            base.OnAfterRecycle(_unit);
             _unit.SetActive(false);
-
             if (group)
                 _unit.transform.SetParent(GroupParent);
             if (IdleList.Count > maxCount)
@@ -65,10 +58,13 @@ namespace CZToolKit.Core.ObjectPool
             }
         }
 
-        protected virtual GameObject CreateNewUnit(Transform parent)
+        public override void Dispose()
         {
-            GameObject go = GameObject.Instantiate(template, parent, false);
-            return go;
+            foreach (var unit in IdleList)
+            {
+                GameObject.Destroy(unit);
+            }
+            IdleList.Clear();
         }
     }
 }

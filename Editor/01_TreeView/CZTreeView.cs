@@ -11,6 +11,7 @@
  *
  */
 #endregion
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -45,20 +46,21 @@ namespace CZToolKit.Core.Editors
         List<TreeViewItem> items = new List<TreeViewItem>();
         Dictionary<int, CZTreeViewItem> treeViewItemIDMap = new Dictionary<int, CZTreeViewItem>();
 
+        public event Action<IEnumerable<CZTreeViewItem>> onSelectionChanged;
+        public event Action onContextClicked;
+        public event Action<CZTreeViewItem> onContextClickedItem;
+        public event Action<CZTreeViewItem> onSingleClickedItem;
+        public event Action<CZTreeViewItem> onDoubleClickedItem;
+
         public float RowHeight { get => rowHeight; set => rowHeight = value; }
         public bool ShowBoder { get => showBorder; set => showBorder = value; }
         public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
         public IReadOnlyList<TreeViewItem> Items { get => items; }
         public IReadOnlyDictionary<int, CZTreeViewItem> TreeViewIDMap { get => treeViewItemIDMap; }
 
-        public CZTreeView(TreeViewState state) : base(state)
-        {
-            
-        }
+        public CZTreeView(TreeViewState state) : base(state) { }
 
-        public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
-        {
-        }
+        public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader) { }
 
         protected override TreeViewItem BuildRoot()
         {
@@ -135,6 +137,44 @@ namespace CZToolKit.Core.Editors
             CZTreeViewItem item;
             TreeViewIDMap.TryGetValue(_id, out item);
             return item;
+        }
+
+        protected override void SelectionChanged(IList<int> selectedIds)
+        {
+            base.SelectionChanged(selectedIds);
+            onSelectionChanged?.Invoke(FindItems(selectedIds));
+
+            IEnumerable<CZTreeViewItem> FindItems(IList<int> _ids)
+            {
+                foreach (var id in _ids)
+                {
+                    yield return Find(id);
+                }
+            }
+        }
+
+        protected override void SingleClickedItem(int id)
+        {
+            base.SingleClickedItem(id);
+            onSingleClickedItem?.Invoke(Find(id));
+        }
+
+        protected override void DoubleClickedItem(int id)
+        {
+            base.DoubleClickedItem(id);
+            onDoubleClickedItem?.Invoke(Find(id));
+        }
+
+        protected override void ContextClicked()
+        {
+            base.ContextClicked();
+            onContextClicked?.Invoke();
+        }
+
+        protected override void ContextClickedItem(int id)
+        {
+            base.ContextClickedItem(id);
+            onContextClickedItem?.Invoke(Find(id));
         }
 
         public void Clear()

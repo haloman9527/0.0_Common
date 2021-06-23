@@ -246,6 +246,7 @@ MonoBehaviour:
     template: {fileID: 1819074433}
     maxCount: 10
     group: 1
+    groupParent: {fileID: 1122091066}
 --- !u!4 &1122091066
 Transform:
   m_ObjectHideFlags: 0

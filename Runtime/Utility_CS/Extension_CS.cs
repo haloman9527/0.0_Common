@@ -3,6 +3,17 @@ using System.Collections.Generic;
 
 public static partial class Extension
 {
+    public static bool TryGet<T>(this T[] _array, int _index, out T _element)
+    {
+        _element = default;
+        if (_array.Length > _index)
+        {
+            _element = _array[_index];
+            return true;
+        }
+        return false;
+    }
+
     static Random Random { get; set; } = new Random();
 
     /// <summary> 快速排序(第二个参数是中间值) </summary>

@@ -72,7 +72,7 @@ namespace CZToolKit.Core.Editors
         {
             if (_object == null) return null;
 
-            List<FieldInfo> fields = Utility_Refelection.GetFieldInfos(_object.GetType());
+            List<FieldInfo> fields = Utility_Reflection.GetFieldInfos(_object.GetType());
             for (int j = 0; j < fields.Count; j++)
             {
                 if (CanDraw(fields[j]))

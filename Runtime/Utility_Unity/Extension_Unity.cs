@@ -86,11 +86,11 @@ public static partial class Extension
         return 0.299f * _color.r + 0.587f * _color.g + 0.114f * _color.b;
     }
 
-    public static string GetRelativePath(this Transform _self, Transform _parent)
+    public static string GetRelativePath(this Transform _self, Transform _root)
     {
         string path = _self.name;
         Transform trans = _self.parent;
-        while (trans != null && trans != _parent)
+        while (trans != null && trans != _root)
         {
             path = trans.name + "/" + path;
             trans = trans.parent;

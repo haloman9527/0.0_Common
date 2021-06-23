@@ -23,7 +23,7 @@ namespace CZToolKit.Core.SharedVariable
     {
         public static IEnumerable<SharedVariable> CollectionObjectSharedVariables(object _object)
         {
-            List<FieldInfo> fieldInfos = Utility_Refelection.GetFieldInfos(_object.GetType());
+            List<FieldInfo> fieldInfos = Utility_Reflection.GetFieldInfos(_object.GetType());
             Type sharedType = typeof(SharedVariable);
             foreach (var fieldInfo in fieldInfos)
             {

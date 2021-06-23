@@ -9,7 +9,7 @@ namespace CZToolKit.Core.Blackboards
 
         static CZTypeFactory()
         {
-            foreach (var type in Utility_Refelection.GetChildrenTypes<ICZType>())
+            foreach (var type in Utility_Reflection.GetChildrenTypes<ICZType>())
             {
                 if (!type.IsGenericType && !type.IsAbstract)
                     TypeCreator[type] = () => { return Activator.CreateInstance(type) as ICZType; };

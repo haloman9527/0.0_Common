@@ -64,10 +64,9 @@ namespace CZToolKit.Core.ObjectPool
         }
 
         /// <summary> 生成 </summary>
-        public virtual T Spawn()
+        public T Spawn()
         {
             T unit = null;
-
             while (IdleList.Count > 0 && unit == null)
             {
                 unit = IdleList[0];
@@ -78,15 +77,37 @@ namespace CZToolKit.Core.ObjectPool
                 unit = CreateNewUnit();
 
             WorkList.Add(unit);
+            OnBeforeSpawn(unit);
+
+            IPoolable recyclable;
+            if ((recyclable = unit as IPoolable) != null)
+                recyclable.OnSpawned();
+            OnAfterSpawn(unit);
             return unit;
         }
 
+        protected virtual void OnBeforeSpawn(T _unit) { }
+
+        protected virtual void OnAfterSpawn(T _unit) { }
+
         /// <summary> 回收 </summary>
-        public virtual void Recycle(T _unit)
+        public void Recycle(T _unit)
         {
             WorkList.Remove(_unit);
-            IdleList.Add(_unit);
+            if (_unit != null)
+            {
+                IdleList.Add(_unit);
+                OnBeforeRecycle(_unit);
+                IPoolable recyclable;
+                if ((recyclable = _unit as IPoolable) != null)
+                    recyclable.OnRecycled();
+                OnAfterRecycle(_unit);
+            }
         }
+
+        protected virtual void OnBeforeRecycle(T _unit) { }
+
+        protected virtual void OnAfterRecycle(T _unit) { }
 
         /// <summary> 回收所有 </summary>
         public virtual void RecycleAll()
@@ -102,6 +123,6 @@ namespace CZToolKit.Core.ObjectPool
 
         protected abstract T CreateNewUnit();
 
-        public virtual void Dispose() { }
+        public abstract void Dispose();
     }
 }
