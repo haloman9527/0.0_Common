@@ -288,59 +288,55 @@ namespace CZToolKit.Core.Editors
 
             if (_fieldType.Equals(typeof(int)))
             {
-                return EditorGUILayout.IntField(_content, (int)_value, EditorStylesExtension.NumberFieldStyle);
+                return EditorGUILayout.IntField(_content, _value == null ? 0 : (int)_value, EditorStylesExtension.NumberFieldStyle);
             }
             if (_fieldType.Equals(typeof(float)))
             {
-                return EditorGUILayout.FloatField(_content, (float)_value, EditorStylesExtension.NumberFieldStyle);
+                return EditorGUILayout.FloatField(_content, _value == null ? 0 : (float)_value, EditorStylesExtension.NumberFieldStyle);
             }
             if (_fieldType.Equals(typeof(double)))
             {
-                return EditorGUILayout.FloatField(_content, Convert.ToSingle((double)_value), EditorStylesExtension.NumberFieldStyle);
+                return EditorGUILayout.FloatField(_content, Convert.ToSingle(_value == null ? 0 : (double)_value), EditorStylesExtension.NumberFieldStyle);
             }
             if (_fieldType.Equals(typeof(long)))
             {
-                return (long)EditorGUILayout.IntField(_content, Convert.ToInt32((long)_value), EditorStylesExtension.NumberFieldStyle);
+                return (long)EditorGUILayout.IntField(_content, Convert.ToInt32(_value == null ? 0 : (long)_value), EditorStylesExtension.NumberFieldStyle);
             }
             if (_fieldType.Equals(typeof(bool)))
             {
-                return EditorGUILayout.Toggle(_content, (bool)_value);
+                return EditorGUILayout.Toggle(_content, _value == null ? false : (bool)_value);
             }
             if (_fieldType.Equals(typeof(string)))
             {
-                return EditorGUILayout.TextField(_content, (string)_value, EditorStylesExtension.TextFieldStyle);
+                return EditorGUILayout.TextField(_content, _value == null ? "" : (string)_value, EditorStylesExtension.TextFieldStyle);
             }
             if (_fieldType.Equals(typeof(byte)))
             {
-                return Convert.ToByte(EditorGUILayout.IntField(_content, Convert.ToInt32(_value)));
+                return Convert.ToByte(EditorGUILayout.IntField(_content, Convert.ToInt32(_value == null ? 0 : (byte)_value)));
             }
             if (_fieldType.Equals(typeof(Vector2)))
             {
-                return EditorGUILayout.Vector2Field(_content, (Vector2)_value);
+                return EditorGUILayout.Vector2Field(_content, _value == null ? Vector2.zero : (Vector2)_value);
             }
             if (_fieldType.Equals(typeof(Vector2Int)))
             {
-                return EditorGUILayout.Vector2IntField(_content, (Vector2Int)_value);
+                return EditorGUILayout.Vector2IntField(_content, _value == null ? Vector2Int.zero : (Vector2Int)_value);
             }
             if (_fieldType.Equals(typeof(Vector3)))
             {
-                return EditorGUILayout.Vector3Field(_content, (Vector3)_value);
+                return EditorGUILayout.Vector3Field(_content, _value == null ? Vector3.zero : (Vector3)_value);
             }
             if (_fieldType.Equals(typeof(Vector3Int)))
             {
-                return EditorGUILayout.Vector3IntField(_content, (Vector3Int)_value);
-            }
-            if (_fieldType.Equals(typeof(Vector3)))
-            {
-                return EditorGUILayout.Vector3Field(_content, (Vector3)_value);
+                return EditorGUILayout.Vector3IntField(_content, _value == null ? Vector3Int.zero : (Vector3Int)_value);
             }
             if (_fieldType.Equals(typeof(Vector4)))
             {
-                return EditorGUILayout.Vector4Field(_content.text, (Vector4)_value);
+                return EditorGUILayout.Vector4Field(_content.text, _value == null ? Vector4.zero : (Vector4)_value);
             }
             if (_fieldType.Equals(typeof(Quaternion)))
             {
-                Quaternion quaternion = (Quaternion)_value;
+                Quaternion quaternion = _value == null ? Quaternion.identity : (Quaternion)_value;
                 Vector4 vector = Vector4.zero;
                 vector.Set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
                 vector = EditorGUILayout.Vector4Field(_content.text, vector);
@@ -349,11 +345,11 @@ namespace CZToolKit.Core.Editors
             }
             if (_fieldType.Equals(typeof(Color)))
             {
-                return EditorGUILayout.ColorField(_content, (Color)_value);
+                return EditorGUILayout.ColorField(_content, _value == null ? Color.black : (Color)_value);
             }
             if (_fieldType.Equals(typeof(Rect)))
             {
-                return EditorGUILayout.RectField(_content, (Rect)_value);
+                return EditorGUILayout.RectField(_content, _value == null ? Rect.zero : (Rect)_value);
             }
             if (_fieldType.Equals(typeof(Matrix4x4)))
             {
@@ -361,7 +357,7 @@ namespace CZToolKit.Core.Editors
                 if (EditorGUILayoutExtension.DrawFoldout(_content.text.GetHashCode(), _content))
                 {
                     EditorGUI.indentLevel++;
-                    Matrix4x4 matrix4x = (Matrix4x4)_value;
+                    Matrix4x4 matrix4x = _value == null ? Matrix4x4.identity : (Matrix4x4)_value;
                     for (int i = 0; i < 4; i++)
                     {
                         for (int j = 0; j < 4; j++)
@@ -437,103 +433,6 @@ namespace CZToolKit.Core.Editors
             EditorGUILayout.LabelField("Unsupported Type: " + _fieldType);
             return null;
         }
-
-        //public static SharedVariable DrawSharedVariable(GUIContent guiContent, FieldInfo fieldInfo, Type fieldType, SharedVariable sharedVariable)
-        //{
-        //    if (!fieldType.Equals(typeof(SharedVariable)) && sharedVariable == null)
-        //    {
-        //        sharedVariable = (Activator.CreateInstance(fieldType, true) as SharedVariable);
-        //        if (TaskUtility.HasAttribute(fieldInfo, typeof(RequiredFieldAttribute)) || TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
-        //        {
-        //            sharedVariable.IsShared = true;
-        //        }
-        //        GUI.changed = true;
-        //    }
-        //    if (sharedVariable != null && sharedVariable.IsDynamic)
-        //    {
-        //        sharedVariable.Name = EditorGUILayout.TextField(guiContent, sharedVariable.Name, new GUILayoutOption[0]);
-        //        if (!TaskUtility.HasAttribute(fieldInfo, typeof(RequiredFieldAttribute)) && !TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
-        //        {
-        //            sharedVariable = EditorGUILayoutExtension.DrawSharedVariableToggleSharedButton(sharedVariable);
-        //        }
-        //    }
-        //    else if (sharedVariable == null || sharedVariable.IsShared)
-        //    {
-        //        GUILayout.BeginHorizontal(new GUILayoutOption[0]);
-        //        string[] array = null;
-        //        int num = -1;
-        //        int num2 = EditorGUILayoutExtension.GetVariablesOfType((sharedVariable == null) ? null : sharedVariable.GetType().GetProperty("Value").PropertyType, sharedVariable != null && sharedVariable.IsGlobal, (sharedVariable == null) ? string.Empty : sharedVariable.Name, EditorGUILayoutExtension.behaviorSource, out array, ref num, fieldType.Equals(typeof(SharedVariable)), true);
-        //        Color backgroundColor = GUI.backgroundColor;
-        //        if (num2 == 0 && !TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
-        //        {
-        //            GUI.backgroundColor = Color.red;
-        //        }
-        //        int num3 = num2;
-        //        num2 = EditorGUILayout.Popup(guiContent.text, num2, array, BehaviorDesignerUtility.SharedVariableToolbarPopup, new GUILayoutOption[0]);
-        //        GUI.backgroundColor = backgroundColor;
-        //        if (num2 != num3)
-        //        {
-        //            if (num2 == 0)
-        //            {
-        //                if (fieldType.Equals(typeof(SharedVariable)))
-        //                {
-        //                    sharedVariable = null;
-        //                }
-        //                else
-        //                {
-        //                    sharedVariable = (Activator.CreateInstance(fieldType, true) as SharedVariable);
-        //                    sharedVariable.IsShared = true;
-        //                }
-        //            }
-        //            else if (num2 < array.Length - 1)
-        //            {
-        //                if (num != -1 && num2 >= num)
-        //                {
-        //                    sharedVariable = GlobalVariables.Instance.GetVariable(array[num2].Substring(8, array[num2].Length - 8));
-        //                }
-        //                else
-        //                {
-        //                    sharedVariable = FieldInspector.behaviorSource.GetVariable(array[num2]);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                sharedVariable = (Activator.CreateInstance(fieldType, true) as SharedVariable);
-        //                sharedVariable.IsShared = true;
-        //                sharedVariable.IsDynamic = true;
-        //            }
-        //            GUI.changed = true;
-        //        }
-        //        if (!fieldType.Equals(typeof(SharedVariable)) && !TaskUtility.HasAttribute(fieldInfo, typeof(RequiredFieldAttribute)) && !TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
-        //        {
-        //            sharedVariable = EditorGUILayoutExtension.DrawSharedVariableToggleSharedButton(sharedVariable);
-        //            GUILayout.Space(-3f);
-        //        }
-        //        GUILayout.EndHorizontal();
-        //        GUILayout.Space(3f);
-        //    }
-        //    else
-        //    {
-        //        GUILayout.BeginHorizontal(new GUILayoutOption[0]);
-        //        ObjectDrawerAttribute[] array2;
-        //        ObjectDrawer objectDrawer;
-        //        if (fieldInfo != null && (array2 = (fieldInfo.GetCustomAttributes(typeof(ObjectDrawerAttribute), true) as ObjectDrawerAttribute[])).Length > 0 && (objectDrawer = ObjectDrawerUtility.GetObjectDrawer(task, array2[0])) != null)
-        //        {
-        //            objectDrawer.Value = sharedVariable;
-        //            objectDrawer.OnGUI(guiContent);
-        //        }
-        //        else
-        //        {
-        //            EditorGUILayoutExtension.DrawFields(task, sharedVariable, guiContent);
-        //        }
-        //        if (!TaskUtility.HasAttribute(fieldInfo, typeof(RequiredFieldAttribute)) && !TaskUtility.HasAttribute(fieldInfo, typeof(SharedRequiredAttribute)))
-        //        {
-        //            sharedVariable = EditorGUILayoutExtension.DrawSharedVariableToggleSharedButton(sharedVariable);
-        //        }
-        //        GUILayout.EndHorizontal();
-        //    }
-        //    return sharedVariable;
-        //}
 
         private static LayerMask DrawLayerMask(GUIContent guiContent, LayerMask layerMask)
         {

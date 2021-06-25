@@ -52,31 +52,6 @@ namespace CZToolKit.Core
                 if (_baseType.IsAssignableFrom(type))
                     yield return type;
             }
-            //var selfAssembly = Assembly.GetAssembly(_baseType);
-            //if (selfAssembly.FullName.StartsWith("Assembly-CSharp") && !selfAssembly.FullName.Contains("-firstpass"))
-            //{
-            //    foreach (var type in selfAssembly.GetTypes())
-            //    {
-            //        if (!type.IsAbstract && _baseType.IsAssignableFrom(type))
-            //        {
-            //            yield return type;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            //    foreach (Assembly assembly in assemblies)
-            //    {
-            //        if (assembly.FullName.StartsWith("Unity")) continue;
-            //        if (!assembly.FullName.Contains("Version=0.0.0")) continue;
-            //        foreach (var type in assembly.GetTypes())
-            //        {
-            //            if (type != null && !type.IsAbstract && _baseType.IsAssignableFrom(type))
-            //                yield return type;
-            //        }
-            //    }
-            //}
         }
 
         public static Assembly LoadAssembly(string _assemblyString)
@@ -116,11 +91,11 @@ namespace CZToolKit.Core
         {
             if (TypeFieldInfoCache.TryGetValue(_type, out List<FieldInfo> fieldInfos))
                 return fieldInfos;
-            TypeFieldInfoCache[_type] = fieldInfos = new List<FieldInfo>(_type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            TypeFieldInfoCache[_type] = fieldInfos = new List<FieldInfo>(_type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
             // 获取类包含的所有字段(包含私有)
             while ((_type = _type.BaseType) != null)
             {
-                fieldInfos.InsertRange(0, _type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfos.InsertRange(0, _type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
             }
             return fieldInfos;
         }
@@ -139,18 +114,18 @@ namespace CZToolKit.Core
         /// <summary> 获取方法，包括基类的私有方法 </summary>
         public static MethodInfo GetMethodInfo(Type _type, string _methodName)
         {
-            return GetMethodInfos(_type).Find(f => f.Name == _methodName);
+            return GetMethodInfos(_type).Find(t => t.Name == _methodName);
         }
 
         public static List<MethodInfo> GetMethodInfos(Type _type)
         {
             if (TypeMethodInfoCache.TryGetValue(_type, out List<MethodInfo> methodInfos))
                 return methodInfos;
-            TypeMethodInfoCache[_type] = methodInfos = new List<MethodInfo>(_type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            TypeMethodInfoCache[_type] = methodInfos = new List<MethodInfo>(_type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
             // 获取类包含的所有方法(包含私有)
             while ((_type = _type.BaseType) != null)
             {
-                methodInfos.InsertRange(0, _type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                methodInfos.InsertRange(0, _type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
             }
             return methodInfos;
         }
