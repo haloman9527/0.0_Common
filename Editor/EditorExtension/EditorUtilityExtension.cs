@@ -26,7 +26,7 @@ namespace CZToolKit.Core.Editors
         {
             if (MonoScriptCache.TryGetValue(_type, out MonoScript monoScript))
                 return monoScript;
-            MonoScriptCache[_type] = monoScript;
+
 
             var scriptGUIDs = AssetDatabase.FindAssets($"t:script {_type.Name}");
             foreach (var scriptGUID in scriptGUIDs)
@@ -35,7 +35,7 @@ namespace CZToolKit.Core.Editors
                 var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
 
                 if (script != null && String.Equals(_type.Name, Path.GetFileNameWithoutExtension(assetPath), StringComparison.OrdinalIgnoreCase) && script.GetClass() == _type)
-                    monoScript = script;
+                    MonoScriptCache[_type] = monoScript = script;
             }
 
             return monoScript;

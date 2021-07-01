@@ -17,6 +17,21 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Blackboards
 {
+    public interface IReadOnlyCZBlackboard
+    {
+        IReadOnlyDictionary<string, ICZType> DataMap { get; }
+
+        IReadOnlyDictionary<string, string> GUIDMap { get; }
+
+        bool ContainsName(string _name);
+
+        bool ContainsGUID(string _guid);
+
+        bool TryGetData(string _name, out ICZType _data);
+
+        bool TryGetValue<T>(string _name, out T _value);
+    }
+
     [Serializable]
     public class CZDataDictionary : Dictionary<string, ICZType> { }
 
@@ -24,7 +39,7 @@ namespace CZToolKit.Core.Blackboards
     public class CZGUIDMapDictionary : Dictionary<string, string> { }
 
     [Serializable]
-    public class CZBlackboard
+    public class CZBlackboard : IReadOnlyCZBlackboard
     {
         /// <summary> key是guid </summary>
         [SerializeField]
