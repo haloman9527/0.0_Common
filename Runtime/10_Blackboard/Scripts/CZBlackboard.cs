@@ -96,7 +96,7 @@ namespace CZToolKit.Core.Blackboards
             return false;
         }
 
-        public void SetData<T>(string _name, T _value)
+        public void SetValue<T>(string _name, T _value)
         {
             if (!guidMap.TryGetValue(_name, out string guid))
             {
