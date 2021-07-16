@@ -1,4 +1,4 @@
-﻿#region 注 释
+#region 注 释
 /***
  *
  *  Title:

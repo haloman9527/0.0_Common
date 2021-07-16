@@ -1,14 +1,15 @@
-﻿#region <<版 本 注 释>>
+#region 注 释
 /***
  *
- *  Title:""
+ *  Title:
  *      主题: Mono单例基类
  *  Description:
  *      功能: 自动创建单例对象
- *  
  *  Date:
  *  Version:
- *  Writer: 
+ *  Writer: 半只龙虾人
+ *  Github: https://github.com/HalfLobsterMan
+ *  Blog: https://www.crosshair.top/
  *
  */
 #endregion

@@ -1,9 +1,9 @@
-﻿#region <<版 本 注 释>>
+#region 注 释
 /***
  *
- *  Title: ""
+ *  Title:
  *      主题: 事件类,从无参委托到四个参数的事件
- *  Description: 
+ *  Description:
  *      功能: 
  *      	1.事件基类
  *      	2.无参事件类
@@ -11,9 +11,11 @@
  *      	4.二参事件类
  *      	5.三参事件类
  *      	6.四参事件类
- *  Date: 
- *  Version: 
- *  Writer:  
+ *  Date:
+ *  Version:
+ *  Writer: 半只龙虾人
+ *  Github: https://github.com/HalfLobsterMan
+ *  Blog: https://www.crosshair.top/
  *
  */
 #endregion

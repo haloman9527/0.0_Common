@@ -1,22 +1,22 @@
-﻿#region <<版 本 注 释>>
+#region 注 释
 /***
  *
- *  Title: ""
+ *  Title:
  *      主题: 事件管理器,最多支持四个参数
- *  Description: 
+ *  Description:
  *      功能: 
  *      	1.注册一个事件,从无参到四参
  *      	2.调度一个事件,从无参到四参
  *      	3.移除一个事件
  *      	4.移除一类事件
  *      	5.清空事件列表
- *  
- *  Date: 
- *  Version: 
- *  Writer:  
+ *  Date:
+ *  Version:
+ *  Writer: 半只龙虾人
+ *  Github: https://github.com/HalfLobsterMan
+ *  Blog: https://www.crosshair.top/
  *
  */
-
 #endregion
 
 using CZToolKit.Core.Singletons;
