@@ -1,4 +1,19 @@
-﻿using System;
+﻿#region 注 释
+/***
+ *
+ *  Title:
+ *  
+ *  Description:
+ *  
+ *  Date:
+ *  Version:
+ *  Writer: 半只龙虾人
+ *  Github: https://github.com/HalfLobsterMan
+ *  Blog: https://www.crosshair.top/
+ *
+ */
+#endregion
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -288,19 +303,19 @@ namespace CZToolKit.Core.Editors
 
             if (_fieldType.Equals(typeof(int)))
             {
-                return EditorGUILayout.IntField(_content, _value == null ? 0 : (int)_value, EditorStylesExtension.NumberFieldStyle);
+                return EditorGUILayout.DelayedIntField(_content, _value == null ? 0 : (int)_value, EditorStylesExtension.NumberFieldStyle);
             }
             if (_fieldType.Equals(typeof(float)))
             {
-                return EditorGUILayout.FloatField(_content, _value == null ? 0 : (float)_value, EditorStylesExtension.NumberFieldStyle);
+                return EditorGUILayout.DelayedFloatField(_content, _value == null ? 0 : (float)_value, EditorStylesExtension.NumberFieldStyle);
             }
             if (_fieldType.Equals(typeof(double)))
             {
-                return EditorGUILayout.FloatField(_content, Convert.ToSingle(_value == null ? 0 : (double)_value), EditorStylesExtension.NumberFieldStyle);
+                return EditorGUILayout.DelayedDoubleField(_content, Convert.ToSingle(_value == null ? 0 : (double)_value), EditorStylesExtension.NumberFieldStyle);
             }
             if (_fieldType.Equals(typeof(long)))
             {
-                return (long)EditorGUILayout.IntField(_content, Convert.ToInt32(_value == null ? 0 : (long)_value), EditorStylesExtension.NumberFieldStyle);
+                return (long)EditorGUILayout.DelayedIntField(_content, Convert.ToInt32(_value == null ? 0 : (long)_value), EditorStylesExtension.NumberFieldStyle);
             }
             if (_fieldType.Equals(typeof(bool)))
             {
@@ -308,11 +323,11 @@ namespace CZToolKit.Core.Editors
             }
             if (_fieldType.Equals(typeof(string)))
             {
-                return EditorGUILayout.TextField(_content, _value == null ? "" : (string)_value, EditorStylesExtension.TextFieldStyle);
+                return EditorGUILayout.DelayedTextField(_content, _value == null ? "" : (string)_value, EditorStylesExtension.TextFieldStyle);
             }
             if (_fieldType.Equals(typeof(byte)))
             {
-                return Convert.ToByte(EditorGUILayout.IntField(_content, Convert.ToInt32(_value == null ? 0 : (byte)_value)));
+                return Convert.ToByte(EditorGUILayout.DelayedIntField(_content, Convert.ToInt32(_value == null ? 0 : (byte)_value)));
             }
             if (_fieldType.Equals(typeof(Vector2)))
             {

@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace CZToolKit.Core.Editors
 {
-    public class EditorCoroutine
+    public class EditorCoroutine : ICondition
     {
         IEnumerator enumerator;
 
@@ -19,10 +19,14 @@ namespace CZToolKit.Core.Editors
         public bool MoveNext()
         {
             TimeSinceStartup = EditorApplication.timeSinceStartup;
-            return enumerator.MoveNext();
+            return IsRunning = enumerator.MoveNext();
         }
 
         public void Stop() { IsRunning = false; }
 
+        public bool Result(EditorCoroutine _coroutine)
+        {
+            return !IsRunning;
+        }
     }
 }

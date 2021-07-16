@@ -4,10 +4,12 @@
  *  Title:
  *  
  *  Description:
- *  自动换行的Toolbar
+ *      自动换行的Toolbar
  *  Date:
  *  Version:
- *  Writer: 
+ *  Writer: 半只龙虾人
+ *  Github: https://github.com/HalfLobsterMan
+ *  Blog: https://www.crosshair.top/
  *
  */
 #endregion

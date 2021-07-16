@@ -7,7 +7,9 @@
  *  绘制一个普通对象，可通过继承自定义绘制方式
  *  Date:
  *  Version:
- *  Writer: 
+ *  Writer: 半只龙虾人
+ *  Github: https://github.com/HalfLobsterMan
+ *  Blog: https://www.crosshair.top/
  *
  */
 #endregion

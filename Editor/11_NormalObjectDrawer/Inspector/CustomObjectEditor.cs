@@ -7,7 +7,9 @@
  *  自定义ObjectEditor类添加此特性，就会替换原始绘制方式
  *  Date:
  *  Version:
- *  Writer: 
+ *  Writer: 半只龙虾人
+ *  Github: https://github.com/HalfLobsterMan
+ *  Blog: https://www.crosshair.top/
  *
  */
 #endregion

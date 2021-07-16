@@ -55,7 +55,6 @@ namespace CZToolKit.Core.Editors
             resizableArea.minSize = new Vector2(LeftMinWidth, 50);
             resizableArea.side = 10;
             resizableArea.EnableSide(UIDirection.Right);
-            resizableArea.SideOffset[UIDirection.Right] = resizableArea.side / 2;
 
             searchField = new SearchField();
             MenuTreeView = BuildMenuTree(treeViewState);
@@ -117,6 +116,7 @@ namespace CZToolKit.Core.Editors
 
         protected virtual void OnRightGUI(CZMenuTreeViewItem _selectedItem)
         {
+            if (_selectedItem == null) return;
             switch (_selectedItem.userData)
             {
                 case UnityObject unityObject:
@@ -138,8 +138,6 @@ namespace CZToolKit.Core.Editors
 
     public class CZMenuTreeView : CZTreeView
     {
-        public event Action<IList<int>> onSelectionChanged;
-
         public CZMenuTreeView(TreeViewState state) : base(state)
         {
             rowHeight = 30;
@@ -193,13 +191,8 @@ namespace CZToolKit.Core.Editors
         {
             base.RowGUI(args);
             CZMenuTreeViewItem item = args.item as CZMenuTreeViewItem;
-            item.itemDrawer?.Invoke(args.rowRect, item);
-        }
-
-        protected override void SelectionChanged(IList<int> selectedIds)
-        {
-            base.SelectionChanged(selectedIds);
-            onSelectionChanged?.Invoke(selectedIds);
+            if (item != null)
+                item.itemDrawer?.Invoke(args.rowRect, item);
         }
     }
 

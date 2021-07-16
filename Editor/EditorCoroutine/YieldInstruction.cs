@@ -10,13 +10,13 @@ namespace CZToolKit.Core.Editors
 
     public class WaitForSeconds_E : ICondition
     {
-        readonly float time;
+        readonly float interval;
 
-        public WaitForSeconds_E(int _time) { time = _time; }
+        public WaitForSeconds_E(float _interval) { interval = _interval; }
 
         public bool Result(EditorCoroutine _coroutine)
         {
-            return EditorApplication.timeSinceStartup >= _coroutine.TimeSinceStartup + time;
+            return EditorApplication.timeSinceStartup >= _coroutine.TimeSinceStartup + interval;
         }
     }
 
