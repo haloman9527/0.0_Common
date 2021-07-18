@@ -53,6 +53,19 @@ namespace CZToolKit.Core
             TypeAttributes[_type] = _attributes;
             return _attributes == null || _attributes.Length > 0;
         }
+
+        /// <summary> 获取类型的所有特性 </summary>
+        public static IEnumerable<T> GetTypeAttributes<T>(Type _type) where T : Attribute
+        {
+            if (TryGetTypeAttributes(_type, out Attribute[] _attributes))
+            {
+                foreach (var attribute in _attributes)
+                {
+                    if (attribute is T t_attritube)
+                        yield return t_attritube;
+                }
+            }
+        }
         #endregion
 
         #region Field
@@ -110,6 +123,26 @@ namespace CZToolKit.Core
             if (_attributes.Length > 0)
                 return true;
             return false;
+        }
+
+        /// <summary> 根据类型和方法名获取所有特性 </summary>
+        public static bool TryGetFieldAttributes(Type _type, string _fieldName,
+            out Attribute[] _attributes)
+        {
+            return TryGetFieldInfoAttributes(Utility_Reflection.GetFieldInfo(_type, _fieldName), out _attributes);
+        }
+
+        /// <summary> 获取类型的所有特性 </summary>
+        public static IEnumerable<T> GetFieldAttributes<T>(Type _type, string _fieldName) where T : Attribute
+        {
+            if (TryGetFieldAttributes(_type, _fieldName, out Attribute[] _attributes))
+            {
+                foreach (var attribute in _attributes)
+                {
+                    if (attribute is T t_attritube)
+                        yield return t_attritube;
+                }
+            }
         }
         #endregion
 
@@ -174,6 +207,18 @@ namespace CZToolKit.Core
             out Attribute[] _attributes)
         {
             return TryGetMethodInfoAttributes(Utility_Reflection.GetMethodInfo(_type, _methodName), out _attributes);
+        }
+
+        public static IEnumerable<T> GetMethodAttributes<T>(Type _type, string _methodName) where T : Attribute
+        {
+            if (TryGetMethodAttributes(_type, _methodName, out Attribute[] _attributes))
+            {
+                foreach (var attribute in _attributes)
+                {
+                    if (attribute is T t_attritube)
+                        yield return t_attritube;
+                }
+            }
         }
         #endregion
     }
