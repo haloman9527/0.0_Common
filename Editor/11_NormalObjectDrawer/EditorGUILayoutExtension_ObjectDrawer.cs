@@ -366,6 +366,10 @@ namespace CZToolKit.Core.Editors
             {
                 return EditorGUILayout.RectField(_content, _value == null ? Rect.zero : (Rect)_value);
             }
+            if (_fieldType.Equals(typeof(Gradient)))
+            {
+                return EditorGUILayout.GradientField(_content, _value == null ? new Gradient() : (Gradient)_value);
+            }
             if (_fieldType.Equals(typeof(Matrix4x4)))
             {
                 GUILayout.BeginVertical(new GUILayoutOption[0]);
