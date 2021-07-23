@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace CZToolKit.Core.SharedVariable.Editors
 {
-    [CustomFieldDrawer(typeof(SharedVariableAttribute))]
+    //[CustomFieldDrawer(typeof(SharedVariableAttribute))]
     public class SharedVariableFieldDrawer : FieldDrawer
     {
         public override void OnGUI(GUIContent label)

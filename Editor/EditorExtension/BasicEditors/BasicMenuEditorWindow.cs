@@ -76,13 +76,24 @@ namespace CZToolKit.Core.Editors
             MenuTreeView.Reload();
         }
 
+        Vector2 scroll;
         void OnGUI()
         {
+            resizableArea.maxSize = position.size;
+            resizableAreaRect.height = position.height;
+            resizableAreaRect = resizableArea.OnGUI(resizableAreaRect);
+
+            GUILayout.BeginArea(resizableAreaRect);
+            scroll.y = 0;
+            scroll = GUILayout.BeginScrollView(scroll);
+
             Rect searchFieldRect = resizableAreaRect;
-            searchFieldRect.height = 20;
+            searchFieldRect.height = 22;
             searchFieldRect.y += 3;
             searchFieldRect.x += 5;
             searchFieldRect.width -= 10;
+            searchFieldRect.width = Mathf.Max(100, searchFieldRect.width);
+
             string tempSearchText = searchField.OnGUI(searchFieldRect, searchText);
             if (tempSearchText != searchText)
             {
@@ -90,25 +101,25 @@ namespace CZToolKit.Core.Editors
                 MenuTreeView.searchString = searchText;
             }
 
-            resizableArea.maxSize = position.size;
-            resizableAreaRect.height = position.height;
-            resizableAreaRect = resizableArea.OnGUI(resizableAreaRect);
-
             Rect treeviewRect = resizableAreaRect;
             treeviewRect.y += searchFieldRect.height;
             treeviewRect.height -= searchFieldRect.height;
             EditorGUI.DrawRect(treeviewRect, new Color(0.5f, 0.5f, 0.5f, 1));
             MenuTreeView.OnGUI(treeviewRect);
+            GUILayout.EndScrollView();
+            GUILayout.EndArea();
 
             Rect sideRect = resizableAreaRect;
             sideRect.x += sideRect.width;
             sideRect.width = 1;
             EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
 
+
             rightRect = sideRect;
             rightRect.x += rightRect.width + 1;
             rightRect.width = position.width - resizableAreaRect.width - sideRect.width - 2;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
+
 
             GUILayout.BeginArea(rightRect);
 
@@ -120,7 +131,7 @@ namespace CZToolKit.Core.Editors
             if (selection.Count > 0)
             {
                 rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
-                OnRightGUI(MenuTreeView.Find(selection[0]) as CZMenuTreeViewItem);
+                OnRightGUI(MenuTreeView.FindItem(selection[0]) as CZMenuTreeViewItem);
                 GUILayout.EndScrollView();
             }
             GUILayout.EndArea();
@@ -134,13 +145,21 @@ namespace CZToolKit.Core.Editors
             if (_selectedItem == null) return;
             switch (_selectedItem.userData)
             {
+                case null:
+                    GUILayout.Space(10);
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(20);
+                    GUILayout.Label(_selectedItem.displayName, (GUIStyle)"AM MixerHeader2");
+                    GUILayout.EndHorizontal();
+                    GUILayout.Space(5);
+                    EditorGUI.DrawRect(GUILayoutUtility.GetRect(rightRect.width, 1), Color.gray);
+                    break;
                 case UnityObject unityObject:
+                    if (unityObject == null) break;
                     if (!EditorCache.TryGetValue(unityObject, out Editor editor))
                         EditorCache[unityObject] = editor = Editor.CreateEditor(unityObject);
                     editor.OnInspectorGUI();
                     Repaint();
-                    break;
-                case null:
                     break;
                 default:
                     if (!ObjectEditorCache.TryGetValue(_selectedItem.userData, out ObjectEditor objectEditor))
@@ -161,6 +180,14 @@ namespace CZToolKit.Core.Editors
 #endif
         }
 
+        public CZMenuTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
+        {
+            rowHeight = 30;
+#if !UNITY_2019_1_OR_NEWER
+            customFoldoutYOffset = rowHeight / 2 - 8;
+#endif
+        }
+
         public T AddMenuItem<T>(string _path) where T : CZMenuTreeViewItem, new()
         {
             return AddMenuItem<T>(_path, (Texture2D)null);
@@ -172,6 +199,7 @@ namespace CZToolKit.Core.Editors
                 return null;
             T item = new T();
             item.icon = _icon;
+            AddMenuItem(_path, item);
             return item;
         }
 
@@ -181,11 +209,6 @@ namespace CZToolKit.Core.Editors
             if (index == -1)
                 return null;
             return _path.Substring(0, index);
-        }
-
-        protected override void DoubleClickedItem(int id)
-        {
-
         }
 
         protected override bool CanRename(TreeViewItem item)

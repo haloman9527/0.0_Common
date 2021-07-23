@@ -28,7 +28,7 @@ namespace CZToolKit.Core.Editors
         void RemoveElementAt(int _index);
     }
 
-    public class ListField<L, E> : BindableElement, INotifyValueChanged<L>, IListField where L : IList<E>
+    public class ListField<L, E> : BaseField<L>, INotifyValueChanged<L>, IListField where L : IList<E>
     {
         public Foldout foldout;
         IntegerField lengthField;
@@ -36,9 +36,7 @@ namespace CZToolKit.Core.Editors
         Type fieldType;
         Type elementType;
 
-        public L value { get; set; }
-
-        public ListField(string _label, L _list)
+        public ListField(string _label, L _list, VisualElement _inputElement) : base(_label, _inputElement)
         {
             foldout = new Foldout();
             //foldout.SetValueWithoutNotify(EditorGUIExtension.GetFoldoutBool(_list.GetHashCode().ToString(), false));
@@ -56,7 +54,7 @@ namespace CZToolKit.Core.Editors
             Reload();
         }
 
-        public void SetValueWithoutNotify(L newValue)
+        public override void SetValueWithoutNotify(L newValue)
         {
             value = newValue;
             fieldType = value.GetType();

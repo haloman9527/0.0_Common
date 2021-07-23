@@ -24,6 +24,8 @@ namespace CZToolKit.Core.Editors
     public class CZTreeViewItem : TreeViewItem
     {
         public object userData;
+        public Action onContextClicked;
+        public Action onDoubleClicked;
     }
 
     public abstract class CZTreeView : TreeView
@@ -46,7 +48,6 @@ namespace CZToolKit.Core.Editors
         int itemCount = 0;
 
         List<TreeViewItem> items = new List<TreeViewItem>();
-        Dictionary<int, CZTreeViewItem> treeViewItemIDMap = new Dictionary<int, CZTreeViewItem>();
 
         public event Action<IList<int>> onSelectionChanged;
         public event Action onContextClicked;
@@ -58,7 +59,6 @@ namespace CZToolKit.Core.Editors
         public bool ShowBoder { get => showBorder; set => showBorder = value; }
         public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
         public IReadOnlyList<TreeViewItem> Items { get => items; }
-        public IReadOnlyDictionary<int, CZTreeViewItem> TreeViewIDMap { get => treeViewItemIDMap; }
 
         public CZTreeView(TreeViewState state) : base(state) { }
 
@@ -112,7 +112,6 @@ namespace CZToolKit.Core.Editors
                         currentParent.displayName = path[i];
                         currentParent.id = itemCount;
                         current.Add(currentParent);
-                        treeViewItemIDMap[itemCount] = currentParent;
                         itemCount++;
                     }
                     current = currentParent.children;
@@ -123,21 +122,17 @@ namespace CZToolKit.Core.Editors
             _treeViewItem.displayName = path[path.Length - 1];
             _treeViewItem.children = new List<TreeViewItem>();
             current.Add(_treeViewItem);
-            treeViewItemIDMap[itemCount] = _treeViewItem;
             itemCount++;
         }
 
         public void Remove(CZTreeViewItem _treeViewItem)
         {
             items.Remove(_treeViewItem);
-            treeViewItemIDMap.Remove(_treeViewItem.id);
         }
 
-        public CZTreeViewItem Find(int _id)
+        public CZTreeViewItem FindItem(int _id)
         {
-            CZTreeViewItem item;
-            TreeViewIDMap.TryGetValue(_id, out item);
-            return item;
+            return FindItem(_id, rootItem) as CZTreeViewItem;
         }
 
         protected override void SelectionChanged(IList<int> selectedIds)
@@ -209,13 +204,16 @@ namespace CZToolKit.Core.Editors
         protected override void SingleClickedItem(int id)
         {
             base.SingleClickedItem(id);
-            onSingleClickedItem?.Invoke(Find(id));
+            CZTreeViewItem item = FindItem(id);
+            onSingleClickedItem?.Invoke(item);
         }
 
         protected override void DoubleClickedItem(int id)
         {
             base.DoubleClickedItem(id);
-            onDoubleClickedItem?.Invoke(Find(id));
+            CZTreeViewItem item = FindItem(id);
+            onDoubleClickedItem?.Invoke(item);
+            item.onDoubleClicked?.Invoke();
         }
 
         protected override void ContextClicked()
@@ -227,13 +225,14 @@ namespace CZToolKit.Core.Editors
         protected override void ContextClickedItem(int id)
         {
             base.ContextClickedItem(id);
-            onContextClickedItem?.Invoke(Find(id));
+            CZTreeViewItem item = FindItem(id);
+            onContextClickedItem?.Invoke(item);
+            item.onContextClicked?.Invoke();
         }
 
         public void Clear()
         {
             items.Clear();
-            treeViewItemIDMap.Clear();
         }
     }
 }

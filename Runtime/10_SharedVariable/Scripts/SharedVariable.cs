@@ -78,7 +78,9 @@ namespace CZToolKit.Core.SharedVariable
             set
             {
                 if (this.setter != null)
+                {
                     this.setter(value);
+                }
                 else
                     this.value = value;
             }
@@ -103,7 +105,7 @@ namespace CZToolKit.Core.SharedVariable
             getter = () =>
             {
                 SharedVariable<T> variable = _variableOwner.GetVariable(GUID) as SharedVariable<T>;
-                if (variable != null) return variable.Value;
+                if (variable != null) { return variable.Value; }
                 return value;
             };
             setter = _value =>

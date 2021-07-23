@@ -64,7 +64,7 @@ namespace CZToolKit.Core.Editors
 
         public override void OnInspectorGUI()
         {
-            //EditorGUI.BeginChangeCheck();
+            EditorGUI.BeginChangeCheck();
             SerializedProperty iterator = serializedObject.GetIterator();
             iterator.NextVisible(true);
             do
@@ -76,11 +76,11 @@ namespace CZToolKit.Core.Editors
                     EditorGUILayout.PropertyField(iterator);
             } while (iterator.NextVisible(false));
 
-            //if (EditorGUI.EndChangeCheck())
-            //{
-            //    serializedObject.ApplyModifiedProperties();
-            //    EditorUtility.SetDirty(target);
-            //}
+            if (EditorGUI.EndChangeCheck())
+            {
+                //serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(target);
+            }
         }
 
         private void DrawScript(SerializedProperty _serializedProperty)
