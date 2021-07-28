@@ -78,9 +78,7 @@ namespace CZToolKit.Core.SharedVariable
             set
             {
                 if (this.setter != null)
-                {
                     this.setter(value);
-                }
                 else
                     this.value = value;
             }

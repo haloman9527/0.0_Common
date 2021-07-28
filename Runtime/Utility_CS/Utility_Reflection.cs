@@ -4,7 +4,7 @@
  *  Title:
  *  
  *  Description:
- *  
+ *      反射操作及缓存
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
@@ -121,6 +121,36 @@ namespace CZToolKit.Core
             {
                 if (_patern(field))
                     yield return field;
+            }
+        }
+
+        static Dictionary<Type, List<PropertyInfo>> TypePropertyInfoCache = new Dictionary<Type, List<PropertyInfo>>();
+
+        /// <summary> 获取字段，包括基类的私有字段 </summary>
+        public static PropertyInfo GetPropertyInfo(Type _type, string _propertyName)
+        {
+            return GetPropertyInfos(_type).Find(f => f.Name == _propertyName);
+        }
+
+        public static List<PropertyInfo> GetPropertyInfos(Type _type)
+        {
+            if (TypePropertyInfoCache.TryGetValue(_type, out List<PropertyInfo> propertyInfos))
+                return propertyInfos;
+            TypePropertyInfoCache[_type] = propertyInfos = new List<PropertyInfo>(_type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
+            // 获取类包含的所有字段(包含私有)
+            while ((_type = _type.BaseType) != null)
+            {
+                propertyInfos.InsertRange(0, _type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
+            }
+            return propertyInfos;
+        }
+
+        public static IEnumerable<PropertyInfo> GetPropertyInfos(Type _type, Func<PropertyInfo, bool> _patern)
+        {
+            foreach (var property in GetPropertyInfos(_type))
+            {
+                if (_patern(property))
+                    yield return property;
             }
         }
 

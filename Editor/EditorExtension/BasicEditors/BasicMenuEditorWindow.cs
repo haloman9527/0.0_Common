@@ -135,7 +135,6 @@ namespace CZToolKit.Core.Editors
                 GUILayout.EndScrollView();
             }
             GUILayout.EndArea();
-
         }
 
         protected abstract CZMenuTreeView BuildMenuTree(TreeViewState _treeViewState);
@@ -167,6 +166,7 @@ namespace CZToolKit.Core.Editors
                     objectEditor.OnInspectorGUI();
                     break;
             }
+
         }
     }
 

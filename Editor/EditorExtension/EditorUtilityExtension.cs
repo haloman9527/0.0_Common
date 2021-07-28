@@ -24,20 +24,23 @@ namespace CZToolKit.Core.Editors
     {
         static Dictionary<Type, MonoScript> MonoScriptCache = new Dictionary<Type, MonoScript>();
 
-        public static MonoScript FindScriptFromType(Type _type)
+        public static MonoScript FindScriptFromType(Type _type, Func<MonoScript, bool> _pattern = null, bool _compareTypeName = true)
         {
             if (MonoScriptCache.TryGetValue(_type, out MonoScript monoScript))
                 return monoScript;
 
-
-            var scriptGUIDs = AssetDatabase.FindAssets($"t:script {_type.Name}");
+            string findStr = "t:script " + (_compareTypeName ? _type.Name : "");
+            var scriptGUIDs = AssetDatabase.FindAssets(findStr);
             foreach (var scriptGUID in scriptGUIDs)
             {
                 var assetPath = AssetDatabase.GUIDToAssetPath(scriptGUID);
                 var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
 
                 if (script != null && String.Equals(_type.Name, Path.GetFileNameWithoutExtension(assetPath), StringComparison.OrdinalIgnoreCase) && script.GetClass() == _type)
-                    MonoScriptCache[_type] = monoScript = script;
+                {
+                    if (_pattern == null || _pattern(script))
+                        MonoScriptCache[_type] = monoScript = script;
+                }
             }
 
             return monoScript;
