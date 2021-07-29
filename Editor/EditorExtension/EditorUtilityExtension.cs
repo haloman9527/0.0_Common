@@ -22,13 +22,8 @@ namespace CZToolKit.Core.Editors
 {
     public static class EditorUtilityExtension
     {
-        static Dictionary<Type, MonoScript> MonoScriptCache = new Dictionary<Type, MonoScript>();
-
         public static MonoScript FindScriptFromType(Type _type, Func<MonoScript, bool> _pattern = null, bool _compareTypeName = true)
         {
-            if (MonoScriptCache.TryGetValue(_type, out MonoScript monoScript))
-                return monoScript;
-
             string findStr = "t:script " + (_compareTypeName ? _type.Name : "");
             var scriptGUIDs = AssetDatabase.FindAssets(findStr);
             foreach (var scriptGUID in scriptGUIDs)
@@ -36,14 +31,28 @@ namespace CZToolKit.Core.Editors
                 var assetPath = AssetDatabase.GUIDToAssetPath(scriptGUID);
                 var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
 
-                if (script != null && String.Equals(_type.Name, Path.GetFileNameWithoutExtension(assetPath), StringComparison.OrdinalIgnoreCase) && script.GetClass() == _type)
+                if (script != null)
                 {
                     if (_pattern == null || _pattern(script))
-                        MonoScriptCache[_type] = monoScript = script;
+                        return script;
                 }
             }
-
-            return monoScript;
+            return null;
+        }
+        public static IEnumerable<MonoScript> FindAllScriptFromType(Type _type, Func<MonoScript, bool> _pattern = null, bool _compareTypeName = true)
+        {
+            string findStr = "t:script " + (_compareTypeName ? _type.Name : "");
+            var scriptGUIDs = AssetDatabase.FindAssets(findStr);
+            foreach (var scriptGUID in scriptGUIDs)
+            {
+                var assetPath = AssetDatabase.GUIDToAssetPath(scriptGUID);
+                var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
+                if (script != null)
+                {
+                    if (_pattern == null || _pattern(script))
+                        yield return script;
+                }
+            }
         }
     }
 }
