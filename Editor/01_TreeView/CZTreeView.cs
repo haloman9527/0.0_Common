@@ -92,7 +92,7 @@ namespace CZToolKit.Core.Editors
                 labelRect.x += item.depth * depthIndentWidth + depthIndentWidth;
                 labelRect.width -= labelRect.x;
             }
-            GUI.Label(labelRect, EditorGUIExtension.GetGUIContent(item.displayName, item.icon), EditorStylesExtension.LeftLabelStyle);
+            GUI.Label(labelRect, GUIHelper.GetGUIContent(item.displayName, item.icon), EditorStylesExtension.LeftLabelStyle);
         }
 
         public void AddMenuItem<T>(string _path, T _treeViewItem) where T : CZTreeViewItem

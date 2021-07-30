@@ -95,6 +95,24 @@ public static partial class Extension
         return Vector3.up * _self.radius + Vector3.down * _self.GetRealHeight() / 2 + _self.center;
     }
 
+    /// <summary> 获取Capsule的真实高度 </summary>
+    public static float GetRealHeight(this CapsuleCollider _self)
+    {
+        return Mathf.Max(_self.radius * 2, _self.height);
+    }
+
+    /// <summary> 获取Capsule顶部半圆中心 </summary>
+    public static Vector3 GetTopCenter(this CapsuleCollider _self)
+    {
+        return Vector3.down * _self.radius + Vector3.up * _self.GetRealHeight() / 2 + _self.center;
+    }
+
+    /// <summary> 获取CC底部半圆中心 </summary>
+    public static Vector3 GetBottomCenter(this CapsuleCollider _self)
+    {
+        return Vector3.up * _self.radius + Vector3.down * _self.GetRealHeight() / 2 + _self.center;
+    }
+
     /// <summary> 获取颜色明度 </summary>
     public static float GetLuminance(this Color _color)
     {

@@ -54,10 +54,10 @@ namespace CZToolKit.Core.Editors
                 ".",
                 guiContent.text
             });
-            bool @bool = EditorGUIExtension.GetFoldoutBool(text);
+            bool @bool = GUIHelper.GetFoldoutBool(text);
             bool flag = EditorGUILayout.Foldout(@bool, guiContent, true, EditorStylesExtension.FoldoutStyle);
             if (flag != @bool)
-                EditorGUIExtension.SetFoldoutBool(text, flag);
+                GUIHelper.SetFoldoutBool(text, flag);
             return flag;
         }
 
@@ -113,16 +113,16 @@ namespace CZToolKit.Core.Editors
 
         public static object DrawField(string _name, FieldInfo _fieldInfo, object _value)
         {
-            return DrawField(EditorGUIExtension.GetGUIContent(_name), _fieldInfo, _value);
+            return DrawField(GUIHelper.GetGUIContent(_name), _fieldInfo, _value);
         }
 
         public static object DrawField(FieldInfo _fieldInfo, object _value)
         {
             GUIContent content = null;
             if (Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out TooltipAttribute tooltipAtt))
-                content = EditorGUIExtension.GetGUIContent(ObjectNames.NicifyVariableName(_fieldInfo.Name), tooltipAtt.tooltip);
+                content = GUIHelper.GetGUIContent(ObjectNames.NicifyVariableName(_fieldInfo.Name), tooltipAtt.tooltip);
             else
-                content = EditorGUIExtension.GetGUIContent(ObjectNames.NicifyVariableName(_fieldInfo.Name));
+                content = GUIHelper.GetGUIContent(ObjectNames.NicifyVariableName(_fieldInfo.Name));
             return DrawField(content, _fieldInfo, _value);
         }
 
@@ -136,8 +136,8 @@ namespace CZToolKit.Core.Editors
         public static object DrawField(string _name, Type _fieldType, object _value)
         {
             if (typeof(IList).IsAssignableFrom(_fieldType))
-                return EditorGUILayoutExtension.DrawArrayField(EditorGUIExtension.GetGUIContent(_name), null, _fieldType, _value);
-            return EditorGUILayoutExtension.DrawSingleField(EditorGUIExtension.GetGUIContent(_name), null, _fieldType, _value);
+                return EditorGUILayoutExtension.DrawArrayField(GUIHelper.GetGUIContent(_name), null, _fieldType, _value);
+            return EditorGUILayoutExtension.DrawSingleField(GUIHelper.GetGUIContent(_name), null, _fieldType, _value);
         }
 
         private static object DrawArrayField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
@@ -185,7 +185,7 @@ namespace CZToolKit.Core.Editors
                 EditorGUI.indentLevel++;
                 bool flag = _value.GetHashCode() == EditorGUILayoutExtension.editingFieldHash;
                 int count = (!flag) ? list.Count : EditorGUILayoutExtension.savedArraySize;
-                int newCount = EditorGUILayout.IntField(EditorGUIExtension.GetGUIContent("Size"), count);
+                int newCount = EditorGUILayout.IntField(GUIHelper.GetGUIContent("Size"), count);
                 if (flag && EditorGUILayoutExtension.editingArray && (GUIUtility.keyboardControl != EditorGUILayoutExtension.currentKeyboardControl
                     || (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return)))
                 {
