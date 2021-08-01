@@ -13,7 +13,6 @@
  *
  */
 #endregion
-using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -72,23 +71,29 @@ namespace CZToolKit.Core.Editors
                 }
 
                 EditorGUILayout.EndVertical();
-                GUILayout.Space(20);
+                if (_list.arraySize > _count)
+                {
+                    GUILayout.Space(20);
+                    if (_list.arraySize > _count)
+                    {
+                        if (Event.current.type == EventType.ScrollWheel && r.Contains(Event.current.mousePosition))
+                        {
+                            _scroll += Event.current.delta.y * 0.01f;
+                            Event.current.Use();
+                        }
+                        if (targetIndex != -1)
+                        {
+                            _scroll = Mathf.Clamp01((float)targetIndex / _list.arraySize);
+                        }
+
+                        r.xMin += r.width + 5;
+                        r.width = 20;
+                        _scroll = GUI.VerticalScrollbar(r, _scroll, (float)_count / _list.arraySize, 0, 1);
+                    }
+                }
                 GUILayout.EndHorizontal();
                 EditorGUI.indentLevel--;
 
-                if (Event.current.type == EventType.ScrollWheel && r.Contains(Event.current.mousePosition))
-                {
-                    _scroll += Event.current.delta.y * 0.01f;
-                    Event.current.Use();
-                }
-                if (targetIndex != -1)
-                {
-                    _scroll = Mathf.Clamp01((float)targetIndex / _list.arraySize);
-                }
-
-                r.xMin += r.width + 5;
-                r.width = 20;
-                _scroll = GUI.VerticalScrollbar(r, _scroll, (float)_count / _list.arraySize, 0, 1);
             }
             return _scroll;
         }
@@ -107,8 +112,10 @@ namespace CZToolKit.Core.Editors
 
                 Rect t = rect;
                 t.xMin = t.xMax - t.height;
+
                 EditorGUI.Foldout(t, _foldout, string.Empty);
 
+                toggleRect.width = rect.width - 10;
                 EditorGUI.ToggleLeft(toggleRect, _label, _enable);
             }
 
@@ -127,6 +134,7 @@ namespace CZToolKit.Core.Editors
                 }
             }
 
+            EditorGUILayout.BeginVertical();
             EditorGUI.BeginDisabledGroup(!_enable);
             EditorGUI.indentLevel++;
             return _foldout;
@@ -136,6 +144,7 @@ namespace CZToolKit.Core.Editors
         {
             EditorGUI.indentLevel--;
             EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndVertical();
         }
     }
 }
