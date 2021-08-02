@@ -15,18 +15,10 @@
 #endregion
 using System.Collections.Generic;
 
-using UnityObject = UnityEngine.Object;
-
 namespace CZToolKit.Core.SharedVariable
 {
     public interface IVariableOwner
     {
-        string GetOwnerName();
-
-        int GetInstanceID();
-
-        UnityObject Self();
-
         SharedVariable GetVariable(string _guid);
 
         void SetVariable(SharedVariable _variable);

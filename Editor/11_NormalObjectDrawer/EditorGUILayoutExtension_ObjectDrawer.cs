@@ -26,7 +26,7 @@ namespace CZToolKit.Core.Editors
 {
     public static partial class EditorGUILayoutExtension
     {
-        public static void DrawFieldsInInspector(object _targetObject)
+        public static void DrawFieldsInInspector(object _targetObject, UnityObject _unityOwner = null)
         {
             if (_targetObject is UnityObject)
             {
@@ -39,7 +39,7 @@ namespace CZToolKit.Core.Editors
             }
         }
 
-        public static void DrawFieldsInInspector(string _title, object _targetObject)
+        public static void DrawFieldsInInspector(string _title, object _targetObject, UnityObject _unityOwner = null)
         {
             DrawFieldsInInspector(_targetObject);
             ObjectInspector.Instance.name = _title;

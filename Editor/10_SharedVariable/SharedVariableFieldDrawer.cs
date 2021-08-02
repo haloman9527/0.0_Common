@@ -17,6 +17,8 @@ using CZToolKit.Core.Editors;
 using UnityEditor;
 using UnityEngine;
 
+using UnityObject = UnityEngine.Object;
+
 namespace CZToolKit.Core.SharedVariable.Editors
 {
     //[CustomFieldDrawer(typeof(SharedVariableAttribute))]
@@ -35,7 +37,7 @@ namespace CZToolKit.Core.SharedVariable.Editors
             if (EditorGUI.EndChangeCheck())
             {
                 variable.SetValue(value);
-                EditorUtility.SetDirty(variableOwner.Self());
+                EditorUtility.SetDirty(variableOwner as UnityObject);
             }
         }
     }

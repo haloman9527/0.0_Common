@@ -17,6 +17,8 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
+using UnityObject = UnityEngine.Object;
+
 namespace CZToolKit.Core.Editors
 {
     public class FieldDrawer
