@@ -13,19 +13,34 @@
  *
  */
 #endregion
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+
+using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
     public static partial class EditorGUILayoutExtension
     {
-        public static Rect BeginBox()
+        static Stack<Font> fonts = new Stack<Font>();
+        public static void BeginFont(Font _font)
         {
-            return EditorGUILayout.BeginVertical(GUI.skin.box);
+            fonts.Push(GUI.skin.font);
+            GUI.skin.font = _font;
         }
 
-        public static void EndBox()
+        public static void EndFont()
+        {
+            GUI.skin.font = fonts.Pop();
+        }
+
+        public static Rect BeginBoxGroup()
+        {
+            return EditorGUILayout.BeginVertical(EditorStylesExtension.RoundedBoxStyle);
+        }
+
+        public static void EndBoxGroup()
         {
             EditorGUILayout.EndVertical();
         }
@@ -98,21 +113,104 @@ namespace CZToolKit.Core.Editors
             return _scroll;
         }
 
+        public static string FilePath(string _label, string _path)
+        {
+            EditorGUILayout.BeginHorizontal();
+            _path = EditorGUILayout.TextField(_label, _path);
+            Rect rect = GUILayoutUtility.GetLastRect();
+            UnityObject uObj = EditorGUIExtension.DragDropAreaSingle(rect, DragAndDropVisualMode.Copy);
+            if (uObj != null && AssetDatabase.IsMainAsset(uObj))
+            {
+                string p = AssetDatabase.GetAssetPath(uObj);
+                if (!AssetDatabase.IsValidFolder(p))
+                    _path = p;
+            }
+            if (GUILayout.Button(EditorGUIUtility.FindTexture("FolderEmpty Icon"), EditorStylesExtension.OnlyIconButtonStyle, GUILayout.Width(18), GUILayout.Height(18)))
+            {
+                _path = EditorUtility.OpenFilePanel("Select File", Application.dataPath, "*");
+                if (!string.IsNullOrEmpty(_path))
+                    _path = _path.Substring(_path.IndexOf("Assets"));
+            }
+            EditorGUILayout.EndHorizontal();
+            return _path;
+        }
+
+        public static void FilePath(string _label, SerializedProperty _path)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PropertyField(_path);
+            Rect rect = GUILayoutUtility.GetLastRect();
+            UnityObject uObj = EditorGUIExtension.DragDropAreaSingle(rect, DragAndDropVisualMode.Copy);
+            if (uObj != null && AssetDatabase.IsMainAsset(uObj))
+            {
+                string p = AssetDatabase.GetAssetPath(uObj);
+                if (!AssetDatabase.IsValidFolder(p))
+                    _path.stringValue = p;
+            }
+            if (GUILayout.Button(EditorGUIUtility.FindTexture("FolderEmpty Icon"), EditorStylesExtension.OnlyIconButtonStyle, GUILayout.Width(18), GUILayout.Height(18)))
+            {
+                string p = EditorUtility.OpenFilePanel("Select File", Application.dataPath, "*");
+                if (!string.IsNullOrEmpty(p))
+                    _path.stringValue = p.Substring(p.IndexOf("Assets"));
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        public static string FolderPath(string _label, string _folder)
+        {
+            EditorGUILayout.BeginHorizontal();
+            _folder = EditorGUILayout.TextField(_label, _folder);
+            Rect rect = GUILayoutUtility.GetLastRect();
+            UnityObject uObj = EditorGUIExtension.DragDropAreaSingle(rect, DragAndDropVisualMode.Copy);
+            if (uObj != null && AssetDatabase.IsMainAsset(uObj))
+            {
+                string p = AssetDatabase.GetAssetPath(uObj);
+                if (AssetDatabase.IsValidFolder(p))
+                    _folder = p;
+            }
+            if (GUILayout.Button(EditorGUIUtility.FindTexture("FolderEmpty Icon"), EditorStylesExtension.OnlyIconButtonStyle, GUILayout.Width(18), GUILayout.Height(18)))
+            {
+                _folder = EditorUtility.OpenFolderPanel("Select Folder", Application.dataPath, string.Empty);
+                if (!string.IsNullOrEmpty(_folder))
+                    _folder = _folder.Substring(_folder.IndexOf("Assets"));
+            }
+            EditorGUILayout.EndHorizontal();
+            return _folder;
+        }
+
+        public static void FolderPath(string _label, SerializedProperty _folder)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PropertyField(_folder);
+            Rect rect = GUILayoutUtility.GetLastRect();
+            UnityObject uObj = EditorGUIExtension.DragDropAreaSingle(rect, DragAndDropVisualMode.Copy);
+            if (uObj != null && AssetDatabase.IsMainAsset(uObj))
+            {
+                string p = AssetDatabase.GetAssetPath(uObj);
+                if (AssetDatabase.IsValidFolder(p))
+                    _folder.stringValue = p;
+            }
+            if (GUILayout.Button(EditorGUIUtility.FindTexture("FolderEmpty Icon"), EditorStylesExtension.OnlyIconButtonStyle, GUILayout.Width(18), GUILayout.Height(18)))
+            {
+                string p = EditorUtility.OpenFolderPanel("Select Folder", Application.dataPath, string.Empty);
+                if (!string.IsNullOrEmpty(p))
+                    _folder.stringValue = p.Substring(p.IndexOf("Assets"));
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
         public static bool BeginToggleGroup(string _label, bool _foldout, ref bool _enable)
         {
+            BeginBoxGroup();
             Rect rect = GUILayoutUtility.GetRect(50, 25);
             rect = EditorGUI.IndentedRect(rect);
-            rect.xMin += 3f;
-            rect.xMax -= 3f;
+            GUI.Box(rect, string.Empty, GUI.skin.button);
 
             Rect toggleRect = new Rect(rect.x + 10, rect.y, rect.height, rect.height);
             if (Event.current.type == EventType.Repaint)
             {
-                GUI.Box(rect, string.Empty, GUI.skin.button);
-
                 Rect t = rect;
                 t.xMin = t.xMax - t.height;
-
                 EditorGUI.Foldout(t, _foldout, string.Empty);
 
                 toggleRect.width = rect.width - 10;
@@ -134,7 +232,6 @@ namespace CZToolKit.Core.Editors
                 }
             }
 
-            EditorGUILayout.BeginVertical();
             EditorGUI.BeginDisabledGroup(!_enable);
             EditorGUI.indentLevel++;
             return _foldout;
@@ -144,7 +241,7 @@ namespace CZToolKit.Core.Editors
         {
             EditorGUI.indentLevel--;
             EditorGUI.EndDisabledGroup();
-            EditorGUILayout.EndVertical();
+            EndBoxGroup();
         }
     }
 }

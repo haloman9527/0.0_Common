@@ -18,8 +18,28 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
+    public class ContextData { }
+    public class ContextData<T> : ContextData
+    {
+        public T value;
+    }
+
     public static class GUIHelper
     {
+        static Dictionary<int, ContextData> ContextDatas = new Dictionary<int, ContextData>();
+
+        public static ContextData<T> GetContextData<T>(int _key, T _default = default)
+        {
+            if (ContextDatas.TryGetValue(_key, out ContextData _data))
+            {
+                if (_data is ContextData<T> _t_data)
+                    return _t_data;
+            }
+            ContextData<T> t_data = new ContextData<T>() { value = _default };
+            ContextDatas[_key] = t_data;
+            return t_data;
+        }
+
         static Dictionary<string, GUIContent> GUIContentsCache = new Dictionary<string, GUIContent>();
         public static GUIContent GetGUIContent(string _name)
         {

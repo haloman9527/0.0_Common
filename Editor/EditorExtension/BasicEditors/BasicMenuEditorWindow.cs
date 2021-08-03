@@ -77,7 +77,7 @@ namespace CZToolKit.Core.Editors
         }
 
         Vector2 scroll;
-        void OnGUI()
+        protected virtual void OnGUI()
         {
             resizableArea.maxSize = position.size;
             resizableAreaRect.height = position.height;

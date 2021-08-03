@@ -123,7 +123,6 @@ namespace CZToolKit.Core.Editors
             }
         }
 
-
         static GUIStyle rightLabelStyle;
         /// <summary> 右对齐Label </summary>
         public static GUIStyle RightLabelStyle
@@ -139,6 +138,38 @@ namespace CZToolKit.Core.Editors
             }
         }
 
+        static GUIStyle onlyIconButtonStyle;
+        /// <summary> 无背景无边框，Button样式 </summary>
+        public static GUIStyle OnlyIconButtonStyle
+        {
+            get
+            {
+                if (onlyIconButtonStyle == null)
+                {
+                    onlyIconButtonStyle = new GUIStyle(GUI.skin.button);
+                    onlyIconButtonStyle.normal.background = AlphaTexture;
+                    onlyIconButtonStyle.padding.left = 0;
+                    onlyIconButtonStyle.padding.right = 0;
+                    onlyIconButtonStyle.padding.bottom = 0;
+                    onlyIconButtonStyle.padding.top = 0;
+                }
+                return onlyIconButtonStyle;
+            }
+        }
+
+        static GUIStyle roundedBoxStyle;
+        public static GUIStyle RoundedBoxStyle
+        {
+            get
+            {
+                if (roundedBoxStyle == null)
+                {
+                    roundedBoxStyle = new GUIStyle((GUIStyle)"FrameBox");
+                }
+                return roundedBoxStyle;
+            }
+        }
+
         static Texture2D whiteTexture;
         /// <summary> 白色Texture(1,1) </summary>
         public static Texture2D WhiteTexture
@@ -148,6 +179,19 @@ namespace CZToolKit.Core.Editors
                 if (whiteTexture == null)
                     whiteTexture = MakeTex(1, 1, Color.white);
                 return whiteTexture;
+            }
+        }
+
+
+        static Texture2D alphaTexture;
+        /// <summary> 透明Texture(1,1) </summary>
+        public static Texture2D AlphaTexture
+        {
+            get
+            {
+                if (alphaTexture == null)
+                    alphaTexture = MakeTex(1, 1, new Color(0, 0, 0, 0));
+                return alphaTexture;
             }
         }
 
@@ -162,21 +206,6 @@ namespace CZToolKit.Core.Editors
             result.SetPixels(pix);
             result.Apply();
             return result;
-        }
-
-        static Dictionary<string, GUISkin> GUISkins = new Dictionary<string, GUISkin>();
-
-        /// <summary> Default:GUI.skin </summary>
-        public static GUISkin GetGUISkin(string _path)
-        {
-            GUISkin guiSkin;
-            if (GUISkins.TryGetValue(_path, out guiSkin)) return guiSkin;
-
-            guiSkin = AssetDatabase.LoadAssetAtPath<GUISkin>(_path);
-            if (guiSkin == null) return GUI.skin;
-
-            GUISkins[_path] = guiSkin;
-            return guiSkin;
         }
     }
 }
