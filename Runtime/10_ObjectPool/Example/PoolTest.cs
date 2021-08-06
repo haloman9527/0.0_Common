@@ -16,11 +16,13 @@
 using System.Collections;
 using UnityEngine;
 using CZToolKit.Core.ObjectPool;
+using CZToolKit.Core.Attributes;
 
 public class PoolTest : MonoBehaviour
 {
     public UnityGOPool pool = new UnityGOPool();
-
+    [ObjectPreviewButton]
+    public UnityEngine.Object go;
     // Start is called before the first frame update
     void Start()
     {
@@ -41,10 +43,5 @@ public class PoolTest : MonoBehaviour
     {
         yield return new WaitForSeconds(3);
         pool.Recycle(go);
-    }
-
-    public void AnimationEvent()
-    {
-        Debug.Log(1);
     }
 }

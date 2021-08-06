@@ -30,7 +30,6 @@ namespace CZToolKit.Core.Editors
 
         public static string SerializeTableLine(string[] _fields)
         {
-
             for (int f = 0; f < _fields.Length; f++)
             {
                 if (string.IsNullOrEmpty(_fields[f]))
@@ -94,13 +93,14 @@ namespace CZToolKit.Core.Editors
     public class Localization
     {
         int language;
+        string[] languages;
         Dictionary<string, string[]> texts = new Dictionary<string, string[]>();
 
         public event Action onLanguageChanged;
 
         public string[] Languages
         {
-            get { return texts["Key"]; }
+            get { return languages; }
         }
         public int Language
         {
@@ -115,9 +115,16 @@ namespace CZToolKit.Core.Editors
 
         public Localization(string _text)
         {
-            CSVLoader.DeserializeEachLine(_text, _ =>
+            bool firstLine = true;
+            CSVLoader.DeserializeEachLine(_text, _fields =>
             {
-                texts[_[0]] = _.Skip(1).ToArray();
+                if (firstLine)
+                {
+                    languages = _fields.Skip(1).ToArray();
+                    firstLine = false;
+                }
+                else
+                    texts[_fields[0]] = _fields.Skip(1).ToArray();
             });
         }
 
