@@ -13,11 +13,8 @@
  *
  */
 #endregion
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using CZToolKit.Core.Editors;
 
 namespace CZToolKit.Core.Attributes.Editors
 {
@@ -29,7 +26,13 @@ namespace CZToolKit.Core.Attributes.Editors
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (foldout = EditorGUILayout.Foldout(foldout, label, true))
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.PropertyField(position, property, label);
+            if (EditorGUI.EndChangeCheck() && property.objectReferenceValue != null)
+                editor = Editor.CreateEditor(property.objectReferenceValue);
+
+            foldout = EditorGUI.Foldout(position, foldout, string.Empty, true);
+            if (foldout)
             {
                 if (property.objectReferenceValue != null)
                 {
@@ -38,12 +41,6 @@ namespace CZToolKit.Core.Attributes.Editors
                     editor.OnInspectorGUI();
                 }
             }
-        }
-
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-        {
-            return 0;
-            //return base.GetPropertyHeight(property, label);
         }
     }
 }
