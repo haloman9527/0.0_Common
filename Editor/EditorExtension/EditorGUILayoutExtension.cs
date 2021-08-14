@@ -207,29 +207,35 @@ namespace CZToolKit.Core.Editors
             GUI.Box(rect, string.Empty, GUI.skin.button);
 
             Rect toggleRect = new Rect(rect.x + 10, rect.y, rect.height, rect.height);
-            if (Event.current.type == EventType.Repaint)
-            {
-                Rect t = rect;
-                t.xMin = t.xMax - t.height;
-                EditorGUI.Foldout(t, _foldout, string.Empty);
 
-                toggleRect.width = rect.width - 10;
-                EditorGUI.ToggleLeft(toggleRect, _label, _enable);
-            }
 
             Event current = Event.current;
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+            if (current.type == EventType.MouseDown && current.button == 0)
             {
                 if (toggleRect.Contains(current.mousePosition))
                 {
                     _enable = !_enable;
-                    current.Use();
                 }
                 else if (rect.Contains(current.mousePosition))
                 {
                     _foldout = !_foldout;
-                    current.Use();
                 }
+            }
+
+            switch (current.type)
+            {
+                case EventType.MouseDown:
+                case EventType.MouseUp:
+                case EventType.Repaint:
+                    Rect t = rect;
+                    t.xMin = t.xMax - t.height;
+                    EditorGUI.Foldout(t, _foldout, string.Empty);
+
+                    toggleRect.width = rect.width - 10;
+                    EditorGUI.ToggleLeft(toggleRect, _label, _enable);
+                    break;
+                default:
+                    break;
             }
 
             EditorGUI.BeginDisabledGroup(!_enable);
