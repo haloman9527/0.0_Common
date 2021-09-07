@@ -14,6 +14,7 @@
  */
 #endregion
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace CZToolKit.Core.ReactiveX
@@ -28,6 +29,25 @@ namespace CZToolKit.Core.ReactiveX
             {
                 observer.OnNext(value);
             }
+        }
+    }
+
+    public class Foreach<TIn> : Operator<IEnumerable<TIn>>
+    {
+        Action<TIn> action;
+
+        public Foreach(IObservable<IEnumerable<TIn>> _src, Action<TIn> _action) : base(_src)
+        {
+            action = _action;
+        }
+
+        public override void OnNext(IEnumerable<TIn> _value)
+        {
+            foreach (TIn value in _value)
+            {
+                action(value);
+            }
+            observer.OnNext(_value);
         }
     }
 }

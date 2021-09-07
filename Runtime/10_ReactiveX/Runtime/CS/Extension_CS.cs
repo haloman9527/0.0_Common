@@ -36,6 +36,11 @@ namespace CZToolKit.Core.ReactiveX
             return new Foreach<IEnumerable<T>, T>(_src);
         }
 
+        public static IObservable<IEnumerable<T>> Foreach<T>(this IObservable<IEnumerable<T>> _src, Action<T> _action)
+        {
+            return new Foreach<T>(_src, _action);
+        }
+
         public static IObservable<T> First<T>(this IObservable<T> _src)
         {
             return new First<T>(_src);

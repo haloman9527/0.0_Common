@@ -17,12 +17,9 @@ using System;
 
 namespace CZToolKit.Core.ReactiveX
 {
-    public abstract class Operator : IDisposable
-    {
-        public abstract void Dispose();
-    }
+    public interface IOperator : IDisposable { }
 
-    public abstract class Operator<T> : Operator, IObservable<T>, IObserver<T>
+    public abstract class Operator<T> : IOperator, IObservable<T>, IObserver<T>
     {
         protected IObservable<T> src;
         protected IObserver<T> observer;
@@ -54,7 +51,7 @@ namespace CZToolKit.Core.ReactiveX
             return src.Subscribe(this);
         }
 
-        public sealed override void Dispose()
+        public void Dispose()
         {
             (observer as IDisposable)?.Dispose();
             OnDispose();
@@ -63,7 +60,7 @@ namespace CZToolKit.Core.ReactiveX
         public virtual void OnDispose() { }
     }
 
-    public abstract class Operator<TIn, TOut> : Operator, IObservable<TOut>, IObserver<TIn>
+    public abstract class Operator<TIn, TOut> : IOperator, IObservable<TOut>, IObserver<TIn>
     {
         protected IObservable<TIn> src;
         protected IObserver<TOut> observer;
@@ -92,7 +89,7 @@ namespace CZToolKit.Core.ReactiveX
             return src.Subscribe(this);
         }
 
-        public sealed override void Dispose()
+        public void Dispose()
         {
             (observer as IDisposable)?.Dispose();
             OnDispose();

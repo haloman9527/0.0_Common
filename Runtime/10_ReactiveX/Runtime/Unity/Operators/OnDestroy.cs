@@ -17,6 +17,11 @@ using System;
 
 namespace CZToolKit.Core.ReactiveX
 {
+    public interface IOnDestory
+    {
+        event Action onDestroy;
+    }
+
     public class OnDestroy<TIn, TOut> : Operator<TIn, TOut> where TIn : IOnDestory where TOut : class, TIn
     {
         Action action;
