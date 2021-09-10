@@ -42,27 +42,25 @@ namespace CZToolKit.Core.Singletons
             }
         }
 
-        public static T Initialize() { return Instance; }
+        public static bool IsNull { get { return m_Instance == null; } }
 
-        public static void Clean()
+        public static void Initialize()
+        {
+            _Get();
+            T _Get() { return Instance; }
+        }
+
+        public static void Destroy()
         {
             if (m_Instance != null)
             {
-                m_Instance.OnClean();
+                m_Instance.OnBeforeDestroy();
                 m_Instance = null;
             }
         }
 
-        public static bool IsNull { get { return m_Instance == null; } }
+        public CZNormalSingleton() { m_Instance = this as T; }
 
-        public CZNormalSingleton()
-        {
-            m_Instance = this as T;
-            m_Instance.OnInitialize();
-        }
-
-        protected virtual void OnInitialize() { }
-
-        protected virtual void OnClean() { }
+        protected virtual void OnBeforeDestroy() { }
     }
 }

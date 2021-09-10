@@ -54,10 +54,10 @@ namespace CZToolKit.Core.Editors
                 ".",
                 guiContent.text
             });
-            bool @bool = GUIHelper.GetFoldoutBool(text);
+            bool @bool = GUIHelper.GetCachedBool(text);
             bool flag = EditorGUILayout.Foldout(@bool, guiContent, true, EditorStylesExtension.FoldoutStyle);
             if (flag != @bool)
-                GUIHelper.SetFoldoutBool(text, flag);
+                GUIHelper.CacheBool(text, flag);
             return flag;
         }
 

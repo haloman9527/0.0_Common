@@ -73,14 +73,14 @@ namespace CZToolKit.Core.Editors
         }
 
         static Dictionary<string, bool> FoldoutCache = new Dictionary<string, bool>();
-        public static bool GetFoldoutBool(string _key, bool _fallback = false)
+        public static bool GetCachedBool(string _key, bool _fallback = false)
         {
             bool result;
             if (!FoldoutCache.TryGetValue(_key, out result))
                 result = _fallback;
             return result;
         }
-        public static void SetFoldoutBool(string _key, bool _value)
+        public static void CacheBool(string _key, bool _value)
         {
             FoldoutCache[_key] = _value;
         }

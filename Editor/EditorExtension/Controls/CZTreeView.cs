@@ -28,21 +28,32 @@ namespace CZToolKit.Core.Editors
         public Action onContextClicked;
         public Action onDoubleClicked;
 
-        public string name { get; set; }
+        public new List<TreeViewItem> children
+        {
+            get
+            {
+                if (base.children == null)
+                    base.children = new List<TreeViewItem>();
+                return base.children;
+            }
+        }
 
         public CZTreeViewItem() { }
-
-        public CZTreeViewItem(int id) : base(id) { }
-
-        public CZTreeViewItem(int id, int depth) : base(id, depth) { }
-
-        public CZTreeViewItem(int id, int depth, string name) : base(id, depth) { this.name = name; displayName = name; }
-
-        public CZTreeViewItem(int id, int depth, string name, string displayName) : base(id, depth, displayName) { this.name = name; }
     }
 
     public abstract class CZTreeView : TreeView
     {
+        public class Styles
+        {
+            public GUIStyle leftLabelStyle;
+
+            public Styles()
+            {
+                leftLabelStyle = new GUIStyle(EditorStyles.label);
+                leftLabelStyle.alignment = TextAnchor.MiddleLeft;
+            }
+        }
+
         private static void SplitMenuPath(string _menuPath, out string _path, out string _name)
         {
             _menuPath = _menuPath.Trim('/');
@@ -58,10 +69,8 @@ namespace CZToolKit.Core.Editors
 
         }
 
-        int itemCount = 0;
         TreeViewItem root;
-
-        List<TreeViewItem> items = new List<TreeViewItem>();
+        Styles styles;
 
         public event Action<IList<int>> onSelectionChanged;
         public event Action onContextClicked;
@@ -69,16 +78,27 @@ namespace CZToolKit.Core.Editors
         public event Action<CZTreeViewItem> onSingleClickedItem;
         public event Action<CZTreeViewItem> onDoubleClickedItem;
 
+        public Styles GUIStyles
+        {
+            get
+            {
+                if (styles == null) styles = new Styles();
+                return styles;
+            }
+            set { styles = value; }
+        }
         public float RowHeight { get => rowHeight; set => rowHeight = value; }
         public bool ShowBoder { get => showBorder; set => showBorder = value; }
         public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
-        public List<TreeViewItem> Items { get => items; }
         internal TreeViewItem RootItem
         {
             get
             {
                 if (root == null)
-                    root = new CZTreeViewItem(-1, -1, "Root");
+                {
+                    root = new CZTreeViewItem() { id = -1, depth = -1, displayName = "Root" };
+                    root.children = new List<TreeViewItem>();
+                }
                 return root;
             }
         }
@@ -89,7 +109,6 @@ namespace CZToolKit.Core.Editors
 
         protected override TreeViewItem BuildRoot()
         {
-            RootItem.children = items;
             SetupDepthsFromParentsAndChildren(RootItem);
             return RootItem;
         }
@@ -101,13 +120,17 @@ namespace CZToolKit.Core.Editors
             EditorGUI.DrawRect(rowRect, Color.black);
             CZTreeViewItem item = args.item as CZTreeViewItem;
 
-            Rect labelRect = args.rowRect;
-            if (hasSearch)
-                labelRect.xMin += depthIndentWidth;
-            else
-                labelRect.xMin += item.depth * depthIndentWidth + depthIndentWidth;
-            string s = string.IsNullOrEmpty(item.displayName) ? item.name : item.displayName;
-            GUI.Label(labelRect, GUIHelper.GetGUIContent(s, item.icon), EditorStylesExtension.LeftLabelStyle);
+            if (!args.isRenaming)
+            {
+                Rect labelRect = args.rowRect;
+                if (hasSearch)
+                    labelRect.xMin += depthIndentWidth;
+                else
+                    labelRect.xMin += item.depth * depthIndentWidth + depthIndentWidth;
+                GUIContent textContent = GUIHelper.GetGUIContent(item.displayName);
+                textContent.image = item.icon;
+                GUI.Label(labelRect, textContent, GUIStyles.leftLabelStyle);
+            }
             if (item != null)
                 item.itemDrawer?.Invoke(args.rowRect, item);
         }
@@ -115,35 +138,34 @@ namespace CZToolKit.Core.Editors
         public void AddMenuItem<T>(string _path, T _treeViewItem) where T : CZTreeViewItem
         {
             if (string.IsNullOrEmpty(_path)) return;
-            List<TreeViewItem> current = items;
-            CZTreeViewItem currentParent = null;
-            string[] path = _path.Split('/');
-            if (path.Length > 1)
+
+            CZTreeViewItem treeViewItem = RootItem as CZTreeViewItem;
+
+            SplitMenuPath(_path, out _path, out string name);
+            if (!string.IsNullOrEmpty(_path))
             {
-                for (int i = 0; i < path.Length - 1; i++)
+                string[] path = _path.Split('/');
+                for (int i = 0; i < path.Length; i++)
                 {
-                    CZTreeViewItem item = current.Find(t => (t is CZTreeViewItem) && (t as CZTreeViewItem).name == path[i]) as CZTreeViewItem;
-                    if (item == null)
+                    CZTreeViewItem tempItem = treeViewItem.children.Find(item => item.displayName == path[i]) as CZTreeViewItem;
+                    if (tempItem != null)
                     {
-                        item = new CZTreeViewItem();
-                        item.children = new List<TreeViewItem>();
-                        item.name = path[i];
-                        item.id = itemCount;
-                        item.parent = currentParent;
-                        current.Add(item);
-                        itemCount++;
+                        treeViewItem = tempItem;
                     }
-                    currentParent = item;
-                    current = currentParent.children;
+                    else
+                    {
+                        tempItem = new CZTreeViewItem() { id = GenerateID(), displayName = path[i], parent = treeViewItem };
+                        treeViewItem.children.Add(tempItem);
+                        treeViewItem = tempItem;
+                    }
                 }
             }
 
-            _treeViewItem.id = itemCount;
-            _treeViewItem.name = path[path.Length - 1];
-            _treeViewItem.children = new List<TreeViewItem>();
-            _treeViewItem.parent = currentParent;
-            current.Add(_treeViewItem);
-            itemCount++;
+            _treeViewItem.id = GenerateID();
+            _treeViewItem.displayName = name;
+            _treeViewItem.parent = treeViewItem;
+
+            treeViewItem.children.Add(_treeViewItem);
         }
 
         public T AddMenuItem<T>(string _path) where T : CZTreeViewItem, new()
@@ -163,7 +185,9 @@ namespace CZToolKit.Core.Editors
 
         public void Remove(CZTreeViewItem _treeViewItem)
         {
-            items.Remove(_treeViewItem);
+            if (_treeViewItem == null || _treeViewItem.parent == null)
+                return;
+            _treeViewItem.parent.children.Remove(_treeViewItem);
         }
 
         public CZTreeViewItem FindItem(int _id)
@@ -177,18 +201,30 @@ namespace CZToolKit.Core.Editors
             onSelectionChanged?.Invoke(selectedIds);
         }
 
-        public void Sort(Func<TreeViewItem, TreeViewItem, bool> _func)
+        public IEnumerable<CZTreeViewItem> Items()
         {
-            SortChildren(items, _func);
+            return Foreach(RootItem as CZTreeViewItem);
+
+            IEnumerable<CZTreeViewItem> Foreach(CZTreeViewItem parent)
+            {
+                foreach (var item in parent.children)
+                {
+                    yield return item as CZTreeViewItem;
+                }
+            }
         }
 
-        void SortChildren(List<TreeViewItem> _items, Func<TreeViewItem, TreeViewItem, bool> _func)
+        public void Sort(Func<TreeViewItem, TreeViewItem, bool> _func)
         {
-            QuickSort(_items, _func);
-            foreach (var item in _items)
+            SortChildren(RootItem.children, _func);
+
+            void SortChildren(List<TreeViewItem> _items, Func<TreeViewItem, TreeViewItem, bool> func)
             {
-                if (item.hasChildren)
-                    SortChildren(item.children, _func);
+                QuickSort(_items, func);
+                foreach (var item in _items)
+                {
+                    SortChildren(item.children, func);
+                }
             }
         }
 
@@ -268,8 +304,15 @@ namespace CZToolKit.Core.Editors
 
         public void Clear()
         {
-            items.Clear();
-            itemCount = 0;
+            RootItem.children.Clear();
+            id = 0;
+        }
+
+
+        int id = 0;
+        int GenerateID()
+        {
+            return id++;
         }
     }
 }

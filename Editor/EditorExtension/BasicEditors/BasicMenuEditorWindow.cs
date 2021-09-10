@@ -14,7 +14,6 @@
  */
 #endregion
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -25,10 +24,9 @@ using UnityObject = UnityEngine.Object;
 namespace CZToolKit.Core.Editors
 {
     [Serializable]
-    public abstract class BasicMenuEditorWindow : BasicEditorWindow
+    public abstract class BasicMenuEditorWindow : EditorWindow
     {
         static readonly Dictionary<UnityObject, Editor> EditorCache = new Dictionary<UnityObject, Editor>();
-        static readonly Dictionary<object, ObjectEditor> ObjectEditorCache = new Dictionary<object, ObjectEditor>();
 
         [SerializeField]
         ResizableArea resizableArea = new ResizableArea();
@@ -69,7 +67,7 @@ namespace CZToolKit.Core.Editors
         {
             resizableArea.minSize = new Vector2(LeftMinWidth, 50);
             resizableArea.side = 10;
-            resizableArea.EnableSide(UIDirection.Right);
+            resizableArea.EnableSide(ResizableArea.UIDirection.Right);
 
             searchField = new SearchField();
             MenuTreeView = BuildMenuTree(treeViewState);
@@ -161,9 +159,6 @@ namespace CZToolKit.Core.Editors
                     Repaint();
                     break;
                 default:
-                    if (!ObjectEditorCache.TryGetValue(_selectedItem.userData, out ObjectEditor objectEditor))
-                        ObjectEditorCache[_selectedItem.userData] = objectEditor = ObjectEditor.CreateEditor(_selectedItem.userData);
-                    objectEditor.OnInspectorGUI();
                     break;
             }
 
@@ -186,21 +181,6 @@ namespace CZToolKit.Core.Editors
 #if !UNITY_2019_1_OR_NEWER
             customFoldoutYOffset = rowHeight / 2 - 8;
 #endif
-        }
-
-        public T AddMenuItem<T>(string _path) where T : CZMenuTreeViewItem, new()
-        {
-            return AddMenuItem<T>(_path, (Texture2D)null);
-        }
-
-        public T AddMenuItem<T>(string _path, Texture2D _icon) where T : CZMenuTreeViewItem, new()
-        {
-            if (string.IsNullOrEmpty(_path))
-                return null;
-            T item = new T();
-            item.icon = _icon;
-            AddMenuItem(_path, item);
-            return item;
         }
 
         public string GetParentPath(string _path)
@@ -236,7 +216,6 @@ namespace CZToolKit.Core.Editors
 
     public class CZMenuTreeViewItem : CZTreeViewItem
     {
-        public Action<Rect, CZMenuTreeViewItem> itemDrawer;
         public CZMenuTreeViewItem() : base() { }
     }
 }

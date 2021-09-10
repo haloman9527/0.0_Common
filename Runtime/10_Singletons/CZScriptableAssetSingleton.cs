@@ -83,8 +83,6 @@ namespace CZToolKit.Core.Singletons
                         if (ts.Length > 0)
                             m_Instance = ts[0];
 #endif
-                            if (m_Instance != null)
-                                m_Instance.OnInitialize();
                         }
                     }
                 }
@@ -94,20 +92,22 @@ namespace CZToolKit.Core.Singletons
 
         public static bool IsNull { get { return m_Instance == null; } }
 
-        public static T Initialize() { return Instance; }
+        public static void Initialize()
+        {
+            _Get();
+            T _Get() { return Instance; }
+        }
 
-        public static void Clean()
+        public static void Destroy()
         {
             if (m_Instance != null)
             {
-                m_Instance.OnClean();
+                m_Instance.OnBeforeDestroy();
                 m_Instance = null;
             }
         }
 
-        protected virtual void OnInitialize() { }
-
-        protected virtual void OnClean() { }
+        protected virtual void OnBeforeDestroy() { }
 
     }
 }

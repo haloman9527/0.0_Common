@@ -27,14 +27,10 @@ namespace CZToolKit.Core.Singletons
         /// <summary> 线程锁 </summary>
         private static readonly object m_Lock = new object();
 
-        public static GameObject mgrParent;
-
         /// <summary> 单例对象 </summary>
         private static T m_Instance;
 
-        public virtual bool DontDestoryOnLoad { get { return true; } }
-
-        /// <summary> 单例对象属性 </summary>
+        /// <summary> 单例对象属性，自动创建 </summary>
         public static T Instance
         {
             get
@@ -45,24 +41,19 @@ namespace CZToolKit.Core.Singletons
                     {
                         if (m_Instance == null)
                         {
-                            mgrParent = GetMgrParent();
-
-                            Transform mgrTrans = mgrParent.transform.Find(typeof(T).ToString());
-
-                            if (mgrTrans == null)
+                            GameObject go = GameObject.Find(typeof(T).ToString());
+                            if (go == null)
                             {
-                                mgrTrans = new GameObject(typeof(T).Name).transform;
-                                m_Instance = mgrTrans.gameObject.AddComponent<T>();
-                                mgrTrans.transform.SetParent(mgrParent.transform);
+                                go = new GameObject(typeof(T).Name);
+                                m_Instance = go.AddComponent<T>();
                             }
                             else
                             {
-                                m_Instance = mgrTrans.gameObject.GetComponent<T>();
+                                m_Instance = go.gameObject.GetComponent<T>();
                                 if (m_Instance == null)
-                                    m_Instance = mgrTrans.gameObject.AddComponent<T>();
+                                    m_Instance = go.gameObject.AddComponent<T>();
                             }
-                            if (m_Instance != null)
-                                m_Instance.OnInitialize();
+                            DontDestroyOnLoad(go);
                         }
                     }
                 }
@@ -72,44 +63,24 @@ namespace CZToolKit.Core.Singletons
 
         public static bool IsNull { get { return m_Instance == null; } }
 
-        protected virtual void Awake()
+        public static void Initialize()
         {
-            m_Instance = this as T;
-            if (DontDestoryOnLoad)
-                DontDestroyOnLoad(m_Instance.gameObject);
+            _Get();
+            T _Get() { return Instance; }
         }
 
-        public static GameObject GetMgrParent()
-        {
-            if (mgrParent == null)
-            {
-                mgrParent = GameObject.Find("CZManagers");
-                if (mgrParent == null)
-                {
-                    mgrParent = new GameObject("CZManagers");
-                    DontDestroyOnLoad(mgrParent);
-                }
-            }
-            return mgrParent;
-        }
-
-        public static T Initialize()
-        {
-            return Instance;
-        }
-
-        public static void Clean()
+        public static void Destroy()
         {
             if (m_Instance != null)
             {
-                m_Instance.OnClean();
+                m_Instance.OnBeforeDestroy();
                 Destroy(m_Instance.gameObject);
                 m_Instance = null;
             }
         }
 
-        protected virtual void OnInitialize() { }
+        protected virtual void Awake() { m_Instance = this as T; }
 
-        protected virtual void OnClean() { }
+        protected virtual void OnBeforeDestroy() { }
     }
 }

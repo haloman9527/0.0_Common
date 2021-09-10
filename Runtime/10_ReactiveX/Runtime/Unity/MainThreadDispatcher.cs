@@ -19,7 +19,7 @@ namespace CZToolKit.Core.ReactiveX
 {
     public class MainThreadDispatcher : CZMonoSingleton<MainThreadDispatcher>
     {
-        protected override void OnClean()
+        protected override void OnBeforeDestroy()
         {
             StopAllCoroutines();
         }

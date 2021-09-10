@@ -23,6 +23,24 @@ namespace CZToolKit.Core.Editors
     [Serializable]
     public class ResizableArea
     {
+        public enum UIDirection
+        {
+            None = 0,
+            Left = 1,
+            Right = 2,
+            Top = 4,
+            Bottom = 8,
+            TopLeft = 16,
+            //TopCenter,
+            TopRight = 32,
+            //MiddleLeft,
+            MiddleCenter = 64,
+            //MiddleRight,
+            BottomLeft = 128,
+            //BottomCenter,
+            BottomRight = 256
+        }
+
         public const float DefaultSide = 10;
 
         bool isDragging;
@@ -105,9 +123,35 @@ namespace CZToolKit.Core.Editors
                 {
                     float offset;
                     SideOffset.TryGetValue(direction, out offset);
-                    Sides[direction] = _rect.GetSide(direction, side, offset);
+                    Sides[direction] = GetSide(_rect, direction, side, offset);
                 }
             }
+        }
+
+        public Rect GetSide(Rect _self, UIDirection _sideDirection, float _side, float _offset = 0)
+        {
+            switch (_sideDirection)
+            {
+                case UIDirection.MiddleCenter:
+                    return new Rect(_self.x + _side / 2, _self.y + _side / 2, _self.width - _side, _self.height - _side);
+                case UIDirection.Top:
+                    return new Rect(_self.x + _side / 2, _self.y - _side / 2 + _offset, _self.width - _side, _side);
+                case UIDirection.Bottom:
+                    return new Rect(_self.x + _side / 2, _self.y + _self.height - _side / 2 + _offset, _self.width - _side, _side);
+                case UIDirection.Left:
+                    return new Rect(_self.x - _side / 2 + _offset, _self.y + _side / 2, _side, _self.height - _side);
+                case UIDirection.Right:
+                    return new Rect(_self.x + _self.width - _side / 2 + _offset, _self.y + _side / 2, _side, _self.height - _side);
+                case UIDirection.TopLeft:
+                    return new Rect(_self.x - _side / 2 + _offset, _self.y - _side / 2 + _offset, _side, _side);
+                case UIDirection.TopRight:
+                    return new Rect(_self.x + _self.width - _side / 2 + _offset, _self.y - _side / 2 + _offset, _side, _side);
+                case UIDirection.BottomLeft:
+                    return new Rect(_self.x - _side / 2 + _offset, _self.y + _self.height - _side / 2 + _offset, _side, _side);
+                case UIDirection.BottomRight:
+                    return new Rect(_self.x + _self.width - _side / 2 + _offset, _self.y + _self.height - _side / 2 + _offset, _side, _side);
+            }
+            return new Rect();
         }
 
         public virtual Rect OnGUI(Rect _rect)
@@ -164,63 +208,57 @@ namespace CZToolKit.Core.Editors
                             case UIDirection.Top:
                                 if (IsEnabled(sideDirection))
                                 {
-                                    _rect.y += evt.delta.y;
-                                    _rect.height -= evt.delta.y;
+                                    _rect.yMin = evt.mousePosition.y;
                                 }
                                 break;
                             case UIDirection.Bottom:
                                 if (IsEnabled(sideDirection))
                                 {
-                                    _rect.height += evt.delta.y;
+                                    _rect.yMax = evt.mousePosition.y;
                                 }
                                 break;
                             case UIDirection.Left:
                                 if (IsEnabled(sideDirection))
                                 {
-                                    _rect.x += evt.delta.x;
-                                    _rect.width -= evt.delta.x;
+                                    _rect.xMin += evt.mousePosition.x;
                                 }
                                 break;
                             case UIDirection.Right:
                                 if (IsEnabled(sideDirection))
                                 {
-                                    _rect.width += evt.delta.x;
+                                    _rect.xMax = evt.mousePosition.x;
                                 }
                                 break;
                             case UIDirection.TopLeft:
                                 if (IsEnabled(sideDirection))
                                 {
-                                    _rect.y += evt.delta.y;
-                                    _rect.height -= evt.delta.y;
+                                    _rect.yMin = evt.mousePosition.y;
 
-                                    _rect.x += evt.delta.x;
-                                    _rect.width -= evt.delta.x;
+                                    _rect.xMin += evt.mousePosition.x;
                                 }
                                 break;
                             case UIDirection.TopRight:
                                 if (IsEnabled(sideDirection))
                                 {
-                                    _rect.y += evt.delta.y;
-                                    _rect.height -= evt.delta.y;
+                                    _rect.yMin = evt.mousePosition.y;
 
-                                    _rect.width += evt.delta.x;
+                                    _rect.xMax = evt.mousePosition.x;
                                 }
                                 break;
                             case UIDirection.BottomLeft:
                                 if (IsEnabled(sideDirection))
                                 {
-                                    _rect.height += evt.delta.y;
+                                    _rect.yMax = evt.mousePosition.y;
 
-                                    _rect.x += evt.delta.x;
-                                    _rect.width -= evt.delta.x;
+                                    _rect.xMin = evt.mousePosition.x;
                                 }
                                 break;
                             case UIDirection.BottomRight:
                                 if (IsEnabled(sideDirection))
                                 {
-                                    _rect.height += evt.delta.y;
+                                    _rect.yMax = evt.mousePosition.y;
 
-                                    _rect.width += evt.delta.x;
+                                    _rect.xMax = evt.mousePosition.x;
                                 }
                                 break;
                             case UIDirection.MiddleCenter:

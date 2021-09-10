@@ -38,12 +38,7 @@ namespace CZToolKit.Core.Singletons
                     lock (m_Lock)
                     {
                         if (m_Instance == null)
-                        {
                             m_Instance = ScriptableObject.CreateInstance<T>();
-
-                            if (m_Instance != null)
-                                m_Instance.OnInitialize();
-                        }
                     }
                 }
                 return m_Instance;
@@ -52,20 +47,22 @@ namespace CZToolKit.Core.Singletons
 
         public static bool IsNull { get { return m_Instance == null; } }
 
-        public static T Initialize() { return Instance; }
+        public static void Initialize()
+        {
+            _Get();
+            T _Get() { return Instance; }
+        }
 
-        public static void Clean()
+        public static void Destroy()
         {
             if (m_Instance != null)
             {
-                m_Instance.OnClean();
+                m_Instance.OnBeforeDestroy();
                 m_Instance = null;
             }
         }
 
-        protected virtual void OnInitialize() { }
-
-        protected virtual void OnClean() { }
+        protected virtual void OnBeforeDestroy() { }
 
     }
 }

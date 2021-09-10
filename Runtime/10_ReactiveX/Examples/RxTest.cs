@@ -28,9 +28,6 @@ public class RxTest : MonoBehaviour, IOnDestory
     {
 
         List<int> nums = new List<int> { 10, 20, 30 };
-            
-
-
         Observable<List<int>> numsObs = nums.ToObservable();
         numsObs
             .Foreach()
