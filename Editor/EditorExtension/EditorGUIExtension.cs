@@ -24,6 +24,42 @@ namespace CZToolKit.Core.Editors
 {
     public static partial class EditorGUIExtension
     {
+        static Stack<Font> fonts = new Stack<Font>();
+        public static void BeginFont(Font _font)
+        {
+            fonts.Push(GUI.skin.font);
+            GUI.skin.font = _font;
+        }
+
+        public static void EndFont()
+        {
+            GUI.skin.font = fonts.Pop();
+        }
+
+        static Stack<Color> colors = new Stack<Color>();
+        public static void BeginColor(Color _color)
+        {
+            colors.Push(_color);
+            GUI.color = _color;
+        }
+
+        public static void EndColor()
+        {
+            GUI.color = colors.Pop();
+        }
+
+        static Stack<Color> backgroundColors = new Stack<Color>();
+        public static void BeginBackgroundColor(Color _color)
+        {
+            backgroundColors.Push(_color);
+            GUI.color = _color;
+        }
+
+        public static void EndBackgroundColor()
+        {
+            GUI.color = backgroundColors.Pop();
+        }
+
         /// <summary> 绘制一个ProgressBar </summary>
         public static float ProgressBar(Rect _rect, float _value, float _minLimit, float _maxLimit, string _text, bool _dragable = true, bool _drawMinMax = false)
         {

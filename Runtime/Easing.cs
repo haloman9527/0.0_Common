@@ -57,11 +57,11 @@ namespace CZToolKit.Core
 
     public static class Easing
     {
-        private static Func<float, float, float, float>[] _tweens;
+        public static Func<float, float, float, float>[] Tweens;
 
         static Easing()
         {
-            _tweens = new System.Func<float, float, float, float>[]{
+            Tweens = new System.Func<float, float, float, float>[]{
                 Linear,
                 Clerp,
                 Spring,
@@ -100,7 +100,7 @@ namespace CZToolKit.Core
 
         public static float Tween(float start, float end, float t, EasingType easingType)
         {
-            return _tweens[(int)easingType](start, end, t);
+            return Tweens[(int)easingType](start, end, t);
         }
 
         public static float Linear(float start, float end, float t)

@@ -24,7 +24,7 @@ using UnityObject = UnityEngine.Object;
 namespace CZToolKit.Core.Editors
 {
     [Serializable]
-    public abstract class BasicMenuEditorWindow : EditorWindow
+    public abstract class BasicMenuEditorWindow : BasicEditorWindow
     {
         static readonly Dictionary<UnityObject, Editor> EditorCache = new Dictionary<UnityObject, Editor>();
 

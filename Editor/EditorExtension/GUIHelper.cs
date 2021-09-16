@@ -18,17 +18,51 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
-    public class ContextData { }
-    public class ContextData<T> : ContextData
-    {
-        public T value;
-    }
-
     public static class GUIHelper
     {
-        static Dictionary<int, ContextData> ContextDatas = new Dictionary<int, ContextData>();
+        #region GUIContentCache
+        static Dictionary<string, GUIContent> GUIContentsCache = new Dictionary<string, GUIContent>();
 
-        public static ContextData<T> GetContextData<T>(int _key, T _default = default)
+        public static GUIContent TextContent(string _name)
+        {
+            GUIContent content;
+            if (!GUIContentsCache.TryGetValue(_name, out content))
+                content = new GUIContent(_name);
+            content.tooltip = string.Empty;
+            content.image = null;
+            return content;
+        }
+
+        public static GUIContent TextContent(string _name, Texture2D _image)
+        {
+            GUIContent content = TextContent(_name);
+            content.image = _image;
+            return content;
+        }
+
+        public static GUIContent TextContent(string _name, string _tooltip)
+        {
+            GUIContent content = TextContent(_name);
+            content.tooltip = _tooltip;
+            return content;
+        }
+
+        public static GUIContent TextContent(string _name, string _tooltip, Texture2D _image)
+        {
+            GUIContent content = TextContent(_name);
+            content.tooltip = _tooltip;
+            content.image = _image;
+            return content;
+        }
+        #endregion
+
+        #region ContextData
+        public class ContextData { }
+        public sealed class ContextData<T> : ContextData { public T value; }
+
+        static Dictionary<string, ContextData> ContextDatas = new Dictionary<string, ContextData>();
+
+        public static ContextData<T> GetContextData<T>(string _key, T _default = default)
         {
             if (ContextDatas.TryGetValue(_key, out ContextData _data))
             {
@@ -39,50 +73,6 @@ namespace CZToolKit.Core.Editors
             ContextDatas[_key] = t_data;
             return t_data;
         }
-
-        static Dictionary<string, GUIContent> GUIContentsCache = new Dictionary<string, GUIContent>();
-        public static GUIContent GetGUIContent(string _name)
-        {
-            GUIContent content;
-            if (!GUIContentsCache.TryGetValue(_name, out content))
-                content = new GUIContent(_name);
-            content.tooltip = string.Empty;
-            content.image = null;
-            return content;
-        }
-        public static GUIContent GetGUIContent(string _name, Texture2D _image)
-        {
-            GUIContent content = GetGUIContent(_name);
-            content.image = _image;
-            return content;
-        }
-
-        public static GUIContent GetGUIContent(string _name, string _tooltip)
-        {
-            GUIContent content = GetGUIContent(_name);
-            content.tooltip = _tooltip;
-            return content;
-        }
-
-        public static GUIContent GetGUIContent(string _name, string _tooltip, Texture2D _image)
-        {
-            GUIContent content = GetGUIContent(_name);
-            content.tooltip = _tooltip;
-            content.image = _image;
-            return content;
-        }
-
-        static Dictionary<string, bool> FoldoutCache = new Dictionary<string, bool>();
-        public static bool GetCachedBool(string _key, bool _fallback = false)
-        {
-            bool result;
-            if (!FoldoutCache.TryGetValue(_key, out result))
-                result = _fallback;
-            return result;
-        }
-        public static void CacheBool(string _key, bool _value)
-        {
-            FoldoutCache[_key] = _value;
-        }
+        #endregion
     }
 }

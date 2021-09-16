@@ -66,13 +66,13 @@ namespace CZToolKit.Core.Editors
             }
             _path = _menuPath.Substring(0, num);
             _name = _menuPath.Substring(num + 1);
-
         }
 
         TreeViewItem root;
         Styles styles;
 
         public event Action<IList<int>> onSelectionChanged;
+        public event Action onKeyEvent;
         public event Action onContextClicked;
         public event Action<CZTreeViewItem> onContextClickedItem;
         public event Action<CZTreeViewItem> onSingleClickedItem;
@@ -127,7 +127,7 @@ namespace CZToolKit.Core.Editors
                     labelRect.xMin += depthIndentWidth;
                 else
                     labelRect.xMin += item.depth * depthIndentWidth + depthIndentWidth;
-                GUIContent textContent = GUIHelper.GetGUIContent(item.displayName);
+                GUIContent textContent = GUIHelper.TextContent(item.displayName);
                 textContent.image = item.icon;
                 GUI.Label(labelRect, textContent, GUIStyles.leftLabelStyle);
             }
@@ -273,6 +273,12 @@ namespace CZToolKit.Core.Editors
             return;
         }
 
+        protected override void KeyEvent()
+        {
+            base.KeyEvent();
+            onKeyEvent?.Invoke();
+        }
+
         protected override void SingleClickedItem(int id)
         {
             base.SingleClickedItem(id);
@@ -313,6 +319,11 @@ namespace CZToolKit.Core.Editors
         int GenerateID()
         {
             return id++;
+        }
+
+        public void IDAlloc(CZTreeViewItem item)
+        {
+            item.id = GenerateID();
         }
     }
 }

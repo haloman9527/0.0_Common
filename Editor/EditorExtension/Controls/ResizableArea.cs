@@ -26,19 +26,15 @@ namespace CZToolKit.Core.Editors
         public enum UIDirection
         {
             None = 0,
-            Left = 1,
-            Right = 2,
-            Top = 4,
-            Bottom = 8,
-            TopLeft = 16,
-            //TopCenter,
-            TopRight = 32,
-            //MiddleLeft,
-            MiddleCenter = 64,
-            //MiddleRight,
-            BottomLeft = 128,
-            //BottomCenter,
-            BottomRight = 256
+            Left = 1 << 0,
+            Right = 1 << 1,
+            Top = 1 << 2,
+            Bottom = 1 << 3,
+            TopLeft = 1 << 4,
+            TopRight = 1 << 5,
+            MiddleCenter = 1 << 6,
+            BottomLeft = 1 << 7,
+            BottomRight = 1 << 8
         }
 
         public const float DefaultSide = 10;

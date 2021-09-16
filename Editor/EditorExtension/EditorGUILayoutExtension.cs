@@ -13,7 +13,6 @@
  *
  */
 #endregion
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,16 +22,29 @@ namespace CZToolKit.Core.Editors
 {
     public static partial class EditorGUILayoutExtension
     {
-        static Stack<Font> fonts = new Stack<Font>();
-        public static void BeginFont(Font _font)
+        /// <summary>  </summary>
+        /// <param name="_key"> 用于存取上下文数据 </param>
+        /// <returns> visible or not </returns>
+        public static bool BeginFadeGroup(string _key, bool _visible, float _speed = 1)
         {
-            fonts.Push(GUI.skin.font);
-            GUI.skin.font = _font;
+            var contextData = GUIHelper.GetContextData(_key, _visible ? 1f : 0f);
+            contextData.value = Mathf.Clamp01(contextData.value + (_visible ? 0.002f * _speed : -0.002f * _speed));
+
+            float _t = contextData.value;
+            if (_visible)
+            {
+                _t--;
+                _t = -1 * (_t * _t * _t * _t - 1);
+            }
+            else
+                _t = 1 * _t * _t * _t;
+
+            return EditorGUILayout.BeginFadeGroup(_t);
         }
 
-        public static void EndFont()
+        public static void EndFadeGroup()
         {
-            GUI.skin.font = fonts.Pop();
+            EditorGUILayout.EndFadeGroup();
         }
 
         public static Rect BeginBoxGroup()
@@ -43,6 +55,55 @@ namespace CZToolKit.Core.Editors
         public static void EndBoxGroup()
         {
             EditorGUILayout.EndVertical();
+        }
+
+        public static bool BeginToggleGroup(string _label, bool _foldout, ref bool _enable)
+        {
+            BeginBoxGroup();
+            Rect rect = GUILayoutUtility.GetRect(50, 25);
+            rect = EditorGUI.IndentedRect(rect);
+            Rect toggleRect = new Rect(rect.x + 10, rect.y, rect.height, rect.height);
+
+            Event current = Event.current;
+            if (current.type == EventType.MouseDown && current.button == 0)
+            {
+                if (toggleRect.Contains(current.mousePosition))
+                {
+                    _enable = !_enable;
+                }
+                else if (rect.Contains(current.mousePosition))
+                {
+                    _foldout = !_foldout;
+                }
+            }
+
+            switch (current.type)
+            {
+                case EventType.MouseDown:
+                case EventType.MouseUp:
+                case EventType.Repaint:
+                    GUI.Box(rect, string.Empty, GUI.skin.button);
+
+                    Rect t = rect;
+                    t.xMin = t.xMax - t.height;
+                    EditorGUI.Foldout(t, _foldout, string.Empty);
+
+                    toggleRect.width = rect.width - 10;
+                    EditorGUI.ToggleLeft(toggleRect, _label, _enable);
+                    break;
+                default:
+                    break;
+            }
+
+            EditorGUI.BeginDisabledGroup(!_enable);
+
+            return _foldout;
+        }
+
+        public static void EndToggleGroup()
+        {
+            EditorGUI.EndDisabledGroup();
+            EndBoxGroup();
         }
 
         public static float ScrollList(SerializedProperty _list, float _scroll, ref bool _foldout, int _count = 10)
@@ -197,57 +258,6 @@ namespace CZToolKit.Core.Editors
                     _folder.stringValue = p.Substring(p.IndexOf("Assets"));
             }
             EditorGUILayout.EndHorizontal();
-        }
-
-        public static bool BeginToggleGroup(string _label, bool _foldout, ref bool _enable)
-        {
-            BeginBoxGroup();
-            Rect rect = GUILayoutUtility.GetRect(50, 25);
-            rect = EditorGUI.IndentedRect(rect);
-            GUI.Box(rect, string.Empty, GUI.skin.button);
-
-            Rect toggleRect = new Rect(rect.x + 10, rect.y, rect.height, rect.height);
-
-
-            Event current = Event.current;
-            if (current.type == EventType.MouseDown && current.button == 0)
-            {
-                if (toggleRect.Contains(current.mousePosition))
-                {
-                    _enable = !_enable;
-                }
-                else if (rect.Contains(current.mousePosition))
-                {
-                    _foldout = !_foldout;
-                }
-            }
-
-            switch (current.type)
-            {
-                case EventType.MouseDown:
-                case EventType.MouseUp:
-                case EventType.Repaint:
-                    Rect t = rect;
-                    t.xMin = t.xMax - t.height;
-                    EditorGUI.Foldout(t, _foldout, string.Empty);
-
-                    toggleRect.width = rect.width - 10;
-                    EditorGUI.ToggleLeft(toggleRect, _label, _enable);
-                    break;
-                default:
-                    break;
-            }
-
-            EditorGUI.BeginDisabledGroup(!_enable);
-            EditorGUI.indentLevel++;
-            return _foldout;
-        }
-
-        public static void EndToggleGroup()
-        {
-            EditorGUI.indentLevel--;
-            EditorGUI.EndDisabledGroup();
-            EndBoxGroup();
         }
     }
 }
