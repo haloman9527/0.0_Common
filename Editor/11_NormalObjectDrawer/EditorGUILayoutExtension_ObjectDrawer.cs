@@ -54,7 +54,7 @@ namespace CZToolKit.Core.Editors
                 ".",
                 guiContent.text
             });
-            var @bool = GUIHelper.GetContextData(text, false);
+            var @bool = GUIHelper.TryGetContextData(text, false);
             @bool.value = EditorGUILayout.Foldout(@bool.value, guiContent, true, EditorStylesExtension.FoldoutStyle);
             return @bool.value;
         }

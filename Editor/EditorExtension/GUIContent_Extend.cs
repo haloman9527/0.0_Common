@@ -16,80 +16,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
-    public static class CSVLoader
-    {
-        const char LINE_SPERATOR = '\n';
-        static string fieldSperator = "\",\"";
-        static Regex CSVParser = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
-
-        public static string SerializeTableLine(string[] _fields)
-        {
-            for (int f = 0; f < _fields.Length; f++)
-            {
-                if (string.IsNullOrEmpty(_fields[f]))
-                    _fields[f] = "";
-                else
-                    _fields[f] = _fields[f].Replace("\"", "\"\"");
-            }
-            return string.Concat("\"", string.Join(fieldSperator, _fields), "\"");
-        }
-
-        public static string SerializeTable(string[][] _dataTable)
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int lineIndex = 0; lineIndex < _dataTable.Length; lineIndex++)
-            {
-                sb.AppendLine(SerializeTableLine(_dataTable[lineIndex]));
-            }
-            return sb.ToString();
-        }
-
-        public static string[] DeserializeTableLine(string line)
-        {
-            string[] fields = CSVParser.Split(line);
-            for (int f = 0; f < fields.Length; f++)
-            {
-                if (fields[f].Contains(","))
-                {
-                    fields[f] = fields[f].Substring(1);
-                    fields[f] = fields[f].Remove(fields[f].LastIndexOf("\""));
-                }
-                fields[f] = fields[f].Replace("\"\"", "\"");
-            }
-            return fields;
-        }
-
-        public static string[][] DeserializeTable(string text)
-        {
-            string[] lines = text.Split(LINE_SPERATOR);
-            string[][] dataTable = new string[lines.Length][];
-            for (int i = 0; i < lines.Length; i++)
-            {
-                if (string.IsNullOrEmpty(lines[i])) continue;
-                string[] fields = DeserializeTableLine(lines[i]);
-                dataTable[i] = fields;
-            }
-            return dataTable;
-        }
-
-        public static void DeserializeEachLine(string text, Action<string[]> eachLineCallback)
-        {
-            string[] lines = text.Split(LINE_SPERATOR);
-            for (int i = 0; i < lines.Length; i++)
-            {
-                if (string.IsNullOrEmpty(lines[i])) continue;
-                string[] fields = DeserializeTableLine(lines[i]);
-                eachLineCallback(fields);
-            }
-        }
-    }
-
     public class Localization
     {
         int language;
@@ -149,7 +79,7 @@ namespace CZToolKit.Core.Editors
     public class GUIContent_Extend : GUIContent
     {
         string key;
-        Localization owner;
+        Localization dataSource;
 
         public string Key
         {
@@ -158,39 +88,39 @@ namespace CZToolKit.Core.Editors
             {
                 if (key == value) return;
                 key = value;
-                text = owner.GetText(key);
+                Refresh();
             }
         }
 
-        public GUIContent_Extend(Localization _owner)
+        public GUIContent_Extend(Localization _dataSource)
         {
-            owner = _owner;
-            owner.onLanguageChanged += Refresh;
+            dataSource = _dataSource;
+            dataSource.onLanguageChanged += Refresh;
         }
 
         public GUIContent_Extend(string _key, Localization _owner) : base(_owner.GetText(_key))
         {
             key = _key;
-            owner = _owner;
-            owner.onLanguageChanged += Refresh;
+            dataSource = _owner;
+            dataSource.onLanguageChanged += Refresh;
         }
 
         public GUIContent_Extend(Texture image, Localization _owner) : base(image)
         {
-            owner = _owner;
-            owner.onLanguageChanged += Refresh;
+            dataSource = _owner;
+            dataSource.onLanguageChanged += Refresh;
         }
 
         public GUIContent_Extend(string _key, Texture image, Localization _owner) : base(_owner.GetText(_key), image)
         {
             key = _key;
-            owner = _owner;
-            owner.onLanguageChanged += Refresh;
+            dataSource = _owner;
+            dataSource.onLanguageChanged += Refresh;
         }
 
         void Refresh()
         {
-            text = owner.GetText(key);
+            text = dataSource.GetText(key);
         }
     }
 }

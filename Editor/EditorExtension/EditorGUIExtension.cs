@@ -39,13 +39,65 @@ namespace CZToolKit.Core.Editors
         static Stack<Color> colors = new Stack<Color>();
         public static void BeginColor(Color _color)
         {
-            colors.Push(_color);
+            colors.Push(GUI.color);
             GUI.color = _color;
         }
 
         public static void EndColor()
         {
             GUI.color = colors.Pop();
+        }
+
+        public static void BeginAlpha(float alpha)
+        {
+            Color color = GUI.color;
+            color.a *= alpha;
+            BeginColor(color);
+        }
+
+        public static void EndAlpha()
+        {
+            EndColor();
+        }
+
+        static Stack<Matrix4x4> matrixs = new Stack<Matrix4x4>();
+        public static void BeginMatrix(Matrix4x4 matrix4X4)
+        {
+            matrixs.Push(GUI.matrix);
+            GUI.matrix = matrix4X4;
+        }
+
+        public static void EndMatrix()
+        {
+            GUI.matrix = matrixs.Pop();
+        }
+
+        public static void BeginScale(Vector2 _scale, Rect _rect, Vector2 _pivot)
+        {
+            Rect Scale(Rect targetValue, Vector2 scale, Vector2 pivot)
+            {
+                Vector2 absPosition = targetValue.position + targetValue.size * pivot;
+                Vector2 size = targetValue.size;
+                size.x *= scale.x;
+                size.y *= scale.y;
+                targetValue.size = size;
+                targetValue.position = absPosition - targetValue.size * pivot;
+                return targetValue;
+            }
+
+            Rect r = Scale(_rect, _scale, _pivot);
+            Vector2 offset = new Vector2(r.x - _rect.x, r.y - _rect.y);
+            Matrix4x4 matrix = GUI.matrix;
+            matrix.m03 += offset.x;
+            matrix.m13 += offset.y;
+            matrix.m00 *= _scale.x;
+            matrix.m11 *= _scale.y;
+            BeginMatrix(matrix);
+        }
+
+        public static void EndScale()
+        {
+            EndMatrix();
         }
 
         static Stack<Color> backgroundColors = new Stack<Color>();

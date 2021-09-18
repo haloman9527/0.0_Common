@@ -13,46 +13,73 @@
  *
  */
 #endregion
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 namespace CZToolKit.Core.Editors
 {
     public static class GUIHelper
     {
         #region GUIContentCache
-        static Dictionary<string, GUIContent> GUIContentsCache = new Dictionary<string, GUIContent>();
+        public class GUIContentPool
+        {
+            Dictionary<string, GUIContent> GUIContentsCache = new Dictionary<string, GUIContent>();
+
+            public GUIContent TextContent(string _name)
+            {
+                GUIContent content;
+                if (!GUIContentsCache.TryGetValue(_name, out content))
+                    content = new GUIContent(_name);
+                content.tooltip = string.Empty;
+                content.image = null;
+                return content;
+            }
+
+            public GUIContent TextContent(string _name, Texture2D _image)
+            {
+                GUIContent content = TextContent(_name);
+                content.image = _image;
+                return content;
+            }
+
+            public GUIContent TextContent(string _name, string _tooltip)
+            {
+                GUIContent content = TextContent(_name);
+                content.tooltip = _tooltip;
+                return content;
+            }
+
+            public GUIContent TextContent(string _name, string _tooltip, Texture2D _image)
+            {
+                GUIContent content = TextContent(_name);
+                content.tooltip = _tooltip;
+                content.image = _image;
+                return content;
+            }
+        }
+
+        static GUIContentPool ContentPool = new GUIContentPool();
 
         public static GUIContent TextContent(string _name)
         {
-            GUIContent content;
-            if (!GUIContentsCache.TryGetValue(_name, out content))
-                content = new GUIContent(_name);
-            content.tooltip = string.Empty;
-            content.image = null;
-            return content;
+            return ContentPool.TextContent(_name);
         }
 
         public static GUIContent TextContent(string _name, Texture2D _image)
         {
-            GUIContent content = TextContent(_name);
-            content.image = _image;
-            return content;
+            return ContentPool.TextContent(_name, _image);
         }
 
         public static GUIContent TextContent(string _name, string _tooltip)
         {
-            GUIContent content = TextContent(_name);
-            content.tooltip = _tooltip;
-            return content;
+            return ContentPool.TextContent(_name, _tooltip);
         }
 
         public static GUIContent TextContent(string _name, string _tooltip, Texture2D _image)
         {
-            GUIContent content = TextContent(_name);
-            content.tooltip = _tooltip;
-            content.image = _image;
-            return content;
+            return ContentPool.TextContent(_name, _tooltip, _image);
         }
         #endregion
 
@@ -62,7 +89,7 @@ namespace CZToolKit.Core.Editors
 
         static Dictionary<string, ContextData> ContextDatas = new Dictionary<string, ContextData>();
 
-        public static ContextData<T> GetContextData<T>(string _key, T _default = default)
+        public static ContextData<T> TryGetContextData<T>(string _key, T _default = default)
         {
             if (ContextDatas.TryGetValue(_key, out ContextData _data))
             {

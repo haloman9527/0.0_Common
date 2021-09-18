@@ -15,8 +15,12 @@
 #endregion
 using UnityEditor;
 using UnityEngine;
+using UnityEditor.AnimatedValues;
 
 using UnityObject = UnityEngine.Object;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace CZToolKit.Core.Editors
 {
@@ -27,10 +31,10 @@ namespace CZToolKit.Core.Editors
         /// <returns> visible or not </returns>
         public static bool BeginFadeGroup(string _key, bool _visible, float _speed = 1)
         {
-            var contextData = GUIHelper.GetContextData(_key, _visible ? 1f : 0f);
-            contextData.value = Mathf.Clamp01(contextData.value + (_visible ? 0.002f * _speed : -0.002f * _speed));
-
-            float _t = contextData.value;
+            var contextData = GUIHelper.TryGetContextData(_key, new AnimFloat(_visible ? 1 : 0));
+            contextData.value.speed = _speed;
+            contextData.value.target = _visible ? 1 : 0;
+            float _t = contextData.value.value;
             if (_visible)
             {
                 _t--;
@@ -39,12 +43,14 @@ namespace CZToolKit.Core.Editors
             else
                 _t = 1 * _t * _t * _t;
 
+            EditorGUIExtension.BeginAlpha(_t);
             return EditorGUILayout.BeginFadeGroup(_t);
         }
 
         public static void EndFadeGroup()
         {
             EditorGUILayout.EndFadeGroup();
+            EditorGUIExtension.EndAlpha();
         }
 
         public static Rect BeginBoxGroup()
