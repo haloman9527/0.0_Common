@@ -18,9 +18,6 @@ using UnityEngine;
 using UnityEditor.AnimatedValues;
 
 using UnityObject = UnityEngine.Object;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace CZToolKit.Core.Editors
 {
@@ -31,17 +28,20 @@ namespace CZToolKit.Core.Editors
         /// <returns> visible or not </returns>
         public static bool BeginFadeGroup(string _key, bool _visible, float _speed = 1)
         {
-            var contextData = GUIHelper.TryGetContextData(_key, new AnimFloat(_visible ? 1 : 0));
+            if (!GUIHelper.TryGetContextData<AnimFloat>(_key, out var contextData))
+                contextData.value = new AnimFloat(_visible ? 1 : 0);
             contextData.value.speed = _speed;
             contextData.value.target = _visible ? 1 : 0;
             float _t = contextData.value.value;
             if (_visible)
             {
                 _t--;
-                _t = -1 * (_t * _t * _t * _t - 1);
+                _t = -(_t * _t * _t * _t - 1);
             }
             else
-                _t = 1 * _t * _t * _t;
+            {
+                _t = _t * _t * _t;
+            }
 
             EditorGUIExtension.BeginAlpha(_t);
             return EditorGUILayout.BeginFadeGroup(_t);
@@ -102,12 +102,13 @@ namespace CZToolKit.Core.Editors
             }
 
             EditorGUI.BeginDisabledGroup(!_enable);
-
+            EditorGUI.indentLevel++;
             return _foldout;
         }
 
         public static void EndToggleGroup()
         {
+            EditorGUI.indentLevel--;
             EditorGUI.EndDisabledGroup();
             EndBoxGroup();
         }

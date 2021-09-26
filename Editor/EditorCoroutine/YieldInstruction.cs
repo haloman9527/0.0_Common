@@ -23,23 +23,23 @@ namespace CZToolKit.Core.Editors
         bool Result(EditorCoroutine _coroutine);
     }
 
-    public class WaitForSeconds_E : ICondition
+    public class EditorWaitForSeconds : ICondition
     {
-        readonly float interval;
+        readonly float seconds;
 
-        public WaitForSeconds_E(float _interval) { interval = _interval; }
+        public EditorWaitForSeconds(float _seconds) { seconds = _seconds; }
 
         public bool Result(EditorCoroutine _coroutine)
         {
-            return EditorApplication.timeSinceStartup >= _coroutine.TimeSinceStartup + interval;
+            return EditorApplication.timeSinceStartup >= _coroutine.TimeSinceStartup + seconds;
         }
     }
 
-    public class WaitUntil_E : ICondition
+    public class EditorWaitUntil : ICondition
     {
         readonly Func<bool> predicate;
 
-        public WaitUntil_E(Func<bool> _predicate) { predicate = _predicate; }
+        public EditorWaitUntil(Func<bool> _predicate) { predicate = _predicate; }
 
         public bool Result(EditorCoroutine _coroutine)
         {

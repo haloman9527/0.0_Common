@@ -15,6 +15,7 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace CZToolKit.Core
@@ -96,92 +97,92 @@ namespace CZToolKit.Core
         #region GetMemberInfo
         static Dictionary<Type, List<FieldInfo>> TypeFieldInfoCache = new Dictionary<Type, List<FieldInfo>>();
 
+        public static IEnumerable<FieldInfo> GetFieldInfos(Type _type)
+        {
+            Type baseType = _type.BaseType;
+            if (baseType != null)
+            {
+                foreach (var f in GetFieldInfos(baseType))
+                {
+                    yield return f;
+                }
+            }
+
+            if (!TypeFieldInfoCache.TryGetValue(_type, out List<FieldInfo> fieldInfos))
+            {
+                TypeFieldInfoCache[_type] = fieldInfos = new List<FieldInfo>(_type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
+            }
+
+            foreach (var f in fieldInfos)
+            {
+                yield return f;
+            }
+        }
+
         /// <summary> 获取字段，包括基类的私有字段 </summary>
         public static FieldInfo GetFieldInfo(Type _type, string _fieldName)
         {
-            return GetFieldInfos(_type).Find(f => f.Name == _fieldName);
-        }
-
-        public static List<FieldInfo> GetFieldInfos(Type _type)
-        {
-            if (TypeFieldInfoCache.TryGetValue(_type, out List<FieldInfo> fieldInfos))
-                return fieldInfos;
-            TypeFieldInfoCache[_type] = fieldInfos = new List<FieldInfo>(_type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
-            // 获取类包含的所有字段(包含私有)
-            while ((_type = _type.BaseType) != null)
-            {
-                fieldInfos.InsertRange(0, _type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
-            }
-            return fieldInfos;
-        }
-
-        public static IEnumerable<FieldInfo> GetFieldInfos(Type _type, Func<FieldInfo, bool> _patern)
-        {
-            foreach (var field in GetFieldInfos(_type))
-            {
-                if (_patern(field))
-                    yield return field;
-            }
+            return GetFieldInfos(_type).FirstOrDefault(f => f.Name == _fieldName);
         }
 
         static Dictionary<Type, List<PropertyInfo>> TypePropertyInfoCache = new Dictionary<Type, List<PropertyInfo>>();
 
+        public static IEnumerable<PropertyInfo> GetPropertyInfos(Type _type)
+        {
+            Type baseType = _type.BaseType;
+            if (baseType != null)
+            {
+                foreach (var p in GetPropertyInfos(baseType))
+                {
+                    yield return p;
+                }
+            }
+
+            if (!TypePropertyInfoCache.TryGetValue(_type, out List<PropertyInfo> propertyInfos))
+            {
+                TypePropertyInfoCache[_type] = propertyInfos = new List<PropertyInfo>(_type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
+            }
+
+            foreach (var p in propertyInfos)
+            {
+                yield return p;
+            }
+        }
+
         /// <summary> 获取字段，包括基类的私有字段 </summary>
         public static PropertyInfo GetPropertyInfo(Type _type, string _propertyName)
         {
-            return GetPropertyInfos(_type).Find(f => f.Name == _propertyName);
-        }
-
-        public static List<PropertyInfo> GetPropertyInfos(Type _type)
-        {
-            if (TypePropertyInfoCache.TryGetValue(_type, out List<PropertyInfo> propertyInfos))
-                return propertyInfos;
-            TypePropertyInfoCache[_type] = propertyInfos = new List<PropertyInfo>(_type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
-            // 获取类包含的所有字段(包含私有)
-            while ((_type = _type.BaseType) != null)
-            {
-                propertyInfos.InsertRange(0, _type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
-            }
-            return propertyInfos;
-        }
-
-        public static IEnumerable<PropertyInfo> GetPropertyInfos(Type _type, Func<PropertyInfo, bool> _patern)
-        {
-            foreach (var property in GetPropertyInfos(_type))
-            {
-                if (_patern(property))
-                    yield return property;
-            }
+            return GetPropertyInfos(_type).FirstOrDefault(f => f.Name == _propertyName);
         }
 
         static Dictionary<Type, List<MethodInfo>> TypeMethodInfoCache = new Dictionary<Type, List<MethodInfo>>();
 
+        public static IEnumerable<MethodInfo> GetMethodInfos(Type _type)
+        {
+            Type baseType = _type.BaseType;
+            if (baseType != null)
+            {
+                foreach (var m in GetMethodInfos(baseType))
+                {
+                    yield return m;
+                }
+            }
+
+            if (!TypeMethodInfoCache.TryGetValue(_type, out List<MethodInfo> methodInfos))
+            {
+                TypeMethodInfoCache[_type] = methodInfos = new List<MethodInfo>(_type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
+            }
+
+            foreach (var m in methodInfos)
+            {
+                yield return m;
+            }
+        }
+
         /// <summary> 获取方法，包括基类的私有方法 </summary>
         public static MethodInfo GetMethodInfo(Type _type, string _methodName)
         {
-            return GetMethodInfos(_type).Find(t => t.Name == _methodName);
-        }
-
-        public static List<MethodInfo> GetMethodInfos(Type _type)
-        {
-            if (TypeMethodInfoCache.TryGetValue(_type, out List<MethodInfo> methodInfos))
-                return methodInfos;
-            TypeMethodInfoCache[_type] = methodInfos = new List<MethodInfo>(_type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
-            // 获取类包含的所有方法(包含私有)
-            while ((_type = _type.BaseType) != null)
-            {
-                methodInfos.InsertRange(0, _type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
-            }
-            return methodInfos;
-        }
-
-        public static IEnumerable<MethodInfo> GetMethodInfos(Type _type, Func<MethodInfo, bool> _patern)
-        {
-            foreach (var method in GetMethodInfos(_type))
-            {
-                if (_patern(method))
-                    yield return method;
-            }
+            return GetMethodInfos(_type).FirstOrDefault(t => t.Name == _methodName);
         }
         #endregion
     }

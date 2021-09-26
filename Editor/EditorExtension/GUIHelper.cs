@@ -13,16 +13,14 @@
  *
  */
 #endregion
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
 namespace CZToolKit.Core.Editors
 {
     public static class GUIHelper
     {
-        #region GUIContentCache
+        #region GUIContent
         public class GUIContentPool
         {
             Dictionary<string, GUIContent> GUIContentsCache = new Dictionary<string, GUIContent>();
@@ -84,21 +82,54 @@ namespace CZToolKit.Core.Editors
         #endregion
 
         #region ContextData
-        public class ContextData { }
-        public sealed class ContextData<T> : ContextData { public T value; }
+        public interface IContextData { }
 
-        static Dictionary<string, ContextData> ContextDatas = new Dictionary<string, ContextData>();
+        public sealed class ContextData<T> : IContextData { public T value; }
 
-        public static ContextData<T> TryGetContextData<T>(string _key, T _default = default)
+        public class ContextDataCache
         {
-            if (ContextDatas.TryGetValue(_key, out ContextData _data))
+            Dictionary<string, IContextData> ContextDatas = new Dictionary<string, IContextData>();
+
+            public bool TryGetContextData<T>(string _key, out ContextData<T> _contextData)
             {
-                if (_data is ContextData<T> _t_data)
-                    return _t_data;
+                if (ContextDatas.TryGetValue(_key, out IContextData _data))
+                {
+                    if (_data is ContextData<T> _t_data)
+                    {
+                        _contextData = _t_data;
+                        return true;
+                    }
+                }
+                _contextData = new ContextData<T>();
+                ContextDatas[_key] = _contextData;
+                return false;
             }
-            ContextData<T> t_data = new ContextData<T>() { value = _default };
-            ContextDatas[_key] = t_data;
-            return t_data;
+
+            public ContextData<T> GetContextData<T>(string _key, T _default = default)
+            {
+                if (ContextDatas.TryGetValue(_key, out IContextData _data))
+                {
+                    if (_data is ContextData<T> _t_data)
+                    {
+                        return _t_data;
+                    }
+                }
+                var contextData = new ContextData<T>();
+                ContextDatas[_key] = contextData;
+                return contextData;
+            }
+        }
+
+        static ContextDataCache ContextDatas = new ContextDataCache();
+
+        public static bool TryGetContextData<T>(string _key, out ContextData<T> _contextData)
+        {
+            return ContextDatas.TryGetContextData(_key, out _contextData);
+        }
+
+        public static ContextData<T> GetContextData<T>(string _key, T _default = default)
+        {
+            return ContextDatas.GetContextData(_key, _default);
         }
         #endregion
     }

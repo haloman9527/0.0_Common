@@ -24,7 +24,6 @@ using UnityEngine.UIElements;
 
 namespace CZToolKit.Core.Editors
 {
-
     public class ObjectEditor
     {
         static Dictionary<Type, Type> ObjectEditorTypeCache;
@@ -73,7 +72,7 @@ namespace CZToolKit.Core.Editors
         {
             Target = _target;
             Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
-            Fields = Utility_Reflection.GetFieldInfos(Target.GetType()).FindAll(field => EditorGUILayoutExtension.CanDraw(field));
+            Fields = Utility_Reflection.GetFieldInfos(Target.GetType()).Where(field => EditorGUILayoutExtension.CanDraw(field)).ToList();
         }
 
         public string GetTitle() { return string.Empty; }

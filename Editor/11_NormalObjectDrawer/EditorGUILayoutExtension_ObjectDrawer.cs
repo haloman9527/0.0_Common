@@ -54,7 +54,7 @@ namespace CZToolKit.Core.Editors
                 ".",
                 guiContent.text
             });
-            var @bool = GUIHelper.TryGetContextData(text, false);
+            var @bool = GUIHelper.GetContextData(text, false);
             @bool.value = EditorGUILayout.Foldout(@bool.value, guiContent, true, EditorStylesExtension.FoldoutStyle);
             return @bool.value;
         }
@@ -84,17 +84,16 @@ namespace CZToolKit.Core.Editors
         public static object DrawFields(object _object)
         {
             if (_object == null) return null;
-
-            List<FieldInfo> fields = Utility_Reflection.GetFieldInfos(_object.GetType());
-            for (int j = 0; j < fields.Count; j++)
+            
+            foreach (var field in Utility_Reflection.GetFieldInfos(_object.GetType()))
             {
-                if (CanDraw(fields[j]))
+                if (CanDraw(field))
                 {
                     EditorGUI.BeginChangeCheck();
-                    object value = EditorGUILayoutExtension.DrawField(fields[j], fields[j].GetValue(_object));
+                    object value = EditorGUILayoutExtension.DrawField(field, field.GetValue(_object));
                     if (EditorGUI.EndChangeCheck())
                     {
-                        fields[j].SetValue(_object, value);
+                        field.SetValue(_object, value);
                         GUI.changed = true;
                     }
                 }

@@ -20,7 +20,7 @@ using UnityEditor;
 
 namespace CZToolKit.Core.Editors
 {
-    public static class EditorUtilityExtension
+    public static partial class EditorUtilityExtension
     {
         public static MonoScript FindScriptFromType(Type _type, Func<MonoScript, bool> _pattern = null, bool _compareTypeName = true)
         {
@@ -39,6 +39,7 @@ namespace CZToolKit.Core.Editors
             }
             return null;
         }
+
         public static IEnumerable<MonoScript> FindAllScriptFromType(Type _type, Func<MonoScript, bool> _pattern = null, bool _compareTypeName = true)
         {
             string findStr = "t:script " + (_compareTypeName ? _type.Name : "");
@@ -52,6 +53,34 @@ namespace CZToolKit.Core.Editors
                     if (_pattern == null || _pattern(script))
                         yield return script;
                 }
+            }
+        }
+
+        /// <summary> 添加宏定义 </summary>
+        /// <param name="_define"></param>
+        /// <param name="targetGroup"></param>
+        public static void AddDefine(string _define, BuildTargetGroup targetGroup = BuildTargetGroup.Standalone)
+        {
+            string s = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
+            List<string> defines = new List<string>(s.Split(';'));
+            if (!defines.Contains(_define))
+            {
+                defines.Add(_define);
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defines.ToArray()));
+            }
+        }
+
+        /// <summary> 移除宏定义 </summary>
+        /// <param name="_define"></param>
+        /// <param name="targetGroup"></param>
+        public static void RemoveDefine(string _define, BuildTargetGroup targetGroup = BuildTargetGroup.Standalone)
+        {
+            string s = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
+            List<string> defines = new List<string>(s.Split(';'));
+            if (defines.Contains(_define))
+            {
+                defines.Remove(_define);
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defines.ToArray()));
             }
         }
     }
