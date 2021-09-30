@@ -30,8 +30,25 @@ namespace CZToolKit.Core.Editors
 
         public Action onTargetObjectChanged;
 
-        public object TargetObject { get { return targetObject; } set { targetObject = value; onTargetObjectChanged?.Invoke(); } }
-        public UnityObject UnityOwner { get; set; }
+        public object TargetObject
+        {
+            get { return targetObject; }
+            private set
+            {
+                if (targetObject != value)
+                {
+                    targetObject = value;
+                    onTargetObjectChanged?.Invoke();
+                }
+            }
+        }
+        public UnityObject UnityOwner { get; private set; }
+
+        public void Initialize(object _targetObject, UnityObject _unityOwner)
+        {
+            UnityOwner = _unityOwner;
+            TargetObject = _targetObject;
+        }
     }
 
     [CustomEditor(typeof(ObjectInspector))]

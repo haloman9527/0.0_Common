@@ -38,35 +38,28 @@ namespace CZToolKit.Core
             }
         }
 
-        public static IEnumerable<Type> GetChildrenTypes<T>()
+        public static IEnumerable<Type> GetChildTypes<T>()
         {
-            return GetChildrenTypes(typeof(T));
+            return GetChildTypes(typeof(T));
         }
 
-        public static IEnumerable<Type> GetChildrenTypes(Type baseType)
+        public static IEnumerable<Type> GetChildTypes(Type _type)
         {
-            if (ChildrenTypeCache.TryGetValue(baseType, out IEnumerable<Type> childrenTypes))
-            {
-                foreach (var item in childrenTypes)
-                {
-                    yield return item;
-                }
-                yield break;
-            }
+            if (!ChildrenTypeCache.TryGetValue(_type, out IEnumerable<Type> childrenTypes))
+                ChildrenTypeCache[_type] = childrenTypes = BuildCache(_type);
 
-            ChildrenTypeCache[baseType] = childrenTypes = BuildCache(baseType);
             foreach (var type in childrenTypes)
             {
                 yield return type;
             }
-        }
 
-        private static IEnumerable<Type> BuildCache(Type _baseType)
-        {
-            foreach (var type in AllTypeCache)
+            IEnumerable<Type> BuildCache(Type _baseType)
             {
-                if (_baseType.IsAssignableFrom(type))
-                    yield return type;
+                foreach (var type in AllTypeCache)
+                {
+                    if (type != _baseType && _baseType.IsAssignableFrom(type))
+                        yield return type;
+                }
             }
         }
 
@@ -95,27 +88,42 @@ namespace CZToolKit.Core
         }
 
         #region GetMemberInfo
-        static Dictionary<Type, List<FieldInfo>> TypeFieldInfoCache = new Dictionary<Type, List<FieldInfo>>();
+        static Dictionary<Type, List<MemberInfo>> TypeMemberInfoCache = new Dictionary<Type, List<MemberInfo>>();
 
-        public static IEnumerable<FieldInfo> GetFieldInfos(Type _type)
+        public static IEnumerable<MemberInfo> GetMemberInfos(Type _type)
         {
             Type baseType = _type.BaseType;
             if (baseType != null)
             {
-                foreach (var f in GetFieldInfos(baseType))
+                foreach (var m in GetMemberInfos(baseType))
                 {
-                    yield return f;
+                    yield return m;
                 }
             }
 
-            if (!TypeFieldInfoCache.TryGetValue(_type, out List<FieldInfo> fieldInfos))
+            if (!TypeMemberInfoCache.TryGetValue(_type, out List<MemberInfo> memberInfos))
             {
-                TypeFieldInfoCache[_type] = fieldInfos = new List<FieldInfo>(_type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
+                TypeMemberInfoCache[_type] = memberInfos = new List<MemberInfo>(_type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
             }
 
-            foreach (var f in fieldInfos)
+            foreach (var m in memberInfos)
             {
-                yield return f;
+                yield return m;
+            }
+        }
+
+        /// <summary> 获取字段，包括基类的私有字段 </summary>
+        public static MemberInfo GetMemberInfo(Type _type, string _memberName)
+        {
+            return GetMemberInfos(_type).FirstOrDefault(f => f.Name == _memberName);
+        }
+
+        public static IEnumerable<FieldInfo> GetFieldInfos(Type _type)
+        {
+            foreach (var member in GetMemberInfos(_type))
+            {
+                if (member is FieldInfo fieldInfo)
+                    yield return fieldInfo;
             }
         }
 
@@ -125,27 +133,12 @@ namespace CZToolKit.Core
             return GetFieldInfos(_type).FirstOrDefault(f => f.Name == _fieldName);
         }
 
-        static Dictionary<Type, List<PropertyInfo>> TypePropertyInfoCache = new Dictionary<Type, List<PropertyInfo>>();
-
         public static IEnumerable<PropertyInfo> GetPropertyInfos(Type _type)
         {
-            Type baseType = _type.BaseType;
-            if (baseType != null)
+            foreach (var member in GetMemberInfos(_type))
             {
-                foreach (var p in GetPropertyInfos(baseType))
-                {
-                    yield return p;
-                }
-            }
-
-            if (!TypePropertyInfoCache.TryGetValue(_type, out List<PropertyInfo> propertyInfos))
-            {
-                TypePropertyInfoCache[_type] = propertyInfos = new List<PropertyInfo>(_type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
-            }
-
-            foreach (var p in propertyInfos)
-            {
-                yield return p;
+                if (member is PropertyInfo propertyInfo)
+                    yield return propertyInfo;
             }
         }
 
@@ -155,27 +148,12 @@ namespace CZToolKit.Core
             return GetPropertyInfos(_type).FirstOrDefault(f => f.Name == _propertyName);
         }
 
-        static Dictionary<Type, List<MethodInfo>> TypeMethodInfoCache = new Dictionary<Type, List<MethodInfo>>();
-
         public static IEnumerable<MethodInfo> GetMethodInfos(Type _type)
         {
-            Type baseType = _type.BaseType;
-            if (baseType != null)
+            foreach (var member in GetMemberInfos(_type))
             {
-                foreach (var m in GetMethodInfos(baseType))
-                {
-                    yield return m;
-                }
-            }
-
-            if (!TypeMethodInfoCache.TryGetValue(_type, out List<MethodInfo> methodInfos))
-            {
-                TypeMethodInfoCache[_type] = methodInfos = new List<MethodInfo>(_type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
-            }
-
-            foreach (var m in methodInfos)
-            {
-                yield return m;
+                if (member is MethodInfo methodInfo)
+                    yield return methodInfo;
             }
         }
 

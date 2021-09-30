@@ -35,13 +35,14 @@ namespace CZToolKit.Core.Editors
             else
             {
                 Selection.activeObject = ObjectInspector.Instance;
-                ObjectInspector.Instance.TargetObject = _targetObject;
+                ObjectInspector.Instance.Initialize(_targetObject, _unityOwner);
+
             }
         }
 
         public static void DrawFieldsInInspector(string _title, object _targetObject, UnityObject _unityOwner = null)
         {
-            DrawFieldsInInspector(_targetObject);
+            DrawFieldsInInspector(_targetObject, _unityOwner);
             ObjectInspector.Instance.name = _title;
         }
 

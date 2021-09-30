@@ -41,25 +41,27 @@ namespace CZToolKit.Core
         Stack<ICommand> undo = new Stack<ICommand>();
         Stack<ICommand> redo = new Stack<ICommand>();
 
-        int groupIndent = 0;
+        int groupLevel = 0;
 
         public void BeginGroup()
         {
-            groupIndent++;
-            if (groupIndent == 1)
+            groupLevel++;
+            if (groupLevel == 1)
                 undo.Push(new CommandsGroup());
         }
 
         public void EndGroup()
         {
-            groupIndent--;
+            groupLevel--;
+            if (groupLevel < 0)
+                throw new System.Exception($"{nameof(CommandDispatcher)}的{nameof(BeginGroup)}{nameof(EndGroup)}数量不一致");
         }
 
         public void Do(ICommand command)
         {
             command.Do();
             redo.Clear();
-            if (groupIndent > 0)
+            if (groupLevel > 0)
             {
                 CommandsGroup group = undo.Peek() as CommandsGroup;
                 group.undo.Push(command);

@@ -30,7 +30,7 @@ namespace CZToolKit.Core.Editors
         {
             if (!GUIHelper.TryGetContextData<AnimFloat>(_key, out var contextData))
                 contextData.value = new AnimFloat(_visible ? 1 : 0);
-            contextData.value.speed = _speed;
+            contextData.value.speed = _speed * (_visible ? 1 : 2);
             contextData.value.target = _visible ? 1 : 0;
             float _t = contextData.value.value;
             if (_visible)
@@ -40,7 +40,7 @@ namespace CZToolKit.Core.Editors
             }
             else
             {
-                _t = _t * _t * _t;
+                _t = _t * _t;
             }
 
             EditorGUIExtension.BeginAlpha(_t);
@@ -68,7 +68,7 @@ namespace CZToolKit.Core.Editors
             BeginBoxGroup();
             Rect rect = GUILayoutUtility.GetRect(50, 25);
             rect = EditorGUI.IndentedRect(rect);
-            Rect toggleRect = new Rect(rect.x + 10, rect.y, rect.height, rect.height);
+            Rect toggleRect = new Rect(rect.x + 20, rect.y, rect.height, rect.height);
 
             Event current = Event.current;
             if (current.type == EventType.MouseDown && current.button == 0)
@@ -91,10 +91,11 @@ namespace CZToolKit.Core.Editors
                     GUI.Box(rect, string.Empty, GUI.skin.button);
 
                     Rect t = rect;
-                    t.xMin = t.xMax - t.height;
+                    t.xMin += 5;
+                    t.xMax = t.xMin + t.height;
                     EditorGUI.Foldout(t, _foldout, string.Empty);
 
-                    toggleRect.width = rect.width - 10;
+                    toggleRect.width = rect.width - t.width;
                     EditorGUI.ToggleLeft(toggleRect, _label, _enable);
                     break;
                 default:
