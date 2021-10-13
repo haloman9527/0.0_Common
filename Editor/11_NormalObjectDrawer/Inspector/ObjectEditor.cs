@@ -15,12 +15,13 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+
+using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
@@ -30,8 +31,7 @@ namespace CZToolKit.Core.Editors
 
         static ObjectEditor()
         {
-            if (ObjectEditorTypeCache == null)
-                BuildCache();
+            BuildCache();
         }
 
         static void BuildCache()
@@ -40,42 +40,87 @@ namespace CZToolKit.Core.Editors
 
             foreach (var type in TypeCache.GetTypesDerivedFrom<ObjectEditor>())
             {
-                if (Utility_Attribute.TryGetTypeAttribute(type, out CustomObjectEditorAttribute att))
-                    ObjectEditorTypeCache[att.targetType] = type;
+                foreach (var att in Utility_Attribute.GetTypeAttributes(type, true))
+                {
+                    if (att is CustomObjectEditorAttribute sAtt)
+                        ObjectEditorTypeCache[sAtt.targetType] = type;
+                }
             }
         }
 
+        static Type GetEditorType(Type objectType)
+        {
+            if (ObjectEditorTypeCache.TryGetValue(objectType, out Type editorType))
+                return editorType;
+            if (objectType.BaseType != null)
+                return GetEditorType(objectType.BaseType);
+            else
+                return typeof(ObjectEditor);
+        }
 
         public static ObjectEditor CreateEditor(object _targetObject)
         {
-            if (_targetObject == null) return null;
-            Type objectEditorType;
-            ObjectEditor objectEditor;
-            if (ObjectEditorTypeCache.TryGetValue(_targetObject.GetType(), out objectEditorType))
-                objectEditor = Activator.CreateInstance(objectEditorType, true) as ObjectEditor;
-            else if ((objectEditorType = ObjectEditorTypeCache.FirstOrDefault(kv => kv.Key.IsAssignableFrom(_targetObject.GetType())).Value) != null)
-                objectEditor = Activator.CreateInstance(objectEditorType, true) as ObjectEditor;
-            else
-                objectEditor = new ObjectEditor();
+            ObjectEditor objectEditor = InternalCreateEditor(_targetObject);
+            if (objectEditor == null) return null;
+
             objectEditor.Initialize(_targetObject);
             return objectEditor;
+        }
+
+        public static ObjectEditor CreateEditor(object _targetObject, UnityObject _owner)
+        {
+            ObjectEditor objectEditor = InternalCreateEditor(_targetObject);
+            if (objectEditor == null) return null;
+
+            objectEditor.Initialize(_targetObject, _owner);
+            return objectEditor;
+        }
+
+        public static ObjectEditor CreateEditor(object _targetObject, UnityObject _owner, Editor _editor)
+        {
+            ObjectEditor objectEditor = InternalCreateEditor(_targetObject);
+            if (objectEditor == null) return null;
+
+            objectEditor.Initialize(_targetObject, _owner, _editor);
+            return objectEditor;
+        }
+
+        static ObjectEditor InternalCreateEditor(object _targetObject)
+        {
+            if (_targetObject == null) return null;
+            return Activator.CreateInstance(GetEditorType(_targetObject.GetType()), true) as ObjectEditor;
         }
 
         protected IReadOnlyList<FieldInfo> Fields { get; private set; }
 
         public object Target { get; private set; }
+        public UnityObject Owner { get; private set; }
+        public Editor Editor { get; private set; }
         public MonoScript Script { get; private set; }
 
         protected ObjectEditor() { }
 
-        public void Initialize(object _target)
+        void Initialize(object _target)
         {
             Target = _target;
             Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
             Fields = Utility_Reflection.GetFieldInfos(Target.GetType()).Where(field => EditorGUILayoutExtension.CanDraw(field)).ToList();
         }
 
-        public string GetTitle() { return string.Empty; }
+        void Initialize(object _target, UnityObject _owner)
+        {
+            Owner = _owner;
+            Initialize(_target);
+        }
+
+        void Initialize(object _target, UnityObject _owner, Editor _editor)
+        {
+            Owner = _owner;
+            Editor = _editor;
+            Initialize(_target);
+        }
+
+        public virtual string GetTitle() { return string.Empty; }
 
         public virtual void OnEnable() { }
 
@@ -83,7 +128,6 @@ namespace CZToolKit.Core.Editors
 
         public virtual void OnInspectorGUI()
         {
-            //EditorGUILayoutExtension.DrawFields(ObjectInspector.Instance.targetObject);
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField("Script", Script, typeof(MonoScript), false);
             EditorGUI.EndDisabledGroup();
@@ -118,5 +162,12 @@ namespace CZToolKit.Core.Editors
         public virtual void OnDisable() { }
 
         public VisualElement CreateInspectorGUI() { return null; }
+    }
+
+    public class CustomObjectEditorAttribute : Attribute
+    {
+        public Type targetType;
+
+        public CustomObjectEditorAttribute(Type _targetType) { targetType = _targetType; }
     }
 }

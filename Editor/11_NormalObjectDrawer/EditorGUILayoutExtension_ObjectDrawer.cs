@@ -26,24 +26,13 @@ namespace CZToolKit.Core.Editors
 {
     public static partial class EditorGUILayoutExtension
     {
-        public static void DrawFieldsInInspector(object _targetObject, UnityObject _unityOwner = null)
+        /// <summary> 不是<see cref="private"/>、或者标记了<see cref="SerializeField"/>特性，并且没有标记<see cref="NonSerializedAttribute"/>特性，并且没有标记<see cref="HideInInspector"/>特性。 </summary>
+        /// <returns> 满足以上条件返回<see cref="true"/> </returns>
+        public static bool CanDraw(FieldInfo _fieldInfo)
         {
-            if (_targetObject is UnityObject)
-            {
-                Selection.activeObject = _targetObject as UnityObject;
-            }
-            else
-            {
-                Selection.activeObject = ObjectInspector.Instance;
-                ObjectInspector.Instance.Initialize(_targetObject, _unityOwner);
-
-            }
-        }
-
-        public static void DrawFieldsInInspector(string _title, object _targetObject, UnityObject _unityOwner = null)
-        {
-            DrawFieldsInInspector(_targetObject, _unityOwner);
-            ObjectInspector.Instance.name = _title;
+            return ((!_fieldInfo.IsPrivate && !_fieldInfo.IsFamily) || Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out SerializeField serAtt))
+                    && !Utility_Attribute.TryGetTypeAttribute(_fieldInfo.DeclaringType, out NonSerializedAttribute nonAtt)
+                    && !Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out HideInInspector hideAtt);
         }
 
         public static bool DrawFoldout(int hash, GUIContent guiContent)
@@ -60,46 +49,23 @@ namespace CZToolKit.Core.Editors
             return @bool.value;
         }
 
-        public static void SetFoldout(int hash, bool value, GUIContent guiContent)
+        public static void DrawFieldsInInspector(object _targetObject, UnityObject _unityOwner = null)
         {
-            string text = string.Concat(new object[]
+            if (_targetObject is UnityObject)
             {
-                c_EditorPrefsFoldoutKey,
-                hash,
-                ".",
-                guiContent.text
-            });
-            EditorPrefs.SetBool(text, value);
-        }
-
-        /// <summary> 不是<see cref="private"/>、或者标记了<see cref="SerializeField"/>特性，并且没有标记<see cref="NonSerializedAttribute"/>特性，并且没有标记<see cref="HideInInspector"/>特性。 </summary>
-        /// <returns> 满足以上条件返回<see cref="true"/> </returns>
-        public static bool CanDraw(FieldInfo _fieldInfo)
-        {
-            return ((!_fieldInfo.IsPrivate && !_fieldInfo.IsFamily) || Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out SerializeField serAtt))
-                    && !Utility_Attribute.TryGetTypeAttribute(_fieldInfo.DeclaringType, out NonSerializedAttribute nonAtt)
-                    && !Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out HideInInspector hideAtt);
-        }
-
-        /// <summary> 绘制内部所有字段 </summary>
-        public static object DrawFields(object _object)
-        {
-            if (_object == null) return null;
-            
-            foreach (var field in Utility_Reflection.GetFieldInfos(_object.GetType()))
-            {
-                if (CanDraw(field))
-                {
-                    EditorGUI.BeginChangeCheck();
-                    object value = EditorGUILayoutExtension.DrawField(field, field.GetValue(_object));
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        field.SetValue(_object, value);
-                        GUI.changed = true;
-                    }
-                }
+                Selection.activeObject = _targetObject as UnityObject;
             }
-            return _object;
+            else
+            {
+                Selection.activeObject = ObjectInspector.Instance;
+                ObjectInspector.Instance.Initialize(_targetObject, _unityOwner);
+            }
+        }
+
+        public static void DrawFieldsInInspector(string _title, object _targetObject, UnityObject _unityOwner = null)
+        {
+            DrawFieldsInInspector(_targetObject, _unityOwner);
+            ObjectInspector.Instance.name = _title;
         }
 
         public static object DrawField(GUIContent _content, FieldInfo _fieldInfo, object _value)
@@ -138,7 +104,7 @@ namespace CZToolKit.Core.Editors
             return EditorGUILayoutExtension.DrawSingleField(GUIHelper.TextContent(_name), null, _fieldType, _value);
         }
 
-        private static object DrawArrayField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
+        static object DrawArrayField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
         {
             Type elementType;
             if (_fieldType.IsArray)
@@ -284,7 +250,28 @@ namespace CZToolKit.Core.Editors
             return list;
         }
 
-        private static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
+        /// <summary> 绘制内部所有字段 </summary>
+        static object DrawFields(object _object)
+        {
+            if (_object == null) return null;
+
+            foreach (var field in Utility_Reflection.GetFieldInfos(_object.GetType()))
+            {
+                if (CanDraw(field))
+                {
+                    EditorGUI.BeginChangeCheck();
+                    object value = EditorGUILayoutExtension.DrawField(field, field.GetValue(_object));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        field.SetValue(_object, value);
+                        GUI.changed = true;
+                    }
+                }
+            }
+            return _object;
+        }
+
+        static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
         {
             if (Utility_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
                 || Utility_Attribute.TryGetTypeAttribute(_fieldType, out att))
@@ -451,7 +438,7 @@ namespace CZToolKit.Core.Editors
             return null;
         }
 
-        private static LayerMask DrawLayerMask(GUIContent guiContent, LayerMask layerMask)
+        static LayerMask DrawLayerMask(GUIContent guiContent, LayerMask layerMask)
         {
             if (EditorGUILayoutExtension.layerNames == null)
             {
@@ -481,7 +468,7 @@ namespace CZToolKit.Core.Editors
             return layerMask;
         }
 
-        private static void InitLayers()
+        static void InitLayers()
         {
             List<string> list = new List<string>();
             List<int> list2 = new List<int>();
@@ -498,20 +485,20 @@ namespace CZToolKit.Core.Editors
             EditorGUILayoutExtension.maskValues = list2.ToArray();
         }
 
-        private const string c_EditorPrefsFoldoutKey = "CZToolKit.Core.Editors.Foldout.";
+        const string c_EditorPrefsFoldoutKey = "CZToolKit.Core.Editors.Foldout.";
 
-        private static int currentKeyboardControl = -1;
+        static int currentKeyboardControl = -1;
 
-        private static bool editingArray = false;
+        static bool editingArray = false;
 
-        private static int savedArraySize = -1;
+        static int savedArraySize = -1;
 
-        private static int editingFieldHash;
+        static int editingFieldHash;
 
-        private static HashSet<int> drawnObjects = new HashSet<int>();
+        static HashSet<int> drawnObjects = new HashSet<int>();
 
-        private static string[] layerNames;
+        static string[] layerNames;
 
-        private static int[] maskValues;
+        static int[] maskValues;
     }
 }

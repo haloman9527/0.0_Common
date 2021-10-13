@@ -63,7 +63,7 @@ namespace CZToolKit.Core.Editors
             EditorGUILayout.EndVertical();
         }
 
-        public static bool BeginToggleGroup(string _label, bool _foldout, ref bool _enable)
+        public static (bool foldout, bool enable) BeginToggleGroup(string _label, bool _foldout, bool _enable)
         {
             BeginBoxGroup();
             Rect rect = GUILayoutUtility.GetRect(50, 25);
@@ -104,13 +104,55 @@ namespace CZToolKit.Core.Editors
 
             EditorGUI.BeginDisabledGroup(!_enable);
             EditorGUI.indentLevel++;
-            return _foldout;
+            return (_foldout, _enable);
         }
 
         public static void EndToggleGroup()
         {
             EditorGUI.indentLevel--;
             EditorGUI.EndDisabledGroup();
+            EndBoxGroup();
+        }
+
+        public static bool BeginFoldout(string _label, bool _foldout)
+        {
+            BeginBoxGroup();
+            Rect rect = GUILayoutUtility.GetRect(50, 25);
+            rect = EditorGUI.IndentedRect(rect);
+
+            Event current = Event.current;
+            if (current.type == EventType.MouseDown && current.button == 0)
+            {
+                if (rect.Contains(current.mousePosition))
+                {
+                    _foldout = !_foldout;
+                    current.Use();
+                }
+            }
+
+            switch (current.type)
+            {
+                case EventType.MouseDown:
+                case EventType.MouseUp:
+                case EventType.Repaint:
+                    GUI.Box(rect, string.Empty, GUI.skin.button);
+
+                    Rect t = rect;
+                    t.xMin += 5;
+                    t.xMax -= 5;
+                    EditorGUI.Foldout(t, _foldout, _label);
+                    break;
+                default:
+                    break;
+            }
+
+            EditorGUI.indentLevel++;
+            return _foldout;
+        }
+
+        public static void EndFoldout()
+        {
+            EditorGUI.indentLevel--;
             EndBoxGroup();
         }
 

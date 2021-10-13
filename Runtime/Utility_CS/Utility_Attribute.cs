@@ -15,6 +15,7 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace CZToolKit.Core
@@ -29,14 +30,11 @@ namespace CZToolKit.Core
         public static bool TryGetTypeAttribute<AttributeType>(Type _type, out AttributeType _attribute)
             where AttributeType : Attribute
         {
-            if (TryGetTypeAttributes(_type, out Attribute[] attributes))
+            foreach (var tempAttribute in GetTypeAttributes(_type))
             {
-                foreach (var tempAttribute in attributes)
-                {
-                    _attribute = tempAttribute as AttributeType;
-                    if (_attribute != null)
-                        return true;
-                }
+                _attribute = tempAttribute as AttributeType;
+                if (_attribute != null)
+                    return true;
             }
 
             _attribute = null;
@@ -44,26 +42,21 @@ namespace CZToolKit.Core
         }
 
         /// <summary> 获取类型的所有特性 </summary>
-        public static bool TryGetTypeAttributes(Type _type, out Attribute[] _attributes)
+        public static Attribute[] GetTypeAttributes(Type _type, bool _inherit = true)
         {
-            if (TypeAttributes.TryGetValue(_type, out _attributes))
-                return _attributes == null || _attributes.Length > 0;
-
-            _attributes = _type.GetCustomAttributes() as Attribute[];
-            TypeAttributes[_type] = _attributes;
-            return _attributes == null || _attributes.Length > 0;
+            if (TypeAttributes.TryGetValue(_type, out var _attributes))
+                return _attributes;
+            TypeAttributes[_type] = _attributes = CustomAttributeExtensions.GetCustomAttributes(_type, _inherit).ToArray();
+            return _attributes;
         }
 
         /// <summary> 获取类型的所有特性 </summary>
-        public static IEnumerable<T> GetTypeAttributes<T>(Type _type) where T : Attribute
+        public static IEnumerable<T> GetTypeAttributes<T>(Type _type, bool _inherit = true) where T : Attribute
         {
-            if (TryGetTypeAttributes(_type, out Attribute[] _attributes))
+            foreach (var attribute in GetTypeAttributes(_type, _inherit))
             {
-                foreach (var attribute in _attributes)
-                {
-                    if (attribute is T t_attritube)
-                        yield return t_attritube;
-                }
+                if (attribute is T t_attritube)
+                    yield return t_attritube;
             }
         }
         #endregion
@@ -182,7 +175,7 @@ namespace CZToolKit.Core
             out Attribute[] _attributes)
         {
             Dictionary<string, Attribute[]> methodTypes;
-            if (TypeFieldAttributes.TryGetValue(_methodInfo.DeclaringType, out methodTypes))
+            if (TypeMethodAttributes.TryGetValue(_methodInfo.DeclaringType, out methodTypes))
             {
                 if (methodTypes.TryGetValue(_methodInfo.Name, out _attributes))
                 {
@@ -196,7 +189,7 @@ namespace CZToolKit.Core
 
             _attributes = _methodInfo.GetCustomAttributes(typeof(Attribute), true) as Attribute[];
             methodTypes[_methodInfo.Name] = _attributes;
-            TypeFieldAttributes[_methodInfo.DeclaringType] = methodTypes;
+            TypeMethodAttributes[_methodInfo.DeclaringType] = methodTypes;
             if (_attributes.Length > 0)
                 return true;
             return false;
