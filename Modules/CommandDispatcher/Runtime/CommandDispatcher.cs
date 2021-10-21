@@ -113,5 +113,11 @@ namespace CZToolKit.Core
                 command.Undo();
             redo.Push(command);
         }
+
+        public virtual void Clear()
+        {
+            undo.Clear();
+            redo.Clear();
+        }
     }
 }
