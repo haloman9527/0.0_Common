@@ -9,57 +9,8 @@ namespace CZToolKit.Core
         void Undo();
     }
 
-    public class ActionCommand : ICommand
-    {
-        Action @do, @undo;
-
-        public ActionCommand(Action _do, Action _undo)
-        {
-            @do = _do;
-            @undo = _undo;
-        }
-
-        public void Do()
-        {
-            @do?.Invoke();
-        }
-
-        public void Undo()
-        {
-            @undo?.Invoke();
-        }
-    }
-
     public class CommandDispatcher
     {
-        internal class CommandsGroup : ICommand
-        {
-            internal Stack<ICommand> undo = new Stack<ICommand>();
-            internal Stack<ICommand> redo = new Stack<ICommand>();
-
-            public void Do()
-            {
-                while (redo.Count != 0)
-                {
-                    ICommand command = redo.Pop();
-                    if (command != null)
-                        command.Do();
-                    undo.Push(command);
-                }
-            }
-
-            public void Undo()
-            {
-                while (undo.Count != 0)
-                {
-                    ICommand command = undo.Pop();
-                    if (command != null)
-                        command.Undo();
-                    redo.Push(command);
-                }
-            }
-        }
-
         Stack<ICommand> undo = new Stack<ICommand>();
         Stack<ICommand> redo = new Stack<ICommand>();
 
@@ -77,6 +28,11 @@ namespace CZToolKit.Core
             groupLevel--;
             if (groupLevel < 0)
                 throw new System.Exception($"{nameof(CommandDispatcher)}的{nameof(BeginGroup)}{nameof(EndGroup)}数量不一致");
+        }
+
+        public void Do(Action @do, Action @undo)
+        {
+            Do(new ActionCommand(@do, @undo));
         }
 
         public void Do(ICommand command)
@@ -118,6 +74,55 @@ namespace CZToolKit.Core
         {
             undo.Clear();
             redo.Clear();
+        }
+
+        internal class CommandsGroup : ICommand
+        {
+            internal Stack<ICommand> undo = new Stack<ICommand>();
+            internal Stack<ICommand> redo = new Stack<ICommand>();
+
+            public void Do()
+            {
+                while (redo.Count != 0)
+                {
+                    ICommand command = redo.Pop();
+                    if (command != null)
+                        command.Do();
+                    undo.Push(command);
+                }
+            }
+
+            public void Undo()
+            {
+                while (undo.Count != 0)
+                {
+                    ICommand command = undo.Pop();
+                    if (command != null)
+                        command.Undo();
+                    redo.Push(command);
+                }
+            }
+        }
+
+        internal class ActionCommand : ICommand
+        {
+            Action @do, @undo;
+
+            public ActionCommand(Action @do, Action @undo)
+            {
+                this.@do = @do;
+                this.@undo = @undo;
+            }
+
+            public void Do()
+            {
+                @do?.Invoke();
+            }
+
+            public void Undo()
+            {
+                @undo?.Invoke();
+            }
         }
     }
 }

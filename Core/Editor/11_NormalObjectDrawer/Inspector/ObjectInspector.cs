@@ -61,10 +61,9 @@ namespace CZToolKit.Core.Editors
 
         public ObjectInspector T_Target { get { return target as ObjectInspector; } }
 
-        private void OnEnable()
+        void OnEnable()
         {
             UnityOwner = T_Target.UnityOwner;
-
 
             OnEnable(T_Target.TargetObject);
             T_Target.onTargetObjectChanged = () =>
