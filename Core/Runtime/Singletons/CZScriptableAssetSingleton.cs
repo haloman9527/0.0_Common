@@ -44,7 +44,7 @@ namespace CZToolKit.Core.Singletons
 #if UNITY_EDITOR
                             if (m_Instance == null)
                             {
-                                foreach (var guid in UnityEditor.AssetDatabase.FindAssets($"t:{nameof(T)}"))
+                                foreach (var guid in UnityEditor.AssetDatabase.FindAssets($"t:{typeof(T).Name}"))
                                 {
                                     m_Instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
                                     if (m_Instance != null)
@@ -55,7 +55,7 @@ namespace CZToolKit.Core.Singletons
                             if (m_Instance == null)
                             {
                                 m_Instance = CreateInstance<T>();
-                                UnityEditor.AssetDatabase.CreateAsset(m_Instance, $"Assets/{nameof(T)}/{nameof(T)}.asset");
+                                UnityEditor.AssetDatabase.CreateAsset(m_Instance, $"Assets/{typeof(T).Name}/{typeof(T).Name}.asset");
                             }
 #else
 
