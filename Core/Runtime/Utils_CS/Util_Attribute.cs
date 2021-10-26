@@ -67,20 +67,18 @@ namespace CZToolKit.Core
             new Dictionary<Type, Dictionary<string, Attribute[]>>();
 
         /// <summary> 根据<paramref name="_fieldInfo"/>获取特定类型特性 </summary>
-        public static bool TryGetFieldInfoAttribute<AttributeType>(FieldInfo _fieldInfo,
+        public static bool TryGetFieldAttribute<AttributeType>(FieldInfo _fieldInfo,
             out AttributeType _attribute)
             where AttributeType : Attribute
         {
             _attribute = null;
             if (_fieldInfo == null) return false;
-            if (TryGetFieldInfoAttributes(_fieldInfo, out Attribute[] attributes))
+            Attribute[] attributes = GetFieldAttributes(_fieldInfo);
+            for (int i = 0; i < attributes.Length; i++)
             {
-                for (int i = 0; i < attributes.Length; i++)
-                {
-                    _attribute = attributes[i] as AttributeType;
-                    if (_attribute != null)
-                        return true;
-                }
+                _attribute = attributes[i] as AttributeType;
+                if (_attribute != null)
+                    return true;
             }
             return false;
         }
@@ -90,51 +88,34 @@ namespace CZToolKit.Core
             out AttributeType _attribute)
             where AttributeType : Attribute
         {
-            return TryGetFieldInfoAttribute(Util_Reflection.GetFieldInfo(_type, _fieldName), out _attribute);
+            return TryGetFieldAttribute(Util_Reflection.GetFieldInfo(_type, _fieldName), out _attribute);
         }
 
         /// <summary> 根据<paramref name="_fieldInfo"/>获取所有特性 </summary>
-        public static bool TryGetFieldInfoAttributes(FieldInfo _fieldInfo,
-            out Attribute[] _attributes)
+        public static Attribute[] GetFieldAttributes(FieldInfo _fieldInfo)
         {
-            Dictionary<string, Attribute[]> fieldTypes;
-            if (TypeFieldAttributes.TryGetValue(_fieldInfo.DeclaringType, out fieldTypes))
-            {
-                if (fieldTypes.TryGetValue(_fieldInfo.Name, out _attributes))
-                {
-                    if (_attributes != null && _attributes.Length > 0)
-                        return true;
-                    return false;
-                }
-            }
-            else
-                fieldTypes = new Dictionary<string, Attribute[]>();
+            if (!TypeFieldAttributes.TryGetValue(_fieldInfo.DeclaringType, out var fieldTypes))
+                TypeFieldAttributes[_fieldInfo.DeclaringType] = fieldTypes = new Dictionary<string, Attribute[]>();
 
-            _attributes = _fieldInfo.GetCustomAttributes(typeof(Attribute), true) as Attribute[];
-            fieldTypes[_fieldInfo.Name] = _attributes;
-            TypeFieldAttributes[_fieldInfo.DeclaringType] = fieldTypes;
-            if (_attributes.Length > 0)
-                return true;
-            return false;
+            if (!fieldTypes.TryGetValue(_fieldInfo.Name, out var attributes))
+                fieldTypes[_fieldInfo.Name] = attributes = _fieldInfo.GetCustomAttributes(typeof(Attribute), true) as Attribute[];
+
+            return attributes;
         }
 
         /// <summary> 根据类型和方法名获取所有特性 </summary>
-        public static bool TryGetFieldAttributes(Type _type, string _fieldName,
-            out Attribute[] _attributes)
+        public static Attribute[] GetFieldAttributes(Type _type, string _fieldName)
         {
-            return TryGetFieldInfoAttributes(Util_Reflection.GetFieldInfo(_type, _fieldName), out _attributes);
+            return GetFieldAttributes(Util_Reflection.GetFieldInfo(_type, _fieldName));
         }
 
         /// <summary> 获取类型的所有特性 </summary>
         public static IEnumerable<T> GetFieldAttributes<T>(Type _type, string _fieldName) where T : Attribute
         {
-            if (TryGetFieldAttributes(_type, _fieldName, out Attribute[] _attributes))
+            foreach (var attribute in GetFieldAttributes(_type, _fieldName))
             {
-                foreach (var attribute in _attributes)
-                {
-                    if (attribute is T t_attritube)
-                        yield return t_attritube;
-                }
+                if (attribute is T t_attritube)
+                    yield return t_attritube;
             }
         }
         #endregion
@@ -144,20 +125,17 @@ namespace CZToolKit.Core
         static readonly Dictionary<Type, Dictionary<string, Attribute[]>> TypeMethodAttributes =
             new Dictionary<Type, Dictionary<string, Attribute[]>>();
 
-        public static bool TryGetMethodInfoAttribute<AttributeType>(MethodInfo _methodInfo,
+        public static bool TryGetMethodAttribute<AttributeType>(MethodInfo _methodInfo,
             out AttributeType _attribute)
             where AttributeType : Attribute
         {
-            if (TryGetMethodInfoAttributes(_methodInfo, out Attribute[] attributes))
+            Attribute[] attributes = GetMethodAttributes(_methodInfo);
+            for (int i = 0; i < attributes.Length; i++)
             {
-                for (int i = 0; i < attributes.Length; i++)
-                {
-                    _attribute = attributes[i] as AttributeType;
-                    if (_attribute != null)
-                        return true;
-                }
+                _attribute = attributes[i] as AttributeType;
+                if (_attribute != null)
+                    return true;
             }
-
             _attribute = null;
             return false;
         }
@@ -167,50 +145,34 @@ namespace CZToolKit.Core
             out AttributeType _attribute)
             where AttributeType : Attribute
         {
-            return TryGetMethodInfoAttribute(Util_Reflection.GetMethodInfo(_type, _methodName), out _attribute);
+            return TryGetMethodAttribute(Util_Reflection.GetMethodInfo(_type, _methodName), out _attribute);
         }
 
         /// <summary> 根据<paramref name="_methodInfo"/>获取所有特性 </summary>
-        public static bool TryGetMethodInfoAttributes(MethodInfo _methodInfo,
-            out Attribute[] _attributes)
+        public static Attribute[] GetMethodAttributes(MethodInfo _methodInfo)
         {
-            Dictionary<string, Attribute[]> methodTypes;
-            if (TypeMethodAttributes.TryGetValue(_methodInfo.DeclaringType, out methodTypes))
-            {
-                if (methodTypes.TryGetValue(_methodInfo.Name, out _attributes))
-                {
-                    if (_attributes != null && _attributes.Length > 0)
-                        return true;
-                    return false;
-                }
-            }
-            else
-                methodTypes = new Dictionary<string, Attribute[]>();
+            if (!TypeMethodAttributes.TryGetValue(_methodInfo.DeclaringType, out var methodTypes))
+                TypeMethodAttributes[_methodInfo.DeclaringType] = methodTypes = new Dictionary<string, Attribute[]>();
 
-            _attributes = _methodInfo.GetCustomAttributes(typeof(Attribute), true) as Attribute[];
-            methodTypes[_methodInfo.Name] = _attributes;
-            TypeMethodAttributes[_methodInfo.DeclaringType] = methodTypes;
-            if (_attributes.Length > 0)
-                return true;
-            return false;
+            if (!methodTypes.TryGetValue(_methodInfo.Name, out var _attributes))
+                methodTypes[_methodInfo.Name] = _attributes = _methodInfo.GetCustomAttributes(typeof(Attribute), true) as Attribute[];
+
+            return _attributes;
         }
 
         /// <summary> 根据类型和方法名获取所有特性 </summary>
-        public static bool TryGetMethodAttributes(Type _type, string _methodName,
-            out Attribute[] _attributes)
+        public static Attribute[] GetMethodAttributes(Type _type, string _methodName)
         {
-            return TryGetMethodInfoAttributes(Util_Reflection.GetMethodInfo(_type, _methodName), out _attributes);
+            return GetMethodAttributes(Util_Reflection.GetMethodInfo(_type, _methodName));
         }
 
         public static IEnumerable<T> GetMethodAttributes<T>(Type _type, string _methodName) where T : Attribute
         {
-            if (TryGetMethodAttributes(_type, _methodName, out Attribute[] _attributes))
+            Attribute[] _attributes = GetMethodAttributes(_type, _methodName);
+            foreach (var attribute in _attributes)
             {
-                foreach (var attribute in _attributes)
-                {
-                    if (attribute is T t_attritube)
-                        yield return t_attritube;
-                }
+                if (attribute is T t_attritube)
+                    yield return t_attritube;
             }
         }
         #endregion

@@ -31,9 +31,9 @@ namespace CZToolKit.Core.Editors
         /// <returns> 满足以上条件返回<see cref="true"/> </returns>
         public static bool CanDraw(FieldInfo fieldInfo)
         {
-            return ((!fieldInfo.IsPrivate && !fieldInfo.IsFamily) || Util_Attribute.TryGetFieldInfoAttribute(fieldInfo, out SerializeField serAtt))
+            return ((!fieldInfo.IsPrivate && !fieldInfo.IsFamily) || Util_Attribute.TryGetFieldAttribute(fieldInfo, out SerializeField serAtt))
                     && !Util_Attribute.TryGetTypeAttribute(fieldInfo.DeclaringType, out NonSerializedAttribute nonAtt)
-                    && !Util_Attribute.TryGetFieldInfoAttribute(fieldInfo, out HideInInspector hideAtt);
+                    && !Util_Attribute.TryGetFieldAttribute(fieldInfo, out HideInInspector hideAtt);
         }
 
         public static bool DrawFoldout(int hash, GUIContent guiContent)
@@ -84,7 +84,7 @@ namespace CZToolKit.Core.Editors
         public static object DrawField(FieldInfo _fieldInfo, object _value)
         {
             GUIContent content = null;
-            if (Util_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out TooltipAttribute tooltipAtt))
+            if (Util_Attribute.TryGetFieldAttribute(_fieldInfo, out TooltipAttribute tooltipAtt))
                 content = GUIHelper.TextContent(ObjectNames.NicifyVariableName(_fieldInfo.Name), tooltipAtt.tooltip);
             else
                 content = GUIHelper.TextContent(ObjectNames.NicifyVariableName(_fieldInfo.Name));
@@ -219,7 +219,7 @@ namespace CZToolKit.Core.Editors
                 }
 
                 if (_fieldInfo != null
-                    && (Util_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
+                    && (Util_Attribute.TryGetFieldAttribute(_fieldInfo, out FieldAttribute att)
                     || Util_Attribute.TryGetTypeAttribute(elementType, out att)))
                 {
                     for (int k = 0; k < list.Count; k++)
@@ -274,7 +274,7 @@ namespace CZToolKit.Core.Editors
 
         static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
         {
-            if (Util_Attribute.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
+            if (Util_Attribute.TryGetFieldAttribute(_fieldInfo, out FieldAttribute att)
                 || Util_Attribute.TryGetTypeAttribute(_fieldType, out att))
             {
                 ObjectDrawer objectDrawer;
