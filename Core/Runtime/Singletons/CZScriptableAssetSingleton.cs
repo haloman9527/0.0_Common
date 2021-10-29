@@ -21,7 +21,7 @@ namespace CZToolKit.Core.Singletons
 #if ODIN_INSPECTOR
     public abstract class CZScriptableAssetSingleton<T> : Sirenix.OdinInspector.SerializedScriptableObject where T : CZScriptableAssetSingleton<T>
 #else
-    public abstract class ScriptableSingleton<T> : ScriptableObject where T : ScriptableSingleton<T>
+    public abstract class CZScriptableAssetSingleton<T> : ScriptableObject where T : CZScriptableAssetSingleton<T>
 #endif
     {
         /// <summary> 线程锁 </summary>

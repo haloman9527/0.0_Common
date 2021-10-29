@@ -27,7 +27,7 @@ namespace CZToolKit.Core
         {
             groupLevel--;
             if (groupLevel < 0)
-                throw new System.Exception($"{nameof(CommandDispatcher)}µÄ{nameof(BeginGroup)}{nameof(EndGroup)}ÊýÁ¿²»Ò»ÖÂ");
+                throw new System.Exception($"{nameof(CommandDispatcher)}çš„{nameof(BeginGroup)}{nameof(EndGroup)}æ•°é‡ä¸ä¸€è‡´");
         }
 
         public void Do(Action @do, Action @undo)
