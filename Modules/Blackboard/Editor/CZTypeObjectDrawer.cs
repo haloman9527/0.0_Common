@@ -26,7 +26,7 @@ namespace CZToolKit.Core.Blackboards.Editors
         {
             base.OnGUI(position, label);
             ICZType c = Target as ICZType;
-            c.SetValue(EditorGUILayoutExtension.DrawField(label, c.ValueType, c.GetValue()));
+            c.SetValue(EditorGUILayoutExtension.DrawField(c.GetValue(), label));
         }
     }
 }

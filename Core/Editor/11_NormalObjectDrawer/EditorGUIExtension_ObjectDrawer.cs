@@ -15,6 +15,7 @@
 #endregion
 #if UNITY_EDITOR
 using System;
+using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,188 +25,339 @@ namespace CZToolKit.Core.Editors
 {
     public static partial class EditorGUIExtension
     {
-        public static float GetPropertyHeight(Type _type, GUIContent label)
+        public static object CreateInstance(Type type)
         {
-            if (_type.Equals(typeof(bool)))
+            if (type == typeof(string))
+                return "";
+            else
+                return Activator.CreateInstance(type, true);
+        }
+
+        public static bool IsBasicType(Type type)
+        {
+            if (type.Equals(typeof(bool))) return true;
+            if (type.Equals(typeof(byte))) return true;
+            if (type.Equals(typeof(sbyte))) return true;
+            if (type.Equals(typeof(short))) return true;
+            if (type.Equals(typeof(ushort))) return true;
+            if (type.Equals(typeof(int))) return true;
+            if (type.Equals(typeof(uint))) return true;
+            if (type.Equals(typeof(float))) return true;
+            if (type.Equals(typeof(double))) return true;
+            if (type.Equals(typeof(long))) return true;
+            if (type.Equals(typeof(ulong))) return true;
+            if (type.Equals(typeof(string))) return true;
+            if (type.Equals(typeof(char))) return true;
+            if (type.Equals(typeof(Vector2))) return true;
+            if (type.Equals(typeof(Vector2Int))) return true;
+            if (type.Equals(typeof(Vector3))) return true;
+            if (type.Equals(typeof(Vector3Int))) return true;
+            if (type.Equals(typeof(Vector4))) return true;
+            if (type.Equals(typeof(Quaternion))) return true;
+            if (type.Equals(typeof(Color))) return true;
+            if (type.Equals(typeof(Rect))) return true;
+            if (type.Equals(typeof(RectInt))) return true;
+            if (type.Equals(typeof(Bounds))) return true;
+            if (type.Equals(typeof(BoundsInt))) return true;
+            if (type.Equals(typeof(LayerMask))) return true;
+            if (type.IsEnum) return true;
+            if (typeof(Gradient).IsAssignableFrom(type)) return true;
+            if (typeof(AnimationCurve).IsAssignableFrom(type)) return true;
+            if (typeof(UnityObject).IsAssignableFrom(type)) return true;
+            return false;
+        }
+
+        /// <returns> 是否支持绘制此类型数据 </returns>
+        public static bool IsSupport(Type type)
+        {
+            if (IsBasicType(type))
+            {
+                return true;
+            }
+
+            if (typeof(IList).IsAssignableFrom(type))
+            {
+                Type elementType;
+                if (type.IsArray)
+                    elementType = type.GetElementType();
+                else
+                {
+                    Type type2 = type;
+                    while (!type2.IsGenericType)
+                    {
+                        type2 = type2.BaseType;
+                    }
+                    elementType = type2.GetGenericArguments()[0];
+                }
+                if (IsSupport(elementType))
+                {
+                    return true;
+                }
+            }
+
+            if (type.IsClass || (type.IsValueType && !type.IsPrimitive))
+            {
+                if (!typeof(Delegate).IsAssignableFrom(type) && typeof(object).IsAssignableFrom(type))
+                    return true;
+            }
+            return false;
+        }
+
+        //public static float GetPropertyHeight(SerializedPropertyS property)
+        //{
+        //    return GetPropertyHeight(property, true);
+        //}
+
+        //public static float GetPropertyHeight(SerializedPropertyS property, bool includeChildren)
+        //{
+        //    if (!property.HasChildren)
+        //        return GetPropertyHeight(property.FieldInfo.FieldType, GUIHelper.TextContent(property.FieldInfo.Name));
+
+        //    if (!property.isExpanded)
+        //        return EditorGUIUtility.singleLineHeight;
+
+        //    float height = EditorGUIUtility.singleLineHeight;
+
+        //    if (includeChildren)
+        //    {
+        //        foreach (var children in property.GetIterator())
+        //        {
+        //            height += GetPropertyHeight(children) + EditorGUIUtility.standardVerticalSpacing;
+        //        }
+        //    }
+        //    return height;
+        //}
+
+        public static float GetPropertyHeight(Type type, GUIContent label)
+        {
+            if (type.Equals(typeof(bool)))
+            {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Boolean, label);
-            if (_type.Equals(typeof(byte)) || _type.Equals(typeof(sbyte))
-                || _type.Equals(typeof(short)) || _type.Equals(typeof(ushort))
-                || _type.Equals(typeof(int)) || _type.Equals(typeof(uint))
-                || _type.Equals(typeof(long)) || _type.Equals(typeof(ulong)))
+            }
+            if (type.Equals(typeof(byte)) || type.Equals(typeof(sbyte))
+                || type.Equals(typeof(short)) || type.Equals(typeof(ushort))
+                || type.Equals(typeof(int)) || type.Equals(typeof(uint))
+                || type.Equals(typeof(long)) || type.Equals(typeof(ulong)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Integer, label);
             }
-            if (_type.Equals(typeof(float)) || _type.Equals(typeof(double)))
+            if (type.Equals(typeof(float)) || type.Equals(typeof(double)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Float, label);
             }
-            if (_type.Equals(typeof(char)))
+            if (type.Equals(typeof(char)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Character, label);
             }
-            if (_type.Equals(typeof(string)))
+            if (type.Equals(typeof(string)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.String, label);
             }
-            if (_type.Equals(typeof(Color)))
+            if (type.Equals(typeof(Color)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Color, label);
             }
-            if (_type.Equals(typeof(LayerMask)))
+            if (type.Equals(typeof(LayerMask)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.LayerMask, label);
             }
-            if (_type.IsEnum)
-            {
-                return EditorGUI.GetPropertyHeight(SerializedPropertyType.Enum, label);
-            }
-            if (typeof(UnityEngine.Object).IsAssignableFrom(_type))
-            {
-                return EditorGUI.GetPropertyHeight(SerializedPropertyType.ObjectReference, label);
-            }
-            if (_type.Equals(typeof(Vector2)))
+            if (type.Equals(typeof(Vector2)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector2, label);
             }
-            if (_type.Equals(typeof(Vector2Int)))
+            if (type.Equals(typeof(Vector2Int)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector2Int, label);
             }
-            if (_type.Equals(typeof(Vector3)))
+            if (type.Equals(typeof(Vector3)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector3, label);
             }
-            if (_type.Equals(typeof(Vector3Int)))
+            if (type.Equals(typeof(Vector3Int)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector3Int, label);
             }
-            if (_type.Equals(typeof(Vector4)))
+            if (type.Equals(typeof(Vector4)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector4, label);
             }
-            if (_type.Equals(typeof(Quaternion)))
+            if (type.Equals(typeof(Quaternion)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Quaternion, label);
             }
-            if (_type.Equals(typeof(Rect)))
+            if (type.Equals(typeof(Rect)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Rect, label);
             }
-            if (_type.Equals(typeof(RectInt)))
+            if (type.Equals(typeof(RectInt)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.RectInt, label);
             }
-            if (_type.Equals(typeof(Gradient)))
-            {
-                return EditorGUI.GetPropertyHeight(SerializedPropertyType.Gradient, label);
-            }
-            if (_type.Equals(typeof(AnimationCurve)))
-            {
-                return EditorGUI.GetPropertyHeight(SerializedPropertyType.AnimationCurve, label);
-            }
-            if (_type.Equals(typeof(Bounds)))
+            if (type.Equals(typeof(Bounds)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.Bounds, label);
             }
-            if (_type.Equals(typeof(BoundsInt)))
+            if (type.Equals(typeof(BoundsInt)))
             {
                 return EditorGUI.GetPropertyHeight(SerializedPropertyType.BoundsInt, label);
             }
-            return EditorGUIUtility.singleLineHeight;
+            if (type.IsEnum)
+            {
+                return EditorGUI.GetPropertyHeight(SerializedPropertyType.Enum, label);
+            }
+            if (typeof(Gradient).IsAssignableFrom(type))
+            {
+                return EditorGUI.GetPropertyHeight(SerializedPropertyType.Gradient, label);
+            }
+            if (typeof(AnimationCurve).IsAssignableFrom(type))
+            {
+                return EditorGUI.GetPropertyHeight(SerializedPropertyType.AnimationCurve, label);
+            }
+            if (typeof(UnityObject).IsAssignableFrom(type))
+            {
+                return EditorGUI.GetPropertyHeight(SerializedPropertyType.ObjectReference, label);
+            }
+
+            return 0;
         }
 
+        //public static void PropertyField(Rect rect, SerializedPropertyS property)
+        //{
+        //    if (property.HasChildren)
+        //    {
+        //        rect.height = EditorGUIUtility.singleLineHeight;
+        //        property.isExpanded = EditorGUI.Foldout(rect, property.isExpanded, property.niceName);
+        //        EditorGUI.indentLevel++;
+        //        if (property.isExpanded)
+        //        {
+        //            foreach (var children in property.GetIterator())
+        //            {
+        //                rect.y += rect.height + EditorGUIUtility.standardVerticalSpacing;
+        //                rect.height = GetPropertyHeight(children);
 
-        public static object DrawField(Rect _rect, GUIContent _content, Type _fieldType, object _value)
+        //                PropertyField(rect, children);
+        //            }
+        //        }
+        //        EditorGUI.indentLevel--;
+        //    }
+        //    else
+        //    {
+        //        EditorGUI.BeginChangeCheck();
+        //        var value = DrawField(rect, property.FieldInfo.FieldType, property.FieldInfo.GetValue(property.Context), property.niceName);
+        //        if (EditorGUI.EndChangeCheck())
+        //        {
+        //            property.FieldInfo.SetValue(property.Context, value);
+        //        }
+        //    }
+        //}
+
+        public static object DrawField(Rect rect, Type type, object value, GUIContent label)
         {
-            if (_fieldType.Equals(typeof(int)))
+            if (value == null)
             {
-                return EditorGUI.IntField(_rect, _content, _value == null ? 0 : (int)_value, EditorStylesExtension.NumberFieldStyle);
+                if (!typeof(UnityObject).IsAssignableFrom(type))
+                    value = CreateInstance(type);
             }
-            if (_fieldType.Equals(typeof(float)))
+
+            if (!IsSupport(type))
             {
-                return EditorGUI.FloatField(_rect, _content, _value == null ? 0 : (float)_value, EditorStylesExtension.NumberFieldStyle);
+                return null;
             }
-            if (_fieldType.Equals(typeof(double)))
+
+            if (type.Equals(typeof(bool)))
             {
-                return EditorGUI.FloatField(_rect, _content, Convert.ToSingle(_value == null ? 0 : (double)_value), EditorStylesExtension.NumberFieldStyle);
+                return EditorGUI.Toggle(rect, label, value == null ? false : (bool)value);
             }
-            if (_fieldType.Equals(typeof(long)))
+            if (type.Equals(typeof(short)) || type.Equals(typeof(ushort))
+                || type.Equals(typeof(int)) || type.Equals(typeof(uint)))
             {
-                return (long)EditorGUI.IntField(_rect, _content, Convert.ToInt32(_value == null ? 0 : (long)_value), EditorStylesExtension.NumberFieldStyle);
+                return EditorGUI.IntField(rect, label, value == null ? 0 : (int)value);
             }
-            if (_fieldType.Equals(typeof(bool)))
+            if (type.Equals(typeof(long)) || type.Equals(typeof(ulong)))
             {
-                return EditorGUI.Toggle(_rect, _content, _value == null ? false : (bool)_value);
+                return EditorGUI.LongField(rect, label, value == null ? 0 : (long)value);
             }
-            if (_fieldType.Equals(typeof(string)))
+            if (type.Equals(typeof(float)))
             {
-                return EditorGUI.TextField(_rect, _content, _value == null ? "" : (string)_value, EditorStylesExtension.TextFieldStyle);
+                return EditorGUI.FloatField(rect, label, value == null ? 0 : (float)value);
             }
-            if (_fieldType.Equals(typeof(byte)))
+            if (type.Equals(typeof(double)))
             {
-                return Convert.ToByte(EditorGUI.IntField(_rect, _content, Convert.ToInt32(_value == null ? 0 : (byte)_value)));
+                return EditorGUI.DoubleField(rect, label, value == null ? 0 : (double)value);
             }
-            if (_fieldType.Equals(typeof(Vector2)))
+            if (type.Equals(typeof(string)))
             {
-                return EditorGUI.Vector2Field(_rect, _content, _value == null ? Vector2.zero : (Vector2)_value);
+                return EditorGUI.TextField(rect, label, value == null ? "" : (string)value);
             }
-            if (_fieldType.Equals(typeof(Vector2Int)))
+            if (type.Equals(typeof(Vector2)))
             {
-                return EditorGUI.Vector2IntField(_rect, _content, _value == null ? Vector2Int.zero : (Vector2Int)_value);
+                return EditorGUI.Vector2Field(rect, label, value == null ? Vector2.zero : (Vector2)value);
             }
-            if (_fieldType.Equals(typeof(Vector3)))
+            if (type.Equals(typeof(Vector2Int)))
             {
-                return EditorGUI.Vector3Field(_rect, _content, _value == null ? Vector3.zero : (Vector3)_value);
+                return EditorGUI.Vector2IntField(rect, label, value == null ? Vector2Int.zero : (Vector2Int)value);
             }
-            if (_fieldType.Equals(typeof(Vector3Int)))
+            if (type.Equals(typeof(Vector3)))
             {
-                return EditorGUI.Vector3IntField(_rect, _content, _value == null ? Vector3Int.zero : (Vector3Int)_value);
+                return EditorGUI.Vector3Field(rect, label, value == null ? Vector3.zero : (Vector3)value);
             }
-            if (_fieldType.Equals(typeof(Vector4)))
+            if (type.Equals(typeof(Vector3Int)))
             {
-                return EditorGUI.Vector4Field(_rect, _content, _value == null ? Vector4.zero : (Vector4)_value);
+                return EditorGUI.Vector3IntField(rect, label, value == null ? Vector3Int.zero : (Vector3Int)value);
             }
-            if (_fieldType.Equals(typeof(Quaternion)))
+            if (type.Equals(typeof(Vector4)))
             {
-                Quaternion quaternion = _value == null ? Quaternion.identity : (Quaternion)_value;
-                Vector4 vector = Vector4.zero;
-                vector.Set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-                vector = EditorGUI.Vector4Field(_rect, _content, vector);
+                return EditorGUI.Vector4Field(rect, label, value == null ? Vector4.zero : (Vector4)value);
+            }
+            if (type.Equals(typeof(Quaternion)))
+            {
+                Quaternion quaternion = value == null ? Quaternion.identity : (Quaternion)value;
+                Vector4 vector = new Vector4(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+                vector = EditorGUI.Vector4Field(rect, label, vector);
                 quaternion.Set(vector.x, vector.y, vector.z, vector.w);
                 return quaternion;
             }
-            if (_fieldType.Equals(typeof(Color)))
+            if (type.Equals(typeof(Color)))
             {
-                return EditorGUI.ColorField(_rect, _content, _value == null ? Color.black : (Color)_value);
+                return EditorGUI.ColorField(rect, label, value == null ? Color.black : (Color)value);
             }
-            if (_fieldType.Equals(typeof(Rect)))
+            if (type.Equals(typeof(Rect)))
             {
-                return EditorGUI.RectField(_rect, _content, _value == null ? Rect.zero : (Rect)_value);
+                return EditorGUI.RectField(rect, label, value == null ? Rect.zero : (Rect)value);
             }
-            if (_fieldType.Equals(typeof(AnimationCurve)))
+            if (type.Equals(typeof(AnimationCurve)))
             {
-                if (_value == null)
-                {
-                    _value = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
-                    GUI.changed = true;
-                }
-                return EditorGUI.CurveField(_rect, _content, (AnimationCurve)_value);
+                return EditorGUI.CurveField(rect, label, value == null ? AnimationCurve.EaseInOut(0f, 0f, 1f, 1f) : (AnimationCurve)value);
             }
-            if (_fieldType.Equals(typeof(LayerMask)))
+            if (type.Equals(typeof(LayerMask)))
             {
-                LayerMask l = (LayerMask)(_value == null ? (LayerMask)(-1) : _value);
-                return (LayerMask)EditorGUI.LayerField(_rect, _content, l.value);
+                return (LayerMask)EditorGUI.LayerField(rect, label, (LayerMask)(value == null ? (-1) : value));
             }
-            if (typeof(UnityObject).IsAssignableFrom(_fieldType))
+            if (typeof(UnityObject).IsAssignableFrom(type))
             {
-                return EditorGUI.ObjectField(_rect, _content, (UnityObject)_value, _fieldType, true);
+                return EditorGUI.ObjectField(rect, label, (UnityObject)value, type, true);
             }
-            if (_fieldType.IsEnum)
+            if (type.IsEnum)
             {
-                return EditorGUI.EnumPopup(_rect, _content, (Enum)_value);
+                return EditorGUI.EnumPopup(rect, label, (Enum)value);
             }
-            EditorGUILayout.LabelField("Unsupported Type: " + _fieldType);
+
             return null;
+        }
+
+        public static object DrawField(Rect rect, Type type, object value, string label)
+        {
+            return DrawField(rect, type, value, GUIHelper.TextContent(label));
+        }
+
+        public static object DrawField(Rect rect, object value, GUIContent label)
+        {
+            return DrawField(rect, value.GetType(), value, label);
+        }
+
+        public static object DrawField(Rect rect, object value, string label)
+        {
+            return DrawField(rect, value.GetType(), value, label);
         }
     }
 }

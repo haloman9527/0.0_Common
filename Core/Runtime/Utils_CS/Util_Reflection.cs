@@ -43,46 +43,60 @@ namespace CZToolKit.Core
             return GetChildTypes(typeof(T));
         }
 
-        public static IEnumerable<Type> GetChildTypes(Type _type)
+        public static IEnumerable<Type> GetChildTypes(Type type)
         {
-            if (!ChildrenTypeCache.TryGetValue(_type, out IEnumerable<Type> childrenTypes))
-                ChildrenTypeCache[_type] = childrenTypes = BuildCache(_type);
+            if (!ChildrenTypeCache.TryGetValue(type, out IEnumerable<Type> childrenTypes))
+                ChildrenTypeCache[type] = childrenTypes = BuildCache(type);
 
-            foreach (var type in childrenTypes)
+            foreach (var tmpType in childrenTypes)
             {
-                yield return type;
+                yield return tmpType;
             }
 
-            IEnumerable<Type> BuildCache(Type _baseType)
+            IEnumerable<Type> BuildCache(Type baseType)
             {
-                foreach (var type in AllTypeCache)
+                foreach (var tmpType in AllTypeCache)
                 {
-                    if (type != _baseType && _baseType.IsAssignableFrom(type))
-                        yield return type;
+                    if (tmpType != baseType && baseType.IsAssignableFrom(tmpType))
+                        yield return tmpType;
                 }
             }
         }
 
-        public static Assembly LoadAssembly(string _assemblyString)
+        public static Assembly LoadAssembly(string assemblyString)
         {
             Assembly assembly;
-            if (!AssemblyCache.TryGetValue(_assemblyString, out assembly))
-                AssemblyCache[_assemblyString] = assembly = Assembly.Load(_assemblyString);
+            if (!AssemblyCache.TryGetValue(assemblyString, out assembly))
+                AssemblyCache[assemblyString] = assembly = Assembly.Load(assemblyString);
             return assembly;
         }
 
-        public static Type GetType(string _fullName, string _assemblyString)
+        public static Type GetType(string fullName)
         {
-            Type type;
-            if (FullNameTypeCache.TryGetValue(_fullName, out type))
+            if (FullNameTypeCache.TryGetValue(fullName, out Type type))
                 return type;
-            Assembly assembly = LoadAssembly(_assemblyString);
+            foreach (var tmpType in AllTypeCache)
+            {
+                if (tmpType.FullName == fullName)
+                {
+                    FullNameTypeCache[fullName] = type = tmpType;
+                    break;
+                }
+            }
+            return type;
+        }
+
+        public static Type GetType(string fullName, string assemblyString)
+        {
+            if (FullNameTypeCache.TryGetValue(fullName, out Type type))
+                return type;
+            Assembly assembly = LoadAssembly(assemblyString);
             if (assembly == null) return null;
             foreach (var tempType in assembly.GetTypes())
             {
                 FullNameTypeCache[tempType.FullName] = tempType;
             }
-            if (FullNameTypeCache.TryGetValue(_fullName, out type))
+            if (FullNameTypeCache.TryGetValue(fullName, out type))
                 return type;
             return null;
         }
@@ -90,9 +104,9 @@ namespace CZToolKit.Core
         #region GetMemberInfo
         static Dictionary<Type, List<MemberInfo>> TypeMemberInfoCache = new Dictionary<Type, List<MemberInfo>>();
 
-        public static IEnumerable<MemberInfo> GetMemberInfos(Type _type)
+        public static IEnumerable<MemberInfo> GetMemberInfos(Type type)
         {
-            Type baseType = _type.BaseType;
+            Type baseType = type.BaseType;
             if (baseType != null)
             {
                 foreach (var m in GetMemberInfos(baseType))
@@ -101,9 +115,9 @@ namespace CZToolKit.Core
                 }
             }
 
-            if (!TypeMemberInfoCache.TryGetValue(_type, out List<MemberInfo> memberInfos))
+            if (!TypeMemberInfoCache.TryGetValue(type, out List<MemberInfo> memberInfos))
             {
-                TypeMemberInfoCache[_type] = memberInfos = new List<MemberInfo>(_type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
+                TypeMemberInfoCache[type] = memberInfos = new List<MemberInfo>(type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly));
             }
 
             foreach (var m in memberInfos)
@@ -113,29 +127,37 @@ namespace CZToolKit.Core
         }
 
         /// <summary> 获取字段，包括基类的私有字段 </summary>
-        public static MemberInfo GetMemberInfo(Type _type, string _memberName)
+        public static MemberInfo GetMemberInfo(Type type, string memberName)
         {
-            return GetMemberInfos(_type).FirstOrDefault(f => f.Name == _memberName);
+            return GetMemberInfos(type).FirstOrDefault(f => f.Name == memberName);
         }
 
         public static IEnumerable<FieldInfo> GetFieldInfos(Type _type)
         {
-            foreach (var member in GetMemberInfos(_type))
+            return GetFieldInfos(_type, false);
+        }
+
+        public static IEnumerable<FieldInfo> GetFieldInfos(Type type, bool declaredOnly)
+        {
+            foreach (var member in GetMemberInfos(type))
             {
+                if (declaredOnly && member.DeclaringType != type)
+                    continue;
+
                 if (member is FieldInfo fieldInfo)
                     yield return fieldInfo;
             }
         }
 
         /// <summary> 获取字段，包括基类的私有字段 </summary>
-        public static FieldInfo GetFieldInfo(Type _type, string _fieldName)
+        public static FieldInfo GetFieldInfo(Type type, string fieldName)
         {
-            return GetFieldInfos(_type).FirstOrDefault(f => f.Name == _fieldName);
+            return GetFieldInfos(type).FirstOrDefault(f => f.Name == fieldName);
         }
 
-        public static IEnumerable<PropertyInfo> GetPropertyInfos(Type _type)
+        public static IEnumerable<PropertyInfo> GetPropertyInfos(Type type)
         {
-            foreach (var member in GetMemberInfos(_type))
+            foreach (var member in GetMemberInfos(type))
             {
                 if (member is PropertyInfo propertyInfo)
                     yield return propertyInfo;
@@ -143,9 +165,9 @@ namespace CZToolKit.Core
         }
 
         /// <summary> 获取字段，包括基类的私有字段 </summary>
-        public static PropertyInfo GetPropertyInfo(Type _type, string _propertyName)
+        public static PropertyInfo GetPropertyInfo(Type type, string propertyName)
         {
-            return GetPropertyInfos(_type).FirstOrDefault(f => f.Name == _propertyName);
+            return GetPropertyInfos(type).FirstOrDefault(f => f.Name == propertyName);
         }
 
         public static IEnumerable<MethodInfo> GetMethodInfos(Type _type)
@@ -158,9 +180,31 @@ namespace CZToolKit.Core
         }
 
         /// <summary> 获取方法，包括基类的私有方法 </summary>
-        public static MethodInfo GetMethodInfo(Type _type, string _methodName)
+        public static MethodInfo GetMethodInfo(Type type, string methodName)
         {
-            return GetMethodInfos(_type).FirstOrDefault(t => t.Name == _methodName);
+            return GetMethodInfos(type).FirstOrDefault(t => t.Name == methodName);
+        }
+        #endregion
+
+        #region Make Delegate With Result
+        public static Func<Arg0, TResult> CreateInstanceDelegate<TInstance, Arg0, TResult>(TInstance instance, MethodInfo method)
+        {
+            return (Func<Arg0, TResult>)method.CreateDelegate(typeof(Func<Arg0, TResult>), instance);
+        }
+
+        public static Func<Arg0, Arg1, TResult> CreateInstanceDelegate<TInstance, Arg0, Arg1, TResult>(TInstance instance, MethodInfo method)
+        {
+            return (Func<Arg0, Arg1, TResult>)method.CreateDelegate(typeof(Func<Arg0, Arg1, TResult>), instance);
+        }
+
+        public static Func<Arg0, Arg1, Arg2, TResult> CreateInstanceDelegate<TInstance, Arg0, Arg1, Arg2, TResult>(TInstance instance, MethodInfo method)
+        {
+            return (Func<Arg0, Arg1, Arg2, TResult>)method.CreateDelegate(typeof(Func<Arg0, Arg1, Arg2, TResult>), instance);
+        }
+
+        public static Func<Arg0, Arg1, Arg2, Arg3, TResult> CreateInstanceDelegate<TInstance, Arg0, Arg1, Arg2, Arg3, TResult>(TInstance instance, MethodInfo method)
+        {
+            return (Func<Arg0, Arg1, Arg2, Arg3, TResult>)method.CreateDelegate(typeof(Func<Arg0, Arg1, Arg2, Arg3, TResult>), instance);
         }
         #endregion
     }

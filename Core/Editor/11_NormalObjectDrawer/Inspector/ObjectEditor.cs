@@ -135,12 +135,9 @@ namespace CZToolKit.Core.Editors
             foreach (var field in Fields)
             {
                 EditorGUI.BeginChangeCheck();
-                object value = EditorGUILayoutExtension.DrawField(field, field.GetValue(Target));
+                EditorGUILayoutExtension.DrawField(field, Target);
                 if (EditorGUI.EndChangeCheck())
-                {
-                    field.SetValue(Target, value);
                     GUI.changed = true;
-                }
             }
         }
 

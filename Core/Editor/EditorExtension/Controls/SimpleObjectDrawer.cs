@@ -55,23 +55,24 @@ namespace CZToolKit.Core.Editors
                 return typeof(SimpleObjectDrawer);
         }
 
-        static SimpleObjectDrawer InternalCreateEditor(object _targetObject)
+        static SimpleObjectDrawer InternalCreateEditor(object targetObject)
         {
-            if (_targetObject == null) return null;
+            if (targetObject == null) return null;
 
-            return Activator.CreateInstance(GetEditorType(_targetObject.GetType()), true) as SimpleObjectDrawer;
+            return Activator.CreateInstance(GetEditorType(targetObject.GetType()), targetObject) as SimpleObjectDrawer;
         }
 
         public static SimpleObjectDrawer CreateEditor(object _targetObject)
         {
             SimpleObjectDrawer objectEditor = InternalCreateEditor(_targetObject);
             if (objectEditor == null) return null;
-
-            objectEditor.Initialize(_targetObject);
             return objectEditor;
         }
 
-        protected SimpleObjectDrawer() { }
+        public SimpleObjectDrawer(object target)
+        {
+            Initialize(target);
+        }
 
         public object Target { get; private set; }
         protected IReadOnlyList<FieldInfo> Fields { get; private set; }

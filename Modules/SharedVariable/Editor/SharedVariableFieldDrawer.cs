@@ -34,7 +34,7 @@ namespace CZToolKit.Core.SharedVariable.Editors
             //if (variableOwner.GetVariable(variable.GUID) == null)
             //    variableOwner.SetVariable(variable.Clone() as SharedVariable);
             EditorGUI.BeginChangeCheck();
-            object value = EditorGUILayoutExtension.DrawField(label, variable.GetValueType(), variable.GetValue());
+            object value = EditorGUILayoutExtension.DrawField(variable.GetValue(), label);
             if (EditorGUI.EndChangeCheck())
             {
                 variable.SetValue(value);

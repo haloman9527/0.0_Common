@@ -38,128 +38,88 @@ namespace CZToolKit.Core.Editors
 
         public static bool DrawFoldout(int hash, GUIContent guiContent)
         {
-            string text = string.Concat(new object[]
-            {
-                c_EditorPrefsFoldoutKey,
-                hash,
-                ".",
-                guiContent.text
-            });
+            string text = string.Concat(c_EditorPrefsFoldoutKey, hash, ".", guiContent.text);
             var @bool = GUIHelper.GetContextData(text, false);
-            @bool.value = EditorGUILayout.Foldout(@bool.value, guiContent, true, EditorStylesExtension.FoldoutStyle);
+            @bool.value = EditorGUILayout.Foldout(@bool.value, guiContent, true);
             return @bool.value;
         }
 
-        public static void DrawFieldsInInspector(object targetObject, UnityObject unityOwner = null)
+        public static void DrawObjectInInspector(object target, UnityObject context = null)
         {
-            if (targetObject is UnityObject)
+            if (target is UnityObject)
             {
-                Selection.activeObject = targetObject as UnityObject;
+                Selection.activeObject = target as UnityObject;
             }
             else
             {
                 Selection.activeObject = ObjectInspector.Instance;
-                ObjectInspector.Instance.Initialize(targetObject, unityOwner);
+                ObjectInspector.Instance.Initialize(target, context);
             }
         }
 
-        public static void DrawFieldsInInspector(string title, object targetObject, UnityObject unityOwner = null)
+        public static void DrawFieldsInInspector(string title, object target, UnityObject context = null)
         {
-            DrawFieldsInInspector(targetObject, unityOwner);
+            DrawObjectInInspector(target, context);
             ObjectInspector.Instance.name = title;
         }
 
-        public static object DrawField(GUIContent content, FieldInfo fieldInfo, object value)
+        static object DrawArrayField(FieldInfo fieldInfo, object value, GUIContent label)
         {
-            if (typeof(IList).IsAssignableFrom(fieldInfo.FieldType))
-                return EditorGUILayoutExtension.DrawArrayField(content, fieldInfo, fieldInfo.FieldType, value);
-            return EditorGUILayoutExtension.DrawSingleField(content, fieldInfo, fieldInfo.FieldType, value);
-        }
+            Type fieldType = fieldInfo.FieldType;
 
-        public static object DrawField(string name, FieldInfo fieldInfo, object value)
-        {
-            return DrawField(GUIHelper.TextContent(name), fieldInfo, value);
-        }
-
-        public static object DrawField(FieldInfo _fieldInfo, object _value)
-        {
-            GUIContent content = null;
-            if (Util_Attribute.TryGetFieldAttribute(_fieldInfo, out TooltipAttribute tooltipAtt))
-                content = GUIHelper.TextContent(ObjectNames.NicifyVariableName(_fieldInfo.Name), tooltipAtt.tooltip);
-            else
-                content = GUIHelper.TextContent(ObjectNames.NicifyVariableName(_fieldInfo.Name));
-            return DrawField(content, _fieldInfo, _value);
-        }
-
-        public static object DrawField(GUIContent _content, Type _fieldType, object _value)
-        {
-            if (typeof(IList).IsAssignableFrom(_fieldType))
-                return EditorGUILayoutExtension.DrawArrayField(_content, null, _fieldType, _value);
-            return EditorGUILayoutExtension.DrawSingleField(_content, null, _fieldType, _value);
-        }
-
-        public static object DrawField(string _name, Type _fieldType, object _value)
-        {
-            if (typeof(IList).IsAssignableFrom(_fieldType))
-                return EditorGUILayoutExtension.DrawArrayField(GUIHelper.TextContent(_name), null, _fieldType, _value);
-            return EditorGUILayoutExtension.DrawSingleField(GUIHelper.TextContent(_name), null, _fieldType, _value);
-        }
-
-        static object DrawArrayField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
-        {
             Type elementType;
-            if (_fieldType.IsArray)
-                elementType = _fieldType.GetElementType();
+            if (fieldType.IsArray)
+                elementType = fieldType.GetElementType();
             else
             {
-                Type type2 = _fieldType;
+                Type type2 = fieldType;
                 while (!type2.IsGenericType)
                 {
                     type2 = type2.BaseType;
                 }
                 elementType = type2.GetGenericArguments()[0];
             }
+
             IList list;
-            if (_value == null)
+            if (value == null)
             {
-                if (_fieldType.IsGenericType || _fieldType.IsArray)
+                if (fieldType.IsGenericType || fieldType.IsArray)
                 {
-                    _value = list = (Activator.CreateInstance(typeof(List<>).MakeGenericType(new Type[]
+                    value = list = (Activator.CreateInstance(typeof(List<>).MakeGenericType(new Type[]
                     {
                         elementType
                     }), true) as IList);
                 }
                 else
                 {
-                    _value = list = (Activator.CreateInstance(_fieldType, true) as IList);
+                    value = list = (Activator.CreateInstance(fieldType, true) as IList);
                 }
-                if (_fieldType.IsArray)
+                if (fieldType.IsArray)
                 {
                     Array array = Array.CreateInstance(elementType, list.Count);
                     list.CopyTo(array, 0);
-                    _value = list = array;
+                    value = list = array;
                 }
                 GUI.changed = true;
             }
             else
             {
-                list = (IList)_value;
+                list = (IList)value;
             }
-            if (EditorGUILayoutExtension.DrawFoldout(_value.GetHashCode(), _content))
+            if (DrawFoldout(value.GetHashCode(), label))
             {
                 EditorGUI.indentLevel++;
-                bool flag = _value.GetHashCode() == EditorGUILayoutExtension.editingFieldHash;
-                int count = (!flag) ? list.Count : EditorGUILayoutExtension.savedArraySize;
+                bool flag = value.GetHashCode() == editingFieldHash;
+                int count = (!flag) ? list.Count : savedArraySize;
                 int newCount = EditorGUILayout.IntField(GUIHelper.TextContent("Size"), count);
-                if (flag && EditorGUILayoutExtension.editingArray && (GUIUtility.keyboardControl != EditorGUILayoutExtension.currentKeyboardControl
-                    || (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return)))
+                if (flag && editingArray && (GUIUtility.keyboardControl != currentKeyboardControl || (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return)))
                 {
                     if (newCount != list.Count)
                     {
                         int currentCount = list.Count;
                         if (newCount > currentCount)
                         {
-                            if (_fieldType.IsArray)
+                            if (fieldType.IsArray)
                             {
                                 Array array2 = Array.CreateInstance(elementType, newCount);
                                 int num3 = -1;
@@ -193,7 +153,7 @@ namespace CZToolKit.Core.Editors
                         }
                         else
                         {
-                            if (!_fieldType.IsArray)
+                            if (!fieldType.IsArray)
                             {
                                 while (list.Count > newCount)
                                 {
@@ -202,24 +162,24 @@ namespace CZToolKit.Core.Editors
                             }
                         }
                     }
-                    EditorGUILayoutExtension.editingArray = false;
-                    EditorGUILayoutExtension.savedArraySize = -1;
-                    EditorGUILayoutExtension.editingFieldHash = -1;
+                    editingArray = false;
+                    savedArraySize = -1;
+                    editingFieldHash = -1;
                     GUI.changed = true;
                 }
                 else if (newCount != count)
                 {
-                    if (!EditorGUILayoutExtension.editingArray)
+                    if (!editingArray)
                     {
-                        EditorGUILayoutExtension.currentKeyboardControl = GUIUtility.keyboardControl;
-                        EditorGUILayoutExtension.editingArray = true;
-                        EditorGUILayoutExtension.editingFieldHash = _value.GetHashCode();
+                        currentKeyboardControl = GUIUtility.keyboardControl;
+                        editingArray = true;
+                        editingFieldHash = value.GetHashCode();
                     }
-                    EditorGUILayoutExtension.savedArraySize = newCount;
+                    savedArraySize = newCount;
                 }
 
-                if (_fieldInfo != null
-                    && (Util_Attribute.TryGetFieldAttribute(_fieldInfo, out FieldAttribute att)
+                if (fieldInfo != null
+                    && (Util_Attribute.TryGetFieldAttribute(fieldInfo, out FieldAttribute att)
                     || Util_Attribute.TryGetTypeAttribute(elementType, out att)))
                 {
                     for (int k = 0; k < list.Count; k++)
@@ -228,9 +188,9 @@ namespace CZToolKit.Core.Editors
 
                         if ((objectDrawer = Util_ObjectDrawer.GetObjectDrawer(att)) != null)
                         {
-                            _content.text = "Element " + k;
+                            label.text = "Element " + k;
                             objectDrawer.Target = list[k];
-                            objectDrawer.OnGUI(GUILayoutUtility.GetRect(EditorGUIUtility.labelWidth, objectDrawer.GetHeight()), _content);
+                            objectDrawer.OnGUI(GUILayoutUtility.GetRect(EditorGUIUtility.labelWidth, objectDrawer.GetHeight()), label);
                             if (objectDrawer.Target != list[k])
                             {
                                 list[k] = objectDrawer.Target;
@@ -243,247 +203,139 @@ namespace CZToolKit.Core.Editors
                 {
                     for (int k = 0; k < list.Count; k++)
                     {
-                        _content.text = "Element " + k;
-                        list[k] = EditorGUILayoutExtension.DrawField(_content, elementType, list[k]);
+                        label.text = "Element " + k;
+                        list[k] = DrawField(list[k], label);
                     }
                 }
                 EditorGUI.indentLevel--;
             }
             return list;
         }
-        /// <summary> 绘制内部所有字段 </summary>
-        static object DrawFields(object _object)
-        {
-            if (_object == null) return null;
 
-            foreach (var field in Util_Reflection.GetFieldInfos(_object.GetType()))
+        public static void DrawField(FieldInfo fieldInfo, object context, GUIContent label)
+        {
+            object value = fieldInfo.GetValue(context);
+
+            // 查找字段绘制器
+            if (Util_Attribute.TryGetFieldAttribute(fieldInfo, out FieldAttribute att) || Util_Attribute.TryGetTypeAttribute(fieldInfo.FieldType, out att))
             {
-                if (CanDraw(field))
+                ObjectDrawer objectDrawer = Util_ObjectDrawer.GetObjectDrawer(att);
+                if (objectDrawer != null)
                 {
-                    EditorGUI.BeginChangeCheck();
-                    object value = EditorGUILayoutExtension.DrawField(field, field.GetValue(_object));
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        field.SetValue(_object, value);
-                        GUI.changed = true;
-                    }
+                    objectDrawer.Target = value;
+                    objectDrawer.FieldInfo = fieldInfo;
+                    objectDrawer.OnGUI(EditorGUILayout.GetControlRect(true, objectDrawer.GetHeight()), label);
+                    return;
                 }
             }
-            return _object;
+
+            // 判断是否是数组
+            if (typeof(IList).IsAssignableFrom(fieldInfo.FieldType))
+                value = DrawArrayField(fieldInfo, value, label);
+            else
+                value = DrawField(context, label);
+
+            value = DrawField(value, label);
+            fieldInfo.SetValue(context, value);
         }
 
-        static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
+        public static void DrawField(FieldInfo fieldInfo, object context, string label)
         {
-            if (Util_Attribute.TryGetFieldAttribute(_fieldInfo, out FieldAttribute att)
-                || Util_Attribute.TryGetTypeAttribute(_fieldType, out att))
-            {
-                ObjectDrawer objectDrawer;
-                if ((objectDrawer = Util_ObjectDrawer.GetObjectDrawer(att)) != null)
-                {
-                    objectDrawer.Target = _value;
-                    objectDrawer.FieldInfo = _fieldInfo;
-                    objectDrawer.OnGUI(GUILayoutUtility.GetRect(EditorGUIUtility.labelWidth, objectDrawer.GetHeight()), _content);
-                    return _value;
-                }
-            }
+            DrawField(fieldInfo, context, GUIHelper.TextContent(label));
+        }
 
-            if (_fieldType.Equals(typeof(int)))
+        public static void DrawField(FieldInfo fieldInfo, object context)
+        {
+            GUIContent label = null;
+            if (Util_Attribute.TryGetFieldAttribute(fieldInfo, out TooltipAttribute tooltipAtt))
+                label = GUIHelper.TextContent(ObjectNames.NicifyVariableName(fieldInfo.Name), tooltipAtt.tooltip);
+            else
+                label = GUIHelper.TextContent(ObjectNames.NicifyVariableName(fieldInfo.Name));
+            DrawField(fieldInfo, context, label);
+        }
+
+        public static object DrawField(object value, GUIContent label)
+        {
+            Type type = value.GetType();
+
+            // 寻找Type绘制器
+
+            if (type.IsClass || (type.IsValueType && !type.IsPrimitive))
             {
-                return EditorGUILayout.IntField(_content, _value == null ? 0 : (int)_value);
-            }
-            if (_fieldType.Equals(typeof(float)))
-            {
-                return EditorGUILayout.FloatField(_content, _value == null ? 0 : (float)_value);
-            }
-            if (_fieldType.Equals(typeof(double)))
-            {
-                return EditorGUILayout.DoubleField(_content, Convert.ToSingle(_value == null ? 0 : (double)_value));
-            }
-            if (_fieldType.Equals(typeof(long)))
-            {
-                return (long)EditorGUILayout.IntField(_content, Convert.ToInt32(_value == null ? 0 : (long)_value));
-            }
-            if (_fieldType.Equals(typeof(bool)))
-            {
-                return EditorGUILayout.Toggle(_content, _value == null ? false : (bool)_value);
-            }
-            if (_fieldType.Equals(typeof(string)))
-            {
-                return EditorGUILayout.TextField(_content, _value == null ? "" : (string)_value);
-            }
-            if (_fieldType.Equals(typeof(byte)))
-            {
-                return Convert.ToByte(EditorGUILayout.IntField(_content, Convert.ToInt32(_value == null ? 0 : (byte)_value)));
-            }
-            if (_fieldType.Equals(typeof(Vector2)))
-            {
-                return EditorGUILayout.Vector2Field(_content, _value == null ? Vector2.zero : (Vector2)_value);
-            }
-            if (_fieldType.Equals(typeof(Vector2Int)))
-            {
-                return EditorGUILayout.Vector2IntField(_content, _value == null ? Vector2Int.zero : (Vector2Int)_value);
-            }
-            if (_fieldType.Equals(typeof(Vector3)))
-            {
-                return EditorGUILayout.Vector3Field(_content, _value == null ? Vector3.zero : (Vector3)_value);
-            }
-            if (_fieldType.Equals(typeof(Vector3Int)))
-            {
-                return EditorGUILayout.Vector3IntField(_content, _value == null ? Vector3Int.zero : (Vector3Int)_value);
-            }
-            if (_fieldType.Equals(typeof(Vector4)))
-            {
-                return EditorGUILayout.Vector4Field(_content.text, _value == null ? Vector4.zero : (Vector4)_value);
-            }
-            if (_fieldType.Equals(typeof(Quaternion)))
-            {
-                Quaternion quaternion = _value == null ? Quaternion.identity : (Quaternion)_value;
-                Vector4 vector = Vector4.zero;
-                vector.Set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-                vector = EditorGUILayout.Vector4Field(_content.text, vector);
-                quaternion.Set(vector.x, vector.y, vector.z, vector.w);
-                return quaternion;
-            }
-            if (_fieldType.Equals(typeof(Color)))
-            {
-                return EditorGUILayout.ColorField(_content, _value == null ? Color.black : (Color)_value);
-            }
-            if (_fieldType.Equals(typeof(Rect)))
-            {
-                return EditorGUILayout.RectField(_content, _value == null ? Rect.zero : (Rect)_value);
-            }
-            if (_fieldType.Equals(typeof(Gradient)))
-            {
-                return EditorGUILayout.GradientField(_content, _value == null ? new Gradient() : (Gradient)_value);
-            }
-            if (_fieldType.Equals(typeof(Matrix4x4)))
-            {
-                GUILayout.BeginVertical(new GUILayoutOption[0]);
-                if (EditorGUILayoutExtension.DrawFoldout(_content.text.GetHashCode(), _content))
+                if (typeof(Delegate).IsAssignableFrom(type)) return null;
+                if (typeof(object).IsAssignableFrom(type) && value == null) return null;
+                int hashCode = value.GetHashCode();
+
+                if (value == null)
+                {
+                    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        type = Nullable.GetUnderlyingType(type);
+                    value = Activator.CreateInstance(type, true);
+                }
+
+                GUILayout.BeginVertical();
+                if (DrawFoldout(hashCode, label))
                 {
                     EditorGUI.indentLevel++;
-                    Matrix4x4 matrix4x = _value == null ? Matrix4x4.identity : (Matrix4x4)_value;
-                    for (int i = 0; i < 4; i++)
+                    foreach (var field in Util_Reflection.GetFieldInfos(type))
                     {
-                        for (int j = 0; j < 4; j++)
-                        {
-                            EditorGUI.BeginChangeCheck();
-                            matrix4x[i, j] = EditorGUILayout.FloatField("E" + i.ToString() + j.ToString(), matrix4x[i, j]);
-                            if (EditorGUI.EndChangeCheck())
-                            {
-                                GUI.changed = true;
-                            }
-                        }
+                        if (!CanDraw(field)) continue;
+
+                        DrawField(field, value, label);
                     }
-                    _value = matrix4x;
                     EditorGUI.indentLevel--;
                 }
                 GUILayout.EndVertical();
-                return _value;
+                return value;
             }
-            if (_fieldType.Equals(typeof(AnimationCurve)))
-            {
-                if (_value == null)
-                {
-                    _value = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
-                    GUI.changed = true;
-                }
-                return EditorGUILayout.CurveField(_content, (AnimationCurve)_value);
-            }
-            if (_fieldType.Equals(typeof(LayerMask)))
-            {
-                return EditorGUILayoutExtension.DrawLayerMask(_content, (LayerMask)_value);
-            }
-            if (typeof(UnityObject).IsAssignableFrom(_fieldType))
-            {
-                return EditorGUILayout.ObjectField(_content, (UnityObject)_value, _fieldType, true);
-            }
-            if (_fieldType.IsEnum)
-            {
-                return EditorGUILayout.EnumPopup(_content, (Enum)_value);
-            }
-            if (_fieldType.IsClass || (_fieldType.IsValueType && !_fieldType.IsPrimitive))
-            {
-                if (typeof(Delegate).IsAssignableFrom(_fieldType)) return null;
-                if (typeof(object).IsAssignableFrom(_fieldType) && _value == null) return null;
-                int hashCode = _value.GetHashCode();
-                if (EditorGUILayoutExtension.drawnObjects.Contains(hashCode)) return null;
-                try
-                {
-                    EditorGUILayoutExtension.drawnObjects.Add(hashCode);
-                    GUILayout.BeginVertical();
-                    if (_value == null)
-                    {
-                        if (_fieldType.IsGenericType && _fieldType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                            _fieldType = Nullable.GetUnderlyingType(_fieldType);
-                        _value = Activator.CreateInstance(_fieldType, true);
-                    }
-                    if (EditorGUILayoutExtension.DrawFoldout(hashCode, _content))
-                    {
-                        EditorGUI.indentLevel++;
-                        _value = EditorGUILayoutExtension.DrawFields(_value);
-                        EditorGUI.indentLevel--;
-                    }
-                    EditorGUILayoutExtension.drawnObjects.Remove(hashCode);
-                    GUILayout.EndVertical();
-                    return _value;
-                }
-                catch (Exception)
-                {
-                    GUILayout.EndVertical();
-                    EditorGUILayoutExtension.drawnObjects.Remove(hashCode);
-                    return null;
-                }
-            }
-            EditorGUILayout.LabelField("Unsupported Type: " + _fieldType);
-            return null;
+
+            float height = EditorGUIExtension.GetPropertyHeight(type, label);
+            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, height), value, label);
+
+            //if (_fieldType.Equals(typeof(Matrix4x4)))
+            //{
+            //    GUILayout.BeginVertical(new GUILayoutOption[0]);
+            //    if (EditorGUILayoutExtension.DrawFoldout(label.text.GetHashCode(), label))
+            //    {
+            //        EditorGUI.indentLevel++;
+            //        Matrix4x4 matrix4x = _value == null ? Matrix4x4.identity : (Matrix4x4)_value;
+            //        for (int i = 0; i < 4; i++)
+            //        {
+            //            for (int j = 0; j < 4; j++)
+            //            {
+            //                EditorGUI.BeginChangeCheck();
+            //                matrix4x[i, j] = EditorGUILayout.FloatField("E" + i.ToString() + j.ToString(), matrix4x[i, j]);
+            //                if (EditorGUI.EndChangeCheck())
+            //                {
+            //                    GUI.changed = true;
+            //                }
+            //            }
+            //        }
+            //        _value = matrix4x;
+            //        EditorGUI.indentLevel--;
+            //    }
+            //    GUILayout.EndVertical();
+            //    return _value;
+            //}
         }
 
-        static LayerMask DrawLayerMask(GUIContent guiContent, LayerMask layerMask)
+        public static object DrawField(object value, string label)
         {
-            if (EditorGUILayoutExtension.layerNames == null)
-            {
-                EditorGUILayoutExtension.InitLayers();
-            }
-            int num = 0;
-            for (int i = 0; i < EditorGUILayoutExtension.layerNames.Length; i++)
-            {
-                if ((layerMask.value & EditorGUILayoutExtension.maskValues[i]) == EditorGUILayoutExtension.maskValues[i])
-                {
-                    num |= 1 << i;
-                }
-            }
-            int num2 = EditorGUILayout.MaskField(guiContent, num, EditorGUILayoutExtension.layerNames);
-            if (num2 != num)
-            {
-                num = 0;
-                for (int j = 0; j < EditorGUILayoutExtension.layerNames.Length; j++)
-                {
-                    if ((num2 & 1 << j) != 0)
-                    {
-                        num |= EditorGUILayoutExtension.maskValues[j];
-                    }
-                }
-                layerMask.value = num;
-            }
-            return layerMask;
+            return DrawField(value, GUIHelper.TextContent(label));
         }
 
-        static void InitLayers()
+        public static object DrawField(Type type, object value, GUIContent label)
         {
-            List<string> list = new List<string>();
-            List<int> list2 = new List<int>();
-            for (int i = 0; i < 32; i++)
+            if (value == null)
             {
-                string text = LayerMask.LayerToName(i);
-                if (!string.IsNullOrEmpty(text))
-                {
-                    list.Add(text);
-                    list2.Add(1 << i);
-                }
+                value = Activator.CreateInstance(type, true);
             }
-            EditorGUILayoutExtension.layerNames = list.ToArray();
-            EditorGUILayoutExtension.maskValues = list2.ToArray();
+            return DrawField(value, label);
+        }
+
+        public static object DrawField(Type type, object value, string label)
+        {
+            return DrawField(type, value, GUIHelper.TextContent(label));
         }
 
         const string c_EditorPrefsFoldoutKey = "CZToolKit.Core.Editors.Foldout.";
@@ -495,12 +347,6 @@ namespace CZToolKit.Core.Editors
         static int savedArraySize = -1;
 
         static int editingFieldHash;
-
-        static HashSet<int> drawnObjects = new HashSet<int>();
-
-        static string[] layerNames;
-
-        static int[] maskValues;
     }
 }
 #endif
