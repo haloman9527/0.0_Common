@@ -66,29 +66,28 @@ namespace CZToolKit.Core
         static readonly Dictionary<Type, Dictionary<string, Attribute[]>> TypeFieldAttributes =
             new Dictionary<Type, Dictionary<string, Attribute[]>>();
 
-        /// <summary> 根据<paramref name="_fieldInfo"/>获取特定类型特性 </summary>
-        public static bool TryGetFieldAttribute<AttributeType>(FieldInfo _fieldInfo,
-            out AttributeType _attribute)
+        /// <summary> 根据<paramref name="fieldInfo"/>获取特定类型特性 </summary>
+        public static bool TryGetFieldAttribute<AttributeType>(FieldInfo fieldInfo,
+            out AttributeType attribute)
             where AttributeType : Attribute
         {
-            _attribute = null;
-            if (_fieldInfo == null) return false;
-            Attribute[] attributes = GetFieldAttributes(_fieldInfo);
-            for (int i = 0; i < attributes.Length; i++)
+            attribute = null;
+            if (fieldInfo == null) return false;
+            foreach (var tmp in GetFieldAttributes(fieldInfo))
             {
-                _attribute = attributes[i] as AttributeType;
-                if (_attribute != null)
+                attribute = tmp as AttributeType;
+                if (attribute != null)
                     return true;
             }
             return false;
         }
 
         /// <summary> 根据类型和字段名获取特定类型特性 </summary>
-        public static bool TryGetFieldAttribute<AttributeType>(Type _type, string _fieldName,
-            out AttributeType _attribute)
+        public static bool TryGetFieldAttribute<AttributeType>(Type type, string fieldName,
+            out AttributeType attribute)
             where AttributeType : Attribute
         {
-            return TryGetFieldAttribute(Util_Reflection.GetFieldInfo(_type, _fieldName), out _attribute);
+            return TryGetFieldAttribute(Util_Reflection.GetFieldInfo(type, fieldName), out attribute);
         }
 
         /// <summary> 根据<paramref name="_fieldInfo"/>获取所有特性 </summary>
@@ -104,15 +103,15 @@ namespace CZToolKit.Core
         }
 
         /// <summary> 根据类型和方法名获取所有特性 </summary>
-        public static Attribute[] GetFieldAttributes(Type _type, string _fieldName)
+        public static Attribute[] GetFieldAttributes(Type type, string fieldName)
         {
-            return GetFieldAttributes(Util_Reflection.GetFieldInfo(_type, _fieldName));
+            return GetFieldAttributes(Util_Reflection.GetFieldInfo(type, fieldName));
         }
 
         /// <summary> 获取类型的所有特性 </summary>
-        public static IEnumerable<T> GetFieldAttributes<T>(Type _type, string _fieldName) where T : Attribute
+        public static IEnumerable<T> GetFieldAttributes<T>(Type type, string fieldName) where T : Attribute
         {
-            foreach (var attribute in GetFieldAttributes(_type, _fieldName))
+            foreach (var attribute in GetFieldAttributes(type, fieldName))
             {
                 if (attribute is T t_attritube)
                     yield return t_attritube;
