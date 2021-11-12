@@ -326,11 +326,7 @@ namespace CZToolKit.Core.Editors
 
         public static object DrawField(Type type, object value, GUIContent label)
         {
-            if (value == null)
-            {
-                value = Activator.CreateInstance(type, true);
-            }
-            return DrawField(value, label);
+            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, EditorGUIExtension.GetPropertyHeight(type, label)), type, value, label);
         }
 
         public static object DrawField(Type type, object value, string label)

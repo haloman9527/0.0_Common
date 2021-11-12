@@ -14,20 +14,21 @@ namespace CZToolKit.Core
         Stack<ICommand> undo = new Stack<ICommand>();
         Stack<ICommand> redo = new Stack<ICommand>();
 
-        int groupLevel = 0;
+        bool isGrouping = false;
 
         public void BeginGroup()
         {
-            groupLevel++;
-            if (groupLevel == 1)
-                undo.Push(new CommandsGroup());
+            if (isGrouping)
+                throw new System.Exception($"在重新开始一个新的组之前需要结束当前的组{nameof(EndGroup)}");
+            undo.Push(new CommandsGroup());
+            isGrouping = true;
         }
 
         public void EndGroup()
         {
-            groupLevel--;
-            if (groupLevel < 0)
-                throw new System.Exception($"{nameof(CommandDispatcher)}的{nameof(BeginGroup)}{nameof(EndGroup)}数量不一致");
+            if (!isGrouping)
+                throw new System.Exception($"在结束一个组之前需要当前存在一个组{nameof(BeginGroup)}");
+            isGrouping = false;
         }
 
         public void Do(Action @do, Action @undo)
@@ -39,7 +40,7 @@ namespace CZToolKit.Core
         {
             command.Do();
             redo.Clear();
-            if (groupLevel > 0)
+            if (isGrouping)
             {
                 CommandsGroup group = undo.Peek() as CommandsGroup;
                 group.undo.Push(command);
