@@ -20,7 +20,7 @@ namespace CZToolKit.Core
 {
     public static partial class Util
     {
-        public static string GetLocalIp()
+        public static string GetLocalIP()
         {
             ///获取本地的IP地址
             string AddressIP = string.Empty;

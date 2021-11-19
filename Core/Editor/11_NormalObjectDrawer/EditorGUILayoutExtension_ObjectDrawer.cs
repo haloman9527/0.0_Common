@@ -57,10 +57,132 @@ namespace CZToolKit.Core.Editors
             }
         }
 
-        public static void DrawFieldsInInspector(string title, object target, UnityObject context = null)
+        public static void DrawObjectInInspector(string title, object target, UnityObject context = null)
         {
             DrawObjectInInspector(target, context);
             ObjectInspector.Instance.name = title;
+        }
+
+        public static void DrawField(FieldInfo fieldInfo, object context, GUIContent label)
+        {
+            object value = fieldInfo.GetValue(context);
+
+            // 查找字段绘制器
+            if (Util_Attribute.TryGetFieldAttribute(fieldInfo, out FieldAttribute att) || Util_Attribute.TryGetTypeAttribute(fieldInfo.FieldType, out att))
+            {
+                ObjectDrawer objectDrawer = Util_ObjectDrawer.GetObjectDrawer(att);
+                if (objectDrawer != null)
+                {
+                    objectDrawer.Target = value;
+                    objectDrawer.FieldInfo = fieldInfo;
+                    objectDrawer.OnGUI(EditorGUILayout.GetControlRect(true, objectDrawer.GetHeight()), label);
+                    return;
+                }
+            }
+
+            // 判断是否是数组
+            if (typeof(IList).IsAssignableFrom(fieldInfo.FieldType))
+                value = DrawArrayField(fieldInfo, value, label);
+            else
+                value = DrawField(context, label);
+
+            value = DrawField(value, label);
+            fieldInfo.SetValue(context, value);
+        }
+
+        public static void DrawField(FieldInfo fieldInfo, object context, string label)
+        {
+            DrawField(fieldInfo, context, GUIHelper.TextContent(label));
+        }
+
+        public static void DrawField(FieldInfo fieldInfo, object context)
+        {
+            GUIContent label = null;
+            if (Util_Attribute.TryGetFieldAttribute(fieldInfo, out TooltipAttribute tooltipAtt))
+                label = GUIHelper.TextContent(ObjectNames.NicifyVariableName(fieldInfo.Name), tooltipAtt.tooltip);
+            else
+                label = GUIHelper.TextContent(ObjectNames.NicifyVariableName(fieldInfo.Name));
+            DrawField(fieldInfo, context, label);
+        }
+
+        public static object DrawField(object value, GUIContent label)
+        {
+            Type type = value.GetType();
+
+            // 寻找Type绘制器
+
+            if (type.IsClass || (type.IsValueType && !type.IsPrimitive))
+            {
+                if (typeof(Delegate).IsAssignableFrom(type)) return null;
+                if (typeof(object).IsAssignableFrom(type) && value == null) return null;
+                int hashCode = value.GetHashCode();
+
+                if (value == null)
+                {
+                    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        type = Nullable.GetUnderlyingType(type);
+                    value = Activator.CreateInstance(type, true);
+                }
+
+                GUILayout.BeginVertical();
+                if (DrawFoldout(hashCode, label))
+                {
+                    EditorGUI.indentLevel++;
+                    foreach (var field in Util_Reflection.GetFieldInfos(type))
+                    {
+                        if (!CanDraw(field)) continue;
+
+                        DrawField(field, value, label);
+                    }
+                    EditorGUI.indentLevel--;
+                }
+                GUILayout.EndVertical();
+                return value;
+            }
+
+            float height = EditorGUIExtension.GetPropertyHeight(type, label);
+            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, height), value, label);
+
+            //if (_fieldType.Equals(typeof(Matrix4x4)))
+            //{
+            //    GUILayout.BeginVertical(new GUILayoutOption[0]);
+            //    if (EditorGUILayoutExtension.DrawFoldout(label.text.GetHashCode(), label))
+            //    {
+            //        EditorGUI.indentLevel++;
+            //        Matrix4x4 matrix4x = _value == null ? Matrix4x4.identity : (Matrix4x4)_value;
+            //        for (int i = 0; i < 4; i++)
+            //        {
+            //            for (int j = 0; j < 4; j++)
+            //            {
+            //                EditorGUI.BeginChangeCheck();
+            //                matrix4x[i, j] = EditorGUILayout.FloatField("E" + i.ToString() + j.ToString(), matrix4x[i, j]);
+            //                if (EditorGUI.EndChangeCheck())
+            //                {
+            //                    GUI.changed = true;
+            //                }
+            //            }
+            //        }
+            //        _value = matrix4x;
+            //        EditorGUI.indentLevel--;
+            //    }
+            //    GUILayout.EndVertical();
+            //    return _value;
+            //}
+        }
+
+        public static object DrawField(object value, string label)
+        {
+            return DrawField(value, GUIHelper.TextContent(label));
+        }
+
+        public static object DrawField(Type type, object value, GUIContent label)
+        {
+            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, EditorGUIExtension.GetPropertyHeight(type, label)), type, value, label);
+        }
+
+        public static object DrawField(Type type, object value, string label)
+        {
+            return DrawField(type, value, GUIHelper.TextContent(label));
         }
 
         static object DrawArrayField(FieldInfo fieldInfo, object value, GUIContent label)
@@ -210,128 +332,6 @@ namespace CZToolKit.Core.Editors
                 EditorGUI.indentLevel--;
             }
             return list;
-        }
-
-        public static void DrawField(FieldInfo fieldInfo, object context, GUIContent label)
-        {
-            object value = fieldInfo.GetValue(context);
-
-            // 查找字段绘制器
-            if (Util_Attribute.TryGetFieldAttribute(fieldInfo, out FieldAttribute att) || Util_Attribute.TryGetTypeAttribute(fieldInfo.FieldType, out att))
-            {
-                ObjectDrawer objectDrawer = Util_ObjectDrawer.GetObjectDrawer(att);
-                if (objectDrawer != null)
-                {
-                    objectDrawer.Target = value;
-                    objectDrawer.FieldInfo = fieldInfo;
-                    objectDrawer.OnGUI(EditorGUILayout.GetControlRect(true, objectDrawer.GetHeight()), label);
-                    return;
-                }
-            }
-
-            // 判断是否是数组
-            if (typeof(IList).IsAssignableFrom(fieldInfo.FieldType))
-                value = DrawArrayField(fieldInfo, value, label);
-            else
-                value = DrawField(context, label);
-
-            value = DrawField(value, label);
-            fieldInfo.SetValue(context, value);
-        }
-
-        public static void DrawField(FieldInfo fieldInfo, object context, string label)
-        {
-            DrawField(fieldInfo, context, GUIHelper.TextContent(label));
-        }
-
-        public static void DrawField(FieldInfo fieldInfo, object context)
-        {
-            GUIContent label = null;
-            if (Util_Attribute.TryGetFieldAttribute(fieldInfo, out TooltipAttribute tooltipAtt))
-                label = GUIHelper.TextContent(ObjectNames.NicifyVariableName(fieldInfo.Name), tooltipAtt.tooltip);
-            else
-                label = GUIHelper.TextContent(ObjectNames.NicifyVariableName(fieldInfo.Name));
-            DrawField(fieldInfo, context, label);
-        }
-
-        public static object DrawField(object value, GUIContent label)
-        {
-            Type type = value.GetType();
-
-            // 寻找Type绘制器
-
-            if (type.IsClass || (type.IsValueType && !type.IsPrimitive))
-            {
-                if (typeof(Delegate).IsAssignableFrom(type)) return null;
-                if (typeof(object).IsAssignableFrom(type) && value == null) return null;
-                int hashCode = value.GetHashCode();
-
-                if (value == null)
-                {
-                    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-                        type = Nullable.GetUnderlyingType(type);
-                    value = Activator.CreateInstance(type, true);
-                }
-
-                GUILayout.BeginVertical();
-                if (DrawFoldout(hashCode, label))
-                {
-                    EditorGUI.indentLevel++;
-                    foreach (var field in Util_Reflection.GetFieldInfos(type))
-                    {
-                        if (!CanDraw(field)) continue;
-
-                        DrawField(field, value, label);
-                    }
-                    EditorGUI.indentLevel--;
-                }
-                GUILayout.EndVertical();
-                return value;
-            }
-
-            float height = EditorGUIExtension.GetPropertyHeight(type, label);
-            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, height), value, label);
-
-            //if (_fieldType.Equals(typeof(Matrix4x4)))
-            //{
-            //    GUILayout.BeginVertical(new GUILayoutOption[0]);
-            //    if (EditorGUILayoutExtension.DrawFoldout(label.text.GetHashCode(), label))
-            //    {
-            //        EditorGUI.indentLevel++;
-            //        Matrix4x4 matrix4x = _value == null ? Matrix4x4.identity : (Matrix4x4)_value;
-            //        for (int i = 0; i < 4; i++)
-            //        {
-            //            for (int j = 0; j < 4; j++)
-            //            {
-            //                EditorGUI.BeginChangeCheck();
-            //                matrix4x[i, j] = EditorGUILayout.FloatField("E" + i.ToString() + j.ToString(), matrix4x[i, j]);
-            //                if (EditorGUI.EndChangeCheck())
-            //                {
-            //                    GUI.changed = true;
-            //                }
-            //            }
-            //        }
-            //        _value = matrix4x;
-            //        EditorGUI.indentLevel--;
-            //    }
-            //    GUILayout.EndVertical();
-            //    return _value;
-            //}
-        }
-
-        public static object DrawField(object value, string label)
-        {
-            return DrawField(value, GUIHelper.TextContent(label));
-        }
-
-        public static object DrawField(Type type, object value, GUIContent label)
-        {
-            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, EditorGUIExtension.GetPropertyHeight(type, label)), type, value, label);
-        }
-
-        public static object DrawField(Type type, object value, string label)
-        {
-            return DrawField(type, value, GUIHelper.TextContent(label));
         }
 
         const string c_EditorPrefsFoldoutKey = "CZToolKit.Core.Editors.Foldout.";

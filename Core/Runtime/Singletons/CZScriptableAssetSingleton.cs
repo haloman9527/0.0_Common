@@ -25,37 +25,37 @@ namespace CZToolKit.Core.Singletons
 #endif
     {
         /// <summary> 线程锁 </summary>
-        private static readonly object m_Lock = new object();
+        private static readonly object _lock = new object();
 
-        private static T m_Instance;
+        private static T _instance;
 
         public static T Instance
         {
             get
             {
-                if (m_Instance == null)
+                if (_instance == null)
                 {
-                    if (m_Instance == null)
+                    if (_instance == null)
                     {
-                        m_Instance = Resources.Load<T>(typeof(T).Name);
+                        _instance = Resources.Load<T>(typeof(T).Name);
 
 #if UNITY_EDITOR
-                        if (m_Instance == null)
+                        if (_instance == null)
                         {
                             foreach (var guid in UnityEditor.AssetDatabase.FindAssets($"t:{typeof(T).Name}"))
                             {
-                                m_Instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
-                                if (m_Instance != null)
+                                _instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
+                                if (_instance != null)
                                     break;
                             }
                         }
 
-                        if (m_Instance == null)
+                        if (_instance == null)
                         {
-                            m_Instance = CreateInstance<T>();
+                            _instance = CreateInstance<T>();
                             if (!System.IO.Directory.Exists($"Assets/{typeof(T).Name}"))
                                 System.IO.Directory.CreateDirectory($"Assets/{typeof(T).Name}");
-                            UnityEditor.AssetDatabase.CreateAsset(m_Instance, $"Assets/{typeof(T).Name}/{typeof(T).Name}.asset");
+                            UnityEditor.AssetDatabase.CreateAsset(_instance, $"Assets/{typeof(T).Name}/{typeof(T).Name}.asset");
                         }
 #else
                         T[] ts = Resources.LoadAll<T>(typeof(T).Name);
@@ -64,11 +64,11 @@ namespace CZToolKit.Core.Singletons
 #endif
                     }
                 }
-                return m_Instance;
+                return _instance;
             }
         }
 
-        public static bool IsNull { get { return m_Instance == null; } }
+        public static bool IsNull { get { return _instance == null; } }
 
         public static void Initialize()
         {
@@ -78,15 +78,15 @@ namespace CZToolKit.Core.Singletons
 
         protected virtual void OnEnable()
         {
-            m_Instance = this as T;
+            _instance = this as T;
         }
 
         public static void Destroy()
         {
-            if (m_Instance != null)
+            if (_instance != null)
             {
-                m_Instance.OnBeforeDestroy();
-                m_Instance = null;
+                _instance.OnBeforeDestroy();
+                _instance = null;
             }
         }
 

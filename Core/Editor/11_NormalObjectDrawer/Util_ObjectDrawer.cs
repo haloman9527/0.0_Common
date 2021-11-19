@@ -39,7 +39,7 @@ namespace CZToolKit.Core.Editors
                             CustomFieldDrawerAttribute[] array;
                             if (typeof(ObjectDrawer).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract && (array = (type.GetCustomAttributes(typeof(CustomFieldDrawerAttribute), false) as CustomFieldDrawerAttribute[])).Length > 0)
                             {
-                                Util_ObjectDrawer.objectDrawerTypeMap.Add(array[0].Type, type);
+                                Util_ObjectDrawer.objectDrawerTypeMap.Add(array[0].type, type);
                             }
                         }
                     }
@@ -51,33 +51,33 @@ namespace CZToolKit.Core.Editors
             Util_ObjectDrawer.mapBuilt = true;
         }
 
-        private static bool ObjectDrawerForType(Type _fieldType, ref ObjectDrawer _fieldDrawer, ref Type _fieldDrawerType, int _hash)
+        private static bool ObjectDrawerForType(Type fieldType, ref ObjectDrawer fieldDrawer, ref Type fieldDrawerType, int hash)
         {
             Util_ObjectDrawer.BuildObjectDrawers();
-            if (!Util_ObjectDrawer.objectDrawerTypeMap.ContainsKey(_fieldType))
+            if (!Util_ObjectDrawer.objectDrawerTypeMap.ContainsKey(fieldType))
             {
                 return false;
             }
-            _fieldDrawerType = Util_ObjectDrawer.objectDrawerTypeMap[_fieldType];
-            if (Util_ObjectDrawer.objectDrawerMap.ContainsKey(_hash))
+            fieldDrawerType = Util_ObjectDrawer.objectDrawerTypeMap[fieldType];
+            if (Util_ObjectDrawer.objectDrawerMap.ContainsKey(hash))
             {
-                _fieldDrawer = Util_ObjectDrawer.objectDrawerMap[_hash];
+                fieldDrawer = Util_ObjectDrawer.objectDrawerMap[hash];
             }
             return true;
         }
 
-        public static ObjectDrawer GetObjectDrawer(FieldInfo _fieldInfo)
+        public static ObjectDrawer GetObjectDrawer(FieldInfo fieldInfo)
         {
             ObjectDrawer objectDrawer = null;
             Type type = null;
-            if (!Util_ObjectDrawer.ObjectDrawerForType(_fieldInfo.FieldType, ref objectDrawer, ref type, _fieldInfo.GetHashCode()))
+            if (!Util_ObjectDrawer.ObjectDrawerForType(fieldInfo.FieldType, ref objectDrawer, ref type, fieldInfo.GetHashCode()))
                 return null;
             if (objectDrawer == null)
             {
                 objectDrawer = (Activator.CreateInstance(type) as ObjectDrawer);
-                Util_ObjectDrawer.objectDrawerMap.Add(_fieldInfo.GetHashCode(), objectDrawer);
+                Util_ObjectDrawer.objectDrawerMap.Add(fieldInfo.GetHashCode(), objectDrawer);
             }
-            objectDrawer.FieldInfo = _fieldInfo;
+            objectDrawer.FieldInfo = fieldInfo;
             return objectDrawer;
         }
 

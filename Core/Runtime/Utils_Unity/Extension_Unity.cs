@@ -19,22 +19,22 @@ using UnityEngine;
 public static partial class Extension
 {
     #region Vector
-    public static bool IsZero(this Vector2 _self)
+    public static bool IsZero(this Vector2 self)
     {
-        return _self == Vector2.zero;
+        return self == Vector2.zero;
     }
 
     /// <summary> 检查向量是否在允许范围内存在小幅度误差 </summary>
-    public static bool IsExceeding(this Vector2 _self, float _magnitude)
+    public static bool IsExceeding(this Vector2 self, float magnitude)
     {
         // 允许百分之1的误差
         const float errorTolerance = 1.01f;
-        return _self.sqrMagnitude > _magnitude * _magnitude * errorTolerance;
+        return self.sqrMagnitude > magnitude * magnitude * errorTolerance;
     }
 
-    public static bool IsZero(this Vector2Int v2Int)
+    public static bool IsZero(this Vector2Int self)
     {
-        return v2Int == Vector2Int.zero;
+        return self == Vector2Int.zero;
     }
 
     /// <summary> 检查向量是否在允许范围内存在小幅度误差 </summary>
@@ -78,52 +78,52 @@ public static partial class Extension
     #endregion
 
     /// <summary> 获取CC的真实高度 </summary>
-    public static float GetRealHeight(this CharacterController _self)
+    public static float GetRealHeight(this CharacterController self)
     {
-        return Mathf.Max(_self.radius * 2, _self.height);
+        return Mathf.Max(self.radius * 2, self.height);
     }
 
     /// <summary> 获取CC顶部半圆中心 </summary>
-    public static Vector3 GetTopCenter(this CharacterController _self)
+    public static Vector3 GetTopCenter(this CharacterController self)
     {
-        return Vector3.down * _self.radius + Vector3.up * _self.GetRealHeight() / 2 + _self.center;
+        return Vector3.down * self.radius + Vector3.up * self.GetRealHeight() / 2 + self.center;
     }
 
     /// <summary> 获取CC底部半圆中心 </summary>
-    public static Vector3 GetBottomCenter(this CharacterController _self)
+    public static Vector3 GetBottomCenter(this CharacterController self)
     {
-        return Vector3.up * _self.radius + Vector3.down * _self.GetRealHeight() / 2 + _self.center;
+        return Vector3.up * self.radius + Vector3.down * self.GetRealHeight() / 2 + self.center;
     }
 
     /// <summary> 获取Capsule的真实高度 </summary>
-    public static float GetRealHeight(this CapsuleCollider _self)
+    public static float GetRealHeight(this CapsuleCollider self)
     {
-        return Mathf.Max(_self.radius * 2, _self.height);
+        return Mathf.Max(self.radius * 2, self.height);
     }
 
     /// <summary> 获取Capsule顶部半圆中心 </summary>
-    public static Vector3 GetTopCenter(this CapsuleCollider _self)
+    public static Vector3 GetTopCenter(this CapsuleCollider self)
     {
-        return Vector3.down * _self.radius + Vector3.up * _self.GetRealHeight() / 2 + _self.center;
+        return Vector3.down * self.radius + Vector3.up * self.GetRealHeight() / 2 + self.center;
     }
 
     /// <summary> 获取CC底部半圆中心 </summary>
-    public static Vector3 GetBottomCenter(this CapsuleCollider _self)
+    public static Vector3 GetBottomCenter(this CapsuleCollider self)
     {
-        return Vector3.up * _self.radius + Vector3.down * _self.GetRealHeight() / 2 + _self.center;
+        return Vector3.up * self.radius + Vector3.down * self.GetRealHeight() / 2 + self.center;
     }
 
     /// <summary> 获取颜色明度 </summary>
-    public static float GetLuminance(this Color _color)
+    public static float GetLuminance(this Color color)
     {
-        return 0.299f * _color.r + 0.587f * _color.g + 0.114f * _color.b;
+        return 0.299f * color.r + 0.587f * color.g + 0.114f * color.b;
     }
 
-    public static string GetRelativePath(this Transform _self, Transform _root)
+    public static string GetRelativePath(this Transform self, Transform root)
     {
-        string path = _self.name;
-        Transform trans = _self.parent;
-        while (trans != null && trans != _root)
+        string path = self.name;
+        Transform trans = self.parent;
+        while (trans != null && trans != root)
         {
             path = trans.name + "/" + path;
             trans = trans.parent;
@@ -131,28 +131,28 @@ public static partial class Extension
         return path;
     }
 
-    public static Rect GetSide(this Rect _self, UIDirection _sideDirection, float _side, float _offset = 0)
+    public static Rect GetSide(this Rect self, UIDirection sideDirection, float sideWidth, float offset = 0)
     {
-        switch (_sideDirection)
+        switch (sideDirection)
         {
             case UIDirection.MiddleCenter:
-                return new Rect(_self.x + _side / 2, _self.y + _side / 2, _self.width - _side, _self.height - _side);
+                return new Rect(self.x + sideWidth / 2, self.y + sideWidth / 2, self.width - sideWidth, self.height - sideWidth);
             case UIDirection.Top:
-                return new Rect(_self.x + _side / 2, _self.y - _side / 2 + _offset, _self.width - _side, _side);
+                return new Rect(self.x + sideWidth / 2, self.y - sideWidth / 2 + offset, self.width - sideWidth, sideWidth);
             case UIDirection.Bottom:
-                return new Rect(_self.x + _side / 2, _self.y + _self.height - _side / 2 + _offset, _self.width - _side, _side);
+                return new Rect(self.x + sideWidth / 2, self.y + self.height - sideWidth / 2 + offset, self.width - sideWidth, sideWidth);
             case UIDirection.Left:
-                return new Rect(_self.x - _side / 2 + _offset, _self.y + _side / 2, _side, _self.height - _side);
+                return new Rect(self.x - sideWidth / 2 + offset, self.y + sideWidth / 2, sideWidth, self.height - sideWidth);
             case UIDirection.Right:
-                return new Rect(_self.x + _self.width - _side / 2 + _offset, _self.y + _side / 2, _side, _self.height - _side);
+                return new Rect(self.x + self.width - sideWidth / 2 + offset, self.y + sideWidth / 2, sideWidth, self.height - sideWidth);
             case UIDirection.TopLeft:
-                return new Rect(_self.x - _side / 2 + _offset, _self.y - _side / 2 + _offset, _side, _side);
+                return new Rect(self.x - sideWidth / 2 + offset, self.y - sideWidth / 2 + offset, sideWidth, sideWidth);
             case UIDirection.TopRight:
-                return new Rect(_self.x + _self.width - _side / 2 + _offset, _self.y - _side / 2 + _offset, _side, _side);
+                return new Rect(self.x + self.width - sideWidth / 2 + offset, self.y - sideWidth / 2 + offset, sideWidth, sideWidth);
             case UIDirection.BottomLeft:
-                return new Rect(_self.x - _side / 2 + _offset, _self.y + _self.height - _side / 2 + _offset, _side, _side);
+                return new Rect(self.x - sideWidth / 2 + offset, self.y + self.height - sideWidth / 2 + offset, sideWidth, sideWidth);
             case UIDirection.BottomRight:
-                return new Rect(_self.x + _self.width - _side / 2 + _offset, _self.y + _self.height - _side / 2 + _offset, _side, _side);
+                return new Rect(self.x + self.width - sideWidth / 2 + offset, self.y + self.height - sideWidth / 2 + offset, sideWidth, sideWidth);
         }
         return new Rect();
     }

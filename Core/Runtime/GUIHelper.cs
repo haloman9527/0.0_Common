@@ -25,20 +25,20 @@ namespace CZToolKit.Core.Editors
         {
             Dictionary<string, GUIContent> GUIContentsCache = new Dictionary<string, GUIContent>();
 
-            public GUIContent TextContent(string _name)
+            public GUIContent TextContent(string name)
             {
                 GUIContent content;
-                if (!GUIContentsCache.TryGetValue(_name, out content))
-                    content = new GUIContent(_name);
+                if (!GUIContentsCache.TryGetValue(name, out content))
+                    content = new GUIContent(name);
                 content.tooltip = string.Empty;
                 content.image = null;
                 return content;
             }
 
-            public GUIContent TextContent(string _name, Texture2D _image)
+            public GUIContent TextContent(string name, Texture2D image)
             {
-                GUIContent content = TextContent(_name);
-                content.image = _image;
+                GUIContent content = TextContent(name);
+                content.image = image;
                 return content;
             }
 
@@ -49,35 +49,35 @@ namespace CZToolKit.Core.Editors
                 return content;
             }
 
-            public GUIContent TextContent(string _name, string _tooltip, Texture2D _image)
+            public GUIContent TextContent(string name, string tooltip, Texture2D image)
             {
-                GUIContent content = TextContent(_name);
-                content.tooltip = _tooltip;
-                content.image = _image;
+                GUIContent content = TextContent(name);
+                content.tooltip = tooltip;
+                content.image = image;
                 return content;
             }
         }
 
         static GUIContentPool ContentPool = new GUIContentPool();
 
-        public static GUIContent TextContent(string _name)
+        public static GUIContent TextContent(string name)
         {
-            return ContentPool.TextContent(_name);
+            return ContentPool.TextContent(name);
         }
 
-        public static GUIContent TextContent(string _name, Texture2D _image)
+        public static GUIContent TextContent(string name, Texture2D image)
         {
-            return ContentPool.TextContent(_name, _image);
+            return ContentPool.TextContent(name, image);
         }
 
-        public static GUIContent TextContent(string _name, string _tooltip)
+        public static GUIContent TextContent(string name, string tooltip)
         {
-            return ContentPool.TextContent(_name, _tooltip);
+            return ContentPool.TextContent(name, tooltip);
         }
 
-        public static GUIContent TextContent(string _name, string _tooltip, Texture2D _image)
+        public static GUIContent TextContent(string name, string tooltip, Texture2D image)
         {
-            return ContentPool.TextContent(_name, _tooltip, _image);
+            return ContentPool.TextContent(name, tooltip, image);
         }
         #endregion
 
@@ -90,24 +90,24 @@ namespace CZToolKit.Core.Editors
         {
             Dictionary<string, IContextData> ContextDatas = new Dictionary<string, IContextData>();
 
-            public bool TryGetContextData<T>(string _key, out ContextData<T> _contextData)
+            public bool TryGetContextData<T>(string key, out ContextData<T> contextData)
             {
-                if (ContextDatas.TryGetValue(_key, out IContextData _data))
+                if (ContextDatas.TryGetValue(key, out IContextData _data))
                 {
                     if (_data is ContextData<T> _t_data)
                     {
-                        _contextData = _t_data;
+                        contextData = _t_data;
                         return true;
                     }
                 }
-                _contextData = new ContextData<T>();
-                ContextDatas[_key] = _contextData;
+                contextData = new ContextData<T>();
+                ContextDatas[key] = contextData;
                 return false;
             }
 
-            public ContextData<T> GetContextData<T>(string _key, T _default = default)
+            public ContextData<T> GetContextData<T>(string key, T @default = default)
             {
-                if (ContextDatas.TryGetValue(_key, out IContextData _data))
+                if (ContextDatas.TryGetValue(key, out IContextData _data))
                 {
                     if (_data is ContextData<T> _t_data)
                     {
@@ -115,21 +115,22 @@ namespace CZToolKit.Core.Editors
                     }
                 }
                 var contextData = new ContextData<T>();
-                ContextDatas[_key] = contextData;
+                contextData.value = @default;
+                ContextDatas[key] = contextData;
                 return contextData;
             }
         }
 
         static ContextDataCache ContextDatas = new ContextDataCache();
 
-        public static bool TryGetContextData<T>(string _key, out ContextData<T> _contextData)
+        public static bool TryGetContextData<T>(string key, out ContextData<T> contextData)
         {
-            return ContextDatas.TryGetContextData(_key, out _contextData);
+            return ContextDatas.TryGetContextData(key, out contextData);
         }
 
-        public static ContextData<T> GetContextData<T>(string _key, T _default = default)
+        public static ContextData<T> GetContextData<T>(string _key, T @default = default)
         {
-            return ContextDatas.GetContextData(_key, _default);
+            return ContextDatas.GetContextData(_key, @default);
         }
         #endregion
     }

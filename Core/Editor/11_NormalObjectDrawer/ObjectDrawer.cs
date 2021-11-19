@@ -53,29 +53,29 @@ namespace CZToolKit.Core.Editors
             return false;
         }
 
-        public static Type GetEditorType(Type _objectType)
+        public static Type GetEditorType(Type objectType)
         {
-            if (ObjectEditorTypeCache.TryGetValue(_objectType, out Type editorType))
+            if (ObjectEditorTypeCache.TryGetValue(objectType, out Type editorType))
                 return editorType;
-            if (_objectType.BaseType != null)
-                return GetEditorType(_objectType.BaseType);
+            if (objectType.BaseType != null)
+                return GetEditorType(objectType.BaseType);
             else
                 return typeof(ObjectDrawer);
         }
 
-        static ObjectDrawer InternalCreateEditor(object _targetObject)
+        static ObjectDrawer InternalCreateEditor(object target)
         {
-            if (_targetObject == null) return null;
+            if (target == null) return null;
 
-            return Activator.CreateInstance(GetEditorType(_targetObject.GetType()), true) as ObjectDrawer;
+            return Activator.CreateInstance(GetEditorType(target.GetType()), true) as ObjectDrawer;
         }
 
-        public static ObjectDrawer CreateEditor(object _targetObject)
+        public static ObjectDrawer CreateEditor(object target)
         {
-            ObjectDrawer objectEditor = InternalCreateEditor(_targetObject);
+            ObjectDrawer objectEditor = InternalCreateEditor(target);
             if (objectEditor == null) return null;
 
-            objectEditor.Initialize(_targetObject);
+            objectEditor.Initialize(target);
             return objectEditor;
         }
 
@@ -86,21 +86,21 @@ namespace CZToolKit.Core.Editors
         public object Target { get; set; }
         protected IReadOnlyList<FieldInfo> Fields { get; private set; }
 
-        void Initialize(object _target)
+        void Initialize(object target)
         {
-            Target = _target;
+            Target = target;
             Fields = Util_Reflection.GetFieldInfos(Target.GetType()).Where(field => EditorGUILayoutExtension.CanDraw(field)).ToList();
         }
 
-        void Initialize(object _target, FieldInfo _field)
+        void Initialize(object target, FieldInfo field)
         {
-            Target = _target;
-            Fields = Util_Reflection.GetFieldInfos(Target.GetType()).Where(field => EditorGUILayoutExtension.CanDraw(field)).ToList();
+            Target = target;
+            Fields = Util_Reflection.GetFieldInfos(Target.GetType()).Where(tmpField => EditorGUILayoutExtension.CanDraw(tmpField)).ToList();
         }
 
-        public virtual void OnGUI(Rect _position, GUIContent _label)
+        public virtual void OnGUI(Rect position, GUIContent label)
         {
-            GUI.Label(_position, _label);
+            GUI.Label(position, label);
         }
 
         public virtual float GetHeight()

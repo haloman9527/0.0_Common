@@ -55,18 +55,18 @@ namespace CZToolKit.Core.Editors
             }
         }
 
-        private static void SplitMenuPath(string _menuPath, out string _path, out string _name)
+        private static void SplitMenuPath(string menuPath, out string path, out string name)
         {
-            _menuPath = _menuPath.Trim('/');
-            int num = _menuPath.LastIndexOf('/');
+            menuPath = menuPath.Trim('/');
+            int num = menuPath.LastIndexOf('/');
             if (num == -1)
             {
-                _path = "";
-                _name = _menuPath;
+                path = "";
+                name = menuPath;
                 return;
             }
-            _path = _menuPath.Substring(0, num);
-            _name = _menuPath.Substring(num + 1);
+            path = menuPath.Substring(0, num);
+            name = menuPath.Substring(num + 1);
         }
 
         TreeViewItem root;
@@ -136,37 +136,37 @@ namespace CZToolKit.Core.Editors
                 item.itemDrawer?.Invoke(args.rowRect, item);
         }
 
-        public void AddMenuItem<T>(string _path, T _treeViewItem) where T : CZTreeViewItem
+        public void AddMenuItem<T>(string path, T treeViewItem) where T : CZTreeViewItem
         {
-            if (string.IsNullOrEmpty(_path)) return;
+            if (string.IsNullOrEmpty(path)) return;
 
-            CZTreeViewItem treeViewItem = RootItem as CZTreeViewItem;
+            CZTreeViewItem rootItem = RootItem as CZTreeViewItem;
 
-            SplitMenuPath(_path, out _path, out string name);
-            if (!string.IsNullOrEmpty(_path))
+            SplitMenuPath(path, out path, out string name);
+            if (!string.IsNullOrEmpty(path))
             {
-                string[] path = _path.Split('/');
-                for (int i = 0; i < path.Length; i++)
+                string[] tmpPath = path.Split('/');
+                for (int i = 0; i < tmpPath.Length; i++)
                 {
-                    CZTreeViewItem tempItem = treeViewItem.children.Find(item => item.displayName == path[i]) as CZTreeViewItem;
+                    CZTreeViewItem tempItem = rootItem.children.Find(item => item.displayName == tmpPath[i]) as CZTreeViewItem;
                     if (tempItem != null)
                     {
-                        treeViewItem = tempItem;
+                        rootItem = tempItem;
                     }
                     else
                     {
-                        tempItem = new CZTreeViewItem() { id = GenerateID(), displayName = path[i], parent = treeViewItem };
-                        treeViewItem.children.Add(tempItem);
-                        treeViewItem = tempItem;
+                        tempItem = new CZTreeViewItem() { id = GenerateID(), displayName = tmpPath[i], parent = rootItem };
+                        rootItem.children.Add(tempItem);
+                        rootItem = tempItem;
                     }
                 }
             }
 
-            _treeViewItem.id = GenerateID();
-            _treeViewItem.displayName = name;
-            _treeViewItem.parent = treeViewItem;
+            rootItem.id = GenerateID();
+            rootItem.displayName = name;
+            rootItem.parent = rootItem;
 
-            treeViewItem.children.Add(_treeViewItem);
+            rootItem.children.Add(rootItem);
         }
 
         public T AddMenuItem<T>(string _path) where T : CZTreeViewItem, new()

@@ -37,18 +37,18 @@ namespace CZToolKit.Core.Editors
     public class CZAdvancedDropDown : AdvancedDropdown
     {
         const string DEFAULT_ROOT_NAME = "Root";
-        private static void SplitMenuPath(string _menuPath, out string _path, out string _name)
+        private static void SplitMenuPath(string menuPath, out string path, out string name)
         {
-            _menuPath = _menuPath.Trim('/');
-            int num = _menuPath.LastIndexOf('/');
+            menuPath = menuPath.Trim('/');
+            int num = menuPath.LastIndexOf('/');
             if (num == -1)
             {
-                _path = "";
-                _name = _menuPath;
+                path = "";
+                name = menuPath;
                 return;
             }
-            _path = _menuPath.Substring(0, num);
-            _name = _menuPath.Substring(num + 1);
+            path = menuPath.Substring(0, num);
+            name = menuPath.Substring(num + 1);
 
         }
 
@@ -80,21 +80,21 @@ namespace CZToolKit.Core.Editors
         public CZAdvancedDropDown(AdvancedDropdownState state) : base(state) { }
 
         // 添加一个选项
-        public CZAdvancedDropDownItem Add(string _path, Texture2D _icon = null)
+        public CZAdvancedDropDownItem Add(string path, Texture2D icon = null)
         {
-            SplitMenuPath(_path, out _path, out string name);
+            SplitMenuPath(path, out path, out string name);
             AdvancedDropdownItem parent = Root;
-            if (!string.IsNullOrEmpty(_path))
+            if (!string.IsNullOrEmpty(path))
             {
-                string[] path = _path.Split('/');
-                for (int i = 0; i < path.Length; i++)
+                string[] tmpPath = path.Split('/');
+                for (int i = 0; i < tmpPath.Length; i++)
                 {
-                    CZAdvancedDropDownItem tempItem = parent.children.FirstOrDefault(_item => _item.name == path[i]) as CZAdvancedDropDownItem;
+                    CZAdvancedDropDownItem tempItem = parent.children.FirstOrDefault(_item => _item.name == tmpPath[i]) as CZAdvancedDropDownItem;
                     if (tempItem != null)
                         parent = tempItem;
                     else
                     {
-                        tempItem = new CZAdvancedDropDownItem(path[i]) { id = GenerateID() };
+                        tempItem = new CZAdvancedDropDownItem(tmpPath[i]) { id = GenerateID() };
                         parent.AddChild(tempItem);
                         parent = tempItem;
                     }
@@ -102,7 +102,7 @@ namespace CZToolKit.Core.Editors
             }
             CZAdvancedDropDownItem item = new CZAdvancedDropDownItem(name);
             item.id = GenerateID();
-            item.icon = _icon;
+            item.icon = icon;
             parent.AddChild(item);
             return item;
         }
@@ -114,12 +114,12 @@ namespace CZToolKit.Core.Editors
         }
         protected override AdvancedDropdownItem BuildRoot() { return Root; }
 
-        public void Show(Rect _buttonRect, float maxHeight)
+        public void Show(Rect buttonRect, float maxHeight)
         {
             if (MinimumSize == Vector2.zero)
                 MinimumSize = new Vector2(200, 200);
 
-            base.Show(_buttonRect);
+            base.Show(buttonRect);
 
             var window = EditorWindow.focusedWindow;
 
@@ -142,7 +142,7 @@ namespace CZToolKit.Core.Editors
             size.x = Mathf.Clamp(size.x, window.minSize.x, window.maxSize.x);
             size.y = Mathf.Clamp(size.y, window.minSize.y, window.maxSize.y);
 
-            window.ShowAsDropDown(GUIUtility.GUIToScreenRect(_buttonRect), size);
+            window.ShowAsDropDown(GUIUtility.GUIToScreenRect(buttonRect), size);
         }
 
         int id;

@@ -59,37 +59,37 @@ namespace CZToolKit.Core.Editors
                 return typeof(ObjectEditor);
         }
 
-        public static ObjectEditor CreateEditor(object _targetObject)
+        public static ObjectEditor CreateEditor(object target)
         {
-            ObjectEditor objectEditor = InternalCreateEditor(_targetObject);
+            ObjectEditor objectEditor = InternalCreateEditor(target);
             if (objectEditor == null) return null;
 
-            objectEditor.Initialize(_targetObject);
+            objectEditor.Initialize(target);
             return objectEditor;
         }
 
-        public static ObjectEditor CreateEditor(object _targetObject, UnityObject _owner)
+        public static ObjectEditor CreateEditor(object target, UnityObject context)
         {
-            ObjectEditor objectEditor = InternalCreateEditor(_targetObject);
+            ObjectEditor objectEditor = InternalCreateEditor(target);
             if (objectEditor == null) return null;
 
-            objectEditor.Initialize(_targetObject, _owner);
+            objectEditor.Initialize(target, context);
             return objectEditor;
         }
 
-        public static ObjectEditor CreateEditor(object _targetObject, UnityObject _owner, Editor _editor)
+        public static ObjectEditor CreateEditor(object target, UnityObject context, Editor editor)
         {
-            ObjectEditor objectEditor = InternalCreateEditor(_targetObject);
+            ObjectEditor objectEditor = InternalCreateEditor(target);
             if (objectEditor == null) return null;
 
-            objectEditor.Initialize(_targetObject, _owner, _editor);
+            objectEditor.Initialize(target, context, editor);
             return objectEditor;
         }
 
-        static ObjectEditor InternalCreateEditor(object _targetObject)
+        static ObjectEditor InternalCreateEditor(object target)
         {
-            if (_targetObject == null) return null;
-            return Activator.CreateInstance(GetEditorType(_targetObject.GetType()), true) as ObjectEditor;
+            if (target == null) return null;
+            return Activator.CreateInstance(GetEditorType(target.GetType()), true) as ObjectEditor;
         }
 
         protected IReadOnlyList<FieldInfo> Fields { get; private set; }
@@ -101,24 +101,24 @@ namespace CZToolKit.Core.Editors
 
         protected ObjectEditor() { }
 
-        void Initialize(object _target)
+        void Initialize(object target)
         {
-            Target = _target;
+            Target = target;
             Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
             Fields = Util_Reflection.GetFieldInfos(Target.GetType()).Where(field => EditorGUILayoutExtension.CanDraw(field)).ToList();
         }
 
-        void Initialize(object _target, UnityObject _owner)
+        void Initialize(object target, UnityObject context)
         {
-            Owner = _owner;
-            Initialize(_target);
+            Owner = context;
+            Initialize(target);
         }
 
-        void Initialize(object _target, UnityObject _owner, Editor _editor)
+        void Initialize(object target, UnityObject context, Editor editor)
         {
-            Owner = _owner;
-            Editor = _editor;
-            Initialize(_target);
+            Owner = context;
+            Editor = editor;
+            Initialize(target);
         }
 
         public virtual string GetTitle() { return string.Empty; }
@@ -149,9 +149,9 @@ namespace CZToolKit.Core.Editors
 
         public virtual void DrawPreview(Rect previewArea) { }
 
-        public virtual void OnPreviewGUI(Rect _r, GUIStyle _background) { }
+        public virtual void OnPreviewGUI(Rect rect, GUIStyle background) { }
 
-        public virtual void OnInteractivePreviewGUI(Rect _r, GUIStyle _background) { }
+        public virtual void OnInteractivePreviewGUI(Rect rect, GUIStyle background) { }
 
         public virtual void OnValidate() { }
 
@@ -164,9 +164,9 @@ namespace CZToolKit.Core.Editors
 
     public class CustomObjectEditorAttribute : Attribute
     {
-        public Type targetType;
+        public readonly Type targetType;
 
-        public CustomObjectEditorAttribute(Type _targetType) { targetType = _targetType; }
+        public CustomObjectEditorAttribute(Type targetType) { this.targetType = targetType; }
     }
 }
 #endif

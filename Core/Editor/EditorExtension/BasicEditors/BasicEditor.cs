@@ -43,14 +43,14 @@ namespace CZToolKit.Core.Editors
             CoroutineMachineController.Update();
         }
 
-        public EditorCoroutine StartCoroutine(IEnumerator _coroutine)
+        public EditorCoroutine StartCoroutine(IEnumerator enumerator)
         {
-            return CoroutineMachineController.StartCoroutine(_coroutine);
+            return CoroutineMachineController.StartCoroutine(enumerator);
         }
 
-        public void StopCoroutine(EditorCoroutine _coroutine)
+        public void StopCoroutine(EditorCoroutine coroutine)
         {
-            CoroutineMachineController.StopCoroutine(_coroutine);
+            CoroutineMachineController.StopCoroutine(coroutine);
         }
 
         protected void RegisterDrawer(string propertyPath, UnityAction<SerializedProperty> drawer)
@@ -84,10 +84,10 @@ namespace CZToolKit.Core.Editors
             }
         }
 
-        private void DrawScript(SerializedProperty _serializedProperty)
+        private void DrawScript(SerializedProperty serializedProperty)
         {
             EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.PropertyField(_serializedProperty);
+            EditorGUILayout.PropertyField(serializedProperty);
             EditorGUI.EndDisabledGroup();
         }
     }

@@ -14,22 +14,31 @@
  */
 #endregion
 using System;
+using System.Collections.Generic;
 
 namespace CZToolKit.Core.ReactiveX
 {
-    public class Where<T> : Operator<T>
+    public class Where<T> : Operator<IEnumerable<T>, IEnumerable<T>>
     {
         Func<T, bool> filter;
 
-        public Where(IObservable<T> _src, Func<T, bool> _filter) : base(_src)
+        public Where(IObservable<IEnumerable<T>> _src, Func<T, bool> _filter) : base(_src)
         {
             filter = _filter;
         }
 
-        public override void OnNext(T _value)
+        public override void OnNext(IEnumerable<T> value)
         {
-            if (filter(_value))
-                base.OnNext(_value);
+            observer.OnNext(Collection(value));
+
+            IEnumerable<T> Collection(IEnumerable<T> _value)
+            {
+                foreach (var item in _value)
+                {
+                    if (filter(item))
+                        yield return item;
+                }
+            }
         }
     }
 }

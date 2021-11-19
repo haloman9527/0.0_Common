@@ -25,25 +25,25 @@ namespace CZToolKit.Core
         static string fieldSperator = "\",\"";
         static Regex CSVParser = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
 
-        public static string SerializeTableLine(string[] _fields)
+        public static string SerializeTableLine(string[] fields)
         {
 
-            for (int f = 0; f < _fields.Length; f++)
+            for (int f = 0; f < fields.Length; f++)
             {
-                if (string.IsNullOrEmpty(_fields[f]))
-                    _fields[f] = "";
+                if (string.IsNullOrEmpty(fields[f]))
+                    fields[f] = "";
                 else
-                    _fields[f] = _fields[f].Replace("\"", "\"\"");
+                    fields[f] = fields[f].Replace("\"", "\"\"");
             }
-            return string.Concat("\"", string.Join(fieldSperator, _fields), "\"");
+            return string.Concat("\"", string.Join(fieldSperator, fields), "\"");
         }
 
-        public static string SerializeTable(string[][] _dataTable)
+        public static string SerializeTable(string[][] dataTable)
         {
             StringBuilder sb = new StringBuilder();
-            for (int lineIndex = 0; lineIndex < _dataTable.Length; lineIndex++)
+            for (int lineIndex = 0; lineIndex < dataTable.Length; lineIndex++)
             {
-                sb.AppendLine(SerializeTableLine(_dataTable[lineIndex]));
+                sb.AppendLine(SerializeTableLine(dataTable[lineIndex]));
             }
             return sb.ToString();
         }

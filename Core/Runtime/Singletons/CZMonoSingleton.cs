@@ -25,43 +25,43 @@ namespace CZToolKit.Core.Singletons
 #endif
     {
         /// <summary> 线程锁 </summary>
-        private static readonly object m_Lock = new object();
+        static readonly object _lock = new object();
 
         /// <summary> 单例对象 </summary>
-        private static T m_Instance;
+        static T _instance;
 
         /// <summary> 单例对象属性，自动创建 </summary>
         public static T Instance
         {
             get
             {
-                if (m_Instance == null)
+                if (_instance == null)
                 {
-                    lock (m_Lock)
+                    lock (_lock)
                     {
-                        if (m_Instance == null)
+                        if (_instance == null)
                         {
                             GameObject go = GameObject.Find(typeof(T).ToString());
                             if (go == null)
                             {
                                 go = new GameObject(typeof(T).Name);
-                                m_Instance = go.AddComponent<T>();
+                                _instance = go.AddComponent<T>();
                             }
                             else
                             {
-                                m_Instance = go.gameObject.GetComponent<T>();
-                                if (m_Instance == null)
-                                    m_Instance = go.gameObject.AddComponent<T>();
+                                _instance = go.gameObject.GetComponent<T>();
+                                if (_instance == null)
+                                    _instance = go.gameObject.AddComponent<T>();
                             }
                             DontDestroyOnLoad(go);
                         }
                     }
                 }
-                return m_Instance;
+                return _instance;
             }
         }
 
-        public static bool IsNull { get { return m_Instance == null; } }
+        public static bool IsNull { get { return _instance == null; } }
 
         public static void Initialize()
         {
@@ -71,15 +71,15 @@ namespace CZToolKit.Core.Singletons
 
         public static void Destroy()
         {
-            if (m_Instance != null)
+            if (_instance != null)
             {
-                m_Instance.OnBeforeDestroy();
-                Destroy(m_Instance.gameObject);
-                m_Instance = null;
+                _instance.OnBeforeDestroy();
+                Destroy(_instance.gameObject);
+                _instance = null;
             }
         }
 
-        protected virtual void Awake() { m_Instance = this as T; }
+        protected virtual void Awake() { _instance = this as T; }
 
         protected virtual void OnBeforeDestroy() { }
     }

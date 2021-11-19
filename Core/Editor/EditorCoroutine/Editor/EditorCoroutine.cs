@@ -27,9 +27,9 @@ namespace CZToolKit.Core.Editors
         public double TimeSinceStartup { get; private set; }
         public object Current { get { return enumerator.Current; } }
 
-        public EditorCoroutine(IEnumerator _enumerator)
+        public EditorCoroutine(IEnumerator enumerator)
         {
-            enumerator = _enumerator;
+            this.enumerator = enumerator;
         }
 
         public bool MoveNext()

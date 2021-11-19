@@ -23,9 +23,9 @@ namespace CZToolKit.Core.Editors
 {
     public static partial class EditorUtilityExtension
     {
-        public static MonoScript FindScriptFromType(Type _type, Func<MonoScript, bool> _pattern = null, bool _compareTypeName = true)
+        public static MonoScript FindScriptFromType(Type type, Func<MonoScript, bool> pattern = null, bool compareTypeName = true)
         {
-            string findStr = "t:script " + (_compareTypeName ? _type.Name : "");
+            string findStr = "t:script " + (compareTypeName ? type.Name : "");
             var scriptGUIDs = AssetDatabase.FindAssets(findStr);
             foreach (var scriptGUID in scriptGUIDs)
             {
@@ -34,16 +34,16 @@ namespace CZToolKit.Core.Editors
 
                 if (script != null)
                 {
-                    if (_pattern == null || _pattern(script))
+                    if (pattern == null || pattern(script))
                         return script;
                 }
             }
             return null;
         }
 
-        public static IEnumerable<MonoScript> FindAllScriptFromType(Type _type, Func<MonoScript, bool> _pattern = null, bool _compareTypeName = true)
+        public static IEnumerable<MonoScript> FindAllScriptFromType(Type type, Func<MonoScript, bool> pattern = null, bool compareTypeName = true)
         {
-            string findStr = "t:script " + (_compareTypeName ? _type.Name : "");
+            string findStr = "t:script " + (compareTypeName ? type.Name : "");
             var scriptGUIDs = AssetDatabase.FindAssets(findStr);
             foreach (var scriptGUID in scriptGUIDs)
             {
@@ -51,36 +51,36 @@ namespace CZToolKit.Core.Editors
                 var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
                 if (script != null)
                 {
-                    if (_pattern == null || _pattern(script))
+                    if (pattern == null || pattern(script))
                         yield return script;
                 }
             }
         }
 
         /// <summary> 添加宏定义 </summary>
-        /// <param name="_define"></param>
+        /// <param name="define"></param>
         /// <param name="targetGroup"></param>
-        public static void AddDefine(string _define, BuildTargetGroup targetGroup = BuildTargetGroup.Standalone)
+        public static void AddDefine(string define, BuildTargetGroup targetGroup = BuildTargetGroup.Standalone)
         {
             string s = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
             List<string> defines = new List<string>(s.Split(';'));
-            if (!defines.Contains(_define))
+            if (!defines.Contains(define))
             {
-                defines.Add(_define);
+                defines.Add(define);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defines.ToArray()));
             }
         }
 
         /// <summary> 移除宏定义 </summary>
-        /// <param name="_define"></param>
+        /// <param name="define"></param>
         /// <param name="targetGroup"></param>
-        public static void RemoveDefine(string _define, BuildTargetGroup targetGroup = BuildTargetGroup.Standalone)
+        public static void RemoveDefine(string define, BuildTargetGroup targetGroup = BuildTargetGroup.Standalone)
         {
             string s = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
             List<string> defines = new List<string>(s.Split(';'));
-            if (defines.Contains(_define))
+            if (defines.Contains(define))
             {
-                defines.Remove(_define);
+                defines.Remove(define);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defines.ToArray()));
             }
         }

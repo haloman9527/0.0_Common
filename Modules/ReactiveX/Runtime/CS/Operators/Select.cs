@@ -14,21 +14,30 @@
  */
 #endregion
 using System;
+using System.Collections.Generic;
 
 namespace CZToolKit.Core.ReactiveX
 {
-    public class Select<TIn, TOut> : Operator<TIn, TOut>
+    public class Select<TIn, TOut> : Operator<IEnumerable<TIn>, IEnumerable<TOut>>
     {
         Func<TIn, TOut> selector;
 
-        public Select(IObservable<TIn> _src, Func<TIn, TOut> _selector) : base(_src)
+        public Select(IObservable<IEnumerable<TIn>> _src, Func<TIn, TOut> _selector) : base(_src)
         {
             selector = _selector;
         }
 
-        public override void OnNext(TIn _value)
+        public override void OnNext(IEnumerable<TIn> value)
         {
-            observer.OnNext(selector(_value));
+            observer.OnNext(Collection(value));
+
+            IEnumerable<TOut> Collection(IEnumerable<TIn> _value)
+            {
+                foreach (var item in _value)
+                {
+                    yield return selector(item);
+                }
+            }
         }
     }
 }

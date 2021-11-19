@@ -27,28 +27,28 @@ namespace CZToolKit.Core.Editors
     public class ObjectInspector : CZScriptableSingleton<ObjectInspector>
     {
         [SerializeField]
-        object targetObject;
+        object target;
 
-        public Action onTargetObjectChanged;
+        public Action onTargetChanged;
 
-        public object TargetObject
+        public object Target
         {
-            get { return targetObject; }
+            get { return target; }
             private set
             {
-                if (targetObject != value)
+                if (target != value)
                 {
-                    targetObject = value;
-                    onTargetObjectChanged?.Invoke();
+                    target = value;
+                    onTargetChanged?.Invoke();
                 }
             }
         }
-        public UnityObject UnityOwner { get; private set; }
+        public UnityObject UnityContext { get; private set; }
 
-        public void Initialize(object _targetObject, UnityObject _unityOwner)
+        public void Initialize(object target, UnityObject unityContext)
         {
-            UnityOwner = _unityOwner;
-            TargetObject = _targetObject;
+            UnityContext = unityContext;
+            Target = target;
         }
     }
 
@@ -57,23 +57,23 @@ namespace CZToolKit.Core.Editors
     {
         ObjectEditor objectEditor;
 
-        public UnityObject UnityOwner { get; set; }
+        public UnityObject UnityContext { get; set; }
 
         public ObjectInspector T_Target { get { return target as ObjectInspector; } }
 
         void OnEnable()
         {
-            UnityOwner = T_Target.UnityOwner;
+            UnityContext = T_Target.UnityContext;
 
-            OnEnable(T_Target.TargetObject);
-            T_Target.onTargetObjectChanged = () =>
+            OnEnable(T_Target.Target);
+            T_Target.onTargetChanged = () =>
             {
-                OnEnable(T_Target.TargetObject);
+                OnEnable(T_Target.Target);
             };
 
             void OnEnable(object _targetObject)
             {
-                objectEditor = ObjectEditor.CreateEditor(_targetObject, UnityOwner, this);
+                objectEditor = ObjectEditor.CreateEditor(_targetObject, UnityContext, this);
                 if (objectEditor != null)
                 {
                     string title = objectEditor.GetTitle();
@@ -139,18 +139,18 @@ namespace CZToolKit.Core.Editors
             return title;
         }
 
-        public override void OnPreviewGUI(Rect r, GUIStyle background)
+        public override void OnPreviewGUI(Rect rect, GUIStyle background)
         {
-            base.OnPreviewGUI(r, background);
+            base.OnPreviewGUI(rect, background);
             if (objectEditor != null)
-                objectEditor.OnPreviewGUI(r, background);
+                objectEditor.OnPreviewGUI(rect, background);
         }
 
-        public override void OnInteractivePreviewGUI(Rect r, GUIStyle background)
+        public override void OnInteractivePreviewGUI(Rect rect, GUIStyle background)
         {
-            base.OnInteractivePreviewGUI(r, background);
+            base.OnInteractivePreviewGUI(rect, background);
             if (objectEditor != null)
-                objectEditor.OnInteractivePreviewGUI(r, background);
+                objectEditor.OnInteractivePreviewGUI(rect, background);
         }
 
         private void OnSceneGUI()

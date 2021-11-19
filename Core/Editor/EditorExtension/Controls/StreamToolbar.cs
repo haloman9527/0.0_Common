@@ -29,9 +29,9 @@ namespace CZToolKit.Core.Editors
         public GUIStyle style;
         public string[] tabs;
 
-        public SteamToolbar(string[] _tabs)
+        public SteamToolbar(string[] tabs)
         {
-            tabs = _tabs;
+            this.tabs = tabs;
         }
 
         public void DoLayout()

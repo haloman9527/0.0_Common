@@ -25,27 +25,27 @@ namespace CZToolKit.Core.Singletons
 #endif
     {
         /// <summary> 线程锁 </summary>
-        private static readonly object m_Lock = new object();
+        private static readonly object _lock = new object();
 
-        private static T m_Instance;
+        private static T _instance;
 
         public static T Instance
         {
             get
             {
-                if (m_Instance == null)
+                if (_instance == null)
                 {
-                    lock (m_Lock)
+                    lock (_lock)
                     {
-                        if (m_Instance == null)
-                            m_Instance = ScriptableObject.CreateInstance<T>();
+                        if (_instance == null)
+                            _instance = ScriptableObject.CreateInstance<T>();
                     }
                 }
-                return m_Instance;
+                return _instance;
             }
         }
 
-        public static bool IsNull { get { return m_Instance == null; } }
+        public static bool IsNull { get { return _instance == null; } }
 
         public static void Initialize()
         {
@@ -55,10 +55,10 @@ namespace CZToolKit.Core.Singletons
 
         public static void Destroy()
         {
-            if (m_Instance != null)
+            if (_instance != null)
             {
-                m_Instance.OnBeforeDestroy();
-                m_Instance = null;
+                _instance.OnBeforeDestroy();
+                _instance = null;
             }
         }
 

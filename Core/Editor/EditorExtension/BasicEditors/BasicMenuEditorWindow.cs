@@ -136,18 +136,18 @@ namespace CZToolKit.Core.Editors
             GUILayout.EndArea();
         }
 
-        protected abstract CZMenuTreeView BuildMenuTree(TreeViewState _treeViewState);
+        protected abstract CZMenuTreeView BuildMenuTree(TreeViewState treeViewState);
 
-        protected virtual void OnRightGUI(CZMenuTreeViewItem _selectedItem)
+        protected virtual void OnRightGUI(CZMenuTreeViewItem selectedItem)
         {
-            if (_selectedItem == null) return;
-            switch (_selectedItem.userData)
+            if (selectedItem == null) return;
+            switch (selectedItem.userData)
             {
                 case null:
                     GUILayout.Space(10);
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(20);
-                    GUILayout.Label(_selectedItem.displayName, (GUIStyle)"AM MixerHeader2");
+                    GUILayout.Label(selectedItem.displayName, (GUIStyle)"AM MixerHeader2");
                     GUILayout.EndHorizontal();
                     GUILayout.Space(5);
                     EditorGUI.DrawRect(GUILayoutUtility.GetRect(rightRect.width, 1), Color.gray);

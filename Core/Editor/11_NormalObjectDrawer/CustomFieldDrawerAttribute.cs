@@ -21,11 +21,9 @@ namespace CZToolKit.Core.Editors
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class CustomFieldDrawerAttribute : Attribute
     {
-        Type type;
+        public readonly Type type;
 
-        public Type Type { get { return type; } }
-
-        public CustomFieldDrawerAttribute(Type _type) { type = _type; }
+        public CustomFieldDrawerAttribute(Type type) { this.type = type; }
     }
 }
 #endif

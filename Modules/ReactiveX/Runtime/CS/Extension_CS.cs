@@ -21,12 +21,12 @@ namespace CZToolKit.Core.ReactiveX
     public static partial class Extension
     {
         /// <summary> 当src满足某条件 </summary>
-        public static IObservable<T> Where<T>(this IObservable<T> _src, Func<T, bool> _filter)
+        public static IObservable<IEnumerable<T>> Where<T>(this IObservable<IEnumerable<T>> _src, Func<T, bool> _filter)
         {
             return new Where<T>(_src, _filter);
         }
 
-        public static IObservable<TOut> Select<TIn, TOut>(this IObservable<TIn> _src, Func<TIn, TOut> _filter)
+        public static IObservable<IEnumerable<TOut>> Select<TIn, TOut>(this IObservable<IEnumerable<TIn>> _src, Func<TIn, TOut> _filter)
         {
             return new Select<TIn, TOut>(_src, _filter);
         }
@@ -46,7 +46,7 @@ namespace CZToolKit.Core.ReactiveX
             return new First<T>(_src);
         }
 
-        public static IObservable<T> Execute<T>(this IObservable<T> _src, Action _action)
+        public static IObservable<T> Execute<T>(this IObservable<T> _src, Action<T> _action)
         {
             return new Execute<T>(_src, _action);
         }

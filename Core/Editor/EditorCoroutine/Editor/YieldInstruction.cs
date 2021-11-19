@@ -28,11 +28,11 @@ namespace CZToolKit.Core.Editors
     {
         readonly float seconds;
 
-        public EditorWaitForSeconds(float _seconds) { seconds = _seconds; }
+        public EditorWaitForSeconds(float seconds) { this.seconds = seconds; }
 
-        public bool Result(EditorCoroutine _coroutine)
+        public bool Result(EditorCoroutine coroutine)
         {
-            return EditorApplication.timeSinceStartup >= _coroutine.TimeSinceStartup + seconds;
+            return EditorApplication.timeSinceStartup >= coroutine.TimeSinceStartup + seconds;
         }
     }
 
@@ -40,9 +40,9 @@ namespace CZToolKit.Core.Editors
     {
         readonly Func<bool> predicate;
 
-        public EditorWaitUntil(Func<bool> _predicate) { predicate = _predicate; }
+        public EditorWaitUntil(Func<bool> predicate) { this.predicate = predicate; }
 
-        public bool Result(EditorCoroutine _coroutine)
+        public bool Result(EditorCoroutine coroutine)
         {
             return predicate();
         }

@@ -76,14 +76,14 @@ namespace CZToolKit.Core.Editors
             CoroutineMachine.Update();
         }
 
-        public EditorCoroutine StartCoroutine(IEnumerator _coroutine)
+        public EditorCoroutine StartCoroutine(IEnumerator enumerator)
         {
-            return CoroutineMachine.StartCoroutine(_coroutine);
+            return CoroutineMachine.StartCoroutine(enumerator);
         }
 
-        public void StopCoroutine(EditorCoroutine _coroutine)
+        public void StopCoroutine(EditorCoroutine coroutine)
         {
-            CoroutineMachine.StopCoroutine(_coroutine);
+            CoroutineMachine.StopCoroutine(coroutine);
         }
     }
 }

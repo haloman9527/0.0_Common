@@ -45,26 +45,31 @@ namespace CZToolKit.Core.Editors
             }
         }
 
-        public static Type GetEditorType(Type _objectType)
+        public static bool HasCustomDrawer(Type objectType)
         {
-            if (ObjectEditorTypeCache.TryGetValue(_objectType, out Type editorType))
+            return GetEditorType(objectType) != typeof(SimpleObjectDrawer);
+        }
+
+        public static Type GetEditorType(Type objectType)
+        {
+            if (ObjectEditorTypeCache.TryGetValue(objectType, out Type editorType))
                 return editorType;
-            if (_objectType.BaseType != null)
-                return GetEditorType(_objectType.BaseType);
+            if (objectType.BaseType != null)
+                return GetEditorType(objectType.BaseType);
             else
                 return typeof(SimpleObjectDrawer);
         }
 
-        static SimpleObjectDrawer InternalCreateEditor(object targetObject)
+        static SimpleObjectDrawer InternalCreateEditor(object target)
         {
-            if (targetObject == null) return null;
+            if (target == null) return null;
 
-            return Activator.CreateInstance(GetEditorType(targetObject.GetType()), targetObject) as SimpleObjectDrawer;
+            return Activator.CreateInstance(GetEditorType(target.GetType()), target) as SimpleObjectDrawer;
         }
 
-        public static SimpleObjectDrawer CreateEditor(object _targetObject)
+        public static SimpleObjectDrawer CreateEditor(object target)
         {
-            SimpleObjectDrawer objectEditor = InternalCreateEditor(_targetObject);
+            SimpleObjectDrawer objectEditor = InternalCreateEditor(target);
             if (objectEditor == null) return null;
             return objectEditor;
         }
@@ -77,15 +82,15 @@ namespace CZToolKit.Core.Editors
         public object Target { get; private set; }
         protected IReadOnlyList<FieldInfo> Fields { get; private set; }
 
-        void Initialize(object _target)
+        void Initialize(object target)
         {
-            Target = _target;
+            Target = target;
             Fields = Util_Reflection.GetFieldInfos(Target.GetType()).Where(field => EditorGUILayoutExtension.CanDraw(field)).ToList();
         }
 
-        public virtual void OnGUI(Rect _position, GUIContent _label)
+        public virtual void OnGUI(Rect position, GUIContent label)
         {
-            GUI.Label(_position, _label);
+            GUI.Label(position, label);
         }
 
         public virtual float GetHeight()
@@ -97,8 +102,8 @@ namespace CZToolKit.Core.Editors
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
     public class CustomSimpleObjectDrawerAttribute : Attribute
     {
-        public Type targetType;
+        public readonly Type targetType;
 
-        public CustomSimpleObjectDrawerAttribute(Type _targetType) { targetType = _targetType; }
+        public CustomSimpleObjectDrawerAttribute(Type targetType) { this.targetType = targetType; }
     }
 }

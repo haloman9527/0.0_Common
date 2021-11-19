@@ -25,27 +25,27 @@ namespace CZToolKit.Core.Editors
     public static partial class EditorGUILayoutExtension
     {
         /// <summary>  </summary>
-        /// <param name="_key"> 用于存取上下文数据 </param>
+        /// <param name="key"> 用于存取上下文数据 </param>
         /// <returns> visible or not </returns>
-        public static bool BeginFadeGroup(string _key, bool _visible, float _speed = 1)
+        public static bool BeginFadeGroup(string key, bool visible, float speed = 1)
         {
-            if (!GUIHelper.TryGetContextData<AnimFloat>(_key, out var contextData))
-                contextData.value = new AnimFloat(_visible ? 1 : 0);
-            contextData.value.speed = _speed * (_visible ? 1 : 2);
-            contextData.value.target = _visible ? 1 : 0;
-            float _t = contextData.value.value;
-            if (_visible)
+            if (!GUIHelper.TryGetContextData<AnimFloat>(key, out var contextData))
+                contextData.value = new AnimFloat(visible ? 1 : 0);
+            contextData.value.speed = speed * (visible ? 1 : 2);
+            contextData.value.target = visible ? 1 : 0;
+            float t = contextData.value.value;
+            if (visible)
             {
-                _t--;
-                _t = -(_t * _t * _t * _t - 1);
+                t--;
+                t = -(t * t * t * t - 1);
             }
             else
             {
-                _t = _t * _t;
+                t = t * t;
             }
 
-            EditorGUIExtension.BeginAlpha(_t);
-            return EditorGUILayout.BeginFadeGroup(_t);
+            EditorGUIExtension.BeginAlpha(t);
+            return EditorGUILayout.BeginFadeGroup(t);
         }
 
         public static void EndFadeGroup()
@@ -64,7 +64,7 @@ namespace CZToolKit.Core.Editors
             EditorGUILayout.EndVertical();
         }
 
-        public static (bool foldout, bool enable) BeginToggleGroup(string _label, bool _foldout, bool _enable)
+        public static (bool foldout, bool enable) BeginToggleGroup(string label, bool foldout, bool enable)
         {
             BeginBoxGroup();
             Rect rect = GUILayoutUtility.GetRect(50, 25);
@@ -76,11 +76,11 @@ namespace CZToolKit.Core.Editors
             {
                 if (toggleRect.Contains(current.mousePosition))
                 {
-                    _enable = !_enable;
+                    enable = !enable;
                 }
                 else if (rect.Contains(current.mousePosition))
                 {
-                    _foldout = !_foldout;
+                    foldout = !foldout;
                 }
             }
 
@@ -94,18 +94,18 @@ namespace CZToolKit.Core.Editors
                     Rect t = rect;
                     t.xMin += 5;
                     t.xMax = t.xMin + t.height;
-                    EditorGUI.Foldout(t, _foldout, string.Empty);
+                    EditorGUI.Foldout(t, foldout, string.Empty);
 
                     toggleRect.width = rect.width - t.width;
-                    EditorGUI.ToggleLeft(toggleRect, _label, _enable);
+                    EditorGUI.ToggleLeft(toggleRect, label, enable);
                     break;
                 default:
                     break;
             }
 
-            EditorGUI.BeginDisabledGroup(!_enable);
+            EditorGUI.BeginDisabledGroup(!enable);
             EditorGUI.indentLevel++;
-            return (_foldout, _enable);
+            return (foldout, enable);
         }
 
         public static void EndToggleGroup()
@@ -115,7 +115,7 @@ namespace CZToolKit.Core.Editors
             EndBoxGroup();
         }
 
-        public static bool BeginFoldout(string _label, bool _foldout)
+        public static bool BeginFoldout(string label, bool foldout)
         {
             BeginBoxGroup();
             Rect rect = GUILayoutUtility.GetRect(50, 25);
@@ -126,7 +126,7 @@ namespace CZToolKit.Core.Editors
             {
                 if (rect.Contains(current.mousePosition))
                 {
-                    _foldout = !_foldout;
+                    foldout = !foldout;
                     current.Use();
                 }
             }
@@ -141,14 +141,14 @@ namespace CZToolKit.Core.Editors
                     Rect t = rect;
                     t.xMin += 5;
                     t.xMax -= 5;
-                    EditorGUI.Foldout(t, _foldout, _label);
+                    EditorGUI.Foldout(t, foldout, label);
                     break;
                 default:
                     break;
             }
 
             EditorGUI.indentLevel++;
-            return _foldout;
+            return foldout;
         }
 
         public static void EndFoldout()
@@ -157,16 +157,16 @@ namespace CZToolKit.Core.Editors
             EndBoxGroup();
         }
 
-        public static float ScrollList(SerializedProperty _list, float _scroll, ref bool _foldout, int _count = 10)
+        public static float ScrollList(SerializedProperty list, float scroll, ref bool foldout, int count = 10)
         {
-            _foldout = EditorGUILayout.Foldout(_foldout, _list.displayName, true);
+            foldout = EditorGUILayout.Foldout(foldout, list.displayName, true);
 
-            if (_foldout)
+            if (foldout)
             {
                 EditorGUI.indentLevel++;
 
                 GUILayout.BeginHorizontal();
-                int size = EditorGUILayout.DelayedIntField("Count", _list.arraySize);
+                int size = EditorGUILayout.DelayedIntField("Count", list.arraySize);
                 EditorGUI.indentLevel--;
                 int targetIndex = -1;
                 targetIndex = EditorGUILayout.DelayedIntField(targetIndex, GUILayout.Width(40));
@@ -174,139 +174,139 @@ namespace CZToolKit.Core.Editors
 
                 EditorGUI.indentLevel++;
 
-                if (size != _list.arraySize)
-                    _list.arraySize = size;
+                if (size != list.arraySize)
+                    list.arraySize = size;
 
                 GUILayout.BeginHorizontal();
                 Rect r = EditorGUILayout.BeginVertical();
 
-                if (_list.arraySize > _count)
+                if (list.arraySize > count)
                 {
-                    int startIndex = Mathf.CeilToInt(_list.arraySize * _scroll);
+                    int startIndex = Mathf.CeilToInt(list.arraySize * scroll);
                     startIndex = Mathf.Max(0, startIndex);
-                    for (int i = startIndex; i < startIndex + _count; i++)
+                    for (int i = startIndex; i < startIndex + count; i++)
                     {
-                        EditorGUILayout.PropertyField(_list.GetArrayElementAtIndex(i));
+                        EditorGUILayout.PropertyField(list.GetArrayElementAtIndex(i));
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < _list.arraySize; i++)
+                    for (int i = 0; i < list.arraySize; i++)
                     {
-                        EditorGUILayout.PropertyField(_list.GetArrayElementAtIndex(i));
+                        EditorGUILayout.PropertyField(list.GetArrayElementAtIndex(i));
                     }
                 }
 
                 EditorGUILayout.EndVertical();
-                if (_list.arraySize > _count)
+                if (list.arraySize > count)
                 {
                     GUILayout.Space(20);
-                    if (_list.arraySize > _count)
+                    if (list.arraySize > count)
                     {
                         if (Event.current.type == EventType.ScrollWheel && r.Contains(Event.current.mousePosition))
                         {
-                            _scroll += Event.current.delta.y * 0.01f;
+                            scroll += Event.current.delta.y * 0.01f;
                             Event.current.Use();
                         }
                         if (targetIndex != -1)
                         {
-                            _scroll = Mathf.Clamp01((float)targetIndex / _list.arraySize);
+                            scroll = Mathf.Clamp01((float)targetIndex / list.arraySize);
                         }
 
                         r.xMin += r.width + 5;
                         r.width = 20;
-                        _scroll = GUI.VerticalScrollbar(r, _scroll, (float)_count / _list.arraySize, 0, 1);
+                        scroll = GUI.VerticalScrollbar(r, scroll, (float)count / list.arraySize, 0, 1);
                     }
                 }
                 GUILayout.EndHorizontal();
                 EditorGUI.indentLevel--;
 
             }
-            return _scroll;
+            return scroll;
         }
 
-        public static string FilePath(string _label, string _path)
+        public static string FilePath(string label, string path)
         {
             EditorGUILayout.BeginHorizontal();
-            _path = EditorGUILayout.TextField(_label, _path);
+            path = EditorGUILayout.TextField(label, path);
             Rect rect = GUILayoutUtility.GetLastRect();
             UnityObject uObj = EditorGUIExtension.DragDropAreaSingle(rect, DragAndDropVisualMode.Copy);
             if (uObj != null && AssetDatabase.IsMainAsset(uObj))
             {
                 string p = AssetDatabase.GetAssetPath(uObj);
                 if (!AssetDatabase.IsValidFolder(p))
-                    _path = p;
+                    path = p;
             }
             if (GUILayout.Button(EditorGUIUtility.FindTexture("FolderEmpty Icon"), EditorStylesExtension.OnlyIconButtonStyle, GUILayout.Width(18), GUILayout.Height(18)))
             {
-                _path = EditorUtility.OpenFilePanel("Select File", Application.dataPath, "*");
-                if (!string.IsNullOrEmpty(_path))
-                    _path = _path.Substring(_path.IndexOf("Assets"));
+                path = EditorUtility.OpenFilePanel("Select File", Application.dataPath, "*");
+                if (!string.IsNullOrEmpty(path))
+                    path = path.Substring(path.IndexOf("Assets"));
             }
             EditorGUILayout.EndHorizontal();
-            return _path;
+            return path;
         }
 
-        public static void FilePath(string _label, SerializedProperty _path)
+        public static void FilePath(string label, SerializedProperty pathProperty)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.PropertyField(_path);
+            EditorGUILayout.PropertyField(pathProperty);
             Rect rect = GUILayoutUtility.GetLastRect();
             UnityObject uObj = EditorGUIExtension.DragDropAreaSingle(rect, DragAndDropVisualMode.Copy);
             if (uObj != null && AssetDatabase.IsMainAsset(uObj))
             {
                 string p = AssetDatabase.GetAssetPath(uObj);
                 if (!AssetDatabase.IsValidFolder(p))
-                    _path.stringValue = p;
+                    pathProperty.stringValue = p;
             }
             if (GUILayout.Button(EditorGUIUtility.FindTexture("FolderEmpty Icon"), EditorStylesExtension.OnlyIconButtonStyle, GUILayout.Width(18), GUILayout.Height(18)))
             {
                 string p = EditorUtility.OpenFilePanel("Select File", Application.dataPath, "*");
                 if (!string.IsNullOrEmpty(p))
-                    _path.stringValue = p.Substring(p.IndexOf("Assets"));
+                    pathProperty.stringValue = p.Substring(p.IndexOf("Assets"));
             }
             EditorGUILayout.EndHorizontal();
         }
 
-        public static string FolderPath(string _label, string _folder)
+        public static string FolderPath(string label, string folder)
         {
             EditorGUILayout.BeginHorizontal();
-            _folder = EditorGUILayout.TextField(_label, _folder);
+            folder = EditorGUILayout.TextField(label, folder);
             Rect rect = GUILayoutUtility.GetLastRect();
             UnityObject uObj = EditorGUIExtension.DragDropAreaSingle(rect, DragAndDropVisualMode.Copy);
             if (uObj != null && AssetDatabase.IsMainAsset(uObj))
             {
                 string p = AssetDatabase.GetAssetPath(uObj);
                 if (AssetDatabase.IsValidFolder(p))
-                    _folder = p;
+                    folder = p;
             }
             if (GUILayout.Button(EditorGUIUtility.FindTexture("FolderEmpty Icon"), EditorStylesExtension.OnlyIconButtonStyle, GUILayout.Width(18), GUILayout.Height(18)))
             {
-                _folder = EditorUtility.OpenFolderPanel("Select Folder", Application.dataPath, string.Empty);
-                if (!string.IsNullOrEmpty(_folder))
-                    _folder = _folder.Substring(_folder.IndexOf("Assets"));
+                folder = EditorUtility.OpenFolderPanel("Select Folder", Application.dataPath, string.Empty);
+                if (!string.IsNullOrEmpty(folder))
+                    folder = folder.Substring(folder.IndexOf("Assets"));
             }
             EditorGUILayout.EndHorizontal();
-            return _folder;
+            return folder;
         }
 
-        public static void FolderPath(string _label, SerializedProperty _folder)
+        public static void FolderPath(string label, SerializedProperty folder)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.PropertyField(_folder);
+            EditorGUILayout.PropertyField(folder);
             Rect rect = GUILayoutUtility.GetLastRect();
             UnityObject uObj = EditorGUIExtension.DragDropAreaSingle(rect, DragAndDropVisualMode.Copy);
             if (uObj != null && AssetDatabase.IsMainAsset(uObj))
             {
                 string p = AssetDatabase.GetAssetPath(uObj);
                 if (AssetDatabase.IsValidFolder(p))
-                    _folder.stringValue = p;
+                    folder.stringValue = p;
             }
             if (GUILayout.Button(EditorGUIUtility.FindTexture("FolderEmpty Icon"), EditorStylesExtension.OnlyIconButtonStyle, GUILayout.Width(18), GUILayout.Height(18)))
             {
                 string p = EditorUtility.OpenFolderPanel("Select Folder", Application.dataPath, string.Empty);
                 if (!string.IsNullOrEmpty(p))
-                    _folder.stringValue = p.Substring(p.IndexOf("Assets"));
+                    folder.stringValue = p.Substring(p.IndexOf("Assets"));
             }
             EditorGUILayout.EndHorizontal();
         }

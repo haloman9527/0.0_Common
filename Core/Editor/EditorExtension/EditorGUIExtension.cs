@@ -72,26 +72,26 @@ namespace CZToolKit.Core.Editors
             GUI.matrix = matrixs.Pop();
         }
 
-        public static void BeginScale(Vector2 _scale, Rect _rect, Vector2 _pivot)
+        public static void BeginScale(Vector2 scale, Rect rect, Vector2 pivot)
         {
-            Rect Scale(Rect targetValue, Vector2 scale, Vector2 pivot)
+            Rect Scale(Rect _targetValue, Vector2 _scale, Vector2 _pivot)
             {
-                Vector2 absPosition = targetValue.position + targetValue.size * pivot;
-                Vector2 size = targetValue.size;
-                size.x *= scale.x;
-                size.y *= scale.y;
-                targetValue.size = size;
-                targetValue.position = absPosition - targetValue.size * pivot;
-                return targetValue;
+                Vector2 absPosition = _targetValue.position + _targetValue.size * _pivot;
+                Vector2 size = _targetValue.size;
+                size.x *= _scale.x;
+                size.y *= _scale.y;
+                _targetValue.size = size;
+                _targetValue.position = absPosition - _targetValue.size * _pivot;
+                return _targetValue;
             }
 
-            Rect r = Scale(_rect, _scale, _pivot);
-            Vector2 offset = new Vector2(r.x - _rect.x, r.y - _rect.y);
+            Rect r = Scale(rect, scale, pivot);
+            Vector2 offset = new Vector2(r.x - rect.x, r.y - rect.y);
             Matrix4x4 matrix = GUI.matrix;
             matrix.m03 += offset.x;
             matrix.m13 += offset.y;
-            matrix.m00 *= _scale.x;
-            matrix.m11 *= _scale.y;
+            matrix.m00 *= scale.x;
+            matrix.m11 *= scale.y;
             BeginMatrix(matrix);
         }
 
