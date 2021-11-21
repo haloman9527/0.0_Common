@@ -140,7 +140,7 @@ namespace CZToolKit.Core.Editors
         {
             if (string.IsNullOrEmpty(path)) return;
 
-            CZTreeViewItem rootItem = RootItem as CZTreeViewItem;
+            CZTreeViewItem parentItem = RootItem as CZTreeViewItem;
 
             SplitMenuPath(path, out path, out string name);
             if (!string.IsNullOrEmpty(path))
@@ -151,22 +151,22 @@ namespace CZToolKit.Core.Editors
                     CZTreeViewItem tempItem = rootItem.children.Find(item => item.displayName == tmpPath[i]) as CZTreeViewItem;
                     if (tempItem != null)
                     {
-                        rootItem = tempItem;
+                        parentItem = tempItem;
                     }
                     else
                     {
                         tempItem = new CZTreeViewItem() { id = GenerateID(), displayName = tmpPath[i], parent = rootItem };
-                        rootItem.children.Add(tempItem);
-                        rootItem = tempItem;
+                        parentItem.children.Add(tempItem);
+                        parentItem = tempItem;
                     }
                 }
             }
 
-            rootItem.id = GenerateID();
-            rootItem.displayName = name;
-            rootItem.parent = rootItem;
+            treeViewItem.id = GenerateID();
+            treeViewItem.displayName = name;
+            treeViewItem.parent = rootItem;
 
-            rootItem.children.Add(rootItem);
+            parentItem.children.Add(treeViewItem);
         }
 
         public T AddMenuItem<T>(string _path) where T : CZTreeViewItem, new()
