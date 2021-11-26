@@ -1,3 +1,19 @@
+#region 注 释
+/***
+ *
+ *  Title:
+ *      主题: 指令调度器
+ *  Description:
+ *      功能: 
+ *          提供Do Redo Undo的功能
+ *  Date:
+ *  Version:
+ *  Writer: 半只龙虾人
+ *  Github: https://github.com/HalfLobsterMan
+ *  Blog: https://www.crosshair.top/
+ *
+ */
+#endregion
 using System;
 using System.Collections.Generic;
 
@@ -19,7 +35,7 @@ namespace CZToolKit.Core
         public void BeginGroup()
         {
             if (isGrouping)
-                throw new System.Exception($"在重新开始一个新的组之前需要结束当前的组{nameof(EndGroup)}");
+                return;
             undo.Push(new CommandsGroup());
             isGrouping = true;
         }

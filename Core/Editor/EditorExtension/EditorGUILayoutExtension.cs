@@ -54,9 +54,9 @@ namespace CZToolKit.Core.Editors
             EditorGUIExtension.EndAlpha();
         }
 
-        public static Rect BeginBoxGroup()
+        public static Rect BeginBoxGroup(params GUILayoutOption[] options)
         {
-            return EditorGUILayout.BeginVertical(EditorStylesExtension.RoundedBoxStyle);
+            return EditorGUILayout.BeginVertical(EditorStylesExtension.RoundedBoxStyle, options);
         }
 
         public static void EndBoxGroup()
