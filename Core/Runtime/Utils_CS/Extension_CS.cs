@@ -32,7 +32,7 @@ public static partial class Extension
     }
 
     /// <summary> 快速排序(第二个参数是中间值) </summary>
-    public static void QuickSort<T>(this IList<T> original, Func<T, T, int> func)
+    public static void QuickSort<T>(this IList<T> original, Func<T, T, int> comparer)
     {
         QuickSort(0, original.Count - 1);
         void QuickSort(int left, int right)
@@ -47,11 +47,11 @@ public static partial class Extension
                 {
                     // 双指针收缩
                     // 找到一个大于中数的下标和一个小于中数的下标，交换位置
-                    while (i < right && func(original[i], middle) < 0)
+                    while (i < j && comparer(original[i], middle) < 0)
                     {
                         i++;
                     };
-                    while (j > left && func(original[j], middle) > 0)
+                    while (j > i && comparer(original[j], middle) > 0)
                     {
                         j--;
                     };
@@ -61,7 +61,7 @@ public static partial class Extension
                     original[i] = original[j];
                     original[j] = temp;
 
-                    if (func(original[i], original[j]) == 0) j--;
+                    if (comparer(original[i], original[j]) == 0) j--;
                 }
 
                 QuickSort(left, i);
