@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEngine;
 
 namespace CZToolKit.Core.Editors
 {
@@ -82,6 +83,27 @@ namespace CZToolKit.Core.Editors
             {
                 defines.Remove(define);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defines.ToArray()));
+            }
+        }
+
+        /// <summary> 绝对路径转Assets路径 </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string AbsolutePathToAssetPath(string path)
+        {
+            if (Application.platform == RuntimePlatform.WindowsEditor)
+            {
+                int startIndex = path.IndexOf("Assets\\");
+                if (startIndex < 0) return path;
+
+                return path.Substring(startIndex);
+            }
+            else
+            {
+                int startIndex = path.IndexOf("Assets/");
+                if (startIndex < 0) return path;
+
+                return path.Substring(startIndex);
             }
         }
     }

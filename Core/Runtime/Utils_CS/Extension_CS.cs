@@ -47,14 +47,8 @@ public static partial class Extension
                 {
                     // 双指针收缩
                     // 找到一个大于中数的下标和一个小于中数的下标，交换位置
-                    while (i < j && comparer(original[i], middle) < 0)
-                    {
-                        i++;
-                    };
-                    while (j > i && comparer(original[j], middle) > 0)
-                    {
-                        j--;
-                    };
+                    while (i < j && comparer(original[i], middle) < 0) { i++; };
+                    while (j > i && comparer(original[j], middle) > 0) { j--; };
                     if (i == j) break;
 
                     T temp = original[i];

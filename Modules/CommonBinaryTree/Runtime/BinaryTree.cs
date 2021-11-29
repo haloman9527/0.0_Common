@@ -200,7 +200,7 @@ namespace CZToolKit.Core.CommonBinaryTree
             }
         }
 
-        /// <summary> 中序遍历 </summary>
+        /// <summary> 后序遍历 </summary>
         public static IEnumerable<T> PostorderEnumerate<T>(this INode<T> root)
         {
             if (root.Left != null)
