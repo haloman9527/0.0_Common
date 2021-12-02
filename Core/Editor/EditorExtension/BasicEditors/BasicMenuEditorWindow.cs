@@ -42,20 +42,8 @@ namespace CZToolKit.Core.Editors
 
         public CZMenuTreeView MenuTreeView { get; private set; }
 
-        protected virtual float LeftMinWidth
-        {
-            get
-            {
-                return 50;
-            }
-        }
-        protected virtual float RightMinWidth
-        {
-            get
-            {
-                return 500;
-            }
-        }
+        protected float LeftMinWidth { get; set; } = 50;
+        protected float RightMinWidth { get; set; } = 500;
         protected Rect RightRect
         {
             get
@@ -113,17 +101,13 @@ namespace CZToolKit.Core.Editors
             sideRect.width = 1;
             EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
 
-
             rightRect = sideRect;
             rightRect.x += rightRect.width + 1;
             rightRect.width = position.width - resizableAreaRect.width - sideRect.width - 2;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
 
-
             GUILayout.BeginArea(rightRect);
 
-            rightRect.x = 0;
-            rightRect.y = 0;
             IList<int> selection = MenuTreeView.GetSelection();
 
 
@@ -190,20 +174,6 @@ namespace CZToolKit.Core.Editors
             if (index == -1)
                 return null;
             return _path.Substring(0, index);
-        }
-
-        protected override bool CanRename(TreeViewItem item)
-        {
-            return false;
-        }
-
-        protected override bool CanMultiSelect(TreeViewItem item)
-        {
-            return false;
-        }
-
-        protected override void RenameEnded(RenameEndedArgs args)
-        {
         }
 
         protected override void RowGUI(RowGUIArgs args)

@@ -52,25 +52,33 @@ namespace CZToolKit.Core.Editors
         }
     }
 
+
     [CustomEditor(typeof(ObjectInspector))]
+#if ODIN_INSPECTOR && DRAW_WITH_ODIN
+    public class ObjectInspectorEditor : Sirenix.OdinInspector.Editor.OdinEditor
+#else
     public class ObjectInspectorEditor : Editor
+#endif
     {
         ObjectEditor objectEditor;
 
         public UnityObject UnityContext { get; set; }
 
         public ObjectInspector T_Target { get { return target as ObjectInspector; } }
-
+#if ODIN_INSPECTOR && DRAW_WITH_ODIN
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+#else
         void OnEnable()
         {
+#endif
             UnityContext = T_Target.UnityContext;
-
             OnEnable(T_Target.Target);
             T_Target.onTargetChanged = () =>
             {
                 OnEnable(T_Target.Target);
             };
-
             void OnEnable(object _targetObject)
             {
                 objectEditor = ObjectEditor.CreateEditor(_targetObject, UnityContext, this);
@@ -103,9 +111,13 @@ namespace CZToolKit.Core.Editors
 
         public override void OnInspectorGUI()
         {
-            //base.OnInspectorGUI();
             if (objectEditor != null)
                 objectEditor.OnInspectorGUI();
+        }
+
+        public void DrawBaseInspecotrGUI()
+        {
+            base.OnInspectorGUI();
         }
 
         public override void DrawPreview(Rect previewArea)

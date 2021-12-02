@@ -26,6 +26,16 @@ using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
+    [Serializable]
+    public class GenericObject<T>
+    {
+        public T t;
+        public GenericObject(T t)
+        {
+            this.t = t;
+        }
+    }
+
     public class ObjectEditor
     {
         static Dictionary<Type, Type> ObjectEditorTypeCache;
@@ -129,16 +139,18 @@ namespace CZToolKit.Core.Editors
 
         public virtual void OnInspectorGUI()
         {
-            EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.ObjectField("Script", Script, typeof(MonoScript), false);
-            EditorGUI.EndDisabledGroup();
-            foreach (var field in Fields)
-            {
-                EditorGUI.BeginChangeCheck();
-                EditorGUILayoutExtension.DrawField(field, Target);
-                if (EditorGUI.EndChangeCheck())
-                    GUI.changed = true;
-            }
+            DrawBaseInspector();
+        }
+
+        public void DrawBaseInspector()
+        {
+            if (Editor is ObjectInspectorEditor e)
+                e.DrawBaseInspecotrGUI();
+        }
+
+        public void DrawDefaultInspector()
+        {
+            Editor.DrawDefaultInspector();
         }
 
         public virtual bool HasPreviewGUI() { return false; }

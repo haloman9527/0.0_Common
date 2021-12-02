@@ -78,6 +78,8 @@ namespace CZToolKit.Core.Editors
         public event Action<CZTreeViewItem> onContextClickedItem;
         public event Action<CZTreeViewItem> onSingleClickedItem;
         public event Action<CZTreeViewItem> onDoubleClickedItem;
+        public event Func<CZTreeViewItem, bool> canRename;
+        public event Func<CZTreeViewItem, bool> canMultiSelect;
 
         public Styles GUIStyles
         {
@@ -88,6 +90,7 @@ namespace CZToolKit.Core.Editors
             }
             set { styles = value; }
         }
+        public bool Renames { get; set; } = false;
         public float RowHeight { get => rowHeight; set => rowHeight = value; }
         public bool ShowBoder { get => showBorder; set => showBorder = value; }
         public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
@@ -107,6 +110,25 @@ namespace CZToolKit.Core.Editors
         public CZTreeView(TreeViewState state) : base(state) { }
 
         public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader) { }
+
+        protected override sealed bool CanMultiSelect(TreeViewItem item)
+        {
+            if (canMultiSelect == null)
+                return false;
+            return canMultiSelect(item as CZTreeViewItem);
+        }
+
+        protected override sealed bool CanRename(TreeViewItem item)
+        {
+            if (canRename == null)
+                return false;
+            return canRename(item as CZTreeViewItem);
+        }
+
+        protected override void RenameEnded(RenameEndedArgs args)
+        {
+
+        }
 
         protected override TreeViewItem BuildRoot()
         {
@@ -148,7 +170,7 @@ namespace CZToolKit.Core.Editors
                 string[] tmpPath = path.Split('/');
                 for (int i = 0; i < tmpPath.Length; i++)
                 {
-                    CZTreeViewItem tempItem = rootItem.children.Find(item => item.displayName == tmpPath[i]) as CZTreeViewItem;
+                    CZTreeViewItem tempItem = parentItem.children.Find(item => item.displayName == tmpPath[i]) as CZTreeViewItem;
                     if (tempItem != null)
                     {
                         parentItem = tempItem;

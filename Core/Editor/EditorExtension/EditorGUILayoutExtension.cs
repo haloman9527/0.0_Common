@@ -54,19 +54,29 @@ namespace CZToolKit.Core.Editors
             EditorGUIExtension.EndAlpha();
         }
 
-        public static Rect BeginBoxGroup(params GUILayoutOption[] options)
+        public static Rect BeginVerticalBoxGroup(params GUILayoutOption[] options)
         {
             return EditorGUILayout.BeginVertical(EditorStylesExtension.RoundedBoxStyle, options);
         }
 
-        public static void EndBoxGroup()
+        public static void EndVerticalBoxGroup()
         {
             EditorGUILayout.EndVertical();
         }
 
+        public static Rect BeginHorizontalBoxGroup(params GUILayoutOption[] options)
+        {
+            return EditorGUILayout.BeginHorizontal(EditorStylesExtension.RoundedBoxStyle, options);
+        }
+
+        public static void EndHorizontalBoxGroup()
+        {
+            EditorGUILayout.EndHorizontal();
+        }
+
         public static (bool foldout, bool enable) BeginToggleGroup(string label, bool foldout, bool enable)
         {
-            BeginBoxGroup();
+            BeginVerticalBoxGroup();
             Rect rect = GUILayoutUtility.GetRect(50, 25);
             rect = EditorGUI.IndentedRect(rect);
             Rect toggleRect = new Rect(rect.x + 20, rect.y, rect.height, rect.height);
@@ -112,12 +122,12 @@ namespace CZToolKit.Core.Editors
         {
             EditorGUI.indentLevel--;
             EditorGUI.EndDisabledGroup();
-            EndBoxGroup();
+            EndVerticalBoxGroup();
         }
 
         public static bool BeginFoldout(string label, bool foldout)
         {
-            BeginBoxGroup();
+            BeginVerticalBoxGroup();
             Rect rect = GUILayoutUtility.GetRect(50, 25);
             rect = EditorGUI.IndentedRect(rect);
 
@@ -154,7 +164,7 @@ namespace CZToolKit.Core.Editors
         public static void EndFoldout()
         {
             EditorGUI.indentLevel--;
-            EndBoxGroup();
+            EndVerticalBoxGroup();
         }
 
         public static float ScrollList(SerializedProperty list, float scroll, ref bool foldout, int count = 10)
