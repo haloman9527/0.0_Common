@@ -111,6 +111,12 @@ namespace CZToolKit.Core.Editors
 
         public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader) { }
 
+        protected override TreeViewItem BuildRoot()
+        {
+            SetupDepthsFromParentsAndChildren(RootItem);
+            return RootItem;
+        }
+
         protected override sealed bool CanMultiSelect(TreeViewItem item)
         {
             if (canMultiSelect == null)
@@ -128,12 +134,6 @@ namespace CZToolKit.Core.Editors
         protected override void RenameEnded(RenameEndedArgs args)
         {
 
-        }
-
-        protected override TreeViewItem BuildRoot()
-        {
-            SetupDepthsFromParentsAndChildren(RootItem);
-            return RootItem;
         }
 
         protected override void RowGUI(RowGUIArgs args)

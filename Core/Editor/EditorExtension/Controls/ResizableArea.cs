@@ -95,16 +95,16 @@ namespace CZToolKit.Core.Editors
             directions = Directions;
         }
 
-        public void EnableSide(UIDirection direction)
+        public void SetEnable(UIDirection direction, bool enable)
         {
-            enabledSides |= direction;
-        }
-
-        public void DisableSide(UIDirection direction)
-        {
-            enabledSides &= ~direction;
-            if (Sides.ContainsKey(direction))
-                Sides.Remove(direction);
+            if (enable)
+                enabledSides |= direction;
+            else
+            {
+                enabledSides &= ~direction;
+                if (Sides.ContainsKey(direction))
+                    Sides.Remove(direction);
+            }
         }
 
         public bool IsEnabled(UIDirection direction)

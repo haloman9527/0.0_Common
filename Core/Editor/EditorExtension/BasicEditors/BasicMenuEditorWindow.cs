@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-
+using UnityEngine.UIElements;
 using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
@@ -36,34 +36,53 @@ namespace CZToolKit.Core.Editors
         string searchText;
         SearchField searchField;
         TreeViewState treeViewState = new TreeViewState();
+        VisualElement rightRoot;
 
+        Vector2 scroll;
         Rect rightRect;
         Vector2 rightScroll;
 
         public CZMenuTreeView MenuTreeView { get; private set; }
 
-        protected float LeftMinWidth { get; set; } = 50;
-        protected float RightMinWidth { get; set; } = 500;
-        protected Rect RightRect
+        protected VisualElement RightRoot
         {
             get
             {
-                return rightRect;
+                if (rightRoot == null)
+                {
+                    rightRoot = new VisualElement();
+                    rootVisualElement.Add(rightRoot);
+                }
+                return rightRoot;
             }
         }
+        protected float LeftMinWidth { get; set; } = 50;
+        protected float RightMinWidth { get; set; } = 500;
+        protected Rect RightRect { get { return rightRect; } }
 
         protected virtual void OnEnable()
         {
             resizableArea.minSize = new Vector2(LeftMinWidth, 50);
             resizableArea.side = 10;
-            resizableArea.EnableSide(ResizableArea.UIDirection.Right);
+            resizableArea.SetEnable(ResizableArea.UIDirection.Right, true);
 
             searchField = new SearchField();
-            MenuTreeView = BuildMenuTree(treeViewState);
-            MenuTreeView.Reload();
+            RefreshTreeView();
         }
 
-        Vector2 scroll;
+        protected abstract CZMenuTreeView BuildMenuTree(TreeViewState treeViewState);
+
+        public void RefreshTreeView()
+        {
+            MenuTreeView = BuildMenuTree(treeViewState);
+            MenuTreeView.Reload();
+            var selection = MenuTreeView.GetSelection();
+            OnSelectionChanged(selection);
+            MenuTreeView.onSelectionChanged += OnSelectionChanged;
+        }
+
+        protected virtual void OnSelectionChanged(IList<int> selection) { }
+
         protected virtual void OnGUI()
         {
             resizableArea.maxSize = position.size;
@@ -106,21 +125,25 @@ namespace CZToolKit.Core.Editors
             rightRect.width = position.width - resizableAreaRect.width - sideRect.width - 2;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
 
+            RightRoot.style.left = RightRect.xMin + 50;
+            RightRoot.style.width = RightRect.width - 100;
+            RightRoot.style.top = RightRect.yMin;
+            RightRoot.style.height = RightRect.height;
+
             GUILayout.BeginArea(rightRect);
+            rightRect.x = 0;
+            rightRect.y = 0;
 
             IList<int> selection = MenuTreeView.GetSelection();
-
-
             if (selection.Count > 0)
             {
                 rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
                 OnRightGUI(MenuTreeView.FindItem(selection[0]) as CZMenuTreeViewItem);
                 GUILayout.EndScrollView();
             }
+
             GUILayout.EndArea();
         }
-
-        protected abstract CZMenuTreeView BuildMenuTree(TreeViewState treeViewState);
 
         protected virtual void OnRightGUI(CZMenuTreeViewItem selectedItem)
         {
@@ -146,7 +169,6 @@ namespace CZToolKit.Core.Editors
                 default:
                     break;
             }
-
         }
     }
 
