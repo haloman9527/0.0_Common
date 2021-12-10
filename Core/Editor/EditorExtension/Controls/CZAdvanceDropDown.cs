@@ -24,6 +24,7 @@ namespace CZToolKit.Core.Editors
 {
     public class CZAdvancedDropDownItem : AdvancedDropdownItem
     {
+        public object userData;
         public event Action onSelected;
 
         public CZAdvancedDropDownItem(string name) : base(name) { }
@@ -143,6 +144,11 @@ namespace CZToolKit.Core.Editors
             size.y = Mathf.Clamp(size.y, window.minSize.y, window.maxSize.y);
 
             window.ShowAsDropDown(GUIUtility.GUIToScreenRect(buttonRect), size);
+        }
+
+        public void ShowAsContext(Vector2 buttonSize, float maxHeight)
+        {
+            Show(new Rect(Event.current.mousePosition, buttonSize), maxHeight);
         }
 
         int id;

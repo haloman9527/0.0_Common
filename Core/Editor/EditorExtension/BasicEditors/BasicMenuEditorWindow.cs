@@ -134,27 +134,26 @@ namespace CZToolKit.Core.Editors
             rightRect.x = 0;
             rightRect.y = 0;
 
-            IList<int> selection = MenuTreeView.GetSelection();
-            if (selection.Count > 0)
-            {
-                rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
-                OnRightGUI(MenuTreeView.FindItem(selection[0]) as CZMenuTreeViewItem);
-                GUILayout.EndScrollView();
-            }
+            rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
+            OnRightGUI(MenuTreeView.GetSelection());
+            GUILayout.EndScrollView();
 
             GUILayout.EndArea();
         }
 
-        protected virtual void OnRightGUI(CZMenuTreeViewItem selectedItem)
+        protected virtual void OnRightGUI(IList<int> selection)
         {
-            if (selectedItem == null) return;
-            switch (selectedItem.userData)
+            if (selection.Count == 0) return;
+            CZMenuTreeViewItem first = MenuTreeView.FindItem(selection[0]) as CZMenuTreeViewItem;
+            if (first == null) return;
+
+            switch (first.userData)
             {
                 case null:
                     GUILayout.Space(10);
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(20);
-                    GUILayout.Label(selectedItem.displayName, (GUIStyle)"AM MixerHeader2");
+                    GUILayout.Label(first.displayName, (GUIStyle)"AM MixerHeader2");
                     GUILayout.EndHorizontal();
                     GUILayout.Space(5);
                     EditorGUI.DrawRect(GUILayoutUtility.GetRect(rightRect.width, 1), Color.gray);

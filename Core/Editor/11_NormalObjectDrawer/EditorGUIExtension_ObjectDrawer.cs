@@ -103,30 +103,30 @@ namespace CZToolKit.Core.Editors
             return false;
         }
 
-        //public static float GetPropertyHeight(SerializedPropertyS property)
-        //{
-        //    return GetPropertyHeight(property, true);
-        //}
+        public static float GetPropertyHeight(SerializedPropertyS property)
+        {
+            return GetPropertyHeight(property, true);
+        }
 
-        //public static float GetPropertyHeight(SerializedPropertyS property, bool includeChildren)
-        //{
-        //    if (!property.HasChildren)
-        //        return GetPropertyHeight(property.FieldInfo.FieldType, GUIHelper.TextContent(property.FieldInfo.Name));
+        public static float GetPropertyHeight(SerializedPropertyS property, bool includeChildren)
+        {
+            if (!property.HasChildren)
+                return GetPropertyHeight(property.FieldInfo.FieldType, GUIHelper.TextContent(property.FieldInfo.Name));
 
-        //    if (!property.isExpanded)
-        //        return EditorGUIUtility.singleLineHeight;
+            if (!property.isExpanded)
+                return EditorGUIUtility.singleLineHeight;
 
-        //    float height = EditorGUIUtility.singleLineHeight;
+            float height = EditorGUIUtility.singleLineHeight;
 
-        //    if (includeChildren)
-        //    {
-        //        foreach (var children in property.GetIterator())
-        //        {
-        //            height += GetPropertyHeight(children) + EditorGUIUtility.standardVerticalSpacing;
-        //        }
-        //    }
-        //    return height;
-        //}
+            if (includeChildren)
+            {
+                foreach (var children in property.GetIterator())
+                {
+                    height += GetPropertyHeight(children) + EditorGUIUtility.standardVerticalSpacing;
+                }
+            }
+            return height;
+        }
 
         public static float GetPropertyHeight(Type type, GUIContent label)
         {
@@ -221,35 +221,35 @@ namespace CZToolKit.Core.Editors
             return 0;
         }
 
-        //public static void PropertyField(Rect rect, SerializedPropertyS property)
-        //{
-        //    if (property.HasChildren)
-        //    {
-        //        rect.height = EditorGUIUtility.singleLineHeight;
-        //        property.isExpanded = EditorGUI.Foldout(rect, property.isExpanded, property.niceName);
-        //        EditorGUI.indentLevel++;
-        //        if (property.isExpanded)
-        //        {
-        //            foreach (var children in property.GetIterator())
-        //            {
-        //                rect.y += rect.height + EditorGUIUtility.standardVerticalSpacing;
-        //                rect.height = GetPropertyHeight(children);
+        public static void PropertyField(Rect rect, SerializedPropertyS property)
+        {
+            if (property.HasChildren)
+            {
+                rect.height = EditorGUIUtility.singleLineHeight;
+                property.isExpanded = EditorGUI.Foldout(rect, property.isExpanded, property.niceName);
+                EditorGUI.indentLevel++;
+                if (property.isExpanded)
+                {
+                    foreach (var children in property.GetIterator())
+                    {
+                        rect.y += rect.height + EditorGUIUtility.standardVerticalSpacing;
+                        rect.height = GetPropertyHeight(children);
 
-        //                PropertyField(rect, children);
-        //            }
-        //        }
-        //        EditorGUI.indentLevel--;
-        //    }
-        //    else
-        //    {
-        //        EditorGUI.BeginChangeCheck();
-        //        var value = DrawField(rect, property.FieldInfo.FieldType, property.FieldInfo.GetValue(property.Context), property.niceName);
-        //        if (EditorGUI.EndChangeCheck())
-        //        {
-        //            property.FieldInfo.SetValue(property.Context, value);
-        //        }
-        //    }
-        //}
+                        PropertyField(rect, children);
+                    }
+                }
+                EditorGUI.indentLevel--;
+            }
+            else
+            {
+                EditorGUI.BeginChangeCheck();
+                var value = DrawField(rect, property.FieldInfo.FieldType, property.FieldInfo.GetValue(property.Context), property.niceName);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    property.FieldInfo.SetValue(property.Context, value);
+                }
+            }
+        }
 
         public static object DrawField(Rect rect, Type type, object value, GUIContent label)
         {
