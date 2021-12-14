@@ -48,30 +48,27 @@ namespace CZToolKit.Core.Editors
             Event evt = Event.current;
 
             if (!position.Contains(evt.mousePosition)) return null;
-
-            Object[] temp = null;
-
+            var temp = DragAndDrop.objectReferences;
+            Object[] result = null;
             switch (evt.type)
             {
                 case EventType.DragUpdated:
-                case EventType.DragPerform:
                     DragAndDrop.visualMode = dropVisualMode;
+                    break;
+                case EventType.DragPerform:
                     if (evt.type == EventType.DragPerform)
                     {
                         DragAndDrop.AcceptDrag();
-                        temp = DragAndDrop.objectReferences;
+                        result = temp;
+                        Event.current.Use();
                     }
-                    Event.current.Use();
                     break;
                 case EventType.Repaint:
-                    if (DragAndDrop.visualMode == dropVisualMode)
+                    if (temp != null && temp.Length > 0)
                         EditorGUI.DrawRect(position, hightlightColor);
                     break;
-                default:
-                    break;
             }
-
-            return temp;
+            return result;
         }
 
         /// <summary> 绘制一个可接收拖拽资源的区域 </summary>
