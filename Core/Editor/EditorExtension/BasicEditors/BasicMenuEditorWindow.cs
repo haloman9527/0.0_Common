@@ -33,7 +33,7 @@ namespace CZToolKit.Core.Editors
         ResizableArea resizableArea = new ResizableArea();
         protected Rect resizableAreaRect = new Rect(0, 0, 150, 150);
 
-        string searchText;
+        string searchText = "";
         SearchField searchField;
         TreeViewState treeViewState = new TreeViewState();
         VisualElement rightRoot;
@@ -89,32 +89,13 @@ namespace CZToolKit.Core.Editors
             resizableAreaRect.height = position.height;
             resizableAreaRect = resizableArea.OnGUI(resizableAreaRect);
 
+            // 左列表
             GUILayout.BeginArea(resizableAreaRect);
-            scroll.y = 0;
-            scroll = GUILayout.BeginScrollView(scroll);
-
-            Rect searchFieldRect = resizableAreaRect;
-            searchFieldRect.height = 22;
-            searchFieldRect.y += 3;
-            searchFieldRect.x += 5;
-            searchFieldRect.width -= 10;
-            searchFieldRect.width = Mathf.Max(100, searchFieldRect.width);
-
-            string tempSearchText = searchField.OnGUI(searchFieldRect, searchText);
-            if (tempSearchText != searchText)
-            {
-                searchText = tempSearchText;
-                MenuTreeView.searchString = searchText;
-            }
-
-            Rect treeviewRect = resizableAreaRect;
-            treeviewRect.y += searchFieldRect.height;
-            treeviewRect.height -= searchFieldRect.height;
-            EditorGUI.DrawRect(treeviewRect, new Color(0.5f, 0.5f, 0.5f, 1));
-            MenuTreeView.OnGUI(treeviewRect);
-            GUILayout.EndScrollView();
+            GUILayout.Space(3);
+            OnLeftGUI(resizableAreaRect);
             GUILayout.EndArea();
 
+            // 分割线
             Rect sideRect = resizableAreaRect;
             sideRect.x += sideRect.width;
             sideRect.width = 1;
@@ -125,20 +106,33 @@ namespace CZToolKit.Core.Editors
             rightRect.width = position.width - resizableAreaRect.width - sideRect.width - 2;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
 
-            RightRoot.style.left = RightRect.xMin + 50;
-            RightRoot.style.width = RightRect.width - 100;
-            RightRoot.style.top = RightRect.yMin;
-            RightRoot.style.height = RightRect.height;
+            RightRoot.style.left = rightRect.xMin + 50;
+            RightRoot.style.width = rightRect.width - 100;
+            RightRoot.style.top = rightRect.yMin;
+            RightRoot.style.height = rightRect.height;
 
+            // 右绘制
             GUILayout.BeginArea(rightRect);
-            rightRect.x = 0;
-            rightRect.y = 0;
-
             rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
             OnRightGUI(MenuTreeView.GetSelection());
             GUILayout.EndScrollView();
-
             GUILayout.EndArea();
+        }
+
+        protected virtual void OnLeftGUI(Rect leftRect)
+        {
+            var searchFieldRect = EditorGUILayout.GetControlRect(GUILayout.Height(20), GUILayout.Width(leftRect.width - 2));
+            string tempSearchText = searchField.OnGUI(searchFieldRect, searchText);
+            if (tempSearchText != searchText)
+            {
+                searchText = tempSearchText;
+                MenuTreeView.searchString = searchText;
+            }
+
+            var treeViewRect = EditorGUILayout.GetControlRect(GUILayout.ExpandHeight(true), GUILayout.Width(leftRect.width - 2));
+            EditorGUI.DrawRect(treeViewRect, new Color(0.5f, 0.5f, 0.5f, 1));
+            MenuTreeView.OnGUI(treeViewRect);
+            EditorGUILayout.GetControlRect(GUILayout.Height(treeViewRect.height));
         }
 
         protected virtual void OnRightGUI(IList<int> selection)
@@ -168,6 +162,11 @@ namespace CZToolKit.Core.Editors
                 default:
                     break;
             }
+        }
+
+        protected virtual Rect GetTreeViewRect(Rect treeViewRect)
+        {
+            return treeViewRect;
         }
     }
 

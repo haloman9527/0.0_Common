@@ -19,16 +19,14 @@ using UnityEditor;
 
 namespace CZToolKit.Core.Editors
 {
-    public interface ICondition
-    {
-        bool Result(EditorCoroutine _coroutine);
-    }
-
     public class EditorWaitForSeconds : ICondition
     {
         readonly float seconds;
 
-        public EditorWaitForSeconds(float seconds) { this.seconds = seconds; }
+        public EditorWaitForSeconds(float seconds)
+        {
+            this.seconds = seconds;
+        }
 
         public bool Result(EditorCoroutine coroutine)
         {
@@ -40,7 +38,10 @@ namespace CZToolKit.Core.Editors
     {
         readonly Func<bool> predicate;
 
-        public EditorWaitUntil(Func<bool> predicate) { this.predicate = predicate; }
+        public EditorWaitUntil(Func<bool> predicate)
+        {
+            this.predicate = predicate;
+        }
 
         public bool Result(EditorCoroutine coroutine)
         {

@@ -19,6 +19,11 @@ using UnityEditor;
 
 namespace CZToolKit.Core.Editors
 {
+    public interface ICondition
+    {
+        bool Result(EditorCoroutine _coroutine);
+    }
+
     public class EditorCoroutine : ICondition
     {
         IEnumerator enumerator;
@@ -38,7 +43,10 @@ namespace CZToolKit.Core.Editors
             return IsRunning = enumerator.MoveNext();
         }
 
-        public void Stop() { IsRunning = false; }
+        public void Stop()
+        {
+            IsRunning = false;
+        }
 
         public bool Result(EditorCoroutine _coroutine)
         {
