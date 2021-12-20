@@ -85,15 +85,23 @@ namespace CZToolKit.Core.Editors
 
         protected virtual void OnGUI()
         {
-            resizableArea.maxSize = position.size;
-            resizableAreaRect.height = position.height;
-            resizableAreaRect = resizableArea.OnGUI(resizableAreaRect);
+            Rect center = EditorGUILayout.BeginVertical();
 
+            if (Event.current.type == EventType.Repaint)
+            {
+                resizableAreaRect.x = center.x;
+                resizableAreaRect.y = center.y;
+                resizableAreaRect.height = center.height;
+                resizableArea.maxSize = center.size;
+            }
+
+            resizableAreaRect = resizableArea.OnGUI(resizableAreaRect);
             // 左列表
-            GUILayout.BeginArea(resizableAreaRect);
-            GUILayout.Space(3);
-            OnLeftGUI(resizableAreaRect);
-            GUILayout.EndArea();
+            using (var centerArea = new GUILayout.AreaScope(resizableAreaRect))
+            {
+                GUILayout.Space(3);
+                OnLeftGUI(resizableAreaRect);
+            }
 
             // 分割线
             Rect sideRect = resizableAreaRect;
@@ -103,7 +111,7 @@ namespace CZToolKit.Core.Editors
 
             rightRect = sideRect;
             rightRect.x += rightRect.width + 1;
-            rightRect.width = position.width - resizableAreaRect.width - sideRect.width - 2;
+            rightRect.width = center.width - resizableAreaRect.width - sideRect.width - 2;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
 
             RightRoot.style.left = rightRect.xMin + 50;
@@ -112,11 +120,15 @@ namespace CZToolKit.Core.Editors
             RightRoot.style.height = rightRect.height;
 
             // 右绘制
-            GUILayout.BeginArea(rightRect);
-            rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
-            OnRightGUI(MenuTreeView.GetSelection());
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
+            GUILayoutUtility.GetRect(rightRect.width, rightRect.height);
+            using (var rightArea = new GUILayout.AreaScope(rightRect))
+            {
+                rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
+                OnRightGUI(MenuTreeView.GetSelection());
+                GUILayout.EndScrollView();
+            }
+
+            EditorGUILayout.EndVertical();
         }
 
         protected virtual void OnLeftGUI(Rect leftRect)
