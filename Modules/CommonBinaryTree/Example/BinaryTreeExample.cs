@@ -18,7 +18,6 @@ using CZToolKit.Core.CommonBinaryTree;
 
 public class BinaryTreeExample : MonoBehaviour
 {
-    [Sirenix.OdinInspector.Button]
     void Test()
     {
         BinaryTree<int> tree = new BinaryTree<int>((a, b) =>
