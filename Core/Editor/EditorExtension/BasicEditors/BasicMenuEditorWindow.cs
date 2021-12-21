@@ -25,20 +25,20 @@ using UnityObject = UnityEngine.Object;
 namespace CZToolKit.Core.Editors
 {
     [Serializable]
-    public abstract class BasicMenuEditorWindow : BasicEditorWindow
+    public abstract class BasicMenuEditorWindow : EditorWindow
     {
         static readonly Dictionary<UnityObject, Editor> EditorCache = new Dictionary<UnityObject, Editor>();
 
         [SerializeField]
-        ResizableArea resizableArea = new ResizableArea();
-        protected Rect resizableAreaRect = new Rect(0, 0, 150, 150);
+        readonly ResizableArea leftArea = new ResizableArea();
 
         string searchText = "";
         SearchField searchField;
         TreeViewState treeViewState = new TreeViewState();
         VisualElement rightRoot;
 
-        Vector2 scroll;
+        Rect center;
+        Rect leftRect = new Rect(0, 0, 150, 150);
         Rect rightRect;
         Vector2 rightScroll;
 
@@ -57,14 +57,15 @@ namespace CZToolKit.Core.Editors
             }
         }
         protected float LeftMinWidth { get; set; } = 50;
-        protected float RightMinWidth { get; set; } = 500;
+        protected Rect LeftRect { get { return leftRect; } }
+        protected virtual float RightMinWidth { get; set; } = 500;
         protected Rect RightRect { get { return rightRect; } }
 
         protected virtual void OnEnable()
         {
-            resizableArea.minSize = new Vector2(LeftMinWidth, 50);
-            resizableArea.side = 10;
-            resizableArea.SetEnable(ResizableArea.UIDirection.Right, true);
+            leftArea.minSize = new Vector2(LeftMinWidth, 50);
+            leftArea.side = 10;
+            leftArea.SetEnable(ResizableArea.UIDirection.Right, true);
 
             searchField = new SearchField();
             RefreshTreeView();
@@ -85,33 +86,33 @@ namespace CZToolKit.Core.Editors
 
         protected virtual void OnGUI()
         {
-            Rect center = EditorGUILayout.BeginVertical();
+            var tempCenter = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
-            if (Event.current.type == EventType.Repaint)
+            if (Event.current.type != EventType.Layout)
             {
-                resizableAreaRect.x = center.x;
-                resizableAreaRect.y = center.y;
-                resizableAreaRect.height = center.height;
-                resizableArea.maxSize = center.size;
+                center = tempCenter;
+                leftRect.x = center.x;
+                leftRect.y = center.y;
+                leftRect.height = center.height;
+                leftArea.maxSize = center.size;
             }
 
-            resizableAreaRect = resizableArea.OnGUI(resizableAreaRect);
+            leftRect = leftArea.OnGUI(leftRect);
             // 左列表
-            using (var centerArea = new GUILayout.AreaScope(resizableAreaRect))
+            using (var leftScope = new GUILayout.AreaScope(leftRect))
             {
                 GUILayout.Space(3);
-                OnLeftGUI(resizableAreaRect);
+                OnLeftGUI();
             }
 
             // 分割线
-            Rect sideRect = resizableAreaRect;
-            sideRect.x += sideRect.width;
+            Rect sideRect = center;
+            sideRect.xMin = leftRect.xMax;
             sideRect.width = 1;
             EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
 
-            rightRect = sideRect;
-            rightRect.x += rightRect.width + 1;
-            rightRect.width = center.width - resizableAreaRect.width - sideRect.width - 2;
+            rightRect = center;
+            rightRect.xMin = sideRect.xMax + 2;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
 
             RightRoot.style.left = rightRect.xMin + 50;
@@ -120,8 +121,7 @@ namespace CZToolKit.Core.Editors
             RightRoot.style.height = rightRect.height;
 
             // 右绘制
-            GUILayoutUtility.GetRect(rightRect.width, rightRect.height);
-            using (var rightArea = new GUILayout.AreaScope(rightRect))
+            using (var rightScope = new GUILayout.AreaScope(rightRect))
             {
                 rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
                 OnRightGUI(MenuTreeView.GetSelection());
@@ -131,9 +131,10 @@ namespace CZToolKit.Core.Editors
             EditorGUILayout.EndVertical();
         }
 
-        protected virtual void OnLeftGUI(Rect leftRect)
+        protected virtual void OnLeftGUI()
         {
-            var searchFieldRect = EditorGUILayout.GetControlRect(GUILayout.Height(20), GUILayout.Width(leftRect.width - 2));
+            EditorGUILayout.BeginVertical();
+            var searchFieldRect = EditorGUILayout.GetControlRect(GUILayout.Height(20), GUILayout.ExpandWidth(true));
             string tempSearchText = searchField.OnGUI(searchFieldRect, searchText);
             if (tempSearchText != searchText)
             {
@@ -141,15 +142,16 @@ namespace CZToolKit.Core.Editors
                 MenuTreeView.searchString = searchText;
             }
 
-            var treeViewRect = EditorGUILayout.GetControlRect(GUILayout.ExpandHeight(true), GUILayout.Width(leftRect.width - 2));
+            var treeViewRect = EditorGUILayout.GetControlRect(GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
             EditorGUI.DrawRect(treeViewRect, new Color(0.5f, 0.5f, 0.5f, 1));
             MenuTreeView.OnGUI(treeViewRect);
-            EditorGUILayout.GetControlRect(GUILayout.Height(treeViewRect.height));
+            EditorGUILayout.EndVertical();
         }
 
         protected virtual void OnRightGUI(IList<int> selection)
         {
-            if (selection.Count == 0) return;
+            if (selection.Count == 0)
+                return;
             CZMenuTreeViewItem first = MenuTreeView.FindItem(selection[0]) as CZMenuTreeViewItem;
             if (first == null) return;
 
@@ -171,14 +173,7 @@ namespace CZToolKit.Core.Editors
                     editor.OnInspectorGUI();
                     Repaint();
                     break;
-                default:
-                    break;
             }
-        }
-
-        protected virtual Rect GetTreeViewRect(Rect treeViewRect)
-        {
-            return treeViewRect;
         }
     }
 
