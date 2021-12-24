@@ -26,16 +26,6 @@ using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
-    [Serializable]
-    public class GenericObject<T>
-    {
-        public T t;
-        public GenericObject(T t)
-        {
-            this.t = t;
-        }
-    }
-
     public class ObjectEditor
     {
         static Dictionary<Type, Type> ObjectEditorTypeCache;
@@ -102,12 +92,11 @@ namespace CZToolKit.Core.Editors
             return Activator.CreateInstance(GetEditorType(target.GetType()), true) as ObjectEditor;
         }
 
-        protected IReadOnlyList<FieldInfo> Fields { get; private set; }
-
         public object Target { get; private set; }
         public UnityObject Owner { get; private set; }
         public Editor Editor { get; private set; }
         public MonoScript Script { get; private set; }
+        public SerializedPropertyS SerializedObject { get; private set; }
 
         protected ObjectEditor() { }
 
@@ -115,7 +104,7 @@ namespace CZToolKit.Core.Editors
         {
             Target = target;
             Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
-            Fields = Util_Reflection.GetFieldInfos(Target.GetType()).Where(field => EditorGUILayoutExtension.CanDraw(field)).ToList();
+            SerializedObject = new SerializedPropertyS(Target);
         }
 
         void Initialize(object target, UnityObject context)
@@ -140,6 +129,7 @@ namespace CZToolKit.Core.Editors
         public virtual void OnInspectorGUI()
         {
             DrawBaseInspector();
+            EditorGUILayoutExtension.PropertyField(SerializedObject);
         }
 
         public void DrawBaseInspector()

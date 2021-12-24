@@ -141,6 +141,11 @@ namespace CZToolKit.Core.Editors
                 searchText = tempSearchText;
                 MenuTreeView.searchString = searchText;
             }
+            if (searchField.HasFocus() && (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return))
+            {
+                MenuTreeView.SetFocusAndEnsureSelectedItem();
+                Event.current.Use();
+            }
 
             var treeViewRect = EditorGUILayout.GetControlRect(GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
             EditorGUI.DrawRect(treeViewRect, new Color(0.5f, 0.5f, 0.5f, 1));

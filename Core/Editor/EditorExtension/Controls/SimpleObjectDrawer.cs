@@ -79,7 +79,7 @@ namespace CZToolKit.Core.Editors
             Initialize(target);
         }
 
-        public object Target { get; private set; }
+        public object Target { get; set; }
         protected IReadOnlyList<FieldInfo> Fields { get; private set; }
 
         void Initialize(object target)
@@ -93,9 +93,9 @@ namespace CZToolKit.Core.Editors
             GUI.Label(position, label);
         }
 
-        public virtual float GetHeight()
+        public virtual float GetHeight(GUIContent label)
         {
-            return 20;
+            return EditorGUIUtility.singleLineHeight;
         }
     }
 
