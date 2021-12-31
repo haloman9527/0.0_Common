@@ -25,13 +25,13 @@ namespace CZToolKit.Core.Editors
     public class CZAdvancedDropDownItem : AdvancedDropdownItem
     {
         public object userData;
-        public event Action onSelected;
+        public event Action<CZAdvancedDropDownItem> onSelected;
 
         public CZAdvancedDropDownItem(string name) : base(name) { }
 
         public void Selected()
         {
-            onSelected?.Invoke();
+            onSelected?.Invoke(this);
         }
     }
 
