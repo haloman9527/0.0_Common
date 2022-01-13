@@ -13,19 +13,6 @@
  *
  */
 #endregion
-#region ע ��
-/***
- *
- *  Title:
- *  
- *  Description:
- *  
- *  Date:
- *  Version:
- *  Writer: 
- *
- */
-#endregion
 using System.Collections.Generic;
 
 namespace CZToolKit.Core.SharedVariable

@@ -25,7 +25,7 @@ namespace CZToolKit.Core.Editors
     public class CZTreeViewItem : TreeViewItem
     {
         public object userData;
-        public Action<Rect, CZTreeViewItem> itemDrawer;
+        public Action<Rect> itemDrawer;
         public Action onContextClicked;
         public Action onDoubleClicked;
 
@@ -90,7 +90,6 @@ namespace CZToolKit.Core.Editors
             }
             set { styles = value; }
         }
-        public bool Renames { get; set; } = false;
         public float RowHeight { get => rowHeight; set => rowHeight = value; }
         public bool ShowBoder { get => showBorder; set => showBorder = value; }
         public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
@@ -153,12 +152,13 @@ namespace CZToolKit.Core.Editors
                 GUIContent textContent = GUIHelper.TextContent(item.displayName);
                 textContent.image = item.icon;
                 GUI.Label(labelRect, textContent, GUIStyles.leftLabelStyle);
+
+                if (item != null)
+                    item.itemDrawer?.Invoke(args.rowRect);
             }
-            if (item != null)
-                item.itemDrawer?.Invoke(args.rowRect, item);
         }
 
-        public void AddMenuItem<T>(string path, T treeViewItem) where T : CZTreeViewItem
+        public void AddMenuItem<T>(string path, T treeViewItem) where T : CZTreeViewItem, new()
         {
             if (string.IsNullOrEmpty(path)) return;
 
@@ -177,7 +177,7 @@ namespace CZToolKit.Core.Editors
                     }
                     else
                     {
-                        tempItem = new CZTreeViewItem() { id = GenerateID(), displayName = tmpPath[i], parent = rootItem };
+                        tempItem = new T() { id = GenerateID(), displayName = tmpPath[i], parent = parentItem };
                         parentItem.children.Add(tempItem);
                         parentItem = tempItem;
                     }
@@ -186,8 +186,7 @@ namespace CZToolKit.Core.Editors
 
             treeViewItem.id = GenerateID();
             treeViewItem.displayName = name;
-            treeViewItem.parent = rootItem;
-
+            treeViewItem.parent = parentItem;
             parentItem.children.Add(treeViewItem);
         }
 

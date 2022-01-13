@@ -17,7 +17,7 @@ using System;
 
 namespace CZToolKit.Core.ReactiveX
 {
-    public class Execute<T> : Operator<T>
+    public class Execute<T> : Operator<T, T>
     {
         Action<T> func;
         public Execute(IObservable<T> _src, Action<T> _func) : base(_src)
@@ -28,7 +28,7 @@ namespace CZToolKit.Core.ReactiveX
         public override void OnNext(T _value)
         {
             func.Invoke(_value);
-            base.OnNext(_value);
+            observer.OnNext(_value);
         }
     }
 }

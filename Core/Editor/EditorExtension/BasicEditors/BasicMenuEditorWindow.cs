@@ -131,9 +131,8 @@ namespace CZToolKit.Core.Editors
             EditorGUILayout.EndVertical();
         }
 
-        protected virtual void OnLeftGUI()
+        protected virtual void OnSerachFieldGUI(string placeholderText = "")
         {
-            EditorGUILayout.BeginVertical();
             var searchFieldRect = EditorGUILayout.GetControlRect(GUILayout.Height(20), GUILayout.ExpandWidth(true));
             string tempSearchText = searchField.OnGUI(searchFieldRect, searchText);
             if (tempSearchText != searchText)
@@ -147,9 +146,35 @@ namespace CZToolKit.Core.Editors
                 Event.current.Use();
             }
 
+            if (string.IsNullOrEmpty(searchText))
+            {
+                EditorGUI.BeginDisabledGroup(true);
+
+                Rect placeholderRect = searchFieldRect;
+                placeholderRect.xMin += 15;
+                placeholderRect.yMin -= 3;
+                placeholderRect.yMax -= 3;
+                GUI.Label(placeholderRect, placeholderText);
+
+                EditorGUI.EndDisabledGroup();
+            }
+        }
+
+        protected virtual void OnTreeViewGUI()
+        {
             var treeViewRect = EditorGUILayout.GetControlRect(GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
             EditorGUI.DrawRect(treeViewRect, new Color(0.5f, 0.5f, 0.5f, 1));
-            MenuTreeView.OnGUI(treeViewRect);
+            if (MenuTreeView != null)
+                MenuTreeView.OnGUI(treeViewRect);
+        }
+
+        protected virtual void OnLeftGUI()
+        {
+            EditorGUILayout.BeginVertical();
+
+            OnSerachFieldGUI();
+            OnTreeViewGUI();
+
             EditorGUILayout.EndVertical();
         }
 
@@ -206,14 +231,6 @@ namespace CZToolKit.Core.Editors
             if (index == -1)
                 return null;
             return _path.Substring(0, index);
-        }
-
-        protected override void RowGUI(RowGUIArgs args)
-        {
-            base.RowGUI(args);
-            CZMenuTreeViewItem item = args.item as CZMenuTreeViewItem;
-            if (item != null)
-                item.itemDrawer?.Invoke(args.rowRect, item);
         }
     }
 
