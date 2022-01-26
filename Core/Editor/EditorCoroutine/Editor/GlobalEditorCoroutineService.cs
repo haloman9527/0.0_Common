@@ -26,10 +26,10 @@ namespace CZToolKit.Core.Editors
     }
 
     [InitializeOnLoad]
-    public class GlobalEditorCoroutineMachine
+    public class GlobalEditorCoroutineService
     {
         #region Perference
-        static string Name = nameof(GlobalEditorCoroutineMachine);
+        static string Name = nameof(GlobalEditorCoroutineService);
         static string key = "GlobalEditorCoroutine.Settings";
 
 #if UNITY_2019_1_OR_NEWER
@@ -85,26 +85,26 @@ namespace CZToolKit.Core.Editors
                 EditorApplication.update -= Update;
         }
 
-        static CoroutineMachineController CoroutineMachine = new CoroutineMachineController();
+        static EditorCoroutineService CoroutineService = new EditorCoroutineService();
 
-        static GlobalEditorCoroutineMachine()
+        static GlobalEditorCoroutineService()
         {
             UpdateStatus();
         }
 
         static void Update()
         {
-            CoroutineMachine.Update();
+            CoroutineService.Update();
         }
 
-        public static EditorCoroutine StartCoroutine(IEnumerator enumerator)
+        public static ICoroutine StartCoroutine(IEnumerator enumerator)
         {
-            return CoroutineMachine.StartCoroutine(enumerator);
+            return CoroutineService.StartCoroutine(enumerator);
         }
 
         public static void StopCoroutine(EditorCoroutine coroutine)
         {
-            CoroutineMachine.StopCoroutine(coroutine);
+            CoroutineService.StopCoroutine(coroutine);
         }
     }
 }

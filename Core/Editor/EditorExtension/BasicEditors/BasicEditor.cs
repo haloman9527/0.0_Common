@@ -24,7 +24,7 @@ namespace CZToolKit.Core.Editors
     public abstract class BasicEditor : Editor
     {
         Dictionary<string, UnityAction<SerializedProperty>> customDrawers;
-        CoroutineMachineController CoroutineMachineController = new CoroutineMachineController();
+        EditorCoroutineService CoroutineMachineController = new EditorCoroutineService();
 
         protected virtual void OnEnable()
         {

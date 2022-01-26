@@ -69,7 +69,7 @@ namespace CZToolKit.Core.Editors
                 AssetDatabase.OpenAsset(MonoScript);
         }
 
-        CoroutineMachineController CoroutineMachine = new CoroutineMachineController();
+        EditorCoroutineService CoroutineMachine = new EditorCoroutineService();
 
         protected virtual void Update()
         {

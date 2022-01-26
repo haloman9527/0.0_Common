@@ -13,24 +13,23 @@
  *
  */
 #endregion
-#if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Core
 {
-    public class CoroutineMachineController
+    public abstract class CoroutineService<T> where T : class, ICoroutine
     {
-        Queue<EditorCoroutine> coroutineQueue = new Queue<EditorCoroutine>();
+        protected readonly Queue<T> coroutineQueue = new Queue<T>();
 
         public void Update()
         {
             int count = coroutineQueue.Count;
             while (count-- > 0)
             {
-                EditorCoroutine coroutine = coroutineQueue.Dequeue();
+                T coroutine = coroutineQueue.Dequeue();
                 if (!coroutine.IsRunning) continue;
-                ICondition condition = coroutine.Current as ICondition;
+                IYield condition = coroutine.Current;
                 if (condition == null || condition.Result(coroutine))
                 {
                     if (!coroutine.MoveNext())
@@ -40,17 +39,8 @@ namespace CZToolKit.Core.Editors
             }
         }
 
-        public EditorCoroutine StartCoroutine(IEnumerator enumerator)
-        {
-            EditorCoroutine coroutine = new EditorCoroutine(enumerator);
-            coroutineQueue.Enqueue(coroutine);
-            return coroutine;
-        }
+        public abstract T StartCoroutine(IEnumerator enumerator);
 
-        public void StopCoroutine(EditorCoroutine coroutine)
-        {
-            coroutine.Stop();
-        }
+        public abstract void StopCoroutine(T coroutine);
     }
 }
-#endif
