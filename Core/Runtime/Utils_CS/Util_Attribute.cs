@@ -27,33 +27,33 @@ namespace CZToolKit.Core
         static readonly Dictionary<Type, Attribute[]> TypeAttributes = new Dictionary<Type, Attribute[]>();
 
         /// <summary> 获取类型的特定特性 </summary>
-        public static bool TryGetTypeAttribute<AttributeType>(Type _type, out AttributeType _attribute)
+        public static bool TryGetTypeAttribute<AttributeType>(Type type, out AttributeType attribute)
             where AttributeType : Attribute
         {
-            foreach (var tempAttribute in GetTypeAttributes(_type))
+            foreach (var tempAttribute in GetTypeAttributes(type))
             {
-                _attribute = tempAttribute as AttributeType;
-                if (_attribute != null)
+                attribute = tempAttribute as AttributeType;
+                if (attribute != null)
                     return true;
             }
 
-            _attribute = null;
+            attribute = null;
             return false;
         }
 
         /// <summary> 获取类型的所有特性 </summary>
-        public static Attribute[] GetTypeAttributes(Type _type, bool _inherit = true)
+        public static Attribute[] GetTypeAttributes(Type type, bool inherit = true)
         {
-            if (TypeAttributes.TryGetValue(_type, out var _attributes))
+            if (TypeAttributes.TryGetValue(type, out var _attributes))
                 return _attributes;
-            TypeAttributes[_type] = _attributes = CustomAttributeExtensions.GetCustomAttributes(_type, _inherit).ToArray();
+            TypeAttributes[type] = _attributes = CustomAttributeExtensions.GetCustomAttributes(type, inherit).ToArray();
             return _attributes;
         }
 
         /// <summary> 获取类型的所有特性 </summary>
-        public static IEnumerable<T> GetTypeAttributes<T>(Type _type, bool _inherit = true) where T : Attribute
+        public static IEnumerable<T> GetTypeAttributes<T>(Type type, bool inherit = true) where T : Attribute
         {
-            foreach (var attribute in GetTypeAttributes(_type, _inherit))
+            foreach (var attribute in GetTypeAttributes(type, inherit))
             {
                 if (attribute is T t_attritube)
                     yield return t_attritube;
@@ -67,9 +67,7 @@ namespace CZToolKit.Core
             new Dictionary<Type, Dictionary<string, Attribute[]>>();
 
         /// <summary> 根据<paramref name="fieldInfo"/>获取特定类型特性 </summary>
-        public static bool TryGetFieldAttribute<AttributeType>(FieldInfo fieldInfo,
-            out AttributeType attribute)
-            where AttributeType : Attribute
+        public static bool TryGetFieldAttribute<AttributeType>(FieldInfo fieldInfo, out AttributeType attribute) where AttributeType : Attribute
         {
             attribute = null;
             if (fieldInfo == null) return false;
@@ -90,14 +88,14 @@ namespace CZToolKit.Core
             return TryGetFieldAttribute(Util_Reflection.GetFieldInfo(type, fieldName), out attribute);
         }
 
-        /// <summary> 根据<paramref name="_fieldInfo"/>获取所有特性 </summary>
-        public static Attribute[] GetFieldAttributes(FieldInfo _fieldInfo)
+        /// <summary> 根据<paramref name="fieldInfo"/>获取所有特性 </summary>
+        public static Attribute[] GetFieldAttributes(FieldInfo fieldInfo)
         {
-            if (!TypeFieldAttributes.TryGetValue(_fieldInfo.DeclaringType, out var fieldTypes))
-                TypeFieldAttributes[_fieldInfo.DeclaringType] = fieldTypes = new Dictionary<string, Attribute[]>();
+            if (!TypeFieldAttributes.TryGetValue(fieldInfo.DeclaringType, out var fieldTypes))
+                TypeFieldAttributes[fieldInfo.DeclaringType] = fieldTypes = new Dictionary<string, Attribute[]>();
 
-            if (!fieldTypes.TryGetValue(_fieldInfo.Name, out var attributes))
-                fieldTypes[_fieldInfo.Name] = attributes = _fieldInfo.GetCustomAttributes(typeof(Attribute), true) as Attribute[];
+            if (!fieldTypes.TryGetValue(fieldInfo.Name, out var attributes))
+                fieldTypes[fieldInfo.Name] = attributes = fieldInfo.GetCustomAttributes(typeof(Attribute), true) as Attribute[];
 
             return attributes;
         }
@@ -124,11 +122,11 @@ namespace CZToolKit.Core
         static readonly Dictionary<Type, Dictionary<string, Attribute[]>> TypeMethodAttributes =
             new Dictionary<Type, Dictionary<string, Attribute[]>>();
 
-        public static bool TryGetMethodAttribute<AttributeType>(MethodInfo _methodInfo,
+        public static bool TryGetMethodAttribute<AttributeType>(MethodInfo methodInfo,
             out AttributeType _attribute)
             where AttributeType : Attribute
         {
-            Attribute[] attributes = GetMethodAttributes(_methodInfo);
+            Attribute[] attributes = GetMethodAttributes(methodInfo);
             for (int i = 0; i < attributes.Length; i++)
             {
                 _attribute = attributes[i] as AttributeType;
@@ -140,11 +138,11 @@ namespace CZToolKit.Core
         }
 
         /// <summary> 根据类型和方法名获取特定类型特性 </summary>
-        public static bool TryGetMethodAttribute<AttributeType>(Type _type, string _methodName,
+        public static bool TryGetMethodAttribute<AttributeType>(Type type, string _methodName,
             out AttributeType _attribute)
             where AttributeType : Attribute
         {
-            return TryGetMethodAttribute(Util_Reflection.GetMethodInfo(_type, _methodName), out _attribute);
+            return TryGetMethodAttribute(Util_Reflection.GetMethodInfo(type, _methodName), out _attribute);
         }
 
         /// <summary> 根据<paramref name="_methodInfo"/>获取所有特性 </summary>
@@ -160,14 +158,14 @@ namespace CZToolKit.Core
         }
 
         /// <summary> 根据类型和方法名获取所有特性 </summary>
-        public static Attribute[] GetMethodAttributes(Type _type, string _methodName)
+        public static Attribute[] GetMethodAttributes(Type type, string _methodName)
         {
-            return GetMethodAttributes(Util_Reflection.GetMethodInfo(_type, _methodName));
+            return GetMethodAttributes(Util_Reflection.GetMethodInfo(type, _methodName));
         }
 
-        public static IEnumerable<T> GetMethodAttributes<T>(Type _type, string _methodName) where T : Attribute
+        public static IEnumerable<T> GetMethodAttributes<T>(Type type, string methodName) where T : Attribute
         {
-            Attribute[] _attributes = GetMethodAttributes(_type, _methodName);
+            Attribute[] _attributes = GetMethodAttributes(type, methodName);
             foreach (var attribute in _attributes)
             {
                 if (attribute is T t_attritube)

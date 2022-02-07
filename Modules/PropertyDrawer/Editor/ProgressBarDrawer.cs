@@ -20,8 +20,8 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Attributes.Editors
 {
-    [CustomPropertyDrawer(typeof(ProgressBarAttribute))]
-    public class ProgressBarDrawer : PropertyDrawer
+    [@CustomPropertyDrawer(typeof(ProgressBarAttribute))]
+    public class ProgressBarDrawer : UnityEditor.PropertyDrawer
     {
         ProgressBarAttribute progressBarAttribute;
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

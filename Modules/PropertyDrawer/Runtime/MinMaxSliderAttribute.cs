@@ -19,7 +19,7 @@ using System;
 namespace CZToolKit.Core.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true,Inherited = true)]
-    public class MinMaxSliderAttribute : PropertyAttribute {
+    public class MinMaxSliderAttribute : UnityEngine.PropertyAttribute {
 
         public float min, max;
         public float fieldWidth = 50;

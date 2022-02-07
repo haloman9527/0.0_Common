@@ -14,8 +14,6 @@
  */
 #endregion
 #if UNITY_EDITOR
-using System;
-using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -40,8 +38,11 @@ namespace CZToolKit.Core.Editors
 
         public static float GetPropertyHeight(SerializedPropertyS property, bool includeChildren, GUIContent label)
         {
-            if (!property.HasChildren)
-                return GetPropertyHeight(property.propertyType, label);
+            if (property.drawer != null)
+                return property.drawer.GetHeight();
+
+            if (IsBasicType(property.propertyType))
+                return GetHeight(property.propertyType, label);
 
             if (!property.expanded)
                 return EditorGUIUtility.singleLineHeight;
@@ -60,7 +61,11 @@ namespace CZToolKit.Core.Editors
 
         public static void PropertyField(Rect rect, SerializedPropertyS property)
         {
-            if (property.HasChildren)
+            if (property.drawer != null)
+            {
+                property.drawer.OnGUI(rect, property.niceName);
+            }
+            else if (property.HasChildren)
             {
                 rect.height = EditorGUIUtility.singleLineHeight;
                 property.expanded = EditorGUI.Foldout(rect, property.expanded, property.niceName);

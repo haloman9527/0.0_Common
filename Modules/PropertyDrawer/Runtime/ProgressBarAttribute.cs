@@ -19,7 +19,7 @@ using UnityEngine;
 namespace CZToolKit.Core.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
-    public class ProgressBarAttribute : PropertyAttribute
+    public class ProgressBarAttribute : UnityEngine.PropertyAttribute
     {
         public readonly float min;
         public readonly float max;

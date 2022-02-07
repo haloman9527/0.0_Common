@@ -21,7 +21,7 @@ using UnityEngine;
 namespace CZToolKit.Core.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
-    public class PreviewObjectFieldAttribute : PropertyAttribute
+    public class PreviewObjectFieldAttribute : UnityEngine.PropertyAttribute
     {
 
     }

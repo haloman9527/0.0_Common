@@ -19,8 +19,8 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Blackboards.Editors
 {
-    [CustomFieldDrawerAttribute(typeof(CZTypeAttribute))]
-    public class CZTypeObjectDrawer : ObjectDrawer
+    [CustomPropertyDrawer(typeof(CZTypeAttribute))]
+    public class CZTypeObjectDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, GUIContent label)
         {

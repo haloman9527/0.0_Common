@@ -16,5 +16,5 @@
 
 namespace CZToolKit.Core.SharedVariable
 {
-    public class SharedVariableAttribute : FieldAttribute { }
+    public class SharedVariableAttribute : PropertyAttribute { }
 }

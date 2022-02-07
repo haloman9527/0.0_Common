@@ -34,6 +34,7 @@ namespace CZToolKit.Core.Editors
         // 上下文和FieldInfo
         public readonly SerializedPropertyS parent;
         public readonly FieldInfo fieldInfo;
+        public readonly PropertyDrawer drawer;
 
         /// <summary> 是否展开 </summary>
         public bool expanded;
@@ -91,9 +92,14 @@ namespace CZToolKit.Core.Editors
             if (!HasChildren)
             {
                 childrens = new Dictionary<string, SerializedPropertyS>();
-                if (!typeof(UnityObject).IsAssignableFrom(propertyType))
-                    fieldInfo.SetValue(parent, EditorGUIExtension.CreateInstance(propertyType));
             }
+
+            var editorType = PropertyDrawer.GetEditorType(propertyType);
+            var att = (PropertyAttribute)null;
+            if (editorType == null && Util_Attribute.TryGetTypeAttribute(propertyType, out att))
+                editorType = PropertyDrawer.GetEditorType(propertyType);
+            if (editorType != null)
+                drawer = PropertyDrawer.CreateEditor(this, att, editorType);
         }
 
         private SerializedPropertyS(FieldInfo fieldInfo, SerializedPropertyS parent)
@@ -114,12 +120,20 @@ namespace CZToolKit.Core.Editors
                     hasChildren = true;
                 }
             }
+
             if (!HasChildren)
             {
                 childrens = new Dictionary<string, SerializedPropertyS>();
                 if (!typeof(UnityObject).IsAssignableFrom(propertyType))
                     fieldInfo.SetValue(parent.Value, EditorGUIExtension.CreateInstance(propertyType));
             }
+
+            var editorType = PropertyDrawer.GetEditorType(propertyType);
+            var att = (PropertyAttribute)null;
+            if (editorType == null && Util_Attribute.TryGetFieldAttribute<PropertyAttribute>(fieldInfo, out att))
+                editorType = PropertyDrawer.GetEditorType(att.GetType());
+            if (editorType != null)
+                drawer = PropertyDrawer.CreateEditor(this, att, editorType);
         }
 
         private void InternalCreate()

@@ -44,41 +44,9 @@ namespace CZToolKit.Core.Editors
             return @bool.value;
         }
 
-        public static void DrawObjectInInspector(object target, UnityObject context = null)
-        {
-            if (target is UnityObject)
-            {
-                Selection.activeObject = target as UnityObject;
-            }
-            else
-            {
-                Selection.activeObject = ObjectInspector.Instance;
-                ObjectInspector.Instance.Initialize(target, context);
-            }
-        }
-
-        public static void DrawObjectInInspector(string title, object target, UnityObject context = null)
-        {
-            DrawObjectInInspector(target, context);
-            ObjectInspector.Instance.name = title;
-        }
-
         public static void DrawField(FieldInfo fieldInfo, object context, GUIContent label)
         {
             object value = fieldInfo.GetValue(context);
-
-            // 查找字段绘制器
-            if (Util_Attribute.TryGetFieldAttribute(fieldInfo, out FieldAttribute att) || Util_Attribute.TryGetTypeAttribute(fieldInfo.FieldType, out att))
-            {
-                ObjectDrawer objectDrawer = Util_ObjectDrawer.GetObjectDrawer(att);
-                if (objectDrawer != null)
-                {
-                    objectDrawer.Target = value;
-                    objectDrawer.FieldInfo = fieldInfo;
-                    objectDrawer.OnGUI(EditorGUILayout.GetControlRect(true, objectDrawer.GetHeight()), label);
-                    return;
-                }
-            }
 
             // 判断是否是数组
             if (typeof(IList).IsAssignableFrom(fieldInfo.FieldType))
@@ -109,8 +77,6 @@ namespace CZToolKit.Core.Editors
         {
             Type type = value.GetType();
 
-            // 寻找Type绘制器
-
             if (type.IsClass || (type.IsValueType && !type.IsPrimitive))
             {
                 if (typeof(Delegate).IsAssignableFrom(type)) return null;
@@ -140,7 +106,7 @@ namespace CZToolKit.Core.Editors
                 return value;
             }
 
-            float height = EditorGUIExtension.GetPropertyHeight(type, label);
+            float height = EditorGUIExtension.GetHeight(type, label);
             return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, height), value, label);
 
             //if (_fieldType.Equals(typeof(Matrix4x4)))
@@ -177,7 +143,7 @@ namespace CZToolKit.Core.Editors
 
         public static object DrawField(Type type, object value, GUIContent label)
         {
-            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, EditorGUIExtension.GetPropertyHeight(type, label)), type, value, label);
+            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, EditorGUIExtension.GetHeight(type, label)), type, value, label);
         }
 
         public static object DrawField(Type type, object value, string label)
@@ -300,35 +266,12 @@ namespace CZToolKit.Core.Editors
                     savedArraySize = newCount;
                 }
 
-                if (fieldInfo != null
-                    && (Util_Attribute.TryGetFieldAttribute(fieldInfo, out FieldAttribute att)
-                    || Util_Attribute.TryGetTypeAttribute(elementType, out att)))
+                for (int k = 0; k < list.Count; k++)
                 {
-                    for (int k = 0; k < list.Count; k++)
-                    {
-                        ObjectDrawer objectDrawer;
+                    label.text = "Element " + k;
+                    list[k] = DrawField(list[k], label);
+                }
 
-                        if ((objectDrawer = Util_ObjectDrawer.GetObjectDrawer(att)) != null)
-                        {
-                            label.text = "Element " + k;
-                            objectDrawer.Target = list[k];
-                            objectDrawer.OnGUI(GUILayoutUtility.GetRect(EditorGUIUtility.labelWidth, objectDrawer.GetHeight()), label);
-                            if (objectDrawer.Target != list[k])
-                            {
-                                list[k] = objectDrawer.Target;
-                                GUI.changed = true;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    for (int k = 0; k < list.Count; k++)
-                    {
-                        label.text = "Element " + k;
-                        list[k] = DrawField(list[k], label);
-                    }
-                }
                 EditorGUI.indentLevel--;
             }
             return list;

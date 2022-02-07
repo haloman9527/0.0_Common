@@ -23,8 +23,8 @@ using UnityObject = UnityEngine.Object;
 namespace CZToolKit.Core.Attributes.Editors
 {
 
-    [CustomPropertyDrawer(typeof(ObjectPreviewButtonAttribute), true)]
-    public class ObjectPreviewButtonDrawer : PropertyDrawer
+    [@CustomPropertyDrawer(typeof(ObjectPreviewButtonAttribute), true)]
+    public class ObjectPreviewButtonDrawer : UnityEditor.PropertyDrawer
     {
         public class ObjectPreviewPopupWindow : PopupWindowContent
         {

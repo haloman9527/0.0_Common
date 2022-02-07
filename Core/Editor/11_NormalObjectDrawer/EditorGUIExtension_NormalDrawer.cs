@@ -78,9 +78,8 @@ namespace CZToolKit.Core.Editors
 
             if (typeof(IList).IsAssignableFrom(type))
             {
-                Type elementType;
                 if (type.IsArray)
-                    elementType = type.GetElementType();
+                    type = type.GetElementType();
                 else
                 {
                     Type type2 = type;
@@ -88,11 +87,7 @@ namespace CZToolKit.Core.Editors
                     {
                         type2 = type2.BaseType;
                     }
-                    elementType = type2.GetGenericArguments()[0];
-                }
-                if (IsSupport(elementType))
-                {
-                    return true;
+                    type = type2.GetGenericArguments()[0];
                 }
             }
 
@@ -104,7 +99,7 @@ namespace CZToolKit.Core.Editors
             return false;
         }
 
-        public static float GetPropertyHeight(Type type, GUIContent label)
+        public static float GetHeight(Type type, GUIContent label)
         {
             if (type.Equals(typeof(bool)))
             {
@@ -204,12 +199,10 @@ namespace CZToolKit.Core.Editors
                 if (!typeof(UnityObject).IsAssignableFrom(type))
                     value = CreateInstance(type);
             }
-
             if (!IsSupport(type))
             {
                 return null;
             }
-
             if (type.Equals(typeof(bool)))
             {
                 return EditorGUI.Toggle(rect, label, value == null ? false : (bool)value);

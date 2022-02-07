@@ -19,5 +19,5 @@ using System;
 namespace CZToolKit.Core.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class InlineEditorAttribute : PropertyAttribute { }
+    public class InlineEditorAttribute : UnityEngine.PropertyAttribute { }
 }
