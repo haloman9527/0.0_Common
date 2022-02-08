@@ -13,18 +13,12 @@
  *
  */
 #endregion
-
 using UnityEngine;
 
 namespace CZToolKit.Core
 {
     public static partial class MathLibrary
     {
-        public static Vector2 Reverse(Vector2 value)
-        {
-            return new Vector2(-value.x, -value.y);
-        }
-
         public static Vector2 AbsReverse(Vector2 value)
         {
             return new Vector2(-Mathf.Abs(value.x), -Mathf.Abs(value.y));
@@ -50,12 +44,12 @@ namespace CZToolKit.Core
             return new Vector4(-Mathf.Abs(value.x), -Mathf.Abs(value.y), -Mathf.Abs(value.z), -Mathf.Abs(value.w));
         }
 
-        public static Rect Scale(Rect value, float scale, Vector2 pivot)
+        public static Rect Scale(Rect rect, Vector2 pivot, float scale)
         {
-            Vector2 absPosition = value.position + value.size * pivot;
-            value.size *= scale;
-            value.position = absPosition - value.size * pivot;
-            return value;
+            Vector2 absPosition = rect.position + rect.size * pivot;
+            rect.size *= scale;
+            rect.position = absPosition - rect.size * pivot;
+            return rect;
         }
     }
 }
