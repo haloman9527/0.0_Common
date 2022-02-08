@@ -36,6 +36,11 @@ namespace CZToolKit.Core.Editors
             get;
             private set;
         }
+        public Editor Editor
+        {
+            get;
+            private set;
+        }
         public MonoScript Script
         {
             get;
@@ -60,6 +65,15 @@ namespace CZToolKit.Core.Editors
         {
             Target = target;
             Owner = context;
+            Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
+            SerializedObject = new SerializedPropertyS(Target);
+        }
+
+        void Initialize(object target, UnityObject context, Editor editor)
+        {
+            Target = target;
+            Owner = context;
+            Editor = editor;
             Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
             SerializedObject = new SerializedPropertyS(Target);
         }
@@ -157,6 +171,15 @@ namespace CZToolKit.Core.Editors
             return objectEditor;
         }
 
+        public static ObjectEditor CreateEditor(object target, UnityObject context, Editor editor)
+        {
+            ObjectEditor objectEditor = Activator.CreateInstance(GetEditorType(target.GetType()), true) as ObjectEditor;
+            if (objectEditor == null)
+                return null;
+            objectEditor.Initialize(target, context, editor);
+            return objectEditor;
+        }
+
         public static ObjectEditor CreateEdiotr(object target, Type editorType)
         {
             ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
@@ -172,6 +195,15 @@ namespace CZToolKit.Core.Editors
             if (objectEditor == null)
                 return null;
             objectEditor.Initialize(target, context);
+            return objectEditor;
+        }
+
+        public static ObjectEditor CreateEditor(object target, UnityObject context, Editor editor, Type editorType)
+        {
+            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
+            if (objectEditor == null)
+                return null;
+            objectEditor.Initialize(target, context, editor);
             return objectEditor;
         }
 

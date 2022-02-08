@@ -40,6 +40,29 @@ namespace CZToolKit.Core.Editors
             get { return Property.Value; }
         }
 
+        protected PropertyDrawer() { }
+
+        public PropertyDrawer(object target)
+        {
+            Initialize(target, null);
+        }
+
+        public PropertyDrawer(object target, PropertyAttribute attribute)
+        {
+
+            Initialize(target, attribute);
+        }
+
+        public PropertyDrawer(SerializedPropertyS target)
+        {
+            Initialize(target, null);
+        }
+
+        public PropertyDrawer(SerializedPropertyS target, PropertyAttribute attribute)
+        {
+            Initialize(target, attribute);
+        }
+
         void Initialize(object target, PropertyAttribute attribute)
         {
             Property = new SerializedPropertyS(target);
@@ -61,9 +84,9 @@ namespace CZToolKit.Core.Editors
             EditorGUILayoutExtension.PropertyField(Property);
         }
 
-        public virtual float GetHeight()
+        public virtual float GetHeight(GUIContent label)
         {
-            return 18f;
+            return EditorGUIUtility.singleLineHeight;
         }
 
         #region Static
@@ -115,14 +138,14 @@ namespace CZToolKit.Core.Editors
 
         public static PropertyDrawer CreateEditor(object target, PropertyAttribute attribute)
         {
-            PropertyDrawer drawer = Activator.CreateInstance(target.GetType(), true) as PropertyDrawer;
-            if (drawer != null)
-                drawer.Initialize(target, attribute);
-            return drawer;
+            var editorType = GetEditorType(target.GetType());
+            return CreateEditor(target, attribute, editorType);
         }
 
         public static PropertyDrawer CreateEditor(object target, PropertyAttribute attribute, Type editorType)
         {
+            if (editorType == null)
+                return null;
             PropertyDrawer drawer = Activator.CreateInstance(editorType, true) as PropertyDrawer;
             if (drawer != null)
                 drawer.Initialize(target, attribute);

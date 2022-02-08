@@ -23,12 +23,12 @@ namespace CZToolKit.Core.Editors
     {
         public static float GetPropertyHeight(SerializedPropertyS property)
         {
-            return GetPropertyHeight(property, true, property.niceName);
+            return GetPropertyHeight(property, property.expanded, property.niceName);
         }
 
         public static float GetPropertyHeight(SerializedPropertyS property, GUIContent label)
         {
-            return GetPropertyHeight(property, true, label);
+            return GetPropertyHeight(property, property.expanded, label);
         }
 
         public static float GetPropertyHeight(SerializedPropertyS property, bool includeChildren)
@@ -39,17 +39,13 @@ namespace CZToolKit.Core.Editors
         public static float GetPropertyHeight(SerializedPropertyS property, bool includeChildren, GUIContent label)
         {
             if (property.drawer != null)
-                return property.drawer.GetHeight();
+                return property.drawer.GetHeight(property.niceName);
 
             if (IsBasicType(property.propertyType))
                 return GetHeight(property.propertyType, label);
 
-            if (!property.expanded)
-                return EditorGUIUtility.singleLineHeight;
-
             float height = EditorGUIUtility.singleLineHeight;
-
-            if (includeChildren)
+            if (includeChildren && property.expanded)
             {
                 foreach (var children in property.GetIterator())
                 {
@@ -75,8 +71,7 @@ namespace CZToolKit.Core.Editors
                     foreach (var children in property.GetIterator())
                     {
                         rect.y += rect.height + EditorGUIUtility.standardVerticalSpacing;
-                        rect.height = GetPropertyHeight(children);
-
+                        rect.height = GetPropertyHeight(children, false);
                         PropertyField(rect, children);
                     }
                 }

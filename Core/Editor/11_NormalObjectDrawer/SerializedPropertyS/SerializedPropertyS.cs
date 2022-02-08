@@ -32,6 +32,7 @@ namespace CZToolKit.Core.Editors
         private Dictionary<string, SerializedPropertyS> childrens;
 
         // 上下文和FieldInfo
+        public readonly SerializedPropertyS root;
         public readonly SerializedPropertyS parent;
         public readonly FieldInfo fieldInfo;
         public readonly PropertyDrawer drawer;
@@ -61,6 +62,11 @@ namespace CZToolKit.Core.Editors
                 }
             }
         }
+        public string Name
+        {
+            get;
+            private set;
+        }
         public bool IsRoot
         {
             get { return parent == null; }
@@ -75,6 +81,7 @@ namespace CZToolKit.Core.Editors
             if (value == null)
                 throw new NullReferenceException($"{nameof(value)}不能为空！");
 
+            this.root = this;
             this.value = value;
             this.niceName = GUIHelper.TextContent(value.GetType().Name);
             this.propertyType = value.GetType();
@@ -100,10 +107,12 @@ namespace CZToolKit.Core.Editors
                 editorType = PropertyDrawer.GetEditorType(propertyType);
             if (editorType != null)
                 drawer = PropertyDrawer.CreateEditor(this, att, editorType);
+            root = this;
         }
 
         private SerializedPropertyS(FieldInfo fieldInfo, SerializedPropertyS parent)
         {
+            this.root = parent.root;
             this.parent = parent;
             this.fieldInfo = fieldInfo;
             this.value = fieldInfo.GetValue(parent.Value);
@@ -151,7 +160,8 @@ namespace CZToolKit.Core.Editors
                 var list = (IList)value;
                 for (int i = 0; i < list.Count; i++)
                 {
-                    childrens[$"Element {i}"] = new SerializedPropertyS(list[i]);
+                    string name = $"Element {i}";
+                    childrens[name] = new SerializedPropertyS(list[i]) { Name = name };
                 }
             }
             else
@@ -181,7 +191,7 @@ namespace CZToolKit.Core.Editors
                             continue;
                         }
                     }
-                    childrens[fieldInfo.Name] = new SerializedPropertyS(fieldInfo, this);
+                    childrens[fieldInfo.Name] = new SerializedPropertyS(fieldInfo, this) { Name = fieldInfo.Name };
                 }
             }
         }

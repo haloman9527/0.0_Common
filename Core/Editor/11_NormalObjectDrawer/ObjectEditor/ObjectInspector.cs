@@ -81,7 +81,7 @@ namespace CZToolKit.Core.Editors
             };
             void OnEnable(object _targetObject)
             {
-                objectEditor = ObjectEditor.CreateEditor(_targetObject, UnityContext);
+                objectEditor = ObjectEditor.CreateEditor(_targetObject, UnityContext, this);
                 if (objectEditor != null)
                 {
                     string title = objectEditor.GetTitle();
