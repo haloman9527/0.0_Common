@@ -37,7 +37,7 @@ namespace CZToolKit.Core.Editors
         }
     }
 
-    public class EditorCoroutine : ICoroutine
+    public class EditorCoroutine : ICoroutine, IYield
     {
         IEnumerator enumerator;
         Dictionary<int, IYield> cache = new Dictionary<int, IYield>();
@@ -88,6 +88,11 @@ namespace CZToolKit.Core.Editors
         public void Stop()
         {
             IsRunning = false;
+        }
+
+        public bool Result(ICoroutine coroutine)
+        {
+            return !IsRunning;
         }
     }
 }

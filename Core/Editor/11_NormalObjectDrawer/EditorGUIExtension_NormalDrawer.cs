@@ -16,6 +16,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,12 +26,27 @@ namespace CZToolKit.Core.Editors
 {
     public static partial class EditorGUIExtension
     {
+        static Dictionary<Type, float> heightMap;
+        static Dictionary<Type, float> HeightMap
+        {
+            get
+            {
+                if (heightMap == null)
+                {
+                    heightMap = new Dictionary<Type, float>();
+
+                }
+                return heightMap;
+            }
+        }
+
         public static object CreateInstance(Type type)
         {
             if (type == typeof(string))
                 return "";
-            else
-                return Activator.CreateInstance(type, true);
+            if (type.IsArray)
+                return Array.CreateInstance(type.GetElementType(), 0);
+            return Activator.CreateInstance(type, true);
         }
 
         /// <summary> 是否是基元类型 </summary>
