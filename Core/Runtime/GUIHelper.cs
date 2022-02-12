@@ -119,6 +119,11 @@ namespace CZToolKit.Core.Editors
                 ContextDatas[key] = contextData;
                 return contextData;
             }
+
+            public void RemoveContextData(string key)
+            {
+                ContextDatas.Remove(key);
+            }
         }
 
         static ContextDataCache ContextDatas = new ContextDataCache();
@@ -128,9 +133,14 @@ namespace CZToolKit.Core.Editors
             return ContextDatas.TryGetContextData(key, out contextData);
         }
 
-        public static ContextData<T> GetContextData<T>(string _key, T @default = default)
+        public static ContextData<T> GetContextData<T>(string key, T @default = default)
         {
-            return ContextDatas.GetContextData(_key, @default);
+            return ContextDatas.GetContextData(key, @default);
+        }
+
+        public static void RemoveContextData(string key)
+        {
+            ContextDatas.RemoveContextData(key);
         }
         #endregion
     }

@@ -60,12 +60,8 @@ namespace CZToolKit.Core.Editors
                     if (!propertyType.IsAssignableFrom(tempType))
                         throw new Exception($"{nameof(value)}({tempType.Name})不是{propertyType.Name}类型");
                 }
-                bool equal = this.value == null ? value == null : this.value.Equals(value);
-                if (!equal)
-                {
-                    this.value = value;
-                    ValueChanged();
-                }
+                this.value = value;
+                onValueChanged?.Invoke();
             }
         }
         public string Name
@@ -148,76 +144,88 @@ namespace CZToolKit.Core.Editors
                 if (fieldInfo != null && parent != null)
                     fieldInfo.SetValue(parent.Value, value);
             }
-
-            if (isArray)
+            if (value == null)
             {
-                if (childrens == null)
-                    childrens = new SortedDictionary<int, SerializedPropertyS>();
-                var list = (IList)value;
-                foreach (var key in childrens.Keys.ToArray())
-                {
-                    if (key >= list.Count || !childrens[key].value.Equals(list[key]))
-                        childrens.Remove(key);
-                }
-                for (int i = 0; i < list.Count; i++)
-                {
-                    var elementName = $"Element {i}";
-                    var element = new SerializedPropertyS(list[i], elementName);
-                    int j = i;
-                    element.onValueChanged += () => { list[j] = element.value; };
-                    childrens[i] = element;
-                }
+                childrens.Clear();
             }
             else
             {
-                if (childrens == null)
+                if (isArray)
                 {
-                    childrens = new Dictionary<int, SerializedPropertyS>();
+                    if (childrens == null)
+                        childrens = new SortedDictionary<int, SerializedPropertyS>();
+                    var list = (IList)value;
+                    foreach (var key in childrens.Keys.ToArray())
+                    {
+                        if (key >= list.Count || !childrens[key].value.Equals(list[key]))
+                            childrens.Remove(key);
+                    }
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        var index = i;
+                        var element = new SerializedPropertyS(list[index], $"Element {index}");
+                        element.onValueChanged += () => { list[index] = element.value; };
+                        childrens[index] = element;
+                    }
+                }
+                else
+                {
+                    if (childrens == null)
+                        childrens = new Dictionary<int, SerializedPropertyS>();
                     if (hasChildren)
                     {
                         int id = 0;
-                        foreach (var fieldInfo in Util_Reflection.GetFieldInfos(propertyType))
+                        foreach (var childFieldInfo in Util_Reflection.GetFieldInfos(propertyType))
                         {
-                            if (fieldInfo.Name.StartsWith("<"))
+                            if (childFieldInfo.Name.StartsWith("<"))
                                 continue;
                             // public 修饰符
-                            if (!fieldInfo.IsPublic)
+                            if (!childFieldInfo.IsPublic)
                             {
 #if UNITY_EDITOR
                                 // 如果不带有SerializeField特性
-                                if (!Util_Attribute.TryGetFieldAttribute<SerializeField>(fieldInfo, out var serializeField))
+                                if (!Util_Attribute.TryGetFieldAttribute<SerializeField>(childFieldInfo, out var serializeField))
                                 {
                                     continue;
                                 }
 #endif
                                 // 若带有NonSerialized特性
-                                if (Util_Attribute.TryGetFieldAttribute<NonSerializedAttribute>(fieldInfo, out var nonSerialized))
+                                if (Util_Attribute.TryGetFieldAttribute<NonSerializedAttribute>(childFieldInfo, out var nonSerialized))
                                 {
                                     continue;
                                 }
                                 // 若带有HideInInspector特性
-                                if (Util_Attribute.TryGetFieldAttribute<HideInInspector>(fieldInfo, out var hideInInspector))
+                                if (Util_Attribute.TryGetFieldAttribute<HideInInspector>(childFieldInfo, out var hideInInspector))
                                 {
                                     continue;
                                 }
                             }
-                            var child = new SerializedPropertyS(fieldInfo, this, fieldInfo.Name);
-                            //if (isValueType)
-                            //    child.onValueChanged += () => fieldInfo?.SetValue(parent.value, value);
-                            childrens[id] = child;
+                            if (!childrens.TryGetValue(id, out var child))
+                            {
+                                childrens[id] = child = new SerializedPropertyS(childFieldInfo, this, childFieldInfo.Name);
+                                child.onValueChanged += () => { childFieldInfo.SetValue(value, child.value); };
+                                if (isValueType)
+                                    child.onValueChanged += () => { Value = value; };
+                            }
+                            else
+                            {
+                                var v = childFieldInfo.GetValue(value);
+                                if (child.value == null)
+                                {
+                                    if (v != child.value)
+                                        child.value = v;
+                                }
+                                else
+                                {
+                                    if (v == null || !v.Equals(child.value))
+                                        child.value = v;
+                                }
+                            }
                             id++;
                         }
                     }
                 }
             }
-        }
-
-        private void ValueChanged()
-        {
-            if (hasChildren)
-                this.childrens = null;
-            fieldInfo?.SetValue(parent.value, value);
-            onValueChanged?.Invoke();
         }
 
         public IEnumerable<SerializedPropertyS> GetIterator()
