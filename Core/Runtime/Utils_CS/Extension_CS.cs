@@ -18,8 +18,6 @@ using System.Collections.Generic;
 
 public static partial class Extension
 {
-    static Random Random { get; set; } = new Random();
-
     public static bool TryGet<T>(this T[] array, int index, out T element)
     {
         element = default;
