@@ -39,11 +39,11 @@ namespace CZToolKit.Core.SimpleFSM
                 return;
 
             if (currentState != null)
-                currentState.OnExit();
+                currentState.OnEnd();
 
             currentState = states[stateName];
             if (currentState != null)
-                currentState.OnStart();
+                currentState.OnBegin();
         }
     }
 
@@ -51,10 +51,10 @@ namespace CZToolKit.Core.SimpleFSM
     {
         FSM Owner { get; }
 
-        void OnStart();
+        void OnBegin();
 
         void OnUpdate();
 
-        void OnExit();
+        void OnEnd();
     }
 }

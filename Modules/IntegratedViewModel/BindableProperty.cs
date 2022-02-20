@@ -82,7 +82,7 @@ namespace CZToolKit.Core.BindableProperty
         }
         public virtual void SetValueWithoutNotify(T value)
         {
-            Value = value;
+            setter?.Invoke(value);
         }
         public void SetValueWithoutNotify(object value)
         {

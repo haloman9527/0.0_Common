@@ -19,35 +19,34 @@ using System.Collections.Generic;
 
 namespace CZToolKit.Core.BindableProperty
 {
-    public interface IReadOnlyIntegratedViewModel<TKey, TValue>
-    {
-        TValue this[TKey key] { get; }
-        IEnumerable<TKey> Keys { get; }
-        IEnumerable<TValue> Values { get; }
-
-        bool ContainsKey(TKey key);
-        bool TryGetValue(TKey key, out TValue value);
-    }
-
-    public abstract class IntegratedViewModel : IReadOnlyIntegratedViewModel<string, IBindableProperty>, IEnumerable<KeyValuePair<string, IBindableProperty>>, IEnumerable
+    public class IntegratedViewModel : IIntergratedViewModel<string, IBindableProperty>, IReadOnlyIntegratedViewModel<string, IBindableProperty>, IEnumerable<KeyValuePair<string, IBindableProperty>>, IEnumerable
     {
         [NonSerialized]
-        Dictionary<string, IBindableProperty> bindableProperties;
-
+        Dictionary<string, IBindableProperty> internalBindableProperties = new Dictionary<string, IBindableProperty>();
         Dictionary<string, IBindableProperty> InternalBindableProperties
         {
             get
             {
-                if (bindableProperties == null)
-                    bindableProperties = new Dictionary<string, IBindableProperty>();
-                return bindableProperties;
+                if (internalBindableProperties == null)
+                    internalBindableProperties = new Dictionary<string, IBindableProperty>();
+                return internalBindableProperties;
             }
-            set { bindableProperties = value; }
         }
 
-        public IEnumerable<string> Keys { get { return InternalBindableProperties.Keys; } }
+        public IEnumerable<string> Keys
+        {
+            get { return InternalBindableProperties.Keys; }
+        }
 
-        public IEnumerable<IBindableProperty> Values { get { return InternalBindableProperties.Values; } }
+        public IEnumerable<IBindableProperty> Values
+        {
+            get { return InternalBindableProperties.Values; }
+        }
+
+        public int Count
+        {
+            get { return InternalBindableProperties.Count; }
+        }
 
         public IBindableProperty this[string propertyName]
         {
@@ -75,12 +74,12 @@ namespace CZToolKit.Core.BindableProperty
             return InternalBindableProperties.TryGetValue(key, out value);
         }
 
-        protected T GetPropertyValue<T>(string propertyName)
+        public T GetPropertyValue<T>(string propertyName)
         {
             return this[propertyName].AsBindableProperty<T>().Value;
         }
 
-        protected void SetPropertyValue<T>(string propertyName, T value)
+        public void SetPropertyValue<T>(string propertyName, T value)
         {
             this[propertyName].AsBindableProperty<T>().Value = value;
         }
