@@ -30,12 +30,14 @@ namespace CZToolKit.Core.BindableProperty
             get
             {
                 if (getter == null)
-                    return default;
+                    throw new NullReferenceException("haven't get method");
                 return getter();
             }
             set
             {
-                if (setter == null || Equals(Value, value))
+                if (setter == null)
+                    throw new NullReferenceException("haven't set method");
+                if (Equals(Value, value))
                     return;
                 setter(value);
                 ValueChanged();
@@ -80,7 +82,7 @@ namespace CZToolKit.Core.BindableProperty
         {
             AsBindableProperty<T1>().UnregisterValueChangedEvent(onValueChanged);
         }
-        public virtual void SetValueWithoutNotify(T value)
+        public void SetValueWithoutNotify(T value)
         {
             setter?.Invoke(value);
         }

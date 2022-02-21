@@ -21,8 +21,6 @@ namespace CZToolKit.Core.BindableProperty
 {
     public class BindableList<T> : BindableProperty<List<T>>, IEnumerable<T>, IList<T>
     {
-        List<T> value;
-
         public event Action onAdded;
         public event Action<int> onInserted;
         public event Action<T> onRemoved;
@@ -43,24 +41,13 @@ namespace CZToolKit.Core.BindableProperty
             get { return false; }
         }
 
-        public BindableList()
-        {
-            value = new List<T>();
-            getter += () => value;
-            setter += v => value = v;
-        }
+        public BindableList() { }
 
-        public BindableList(List<T> value)
-        {
-            this.value = new List<T>(value);
-            getter += () => value;
-            setter += v => value = v;
-        }
+        public BindableList(Func<List<T>> getter) : base(getter) { }
 
-        public override void SetValueWithoutNotify(List<T> value)
-        {
-            base.SetValueWithoutNotify(new List<T>(value));
-        }
+        public BindableList(Action<List<T>> setter) : base(setter) { }
+
+        public BindableList(Func<List<T>> getter, Action<List<T>> setter) : base(getter, setter) { }
 
         public void Add(T item)
         {
