@@ -30,7 +30,7 @@ namespace CZToolKit.Core.SimpleFSM
 
         public virtual void PushState(string stateName, IFSMState state)
         {
-            states[stateName] = state;
+            states.Add(stateName, state);
         }
 
         public virtual void ChangeTo(string stateName)

@@ -21,10 +21,10 @@ namespace CZToolKit.Core.BindableProperty
 {
     public class BindableDictionary<TKey, TValue> : BindableProperty<Dictionary<TKey, TValue>>, IDictionary<TKey, TValue>
     {
-        public event Action<TKey> onAdded;
-        public event Action<TKey, TValue> onItemValueChanged;
-        public event Action<TKey> onRemoved;
-        public event Action onClear;
+        public event Action<TKey> OnAdded;
+        public event Action<TKey, TValue> OnItemValueChanged;
+        public event Action<KeyValuePair<TKey, TValue>> OnRemoved;
+        public event Action OnClear;
 
         public ICollection<TKey> Keys
         {
@@ -54,12 +54,12 @@ namespace CZToolKit.Core.BindableProperty
                 if (Value.ContainsKey(key))
                 {
                     Value[key] = value;
-                    onItemValueChanged?.Invoke(key, value);
+                    OnItemValueChanged?.Invoke(key, value);
                 }
                 else
                 {
                     Value[key] = value;
-                    onAdded?.Invoke(key);
+                    OnAdded?.Invoke(key);
                 }
             }
         }
@@ -77,7 +77,7 @@ namespace CZToolKit.Core.BindableProperty
         public void Add(TKey key, TValue value)
         {
             Value.Add(key, value);
-            onAdded?.Invoke(key);
+            OnAdded?.Invoke(key);
         }
 
         public bool ContainsKey(TKey key)
@@ -87,9 +87,10 @@ namespace CZToolKit.Core.BindableProperty
 
         bool IDictionary<TKey, TValue>.Remove(TKey key)
         {
+            var value = Value[key];
             var result = Value.Remove(key);
             if (result)
-                onRemoved?.Invoke(key);
+                OnRemoved?.Invoke(new KeyValuePair<TKey, TValue>(key, value));
             return result;
         }
 
@@ -101,7 +102,7 @@ namespace CZToolKit.Core.BindableProperty
         public void Clear()
         {
             Value.Clear();
-            onClear?.Invoke();
+            OnClear?.Invoke();
         }
 
         public bool IsReadOnly => throw new NotImplementedException();

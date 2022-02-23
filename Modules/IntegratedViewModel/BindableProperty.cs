@@ -20,8 +20,8 @@ namespace CZToolKit.Core.BindableProperty
     [Serializable]
     public class BindableProperty<T> : IBindableProperty, IBindableProperty<T>
     {
-        public event Func<T> getter;
-        public event Action<T> setter;
+        public event Func<T> Getter;
+        public event Action<T> Setter;
         public event Action<T> onValueChanged;
         public event Action<object> onBoxedValueChanged;
 
@@ -29,17 +29,17 @@ namespace CZToolKit.Core.BindableProperty
         {
             get
             {
-                if (getter == null)
+                if (Getter == null)
                     throw new NullReferenceException("haven't get method");
-                return getter();
+                return Getter();
             }
             set
             {
-                if (setter == null)
+                if (Setter == null)
                     throw new NullReferenceException("haven't set method");
                 if (Equals(Value, value))
                     return;
-                setter(value);
+                Setter(value);
                 ValueChanged();
             }
         }
@@ -51,9 +51,9 @@ namespace CZToolKit.Core.BindableProperty
         public Type ValueType { get { return typeof(T); } }
 
         public BindableProperty() { }
-        public BindableProperty(Func<T> getter) { this.getter = getter; }
-        public BindableProperty(Action<T> setter) { this.setter = setter; }
-        public BindableProperty(Func<T> getter, Action<T> setter) { this.getter = getter; this.setter = setter; }
+        public BindableProperty(Func<T> getter) { this.Getter = getter; }
+        public BindableProperty(Action<T> setter) { this.Setter = setter; }
+        public BindableProperty(Func<T> getter, Action<T> setter) { this.Getter = getter; this.Setter = setter; }
 
         public void ValueChanged()
         {
@@ -84,7 +84,7 @@ namespace CZToolKit.Core.BindableProperty
         }
         public void SetValueWithoutNotify(T value)
         {
-            setter?.Invoke(value);
+            Setter?.Invoke(value);
         }
         public void SetValueWithoutNotify(object value)
         {
