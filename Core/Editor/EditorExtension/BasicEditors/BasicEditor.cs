@@ -80,7 +80,6 @@ namespace CZToolKit.Core.Editors
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(target);
             }
         }
 
