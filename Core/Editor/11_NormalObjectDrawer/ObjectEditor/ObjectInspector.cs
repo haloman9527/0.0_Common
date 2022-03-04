@@ -24,7 +24,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
-    public class ObjectInspector : CZScriptableSingleton<ObjectInspector>
+    public class ObjectInspector : Singletons.ScriptableSingleton<ObjectInspector>
     {
         [SerializeField]
         object target;

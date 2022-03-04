@@ -34,7 +34,7 @@ using CZToolKit.Core.Singletons;
 
 namespace CZToolKit.Core.ObjectPool
 {
-    public class PoolManager : CZNormalSingleton<PoolManager>
+    public class PoolManager : CommonSingleton<PoolManager>
     {
         private Dictionary<string, IPoolBase> _pools = new Dictionary<string, IPoolBase>();
 

@@ -13,57 +13,58 @@
  *
  */
 #endregion
-using System;
 using UnityEngine;
 
 namespace CZToolKit.Core.Singletons
 {
 #if ODIN_INSPECTOR
-    public abstract class CZScriptableSingleton<T> : Sirenix.OdinInspector.SerializedScriptableObject where T : CZScriptableSingleton<T>
+    public abstract class ScriptableSingleton<T> : Sirenix.OdinInspector.SerializedScriptableObject where T : ScriptableSingleton<T>
 #else
-    public abstract class CZScriptableSingleton<T> : ScriptableObject where T : CZScriptableSingleton<T>
+    public abstract class ScriptableSingleton<T> : ScriptableObject where T : ScriptableSingleton<T>
 #endif
     {
         /// <summary> 线程锁 </summary>
         private static readonly object _lock = new object();
 
-        private static T _instance;
+        /// <summary> 单例对象 </summary>
+        public static T instance
+        {
+            get;
+            private set;
+        }
 
         public static T Instance
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
                     lock (_lock)
                     {
-                        if (_instance == null)
-                            _instance = ScriptableObject.CreateInstance<T>();
+                        Initialize();
                     }
                 }
-                return _instance;
+                return instance;
             }
         }
 
-        public static bool IsNull { get { return _instance == null; } }
-
         public static void Initialize()
         {
-            _Get();
-            T _Get() { return Instance; }
+            if (instance != null)
+                return;
+            instance = ScriptableObject.CreateInstance<T>();
         }
 
         public static void Destroy()
         {
-            if (_instance != null)
+            if (instance != null)
             {
-                _instance.OnBeforeDestroy();
-                _instance = null;
+                instance.OnBeforeDestroy();
+                instance = null;
             }
         }
 
         protected virtual void OnBeforeDestroy() { }
-
     }
 }
 

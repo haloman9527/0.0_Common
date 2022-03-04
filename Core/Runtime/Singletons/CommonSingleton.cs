@@ -13,53 +13,54 @@
  *
  */
 #endregion
-using System;
 
 namespace CZToolKit.Core.Singletons
 {
-    public class CZNormalSingleton<T> where T : CZNormalSingleton<T>, new()
+    public class CommonSingleton<T> where T : CommonSingleton<T>, new()
     {
         /// <summary> 线程锁 </summary>
         private static readonly object _lock = new object();
 
         /// <summary> 单例对象 </summary>
-        private static T _instance;
+        public static T instance
+        {
+            get;
+            private set;
+        }
 
         /// <summary> 单例对象属性 </summary>
         public static T Instance
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
                     lock (_lock)
                     {
-                        if (_instance == null)
-                            _instance = new T();
+                        Initialize();
                     }
                 }
-                return _instance;
+                return instance;
             }
         }
 
-        public static bool IsNull { get { return _instance == null; } }
-
         public static void Initialize()
         {
-            _Get();
-            T _Get() { return Instance; }
+            if (instance != null)
+                return;
+            instance = new T();
         }
 
         public static void Destroy()
         {
-            if (_instance != null)
+            if (instance != null)
             {
-                _instance.OnBeforeDestroy();
-                _instance = null;
+                instance.OnBeforeDestroy();
+                instance = null;
             }
         }
 
-        public CZNormalSingleton() { _instance = this as T; }
+        public CommonSingleton() { instance = this as T; }
 
         protected virtual void OnBeforeDestroy() { }
     }
