@@ -25,7 +25,7 @@ namespace CZToolKit.Core.Singletons
         public static T instance
         {
             get;
-            private set;
+            protected set;
         }
 
         /// <summary> 单例对象属性 </summary>
@@ -59,8 +59,6 @@ namespace CZToolKit.Core.Singletons
                 instance = null;
             }
         }
-
-        public CommonSingleton() { instance = this as T; }
 
         protected virtual void OnBeforeDestroy() { }
     }

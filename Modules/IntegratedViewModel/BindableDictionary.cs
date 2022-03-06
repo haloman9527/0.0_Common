@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.BindableProperty
+namespace CZToolKit.Core.IntegratedViewModel
 {
     public class BindableDictionary<TKey, TValue> : BindableProperty<Dictionary<TKey, TValue>>, IDictionary<TKey, TValue>
     {
@@ -41,11 +41,6 @@ namespace CZToolKit.Core.BindableProperty
             get { return Value.Count; }
         }
 
-        public BindableDictionary() : base()
-        {
-            SetValueWithoutNotify(new Dictionary<TKey, TValue>());
-        }
-
         public TValue this[TKey key]
         {
             get { return Value[key]; }
@@ -63,6 +58,10 @@ namespace CZToolKit.Core.BindableProperty
                 }
             }
         }
+
+        public BindableDictionary(Func<Dictionary<TKey, TValue>> getter) : base(getter) { }
+
+        public BindableDictionary(Func<Dictionary<TKey, TValue>> getter, Action<Dictionary<TKey, TValue>> setter) : base(getter, setter) { }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {

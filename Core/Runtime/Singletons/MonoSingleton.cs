@@ -27,7 +27,7 @@ namespace CZToolKit.Core.Singletons
         public static T instance
         {
             get;
-            private set;
+            protected set;
         }
 
         /// <summary> 单例对象属性，自动创建 </summary>
@@ -50,19 +50,11 @@ namespace CZToolKit.Core.Singletons
         {
             if (instance != null)
                 return;
-            GameObject go = GameObject.Find(typeof(T).ToString());
-            if (go == null)
-            {
-                go = new GameObject(typeof(T).Name);
-                instance = go.AddComponent<T>();
-            }
-            else
-            {
-                instance = go.gameObject.GetComponent<T>();
-                if (instance == null)
-                    instance = go.gameObject.AddComponent<T>();
-            }
-            DontDestroyOnLoad(go);
+
+            instance = GameObject.FindObjectOfType<T>();
+            if (instance == null)
+                instance = new GameObject(typeof(T).Name).AddComponent<T>();
+            DontDestroyOnLoad(instance.gameObject);
         }
 
         public static void Destroy()
@@ -74,8 +66,6 @@ namespace CZToolKit.Core.Singletons
                 instance = null;
             }
         }
-
-        protected virtual void Awake() { instance = this as T; }
 
         protected virtual void OnBeforeDestroy() { }
     }

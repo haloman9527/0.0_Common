@@ -16,11 +16,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.BindableProperty
+namespace CZToolKit.Core.IntegratedViewModel
 {
     public interface IReadOnlyIntegratedViewModel<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> { }
 
-    public interface IIntergratedViewModel<TKey, TValue> : IReadOnlyIntegratedViewModel<TKey, TValue>
+    public interface IIntegratedViewModel<TKey, TValue> : IReadOnlyIntegratedViewModel<TKey, TValue>
     {
         T GetPropertyValue<T>(string propertyName);
 

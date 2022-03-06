@@ -30,7 +30,7 @@ namespace CZToolKit.Core.Singletons
         public static T instance
         {
             get;
-            private set;
+            protected set;
         }
 
         public static T Instance
@@ -53,16 +53,12 @@ namespace CZToolKit.Core.Singletons
             if (instance != null)
                 return;
 
-            instance = Resources.Load<T>(typeof(T).Name);
 #if UNITY_EDITOR
-            if (instance == null)
+            foreach (var guid in UnityEditor.AssetDatabase.FindAssets($"t:{typeof(T).Name}"))
             {
-                foreach (var guid in UnityEditor.AssetDatabase.FindAssets($"t:{typeof(T).Name}"))
-                {
-                    instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
-                    if (instance != null)
-                        break;
-                }
+                instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
+                if (instance != null)
+                    break;
             }
 
             if (instance == null)
@@ -77,11 +73,6 @@ namespace CZToolKit.Core.Singletons
             if (ts.Length > 0)
                 instance = ts[0];
 #endif
-        }
-
-        protected virtual void OnEnable()
-        {
-            instance = this as T;
         }
 
         public static void Destroy()

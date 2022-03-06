@@ -61,6 +61,17 @@ namespace CZToolKit.Core.Editors
             }
         }
 
+        EditorCoroutineService coroutineMachine;
+        EditorCoroutineService CoroutineMachine
+        {
+            get
+            {
+                if (coroutineMachine == null)
+                    coroutineMachine = new EditorCoroutineService();
+                return coroutineMachine;
+            }
+        }
+
         protected virtual void ShowButton(Rect rect)
         {
             rect.x -= 8;
@@ -68,8 +79,6 @@ namespace CZToolKit.Core.Editors
             if (GUI.Button(rect, CSIcon, CSIconStyle))
                 AssetDatabase.OpenAsset(MonoScript);
         }
-
-        EditorCoroutineService CoroutineMachine = new EditorCoroutineService();
 
         protected virtual void Update()
         {

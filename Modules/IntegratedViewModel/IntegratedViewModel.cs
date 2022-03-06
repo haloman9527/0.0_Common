@@ -17,9 +17,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.BindableProperty
+namespace CZToolKit.Core.IntegratedViewModel
 {
-    public class IntegratedViewModel : IIntergratedViewModel<string, IBindableProperty>, IReadOnlyIntegratedViewModel<string, IBindableProperty>, IEnumerable<KeyValuePair<string, IBindableProperty>>, IEnumerable
+    public class IntegratedViewModel : IIntegratedViewModel<string, IBindableProperty>, IReadOnlyIntegratedViewModel<string, IBindableProperty>, IEnumerable<KeyValuePair<string, IBindableProperty>>, IEnumerable
     {
         [NonSerialized]
         Dictionary<string, IBindableProperty> internalBindableProperties = new Dictionary<string, IBindableProperty>();

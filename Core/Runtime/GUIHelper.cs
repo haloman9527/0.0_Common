@@ -56,6 +56,16 @@ namespace CZToolKit.Core.Editors
                 content.image = image;
                 return content;
             }
+
+            public GUIContent NoneContent(string name)
+            {
+                GUIContent content;
+                if (!GUIContentsCache.TryGetValue(name, out content))
+                    content = new GUIContent();
+                content.tooltip = string.Empty;
+                content.image = null;
+                return content;
+            }
         }
 
         static GUIContentPool ContentPool = new GUIContentPool();
@@ -78,6 +88,11 @@ namespace CZToolKit.Core.Editors
         public static GUIContent TextContent(string name, string tooltip, Texture2D image)
         {
             return ContentPool.TextContent(name, tooltip, image);
+        }
+
+        public static GUIContent NoneContent(string name)
+        {
+            return ContentPool.NoneContent(name);
         }
         #endregion
 

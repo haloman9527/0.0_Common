@@ -93,13 +93,16 @@ namespace CZToolKit.Core.Editors
         public float RowHeight { get => rowHeight; set => rowHeight = value; }
         public bool ShowBoder { get => showBorder; set => showBorder = value; }
         public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
-        internal TreeViewItem RootItem
+        protected TreeViewItem RootItem
         {
             get
             {
                 if (root == null)
                 {
                     root = new CZTreeViewItem() { id = -1, depth = -1, displayName = "Root" };
+                }
+                if (root.children == null)
+                {
                     root.children = new List<TreeViewItem>();
                 }
                 return root;
@@ -116,14 +119,14 @@ namespace CZToolKit.Core.Editors
             return RootItem;
         }
 
-        protected override sealed bool CanMultiSelect(TreeViewItem item)
+        protected override bool CanMultiSelect(TreeViewItem item)
         {
             if (canMultiSelect == null)
                 return false;
             return canMultiSelect(item as CZTreeViewItem);
         }
 
-        protected override sealed bool CanRename(TreeViewItem item)
+        protected override bool CanRename(TreeViewItem item)
         {
             if (canRename == null)
                 return false;
@@ -234,65 +237,6 @@ namespace CZToolKit.Core.Editors
                     yield return item as CZTreeViewItem;
                 }
             }
-        }
-
-        public void Sort(Func<TreeViewItem, TreeViewItem, bool> _func)
-        {
-            SortChildren(RootItem.children, _func);
-
-            void SortChildren(List<TreeViewItem> _items, Func<TreeViewItem, TreeViewItem, bool> func)
-            {
-                QuickSort(_items, func);
-                foreach (var item in _items)
-                {
-                    SortChildren(item.children, func);
-                }
-            }
-        }
-
-        /// <summary> 快速排序(第二个参数是中间值) </summary>
-        void QuickSort<T>(List<T> _original, Func<T, T, bool> _func)
-        {
-            if (_original.Count == 0)
-                return;
-            if (_original.Count == 1)
-                return;
-
-            // 抽取一个数据作为中间值
-            int index = UnityEngine.Random.Range(0, _original.Count);
-            T rN = _original[index];
-
-            // 声明小于中间值的列表
-            List<T> left = new List<T>(Math.Max(4, _original.Count / 2));
-            // 声明大于中间值的列表
-            List<T> right = new List<T>(Math.Max(4, _original.Count / 2));
-            // 遍历数组，与中间值比较，小于中间值的放在left，大于中间值的放在right
-            for (int i = 0; i < _original.Count; i++)
-            {
-                if (i == index) continue;
-
-                if (_func(_original[i], rN))
-                    left.Add(_original[i]);
-                else
-                    right.Add(_original[i]);
-            }
-
-            _original.Clear();
-
-            // 如果左列表元素个数不为0，就把左列表也排序
-            if (left.Count != 0)
-            {
-                QuickSort(left, _func);
-                _original.AddRange(left);
-            }
-            _original.Add(rN);
-            // 如果右列表元素个数不为0，就把右列表也排序
-            if (right.Count != 0)
-            {
-                QuickSort(right, _func);
-                _original.AddRange(right);
-            }
-            return;
         }
 
         protected override void KeyEvent()

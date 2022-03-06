@@ -30,7 +30,7 @@ namespace CZToolKit.Core.Singletons
         public static T instance
         {
             get;
-            private set;
+            protected set;
         }
 
         public static T Instance

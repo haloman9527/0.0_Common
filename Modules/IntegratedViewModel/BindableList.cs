@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.BindableProperty
+namespace CZToolKit.Core.IntegratedViewModel
 {
     public class BindableList<T> : BindableProperty<List<T>>, IEnumerable<T>, IList<T>
     {
@@ -41,11 +41,8 @@ namespace CZToolKit.Core.BindableProperty
             get { return false; }
         }
 
-        public BindableList() { }
-
+        public BindableList() : base() { }
         public BindableList(Func<List<T>> getter) : base(getter) { }
-
-        public BindableList(Action<List<T>> setter) : base(setter) { }
 
         public BindableList(Func<List<T>> getter, Action<List<T>> setter) : base(getter, setter) { }
 

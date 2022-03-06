@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Core.BindableProperty
+namespace CZToolKit.Core.IntegratedViewModel
 {
     [Serializable]
     public class BindableProperty<T> : IBindableProperty, IBindableProperty<T>
@@ -30,13 +30,13 @@ namespace CZToolKit.Core.BindableProperty
             get
             {
                 if (Getter == null)
-                    throw new NullReferenceException("haven't get method");
+                    throw new NotImplementedException("haven't get method");
                 return Getter();
             }
             set
             {
                 if (Setter == null)
-                    throw new NullReferenceException("haven't set method");
+                    throw new NotImplementedException("haven't set method");
                 if (Equals(Value, value))
                     return;
                 Setter(value);
@@ -49,10 +49,8 @@ namespace CZToolKit.Core.BindableProperty
             set { Value = (T)value; }
         }
         public Type ValueType { get { return typeof(T); } }
-
         public BindableProperty() { }
         public BindableProperty(Func<T> getter) { this.Getter = getter; }
-        public BindableProperty(Action<T> setter) { this.Setter = setter; }
         public BindableProperty(Func<T> getter, Action<T> setter) { this.Getter = getter; this.Setter = setter; }
 
         public void ValueChanged()
