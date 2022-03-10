@@ -140,9 +140,6 @@ namespace CZToolKit.Core.Editors
 
         protected override void RowGUI(RowGUIArgs args)
         {
-            Rect rowRect = args.rowRect;
-            rowRect.yMin = rowRect.yMax - 1;
-            EditorGUI.DrawRect(rowRect, Color.black);
             CZTreeViewItem item = args.item as CZTreeViewItem;
 
             if (!args.isRenaming)

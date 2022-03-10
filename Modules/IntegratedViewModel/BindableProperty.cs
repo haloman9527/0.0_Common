@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Core.IntegratedViewModel
+namespace CZToolKit.Core.ViewModel
 {
     [Serializable]
     public class BindableProperty<T> : IBindableProperty, IBindableProperty<T>

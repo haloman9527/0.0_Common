@@ -17,12 +17,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.IntegratedViewModel
+namespace CZToolKit.Core.ViewModel
 {
-    public class IntegratedViewModel : IIntegratedViewModel<string, IBindableProperty>, IReadOnlyIntegratedViewModel<string, IBindableProperty>, IEnumerable<KeyValuePair<string, IBindableProperty>>, IEnumerable
+    public class ViewModel : IViewModel<string, IBindableProperty>, IReadOnlyViewModel<string, IBindableProperty>, IEnumerable<KeyValuePair<string, IBindableProperty>>, IEnumerable
     {
         [NonSerialized]
-        Dictionary<string, IBindableProperty> internalBindableProperties = new Dictionary<string, IBindableProperty>();
+        Dictionary<string, IBindableProperty> internalBindableProperties;
         Dictionary<string, IBindableProperty> InternalBindableProperties
         {
             get

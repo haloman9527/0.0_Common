@@ -14,13 +14,12 @@
  */
 #endregion
 using System;
-using System.Collections.Generic;
 
-namespace CZToolKit.Core.IntegratedViewModel
+namespace CZToolKit.Core.ViewModel
 {
-    public interface IReadOnlyIntegratedViewModel<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> { }
+    public interface IViewModel { }
 
-    public interface IIntegratedViewModel<TKey, TValue> : IReadOnlyIntegratedViewModel<TKey, TValue>
+    public interface IViewModel<TKey, TValue> : IViewModel, IReadOnlyViewModel<TKey, TValue>
     {
         T GetPropertyValue<T>(string propertyName);
 

@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.IntegratedViewModel
+namespace CZToolKit.Core.ViewModel
 {
     public class BindableList<T> : BindableProperty<List<T>>, IEnumerable<T>, IList<T>
     {

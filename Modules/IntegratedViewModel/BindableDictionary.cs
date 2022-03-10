@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.IntegratedViewModel
+namespace CZToolKit.Core.ViewModel
 {
     public class BindableDictionary<TKey, TValue> : BindableProperty<Dictionary<TKey, TValue>>, IDictionary<TKey, TValue>
     {

@@ -50,7 +50,6 @@ namespace CZToolKit.Core.Singletons
         {
             if (instance != null)
                 return;
-
             instance = GameObject.FindObjectOfType<T>();
             if (instance == null)
                 instance = new GameObject(typeof(T).Name).AddComponent<T>();
