@@ -79,7 +79,7 @@ namespace CZToolKit.Core.ObjectPool
         /// <summary> 释放 </summary>
         public void Release(T unit)
         {
-            if (InactiveCount < maxSize)
+            if (InactiveCount <= maxSize)
             {
                 idleQueue.Enqueue(unit);
                 onRelease?.Invoke(unit);

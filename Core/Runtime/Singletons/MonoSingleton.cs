@@ -17,7 +17,6 @@ using UnityEngine;
 
 namespace CZToolKit.Core.Singletons
 {
-    [DefaultExecutionOrder(0)]
     public class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
     {
         /// <summary> 线程锁 </summary>

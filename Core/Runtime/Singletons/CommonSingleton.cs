@@ -50,16 +50,5 @@ namespace CZToolKit.Core.Singletons
                 return;
             instance = new T();
         }
-
-        public static void Destroy()
-        {
-            if (instance != null)
-            {
-                instance.OnBeforeDestroy();
-                instance = null;
-            }
-        }
-
-        protected virtual void OnBeforeDestroy() { }
     }
 }

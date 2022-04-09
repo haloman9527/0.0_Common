@@ -50,7 +50,7 @@ namespace CZToolKit.Core.Editors
 
             // 判断是否是数组
             if (typeof(IList).IsAssignableFrom(fieldInfo.FieldType))
-                value = DrawArrayField(fieldInfo, value, label);
+                value = DrawArrayField(fieldInfo.FieldType, value, label);
             else
                 value = DrawField(context, label);
 
@@ -151,10 +151,8 @@ namespace CZToolKit.Core.Editors
             return DrawField(type, value, GUIHelper.TextContent(label));
         }
 
-        static object DrawArrayField(FieldInfo fieldInfo, object value, GUIContent label)
+        static object DrawArrayField(Type fieldType, object value, GUIContent label)
         {
-            Type fieldType = fieldInfo.FieldType;
-
             Type elementType;
             if (fieldType.IsArray)
                 elementType = fieldType.GetElementType();

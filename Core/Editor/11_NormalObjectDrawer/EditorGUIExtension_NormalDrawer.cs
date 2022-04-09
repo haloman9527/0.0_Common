@@ -92,26 +92,26 @@ namespace CZToolKit.Core.Editors
                 return true;
             }
 
-            if (typeof(IList).IsAssignableFrom(type))
-            {
-                if (type.IsArray)
-                    type = type.GetElementType();
-                else
-                {
-                    Type type2 = type;
-                    while (!type2.IsGenericType)
-                    {
-                        type2 = type2.BaseType;
-                    }
-                    type = type2.GetGenericArguments()[0];
-                }
-            }
+            //if (typeof(IList).IsAssignableFrom(type))
+            //{
+            //    if (type.IsArray)
+            //        type = type.GetElementType();
+            //    else
+            //    {
+            //        Type type2 = type;
+            //        while (!type2.IsGenericType)
+            //        {
+            //            type2 = type2.BaseType;
+            //        }
+            //        type = type2.GetGenericArguments()[0];
+            //    }
+            //}
 
-            if (type.IsClass || (type.IsValueType && !type.IsPrimitive))
-            {
-                if (!typeof(Delegate).IsAssignableFrom(type) && typeof(object).IsAssignableFrom(type))
-                    return true;
-            }
+            //if (type.IsClass || (type.IsValueType && !type.IsPrimitive))
+            //{
+            //    if (!typeof(Delegate).IsAssignableFrom(type) && typeof(object).IsAssignableFrom(type))
+            //        return true;
+            //}
             return false;
         }
 
@@ -296,7 +296,6 @@ namespace CZToolKit.Core.Editors
             {
                 return EditorGUI.EnumPopup(rect, label, (Enum)value);
             }
-
             return null;
         }
 
