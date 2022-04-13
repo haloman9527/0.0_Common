@@ -25,7 +25,7 @@ namespace CZToolKit.Core
         static readonly Dictionary<string, Assembly> AssemblyCache = new Dictionary<string, Assembly>();
         static readonly Dictionary<string, Type> FullNameTypeCache = new Dictionary<string, Type>();
         static readonly List<Type> AllTypeCache = new List<Type>();
-        static readonly Dictionary<Type, IEnumerable<Type>> ChildrenTypeCache = new Dictionary<Type, IEnumerable<Type>>();
+        static readonly Dictionary<Type, HashSet<Type>> ChildrenTypeCache = new Dictionary<Type, HashSet<Type>>();
 
         static Util_Reflection()
         {
@@ -38,28 +38,44 @@ namespace CZToolKit.Core
             }
         }
 
-        public static IEnumerable<Type> GetChildTypes<T>()
+        public static IEnumerable<Type> GetChildTypes<T>(bool inherit = true)
         {
             return GetChildTypes(typeof(T));
         }
 
-        public static IEnumerable<Type> GetChildTypes(Type type)
+        public static IEnumerable<Type> GetChildTypes(Type baseType, bool inherit = true)
         {
-            if (!ChildrenTypeCache.TryGetValue(type, out IEnumerable<Type> childrenTypes))
-                ChildrenTypeCache[type] = childrenTypes = BuildCache(type);
-
-            foreach (var tmpType in childrenTypes)
+            if (!ChildrenTypeCache.ContainsKey(baseType))
+                BuildCache(baseType);
+            if (!ChildrenTypeCache.TryGetValue(baseType, out var childrenTypes))
+                yield break;
+            foreach (var type1 in childrenTypes)
             {
-                yield return tmpType;
-            }
-
-            IEnumerable<Type> BuildCache(Type baseType)
-            {
-                foreach (var tmpType in AllTypeCache)
+                yield return type1;
+                if (inherit)
                 {
-                    if (tmpType != baseType && baseType.IsAssignableFrom(tmpType))
-                        yield return tmpType;
+                    foreach (var type2 in GetChildTypes(type1, inherit))
+                    {
+                        yield return type2;
+                    }
                 }
+            }
+        }
+
+
+        static void BuildCache(Type baseType)
+        {
+            foreach (var type in AllTypeCache)
+            {
+                if (type == baseType)
+                    continue;
+                if (!baseType.IsAssignableFrom(type))
+                    continue;
+                if (type.BaseType == null)
+                    continue;
+                if (!ChildrenTypeCache.TryGetValue(type.BaseType, out var types))
+                    ChildrenTypeCache[type.BaseType] = types = new HashSet<Type>();
+                types.Add(type);
             }
         }
 

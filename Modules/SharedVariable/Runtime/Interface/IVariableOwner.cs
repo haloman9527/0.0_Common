@@ -19,14 +19,14 @@ namespace CZToolKit.Core.SharedVariable
 {
     public interface IVariableOwner
     {
-        SharedVariable GetVariable(string _guid);
+        SharedVariable GetVariable(string guid);
 
-        void SetVariable(SharedVariable _variable);
+        void SetVariable(SharedVariable variable);
 
-        void SetVariableValue(string _guid, object _value);
+        void SetVariableValue(string guid, object value);
 
         IReadOnlyList<SharedVariable> GetVariables();
 
-        void SetVariables(List<SharedVariable> _variables);
+        void SetVariables(List<SharedVariable> variables);
     }
 }
