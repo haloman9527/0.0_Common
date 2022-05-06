@@ -22,7 +22,5 @@ namespace CZToolKit.Core.SharedVariable
         IVariableOwner VarialbeOwner { get; }
 
         IReadOnlyList<SharedVariable> Variables { get; }
-
-        void InitializePropertyMapping(IVariableOwner _variableOwner);
     }
 }

@@ -35,7 +35,7 @@ namespace CZToolKit.Core
         public void BeginGroup()
         {
             if (isGrouping)
-                throw new System.Exception($"在开始一个组之前需要结束当前组{nameof(EndGroup)}");
+                return;
             undo.Push(new CommandsGroup());
             isGrouping = true;
         }

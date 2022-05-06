@@ -149,7 +149,7 @@ namespace CZToolKit.Core.Editors
                     labelRect.xMin += depthIndentWidth;
                 else
                     labelRect.xMin += item.depth * depthIndentWidth + depthIndentWidth;
-                GUIContent textContent = GUIHelper.TextContent(item.displayName);
+                GUIContent textContent = EditorGUIUtility.TrTextContent(item.displayName);
                 textContent.image = item.icon;
                 GUI.Label(labelRect, textContent, GUIStyles.leftLabelStyle);
 

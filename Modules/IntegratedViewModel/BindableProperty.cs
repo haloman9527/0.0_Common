@@ -40,7 +40,7 @@ namespace CZToolKit.Core.ViewModel
                 if (Equals(Value, value))
                     return;
                 Setter(value);
-                ValueChanged();
+                NotifyValueChanged();
             }
         }
         public object ValueBoxed
@@ -53,12 +53,10 @@ namespace CZToolKit.Core.ViewModel
         public BindableProperty(Func<T> getter) { this.Getter = getter; }
         public BindableProperty(Func<T> getter, Action<T> setter) { this.Getter = getter; this.Setter = setter; }
 
-        public void ValueChanged()
+        public void SetGetterSetter(Func<T> getter, Action<T> setter)
         {
-            if (onValueChanged != null)
-                onValueChanged.Invoke(Value);
-            if (onBoxedValueChanged != null)
-                onBoxedValueChanged.Invoke(Value);
+            this.Getter = getter;
+            this.Setter = setter;
         }
         public IBindableProperty<T1> AsBindableProperty<T1>()
         {
@@ -80,15 +78,25 @@ namespace CZToolKit.Core.ViewModel
         {
             AsBindableProperty<T1>().UnregisterValueChangedEvent(onValueChanged);
         }
+        public void SetValueWithNotify(T value)
+        {
+            Setter?.Invoke(value);
+            NotifyValueChanged();
+        }
         public void SetValueWithoutNotify(T value)
         {
             Setter?.Invoke(value);
+        }
+        public void SetValueWithNotify(object value)
+        {
+            SetValueWithoutNotify((T)value);
+            NotifyValueChanged();
         }
         public void SetValueWithoutNotify(object value)
         {
             SetValueWithoutNotify((T)value);
         }
-        public void ClearChangedEvent()
+        public void ClearValueChagnedEvent()
         {
             while (this.onValueChanged != null)
                 this.onValueChanged -= this.onValueChanged;
@@ -96,6 +104,12 @@ namespace CZToolKit.Core.ViewModel
         public override string ToString()
         {
             return (Value != null ? Value.ToString() : "null");
+        }
+
+        public void NotifyValueChanged()
+        {
+            onValueChanged?.Invoke(Value);
+            onBoxedValueChanged?.Invoke(Value);
         }
     }
 }

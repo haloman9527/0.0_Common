@@ -146,11 +146,6 @@ namespace CZToolKit.Core.Editors
             window.ShowAsDropDown(GUIUtility.GUIToScreenRect(buttonRect), size);
         }
 
-        public void ShowAsContext(Vector2 buttonSize, float maxHeight)
-        {
-            Show(new Rect(Event.current.mousePosition, buttonSize), maxHeight);
-        }
-
         int id;
         int GenerateID() { return id++; }
     }

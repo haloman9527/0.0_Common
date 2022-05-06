@@ -13,6 +13,7 @@
  *
  */
 #endregion
+#if UNITY_EDITOR
 using System;
 using System.Linq;
 using System.Reflection;
@@ -20,8 +21,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-
-using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
@@ -238,3 +237,4 @@ namespace CZToolKit.Core.Editors
         }
     }
 }
+#endif

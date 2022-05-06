@@ -210,20 +210,16 @@ namespace CZToolKit.Core.Editors
         public static void DrawObjectInInspector(object target, UnityObject context = null)
         {
             if (target is UnityObject)
-            {
                 Selection.activeObject = target as UnityObject;
-            }
             else
-            {
-                Selection.activeObject = ObjectInspector.Instance;
-                ObjectInspector.Instance.Initialize(target, context);
-            }
+                DrawObjectInInspector("Inspector", target, context);
         }
 
         public static void DrawObjectInInspector(string title, object target, UnityObject context = null)
         {
-            DrawObjectInInspector(target, context);
+            ObjectInspector.Instance.Initialize(target, context);
             ObjectInspector.Instance.name = title;
+            Selection.activeObject = ObjectInspector.Instance;
         }
         #endregion
     }

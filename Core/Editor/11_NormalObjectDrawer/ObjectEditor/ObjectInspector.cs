@@ -14,7 +14,6 @@
  */
 #endregion
 #if UNITY_EDITOR
-using CZToolKit.Core.Singletons;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -52,7 +51,6 @@ namespace CZToolKit.Core.Editors
         }
     }
 
-
     [CustomEditor(typeof(ObjectInspector))]
 #if ODIN_INSPECTOR && DRAW_WITH_ODIN
     public class ObjectInspectorEditor : Sirenix.OdinInspector.Editor.OdinEditor
@@ -60,11 +58,15 @@ namespace CZToolKit.Core.Editors
     public class ObjectInspectorEditor : Editor
 #endif
     {
-        ObjectEditor objectEditor;
-
-        public UnityObject UnityContext { get; set; }
-
-        public ObjectInspector T_Target { get { return target as ObjectInspector; } }
+        public ObjectEditor ObjectEditor
+        {
+            get;
+            set;
+        }
+        public ObjectInspector InspectorObject
+        {
+            get { return target as ObjectInspector; }
+        }
 #if ODIN_INSPECTOR && DRAW_WITH_ODIN
         protected override void OnEnable()
         {
@@ -73,37 +75,39 @@ namespace CZToolKit.Core.Editors
         void OnEnable()
         {
 #endif
-            UnityContext = T_Target.UnityContext;
-            OnEnable(T_Target.Target);
-            T_Target.onTargetChanged = () =>
+            OnEnable(InspectorObject);
+            void OnEnable(ObjectInspector ispectorObject)
             {
-                OnEnable(T_Target.Target);
-            };
-            void OnEnable(object _targetObject)
-            {
-                objectEditor = ObjectEditor.CreateEditor(_targetObject, UnityContext, this);
-                if (objectEditor != null)
+                if (ispectorObject == null)
+                    return;
+                if (ispectorObject.Target == null)
+                    return;
+                ispectorObject.onTargetChanged = () =>
                 {
-                    string title = objectEditor.GetTitle();
-                    if (!string.IsNullOrEmpty(title))
-                        target.name = title;
-                    objectEditor.OnEnable();
-                }
+                    OnEnable(ispectorObject);
+                };
+                ObjectEditor = ObjectEditor.CreateEditor(ispectorObject.Target, ispectorObject.UnityContext, this);
+                if (ObjectEditor == null)
+                    return;
+                string title = ObjectEditor.GetTitle();
+                if (!string.IsNullOrEmpty(title))
+                    ispectorObject.name = title;
+                ObjectEditor.OnEnable();
             }
         }
 
         protected override void OnHeaderGUI()
         {
             base.OnHeaderGUI();
-            if (objectEditor != null)
-                objectEditor.OnHeaderGUI();
+            if (ObjectEditor != null)
+                ObjectEditor.OnHeaderGUI();
         }
 
         public override VisualElement CreateInspectorGUI()
         {
             VisualElement v = null;
-            if (objectEditor != null)
-                v = objectEditor.CreateInspectorGUI();
+            if (ObjectEditor != null)
+                v = ObjectEditor.CreateInspectorGUI();
             if (v == null)
                 v = base.CreateInspectorGUI();
             return v;
@@ -111,8 +115,10 @@ namespace CZToolKit.Core.Editors
 
         public override void OnInspectorGUI()
         {
-            if (objectEditor != null)
-                objectEditor.OnInspectorGUI();
+            if (ObjectEditor.Target == null)
+                ObjectEditor = null;
+            if (ObjectEditor != null)
+                ObjectEditor.OnInspectorGUI();
         }
 
         public void DrawBaseInspecotrGUI()
@@ -123,29 +129,29 @@ namespace CZToolKit.Core.Editors
         public override void DrawPreview(Rect previewArea)
         {
             base.DrawPreview(previewArea);
-            if (objectEditor != null)
-                objectEditor.DrawPreview(previewArea);
+            if (ObjectEditor != null)
+                ObjectEditor.DrawPreview(previewArea);
         }
 
         public override bool HasPreviewGUI()
         {
-            if (objectEditor != null)
-                return objectEditor.HasPreviewGUI();
+            if (ObjectEditor != null)
+                return ObjectEditor.HasPreviewGUI();
             return base.HasPreviewGUI();
         }
 
         public override void OnPreviewSettings()
         {
             base.OnPreviewSettings();
-            if (objectEditor != null)
-                objectEditor.OnPreviewSettings();
+            if (ObjectEditor != null)
+                ObjectEditor.OnPreviewSettings();
         }
 
         public override GUIContent GetPreviewTitle()
         {
             GUIContent title = null;
-            if (objectEditor != null)
-                title = objectEditor.GetPreviewTitle();
+            if (ObjectEditor != null)
+                title = ObjectEditor.GetPreviewTitle();
             if (title == null)
                 title = base.GetPreviewTitle();
             return title;
@@ -154,33 +160,34 @@ namespace CZToolKit.Core.Editors
         public override void OnPreviewGUI(Rect rect, GUIStyle background)
         {
             base.OnPreviewGUI(rect, background);
-            if (objectEditor != null)
-                objectEditor.OnPreviewGUI(rect, background);
+            if (ObjectEditor != null)
+                ObjectEditor.OnPreviewGUI(rect, background);
         }
 
         public override void OnInteractivePreviewGUI(Rect rect, GUIStyle background)
         {
             base.OnInteractivePreviewGUI(rect, background);
-            if (objectEditor != null)
-                objectEditor.OnInteractivePreviewGUI(rect, background);
+            if (ObjectEditor != null)
+                ObjectEditor.OnInteractivePreviewGUI(rect, background);
         }
 
         private void OnSceneGUI()
         {
-            if (objectEditor != null)
-                objectEditor.OnSceneGUI();
+            if (ObjectEditor != null)
+                ObjectEditor.OnSceneGUI();
         }
 
         private void OnValidate()
         {
-            if (objectEditor != null)
-                objectEditor.OnValidate();
+            if (ObjectEditor != null)
+                ObjectEditor.OnValidate();
         }
 
         private void OnDisable()
         {
-            if (objectEditor != null)
-                objectEditor.OnDisable();
+            if (ObjectEditor != null)
+                ObjectEditor.OnDisable();
+            ObjectEditor = null;
         }
     }
 }

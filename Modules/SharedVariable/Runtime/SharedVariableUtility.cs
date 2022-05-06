@@ -14,33 +14,29 @@
  */
 #endregion
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using UnityEngine;
 
 namespace CZToolKit.Core.SharedVariable
 {
     public static class SharedVariableUtility
     {
-        public static IEnumerable<SharedVariable> CollectionObjectSharedVariables(object _object)
+        public static IEnumerable<SharedVariable> CollectionObjectSharedVariables(object obj)
         {
             Type sharedType = typeof(SharedVariable);
-            foreach (var fieldInfo in Util_Reflection.GetFieldInfos(_object.GetType()))
+            foreach (var fieldInfo in Util_Reflection.GetFieldInfos(obj.GetType()))
             {
                 if (sharedType.IsAssignableFrom(fieldInfo.FieldType))
                 {
-                    SharedVariable variable = fieldInfo.GetValue(_object) as SharedVariable;
+                    SharedVariable variable = fieldInfo.GetValue(obj) as SharedVariable;
                     if (variable == null)
                     {
                         variable = Activator.CreateInstance(fieldInfo.FieldType) as SharedVariable;
-                        fieldInfo.SetValue(_object, variable);
+                        fieldInfo.SetValue(obj, variable);
                     }
                     yield return variable;
                     continue;
                 }
             }
         }
-
     }
 }

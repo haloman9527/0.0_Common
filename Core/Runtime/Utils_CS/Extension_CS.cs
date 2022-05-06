@@ -32,6 +32,8 @@ public static partial class Extension
     /// <summary> 快速排序(第二个参数是中间值) </summary>
     public static void QuickSort<T>(this IList<T> original, Func<T, T, int> comparer)
     {
+        if (original.Count <= 1)
+            return;
         QuickSort(0, original.Count - 1);
         void QuickSort(int left, int right)
         {

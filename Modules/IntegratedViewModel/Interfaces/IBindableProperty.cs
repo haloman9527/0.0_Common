@@ -24,11 +24,13 @@ namespace CZToolKit.Core.ViewModel
         object ValueBoxed { get; set; }
         Type ValueType { get; }
 
+        void SetValueWithNotify(object value);
         void SetValueWithoutNotify(object value);
         IBindableProperty<T> AsBindableProperty<T>();
         void RegisterValueChangedEvent<T>(Action<T> onValueChanged);
         void UnregisterValueChangedEvent<T>(Action<T> onValueChanged);
-        void ClearChangedEvent();
+        void NotifyValueChanged();
+        void ClearValueChagnedEvent();
     }
 
     public interface IBindableProperty<T>
@@ -37,10 +39,12 @@ namespace CZToolKit.Core.ViewModel
 
         T Value { get; set; }
 
-        void ValueChanged();
+        void SetGetterSetter(Func<T> getter, Action<T> setter);
         void RegisterValueChangedEvent(Action<T> onValueChanged);
         void UnregisterValueChangedEvent(Action<T> onValueChanged);
+        void SetValueWithNotify(object value);
         void SetValueWithoutNotify(T value);
-        void ClearChangedEvent();
+        void NotifyValueChanged();
+        void ClearValueChagnedEvent();
     }
 }
