@@ -42,7 +42,7 @@ namespace CZToolKit.Core.Editors
         Rect rightRect;
         Vector2 rightScroll;
 
-        public CZMenuTreeView MenuTreeView { get; private set; }
+        public CZTreeView MenuTreeView { get; private set; }
 
         protected VisualElement RightRoot
         {
@@ -71,7 +71,7 @@ namespace CZToolKit.Core.Editors
             RefreshTreeView();
         }
 
-        protected abstract CZMenuTreeView BuildMenuTree(TreeViewState treeViewState);
+        protected abstract CZTreeView BuildMenuTree(TreeViewState treeViewState);
 
         public void RefreshTreeView()
         {
@@ -88,7 +88,7 @@ namespace CZToolKit.Core.Editors
         {
             var tempCenter = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
-            if (Event.current.type != EventType.Layout)
+            if (Event.current.type != EventType.Layout && Event.current.type != EventType.Used)
             {
                 center = tempCenter;
                 leftRect.x = center.x;
@@ -182,7 +182,7 @@ namespace CZToolKit.Core.Editors
         {
             if (selection.Count == 0)
                 return;
-            CZMenuTreeViewItem first = MenuTreeView.FindItem(selection[0]) as CZMenuTreeViewItem;
+            CZTreeViewItem first = MenuTreeView.FindItem(selection[0]);
             if (first == null) return;
 
             switch (first.userData)
@@ -205,38 +205,6 @@ namespace CZToolKit.Core.Editors
                     break;
             }
         }
-    }
-
-    public class CZMenuTreeView : CZTreeView
-    {
-        public CZMenuTreeView(TreeViewState state) : base(state)
-        {
-            rowHeight = 30;
-#if !UNITY_2019_1_OR_NEWER
-            customFoldoutYOffset = rowHeight / 2 - 8;
-#endif
-        }
-
-        public CZMenuTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
-        {
-            rowHeight = 30;
-#if !UNITY_2019_1_OR_NEWER
-            customFoldoutYOffset = rowHeight / 2 - 8;
-#endif
-        }
-
-        public string GetParentPath(string _path)
-        {
-            int index = _path.LastIndexOf('/');
-            if (index == -1)
-                return null;
-            return _path.Substring(0, index);
-        }
-    }
-
-    public class CZMenuTreeViewItem : CZTreeViewItem
-    {
-        public CZMenuTreeViewItem() : base() { }
     }
 }
 #endif

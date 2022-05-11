@@ -42,7 +42,7 @@ namespace CZToolKit.Core.Editors
         public CZTreeViewItem() { }
     }
 
-    public abstract class CZTreeView : TreeView
+    public class CZTreeView : TreeView
     {
         public class Styles
         {
@@ -93,7 +93,7 @@ namespace CZToolKit.Core.Editors
         public float RowHeight { get => rowHeight; set => rowHeight = value; }
         public bool ShowBoder { get => showBorder; set => showBorder = value; }
         public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
-        protected TreeViewItem RootItem
+        public TreeViewItem RootItem
         {
             get
             {
@@ -205,11 +205,11 @@ namespace CZToolKit.Core.Editors
             return item;
         }
 
-        public void Remove(CZTreeViewItem _treeViewItem)
+        public void Remove(CZTreeViewItem treeViewItem)
         {
-            if (_treeViewItem == null || _treeViewItem.parent == null)
+            if (treeViewItem == null || treeViewItem.parent == null)
                 return;
-            _treeViewItem.parent.children.Remove(_treeViewItem);
+            treeViewItem.parent.children.Remove(treeViewItem);
         }
 
         public CZTreeViewItem FindItem(int _id)

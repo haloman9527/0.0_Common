@@ -104,7 +104,7 @@ namespace CZToolKit.Core.Editors
 
                             if (!property.propertyType.IsGenericType && !property.propertyType.IsArray)
                             {
-                                var newList = (Activator.CreateInstance(property.propertyType, true) as IList);
+                                var newList = (EditorGUIExtension.CreateInstance(property.propertyType) as IList);
                                 list = newList;
                             }
 
@@ -117,7 +117,7 @@ namespace CZToolKit.Core.Editors
                                     if (!typeof(UnityObject).IsAssignableFrom(type))
                                     {
                                         for (int i = currentCount; i < size; i++)
-                                            list.Add(Activator.CreateInstance(type, true));
+                                            list.Add(EditorGUIExtension.CreateInstance(type));
                                     }
                                     else
                                     {
