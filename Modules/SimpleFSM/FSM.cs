@@ -14,10 +14,13 @@
  */
 #endregion
 using System.Collections.Generic;
-
+// ^\s+
+// (?<Define>(\w+\s*)+)
+// (?<Generic>(?:<\s*\S+\s*>)*)
+// \((?<Params>[^\(\)\[\]]*)\)
 namespace CZToolKit.Core.SimpleFSM
 {
-    public class FSM
+    public class FSM : IFSM
     {
         private Dictionary<string, IFSMState> states = new Dictionary<string, IFSMState>();
         private IFSMState currentState;
@@ -33,7 +36,7 @@ namespace CZToolKit.Core.SimpleFSM
             states.Add(stateName, state);
         }
 
-        public virtual void ChangeTo(string stateName)
+        public virtual void JumpTo(string stateName)
         {
             if (currentState == states[stateName])
                 return;
@@ -47,10 +50,17 @@ namespace CZToolKit.Core.SimpleFSM
         }
     }
 
+    public interface IFSM
+    {
+        void Update();
+
+        void PushState(string stateName, IFSMState state);
+
+        void JumpTo(string stateName);
+    }
+
     public interface IFSMState
     {
-        FSM Owner { get; }
-
         void OnBegin();
 
         void OnUpdate();

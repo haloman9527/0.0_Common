@@ -95,9 +95,9 @@ namespace CZToolKit.Core.CommonBinaryTree
         }
 
         /// <summary> 层次遍历 </summary>
-        public static IEnumerable<T> LayerEnumerate<T>(this T root) where T : IBinaryTreeNode<T>
+        public static void LayerEnumerate<T>(this T root, ref Queue<T> queue) where T : IBinaryTreeNode<T>
         {
-            Queue<T> queue = new Queue<T>();
+            queue.Clear();
             if (root != null)
             {
                 queue.Enqueue(root);
@@ -105,7 +105,6 @@ namespace CZToolKit.Core.CommonBinaryTree
             while (queue.Count != 0)
             {
                 var node = queue.Dequeue();
-                yield return node;
                 if (node.Left != null)
                 {
                     queue.Enqueue(node.Left);
