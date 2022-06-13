@@ -22,16 +22,16 @@ namespace CZToolKit.Core.ReactiveX
     {
         Button button;
 
-        public OnClick(IObservable<Button> _src) : base(_src) { }
+        public OnClick(IObservable<Button> src) : base(src) { }
 
-        public override void OnNext(Button _button)
+        public override void OnNext(Button button)
         {
-            button = _button;
+            this.button = button;
 
-            if (button == null)
-                OnError(new ArgumentNullException("button", "Button 参数为空"));
+            if (this.button == null)
+                base.OnError(new ArgumentNullException("button", "Button 参数为空"));
             else
-                button.onClick.AddListener(OnBtnClick);
+                this.button.onClick.AddListener(this.OnBtnClick);
         }
 
 
@@ -43,6 +43,13 @@ namespace CZToolKit.Core.ReactiveX
         private void OnBtnClick()
         {
             base.OnNext(button);
+        }
+    }
+    public static partial class Extension
+    {
+        public static IObservable<Button> OnClick(this IObservable<Button> src)
+        {
+            return new OnClick(src);
         }
     }
 }

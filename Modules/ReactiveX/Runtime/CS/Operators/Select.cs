@@ -22,22 +22,30 @@ namespace CZToolKit.Core.ReactiveX
     {
         Func<TIn, TOut> selector;
 
-        public Select(IObservable<IEnumerable<TIn>> _src, Func<TIn, TOut> _selector) : base(_src)
+        public Select(IObservable<IEnumerable<TIn>> src, Func<TIn, TOut> _selector) : base(src)
         {
             selector = _selector;
         }
 
         public override void OnNext(IEnumerable<TIn> value)
         {
-            observer.OnNext(Collection(value));
+            observer.OnNext(Collection());
 
-            IEnumerable<TOut> Collection(IEnumerable<TIn> _value)
+            IEnumerable<TOut> Collection()
             {
-                foreach (var item in _value)
+                foreach (var v in value)
                 {
-                    yield return selector(item);
+                    yield return selector(v);
                 }
             }
+        }
+    }
+
+    public static partial class Extension
+    {
+        public static IObservable<IEnumerable<TOut>> Select<TIn, TOut>(this IObservable<IEnumerable<TIn>> src, Func<TIn, TOut> filter)
+        {
+            return new Select<TIn, TOut>(src, filter);
         }
     }
 }

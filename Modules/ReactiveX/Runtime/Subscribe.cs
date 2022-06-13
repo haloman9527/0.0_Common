@@ -41,35 +41,35 @@ namespace CZToolKit.Core.ReactiveX
             onCompleted = None;
         }
 
-        public Subscribe(Action<T> _onNext)
+        public Subscribe(Action<T> onNext)
         {
-            onNext = _onNext;
+            this.onNext = onNext;
             onError = Throw;
             onCompleted = None;
         }
 
-        public Subscribe(Action<T> _onNext, Action<Exception> _onError)
+        public Subscribe(Action<T> onNext, Action<Exception> onError)
         {
-            onNext = _onNext;
-            onError = _onError;
+            this.onNext = onNext;
+            this.onError = onError;
             onCompleted = None;
         }
 
-        public Subscribe(Action<T> _onNext, Action _onCompleted)
+        public Subscribe(Action<T> onNext, Action onCompleted)
         {
-            onNext = _onNext;
+            this.onNext = onNext;
             onError = Throw;
-            onCompleted = _onCompleted;
+            this.onCompleted = onCompleted;
         }
 
-        public void OnNext(T _value)
+        public void OnNext(T value)
         {
-            onNext?.Invoke(_value);
+            onNext?.Invoke(value);
         }
 
-        public void OnError(Exception _error)
+        public void OnError(Exception error)
         {
-            onError(_error);
+            onError(error);
         }
 
         public void OnCompleted()

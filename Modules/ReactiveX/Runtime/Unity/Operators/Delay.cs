@@ -24,20 +24,20 @@ namespace CZToolKit.Core.ReactiveX
         float delay;
         Coroutine coroutine;
 
-        public Delay(IObservable<T> _src, float _delay) : base(_src)
+        public Delay(IObservable<T> src, float delay) : base(src)
         {
-            delay = _delay;
+            this.delay = delay;
         }
 
-        public override void OnNext(T _value)
+        public override void OnNext(T value)
         {
-            coroutine = MainThreadDispatcher.Instance.StartCoroutine(DDelay(_value));
+            coroutine = MainThreadDispatcher.Instance.StartCoroutine(DDelay(value));
         }
 
-        IEnumerator DDelay(T _value)
+        IEnumerator DDelay(T value)
         {
             yield return new WaitForSeconds(delay);
-            observer.OnNext(_value);
+            observer.OnNext(value);
         }
 
         public override void OnDispose()
@@ -46,20 +46,21 @@ namespace CZToolKit.Core.ReactiveX
                 MainThreadDispatcher.Instance.StopCoroutine(coroutine);
         }
     }
+
     public class SelfDelay<T> : Operator<T> where T : MonoBehaviour
     {
         float delay;
         Coroutine coroutine;
         T obs;
 
-        public SelfDelay(IObservable<T> _src, float _delay) : base(_src)
+        public SelfDelay(IObservable<T> src, float delay) : base(src)
         {
-            delay = _delay;
+            this.delay = delay;
         }
 
-        public override void OnNext(T _value)
+        public override void OnNext(T value)
         {
-            obs = _value;
+            obs = value;
             coroutine = obs.StartCoroutine(DDelay(obs));
         }
 
@@ -72,6 +73,19 @@ namespace CZToolKit.Core.ReactiveX
         public override void OnDispose()
         {
             obs.StopCoroutine(coroutine);
+        }
+    }
+    public static partial class Extension
+    {
+        /// <summary> 通过协程实现的延迟 </summary>
+        public static IObservable<T> Delay<T>(this IObservable<T> _src, float delayTime)
+        {
+            return new Delay<T>(_src, delayTime);
+        }
+
+        public static IObservable<T> SelfDelay<T>(this IObservable<T> _src, float delayTime) where T : MonoBehaviour
+        {
+            return new SelfDelay<T>(_src, delayTime);
         }
     }
 }

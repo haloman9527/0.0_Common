@@ -18,11 +18,11 @@ namespace CZToolKit.Core.ReactiveX
 {
     public class OnTrigger<TIn> : Operator<UnityEvent<TIn>, TIn>
     {
-        public OnTrigger(IObservable<UnityEvent<TIn>> _src) : base(_src) { }
+        public OnTrigger(IObservable<UnityEvent<TIn>> src) : base(src) { }
 
-        public override void OnNext(UnityEvent<TIn> _value)
+        public override void OnNext(UnityEvent<TIn> value)
         {
-            _value.AddListener(v =>
+            value.AddListener(v =>
             {
                 observer.OnNext(v);
             });

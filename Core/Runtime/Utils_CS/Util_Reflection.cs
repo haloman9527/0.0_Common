@@ -71,10 +71,8 @@ namespace CZToolKit.Core
                     continue;
                 if (!baseType.IsAssignableFrom(type))
                     continue;
-                if (type.BaseType == null)
-                    continue;
-                if (!ChildrenTypeCache.TryGetValue(type.BaseType, out var types))
-                    ChildrenTypeCache[type.BaseType] = types = new HashSet<Type>();
+                if (!ChildrenTypeCache.TryGetValue(baseType, out var types))
+                    ChildrenTypeCache[baseType] = types = new HashSet<Type>();
                 types.Add(type);
             }
         }

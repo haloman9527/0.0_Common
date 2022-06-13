@@ -26,17 +26,25 @@ namespace CZToolKit.Core.ReactiveX
     {
         Action action;
 
-        public OnDestroy(IObservable<TIn> _src, Action _action) : base(_src)
+        public OnDestroy(IObservable<TIn> src, Action action) : base(src)
         {
-            action = _action;
+            this.action = action;
         }
 
-        public override void OnNext(TIn _onDestroy)
+        public override void OnNext(TIn onDestroy)
         {
-            _onDestroy.onDestroy += action;
-            observer.OnNext(_onDestroy as TOut);
+            onDestroy.onDestroy += action;
+            observer.OnNext(onDestroy as TOut);
         }
 
         public override void OnDispose() { }
+    }
+
+    public static partial class Extension
+    {
+        public static IObservable<TIn> OnDestroy<TIn>(this IObservable<TIn> src, Action action) where TIn : class, IOnDestory
+        {
+            return new OnDestroy<TIn, TIn>(src, action);
+        }
     }
 }

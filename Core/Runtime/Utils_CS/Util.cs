@@ -13,16 +13,16 @@
  *
  */
 #endregion
-using System;
 using System.Net;
 
 namespace CZToolKit.Core
 {
     public static partial class Util
     {
+
+        /// <summary> 获取本地的IP地址 </summary>
         public static string GetLocalIP()
         {
-            ///获取本地的IP地址
             string AddressIP = string.Empty;
             foreach (IPAddress _IPAddress in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
             {

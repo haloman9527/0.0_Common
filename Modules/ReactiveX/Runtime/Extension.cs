@@ -19,34 +19,34 @@ namespace CZToolKit.Core.ReactiveX
 {
     public static partial class Extension
     {
-        public static Observable<T> ToObservable<T>(this T _src)
+        public static Observable<T> ToObservable<T>(this T src)
         {
-            return new Observable<T>(_src);
+            return new Observable<T>(src);
         }
 
-        public static IDisposable Subscribe<T>(this IObservable<T> _src)
+        public static IDisposable Subscribe<T>(this IObservable<T> src)
         {
-            return _src.Subscribe(new Subscribe<T>());
+            return src.Subscribe(new Subscribe<T>());
         }
 
-        public static IDisposable Subscribe<T>(this IObservable<T> _src, Action<T> _onNext)
+        public static IDisposable Subscribe<T>(this IObservable<T> src, Action<T> onNext)
         {
-            return _src.Subscribe(new Subscribe<T>(_onNext));
+            return src.Subscribe(new Subscribe<T>(onNext));
         }
 
-        public static IDisposable Subscribe<T>(this IObservable<T> _src, Action<T> _onNext, Action<Exception> _onError)
+        public static IDisposable Subscribe<T>(this IObservable<T> src, Action<T> onNext, Action<Exception> onError)
         {
-            return _src.Subscribe(new Subscribe<T>(_onNext, _onError));
+            return src.Subscribe(new Subscribe<T>(onNext, onError));
         }
 
-        public static IDisposable Subscribe<T>(this IObservable<T> _src, Action<T> _onNext, Action _onCompleted)
+        public static IDisposable Subscribe<T>(this IObservable<T> src, Action<T> onNext, Action onCompleted)
         {
-            return _src.Subscribe(new Subscribe<T>(_onNext, _onCompleted));
+            return src.Subscribe(new Subscribe<T>(onNext, onCompleted));
         }
 
-        public static IDisposable Subscribe<T>(this IObservable<T> _src, Action<T> _onNext, Action<Exception> _onError, Action _onCompleted)
+        public static IDisposable Subscribe<T>(this IObservable<T> src, Action<T> onNext, Action<Exception> onError, Action onCompleted)
         {
-            return _src.Subscribe(new Subscribe<T>(_onNext, _onError, _onCompleted));
+            return src.Subscribe(new Subscribe<T>(onNext, onError, onCompleted));
         }
     }
 }

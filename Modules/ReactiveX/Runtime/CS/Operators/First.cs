@@ -21,15 +21,23 @@ namespace CZToolKit.Core.ReactiveX
     {
         bool published = true;
 
-        public First(IObservable<T> _src) : base(_src) { }
+        public First(IObservable<T> src) : base(src) { }
 
-        public override void OnNext(T _value)
+        public override void OnNext(T value)
         {
             if (published)
             {
                 published = false;
-                base.OnNext(_value);
+                base.OnNext(value);
             }
+        }
+    }
+
+    public static partial class Extension
+    {
+        public static IObservable<T> First<T>(this IObservable<T> src)
+        {
+            return new First<T>(src);
         }
     }
 }

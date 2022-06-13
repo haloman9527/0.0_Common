@@ -24,22 +24,22 @@ namespace CZToolKit.Core.ReactiveX
     {
         UpdateType updateType = UpdateType.Update;
 
-        public EveryUpdate(IObservable<T> _src, UpdateType _updateType) : base(_src)
+        public EveryUpdate(IObservable<T> src, UpdateType updateType) : base(src)
         {
-            src = _src;
-            updateType = _updateType;
+            base.src = src;
+            this.updateType = updateType;
         }
 
         Coroutine coroutine;
-        public override void OnNext(T _value)
+        public override void OnNext(T value)
         {
             coroutine = MainThreadDispatcher.Instance.StartCoroutine(Update(() =>
             {
-                observer.OnNext(_value);
+                observer.OnNext(value);
             }));
         }
 
-        public IEnumerator Update(Action _action)
+        public IEnumerator Update(Action action)
         {
             switch (updateType)
             {
@@ -47,20 +47,20 @@ namespace CZToolKit.Core.ReactiveX
                     WaitForFixedUpdate waitForFixedUpdate = new WaitForFixedUpdate();
                     while (true)
                     {
-                        _action();
+                        action();
                         yield return waitForFixedUpdate;
                     }
                 case UpdateType.Update:
                     while (true)
                     {
-                        _action();
+                        action();
                         yield return true;
                     }
                 case UpdateType.LateUpdate:
                     WaitForEndOfFrame waitForEndOfFrame = new WaitForEndOfFrame();
                     while (true)
                     {
-                        _action();
+                        action();
                         yield return waitForEndOfFrame;
                     }
             }
@@ -69,6 +69,14 @@ namespace CZToolKit.Core.ReactiveX
         public override void OnDispose()
         {
             MainThreadDispatcher.Instance.StopCoroutine(coroutine);
+        }
+    }
+
+    public static partial class Extension
+    {
+        public static IObservable<T> EveryUpdate<T>(this IObservable<T> src, UpdateType updateType = UpdateType.Update)
+        {
+            return new EveryUpdate<T>(src, updateType);
         }
     }
 }

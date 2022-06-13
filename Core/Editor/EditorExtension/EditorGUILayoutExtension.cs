@@ -125,43 +125,22 @@ namespace CZToolKit.Core.Editors
             EndVerticalBoxGroup();
         }
 
-        public static bool BeginFoldout(string label, bool foldout)
+        public static bool Foldout(string label, bool foldout)
+        {
+            Rect rect = EditorGUILayout.GetControlRect(GUILayout.Height(25));
+            rect = EditorGUI.IndentedRect(rect);
+            return EditorGUIExtension.FoldoutBar(rect, label, foldout);
+        }
+
+        public static bool BeginFoldoutGroup(string label, bool foldout)
         {
             BeginVerticalBoxGroup();
-            Rect rect = GUILayoutUtility.GetRect(50, 25);
-            rect = EditorGUI.IndentedRect(rect);
-
-            Event current = Event.current;
-            if (current.type == EventType.MouseDown && current.button == 0)
-            {
-                if (rect.Contains(current.mousePosition))
-                {
-                    foldout = !foldout;
-                    current.Use();
-                }
-            }
-
-            switch (current.type)
-            {
-                case EventType.MouseDown:
-                case EventType.MouseUp:
-                case EventType.Repaint:
-                    GUI.Box(rect, string.Empty, GUI.skin.button);
-
-                    Rect t = rect;
-                    t.xMin += 5;
-                    t.xMax -= 5;
-                    EditorGUI.Foldout(t, foldout, label);
-                    break;
-                default:
-                    break;
-            }
-
+            foldout = Foldout(label, foldout);
             EditorGUI.indentLevel++;
             return foldout;
         }
 
-        public static void EndFoldout()
+        public static void EndFoldoutGroup()
         {
             EditorGUI.indentLevel--;
             EndVerticalBoxGroup();

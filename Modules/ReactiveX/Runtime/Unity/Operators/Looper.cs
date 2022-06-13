@@ -26,31 +26,31 @@ namespace CZToolKit.Core.ReactiveX
         int loopTime;
         Coroutine coroutine;
 
-        public Looper(IObservable<T> _src, float _delay, float _interval, int _loopTime) : base(_src)
+        public Looper(IObservable<T> src, float delay, float interval, int loopTime) : base(src)
         {
-            delay = Mathf.Max(0, _delay);
-            interval = Mathf.Max(0, _interval);
-            loopTime = _loopTime;
+            this.delay = Mathf.Max(0, delay);
+            this.interval = Mathf.Max(0, interval);
+            this.loopTime = loopTime;
         }
 
-        public override void OnNext(T _value)
+        public override void OnNext(T value)
         {
-            coroutine = MainThreadDispatcher.Instance.StartCoroutine(Loop(delay, interval, loopTime, _value));
+            coroutine = MainThreadDispatcher.Instance.StartCoroutine(Loop(delay, interval, loopTime, value));
         }
 
-        IEnumerator Loop(float _delay, float _interval, int _loopTime, T _value)
+        IEnumerator Loop(float delay, float interval, int loopTime, T value)
         {
-            if (delay != 0)
-                yield return new WaitForSeconds(_delay);
+            if (this.delay != 0)
+                yield return new WaitForSeconds(delay);
 
-            base.OnNext(_value);
+            base.OnNext(value);
 
-            WaitForSeconds seconds = new WaitForSeconds(interval);
+            WaitForSeconds seconds = new WaitForSeconds(this.interval);
             int currentLoops = 0;
-            while (loopTime < 0 || loopTime > currentLoops++)
+            while (this.loopTime < 0 || this.loopTime > currentLoops++)
             {
                 yield return seconds;
-                base.OnNext(_value);
+                base.OnNext(value);
             }
         }
 
@@ -58,6 +58,14 @@ namespace CZToolKit.Core.ReactiveX
         {
             if (MainThreadDispatcher.instance != null)
                 MainThreadDispatcher.Instance.StopCoroutine(coroutine);
+        }
+    }
+
+    public static partial class Extension
+    {
+        public static IObservable<T> Looper<T>(this IObservable<T> src, float delay, float interval, int loopTimes = -1)
+        {
+            return new Looper<T>(src, delay, interval, loopTimes);
         }
     }
 }

@@ -24,6 +24,8 @@ namespace CZToolKit.Core.Editors
 {
     public static partial class EditorGUIExtension
     {
+        private static readonly int FoldoutHash = "Foldout".GetHashCode();
+
         static Stack<Font> fonts = new Stack<Font>();
         public static void BeginFont(Font _font)
         {
@@ -110,6 +112,45 @@ namespace CZToolKit.Core.Editors
         public static void EndBackgroundColor()
         {
             GUI.color = backgroundColors.Pop();
+        }
+
+        public static bool FoldoutBar(Rect rect, string label, bool foldout)
+        {
+            Event current = Event.current;
+            int controlID = GUIUtility.GetControlID(FoldoutHash, FocusType.Keyboard, rect);
+            switch (current.type)
+            {
+                case EventType.MouseDown:
+                    if (rect.Contains(current.mousePosition) && current.button == 0)
+                    {
+                        GUIUtility.keyboardControl = controlID;
+                        GUIUtility.hotControl = controlID;
+                        current.Use();
+                    }
+                    break;
+                case EventType.MouseUp:
+                    if (GUIUtility.hotControl == controlID)
+                    {
+                        GUIUtility.hotControl = 0;
+                        Event.current.Use();
+                        if (rect.Contains(Event.current.mousePosition))
+                        {
+                            GUI.changed = true;
+                            foldout = !foldout;
+                        }
+                    }
+                    break;
+                case EventType.Repaint:
+                    GUI.Box(rect, string.Empty, GUI.skin.button);
+                    Rect t = rect;
+                    t.xMin += 5;
+                    t.xMax -= 5;
+                    EditorGUI.Foldout(t, foldout, label);
+                    break;
+                default:
+                    break;
+            }
+            return foldout;
         }
 
         /// <summary> 绘制一个ProgressBar </summary>

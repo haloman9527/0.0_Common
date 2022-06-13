@@ -20,15 +20,23 @@ namespace CZToolKit.Core.ReactiveX
     public class Execute<T> : Operator<T, T>
     {
         Action<T> func;
-        public Execute(IObservable<T> _src, Action<T> _func) : base(_src)
+        public Execute(IObservable<T> src, Action<T> func) : base(src)
         {
-            func = _func;
+            this.func = func;
         }
 
-        public override void OnNext(T _value)
+        public override void OnNext(T value)
         {
-            func.Invoke(_value);
-            observer.OnNext(_value);
+            func.Invoke(value);
+            observer.OnNext(value);
+        }
+    }
+
+    public static partial class Extension
+    {
+        public static IObservable<T> Execute<T>(this IObservable<T> src, Action<T> action)
+        {
+            return new Execute<T>(src, action);
         }
     }
 }

@@ -24,14 +24,22 @@ namespace CZToolKit.Core.ReactiveX
         Task task;
         public TaskRun(IObservable<T> _src) : base(_src) { }
 
-        public override void OnNext(T _value)
+        public override void OnNext(T value)
         {
-            task = Task.Run(() => { base.OnNext(_value); });
+            task = Task.Run(() => { base.OnNext(value); });
         }
 
         public override void OnDispose()
         {
             task.Dispose();
+        }
+    }
+
+    public static partial class Extension
+    {
+        public static IObservable<T> TaskRun<T>(this IObservable<T> src)
+        {
+            return new TaskRun<T>(src);
         }
     }
 }

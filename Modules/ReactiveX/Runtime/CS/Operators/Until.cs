@@ -20,15 +20,16 @@ namespace CZToolKit.Core.ReactiveX
     public class Until<T> : Operator<T>
     {
         Func<T, bool> until;
-        public Until(IObservable<T> _src, Func<T, bool> _until) : base(_src)
+
+        public Until(IObservable<T> src, Func<T, bool> until) : base(src)
         {
-            until = _until;
+            this.until = until;
         }
 
-        public override void OnNext(T _value)
+        public override void OnNext(T value)
         {
-            if (until(_value))
-                base.OnNext(_value);
+            if (until(value))
+                base.OnNext(value);
         }
     }
 }

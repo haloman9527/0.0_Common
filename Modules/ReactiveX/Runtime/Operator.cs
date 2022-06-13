@@ -25,19 +25,19 @@ namespace CZToolKit.Core.ReactiveX
         protected IObserver<T> observer;
 
 
-        public Operator(IObservable<T> _src)
+        public Operator(IObservable<T> src)
         {
-            src = _src;
+            this.src = src;
         }
 
-        public virtual void OnNext(T _value)
+        public virtual void OnNext(T value)
         {
-            observer.OnNext(_value);
+            observer.OnNext(value);
         }
 
-        public virtual void OnError(Exception _error)
+        public virtual void OnError(Exception error)
         {
-            observer.OnError(_error);
+            observer.OnError(error);
         }
 
         public virtual void OnCompleted()
@@ -45,9 +45,9 @@ namespace CZToolKit.Core.ReactiveX
             observer.OnCompleted();
         }
 
-        public virtual IDisposable Subscribe(IObserver<T> _observer)
+        public virtual IDisposable Subscribe(IObserver<T> observer)
         {
-            observer = _observer;
+            this.observer = observer;
             return src.Subscribe(this);
         }
 
@@ -66,16 +66,16 @@ namespace CZToolKit.Core.ReactiveX
         protected IObserver<TOut> observer;
 
 
-        public Operator(IObservable<TIn> _src)
+        public Operator(IObservable<TIn> src)
         {
-            src = _src;
+            this.src = src;
         }
 
-        public abstract void OnNext(TIn _value);
+        public abstract void OnNext(TIn value);
 
-        public virtual void OnError(Exception _error)
+        public virtual void OnError(Exception error)
         {
-            observer.OnError(_error);
+            observer.OnError(error);
         }
 
         public virtual void OnCompleted()
@@ -83,9 +83,9 @@ namespace CZToolKit.Core.ReactiveX
             observer.OnCompleted();
         }
 
-        public virtual IDisposable Subscribe(IObserver<TOut> _observer)
+        public virtual IDisposable Subscribe(IObserver<TOut> observer)
         {
-            observer = _observer;
+            this.observer = observer;
             return src.Subscribe(this);
         }
 

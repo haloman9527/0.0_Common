@@ -22,23 +22,32 @@ namespace CZToolKit.Core.ReactiveX
     {
         Func<T, bool> filter;
 
-        public Where(IObservable<IEnumerable<T>> _src, Func<T, bool> _filter) : base(_src)
+        public Where(IObservable<IEnumerable<T>> src, Func<T, bool> filter) : base(src)
         {
-            filter = _filter;
+            this.filter = filter;
         }
 
         public override void OnNext(IEnumerable<T> value)
         {
-            observer.OnNext(Collection(value));
+            observer.OnNext(Collection());
 
-            IEnumerable<T> Collection(IEnumerable<T> _value)
+            IEnumerable<T> Collection()
             {
-                foreach (var item in _value)
+                foreach (var item in value)
                 {
                     if (filter(item))
                         yield return item;
                 }
             }
+        }
+    }
+
+    public static partial class Extension
+    {
+        /// <summary> 当src满足某条件 </summary>
+        public static IObservable<IEnumerable<T>> Where<T>(this IObservable<IEnumerable<T>> src, Func<T, bool> filter)
+        {
+            return new Where<T>(src, filter);
         }
     }
 }
