@@ -14,25 +14,19 @@
  */
 #endregion
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace CZToolKit.Core
 {
     public static partial class Util
     {
-        public static IEnumerable<Transform> EnumerateTransform(Transform root, bool withRoot = false)
+#if UNITY_EDITOR
+        public static string ConvertToRelativePath(string absolutePath)
         {
-            if (withRoot)
-                yield return root;
-            for (int i = 0; i < root.childCount; i++)
-            {
-                foreach (var item in EnumerateTransform(root.GetChild(i)))
-                {
-                    yield return item;
-                }
-            }
+            var path = absolutePath.Replace('\\', '/');
+            return path.Substring(path.LastIndexOf("/Assets/") + 1); ;
         }
+#endif
 
         public static string TextureToBase64(Texture2D texture)
         {
