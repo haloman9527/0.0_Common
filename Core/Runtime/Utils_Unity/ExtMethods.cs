@@ -16,7 +16,7 @@
 using CZToolKit.Core;
 using UnityEngine;
 
-public static partial class Extension
+public static partial class ExtMethods
 {
     #region Vector
     public static bool IsZero(this Vector2 self)

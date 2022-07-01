@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 
-public static partial class Extension
+public static partial class ExtMethods
 {
     public static bool TryGet<T>(this T[] array, int index, out T element)
     {
