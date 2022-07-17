@@ -22,21 +22,7 @@ namespace CZToolKit.Core
 {
     public static partial class Util_Reflection
     {
-        static readonly Dictionary<string, Assembly> AssemblyCache = new Dictionary<string, Assembly>();
-        static readonly Dictionary<string, Type> FullNameTypeCache = new Dictionary<string, Type>();
-        static readonly List<Type> AllTypeCache = new List<Type>();
         static readonly Dictionary<Type, HashSet<Type>> ChildrenTypeCache = new Dictionary<Type, HashSet<Type>>();
-
-        static Util_Reflection()
-        {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (assembly.FullName.StartsWith("Unity")) continue;
-                if (!assembly.FullName.Contains("Version=0.0.0")) continue;
-                AssemblyCache[assembly.FullName] = assembly;
-                AllTypeCache.AddRange(assembly.GetTypes());
-            }
-        }
 
         public static IEnumerable<Type> GetChildTypes<T>(bool inherit = true)
         {
@@ -62,57 +48,18 @@ namespace CZToolKit.Core
             }
         }
 
-
-        static void BuildCache(Type baseType)
+        static void BuildCache(Type parentType)
         {
-            foreach (var type in AllTypeCache)
+            foreach (var type in Util_TypeCache.AllTypes)
             {
-                if (type == baseType)
+                if (type == parentType)
                     continue;
-                if (!baseType.IsAssignableFrom(type))
+                if (!parentType.IsAssignableFrom(type))
                     continue;
-                if (!ChildrenTypeCache.TryGetValue(baseType, out var types))
-                    ChildrenTypeCache[baseType] = types = new HashSet<Type>();
+                if (!ChildrenTypeCache.TryGetValue(parentType, out var types))
+                    ChildrenTypeCache[parentType] = types = new HashSet<Type>();
                 types.Add(type);
             }
-        }
-
-        public static Assembly LoadAssembly(string assemblyString)
-        {
-            Assembly assembly;
-            if (!AssemblyCache.TryGetValue(assemblyString, out assembly))
-                AssemblyCache[assemblyString] = assembly = Assembly.Load(assemblyString);
-            return assembly;
-        }
-
-        public static Type GetType(string fullName)
-        {
-            if (FullNameTypeCache.TryGetValue(fullName, out Type type))
-                return type;
-            foreach (var tmpType in AllTypeCache)
-            {
-                if (tmpType.FullName == fullName)
-                {
-                    FullNameTypeCache[fullName] = type = tmpType;
-                    break;
-                }
-            }
-            return type;
-        }
-
-        public static Type GetType(string fullName, string assemblyString)
-        {
-            if (FullNameTypeCache.TryGetValue(fullName, out Type type))
-                return type;
-            Assembly assembly = LoadAssembly(assemblyString);
-            if (assembly == null) return null;
-            foreach (var tempType in assembly.GetTypes())
-            {
-                FullNameTypeCache[tempType.FullName] = tempType;
-            }
-            if (FullNameTypeCache.TryGetValue(fullName, out type))
-                return type;
-            return null;
         }
 
         #region GetMemberInfo
