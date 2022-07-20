@@ -26,7 +26,7 @@ namespace CZToolKit.Core
 
         public static IEnumerable<Type> GetChildTypes<T>(bool inherit = true)
         {
-            return GetChildTypes(typeof(T));
+            return GetChildTypes(typeof(T), inherit);
         }
 
         public static IEnumerable<Type> GetChildTypes(Type baseType, bool inherit = true)
@@ -50,11 +50,12 @@ namespace CZToolKit.Core
 
         static void BuildCache(Type parentType)
         {
+            
             foreach (var type in Util_TypeCache.AllTypes)
             {
                 if (type == parentType)
                     continue;
-                if (!parentType.IsAssignableFrom(type))
+                if (type.BaseType != parentType)
                     continue;
                 if (!ChildrenTypeCache.TryGetValue(parentType, out var types))
                     ChildrenTypeCache[parentType] = types = new HashSet<Type>();
