@@ -180,7 +180,7 @@ namespace CZToolKit.Core.Editors
             return objectEditor;
         }
 
-        public static ObjectEditor CreateEdiotr(object target, Type editorType)
+        public static ObjectEditor CreateEditor(object target, Type editorType)
         {
             ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
             if (objectEditor == null)
@@ -220,6 +220,22 @@ namespace CZToolKit.Core.Editors
             ObjectInspector.Instance.Initialize(target, context);
             ObjectInspector.Instance.name = title;
             Selection.activeObject = ObjectInspector.Instance;
+        }
+
+        public static void DrawObjectInNewInspector(object target, UnityObject context = null)
+        {
+            if (target is UnityObject)
+                Selection.activeObject = target as UnityObject;
+            else
+                DrawObjectInNewInspector("Inspector", target, context);
+        }
+
+        public static void DrawObjectInNewInspector(string title, object target, UnityObject context = null)
+        {
+            var inspector = ScriptableObject.CreateInstance<ObjectInspector>();
+            inspector.Initialize(target, context);
+            inspector.name = title;
+            Selection.activeObject = inspector;
         }
         #endregion
     }
