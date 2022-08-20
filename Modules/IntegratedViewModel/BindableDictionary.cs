@@ -19,7 +19,7 @@ using System.Collections.Generic;
 
 namespace CZToolKit.Core.ViewModel
 {
-    public class BindableDictionary<TKey, TValue> : BindableProperty<Dictionary<TKey, TValue>>, IDictionary<TKey, TValue>
+    public class BindableDictionary<TKey, TValue> : BindableProperty<Dictionary<TKey, TValue>>
     {
         public event Action<TKey> OnAdded;
         public event Action<TKey, TValue> OnItemValueChanged;
@@ -59,16 +59,13 @@ namespace CZToolKit.Core.ViewModel
             }
         }
 
+        public bool IsReadOnly => false;
+
         public BindableDictionary(Func<Dictionary<TKey, TValue>> getter) : base(getter) { }
 
         public BindableDictionary(Func<Dictionary<TKey, TValue>> getter, Action<Dictionary<TKey, TValue>> setter) : base(getter, setter) { }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            return Value.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
         {
             return Value.GetEnumerator();
         }
@@ -84,7 +81,7 @@ namespace CZToolKit.Core.ViewModel
             return Value.ContainsKey(key);
         }
 
-        bool IDictionary<TKey, TValue>.Remove(TKey key)
+        public bool Remove(TKey key)
         {
             var value = Value[key];
             var result = Value.Remove(key);
@@ -102,28 +99,6 @@ namespace CZToolKit.Core.ViewModel
         {
             Value.Clear();
             OnClear?.Invoke();
-        }
-
-        public bool IsReadOnly => throw new NotImplementedException();
-
-        public void Add(KeyValuePair<TKey, TValue> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Contains(KeyValuePair<TKey, TValue> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Remove(KeyValuePair<TKey, TValue> item)
-        {
-            throw new NotImplementedException();
         }
     }
 }

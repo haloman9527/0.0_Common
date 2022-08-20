@@ -16,7 +16,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEditor;
 
 namespace CZToolKit.Core
 {
@@ -51,7 +50,7 @@ namespace CZToolKit.Core
 
         public static IEnumerable<Type> GetTypesWithAttribute<T>(bool inherit = true) where T : Attribute
         {
-            return GetTypesWithAttribute(typeof(T));
+            return GetTypesWithAttribute(typeof(T), inherit);
         }
 
         public static IEnumerable<Type> GetTypesDerivedFrom(Type parentType)
@@ -75,7 +74,7 @@ namespace CZToolKit.Core
         {
             foreach (var type in AllTypes)
             {
-                foreach (var method in type.GetMethods(BindingFlags.DeclaredOnly))
+                foreach (var method in type.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
                 {
                     if (!method.IsDefined(attributeType, inherit))
                         continue;

@@ -23,7 +23,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
-    public class ObjectInspector : Singletons.ScriptableSingleton<ObjectInspector>
+    public class ObjectInspector : ScriptableObject
     {
         [SerializeField]
         object target;

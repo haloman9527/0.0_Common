@@ -19,7 +19,6 @@ namespace CZToolKit.Core
 {
     public static partial class Util
     {
-
         /// <summary> 获取本地的IP地址 </summary>
         public static string GetLocalIP()
         {

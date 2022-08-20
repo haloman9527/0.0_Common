@@ -50,7 +50,6 @@ namespace CZToolKit.Core
 
         static void BuildCache(Type parentType)
         {
-            
             foreach (var type in Util_TypeCache.AllTypes)
             {
                 if (type == parentType)
