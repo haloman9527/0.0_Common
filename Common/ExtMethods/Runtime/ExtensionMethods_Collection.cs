@@ -29,7 +29,6 @@ public static partial class ExtMethods
         return false;
     }
 
-    /// <summary> 快速排序(第二个参数是中间值) </summary>
     public static void QuickSort<T>(this IList<T> original, Func<T, T, int> comparer)
     {
         if (original.Count <= 1)
