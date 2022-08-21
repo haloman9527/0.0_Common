@@ -49,7 +49,8 @@ namespace CZToolKit.Core.Editors
                 var value = element.FindPropertyRelative("value");
 
                 var keyFieldRect = new Rect(a.x, a.y, a.width * 0.3f - 1, a.height);
-                var objFieldRect = new Rect(a.x + a.width * 0.3f + 1, a.y, a.width * 0.7f - 1, a.height);
+                var objFieldRect = new Rect(a.x + a.width * 0.3f + 1, a.y, a.width * 0.7f - 26, a.height);
+                var dropDownButtonRect = new Rect(a.xMax - 25, a.y, 25, a.height);
 
                 EditorGUI.BeginChangeCheck();
                 var sourceK = key.stringValue;
@@ -64,6 +65,45 @@ namespace CZToolKit.Core.Editors
                     serializedObject.ApplyModifiedProperties();
                     serializedObject.UpdateIfRequiredOrScript();
                 }
+
+                EditorGUI.BeginDisabledGroup(value.objectReferenceValue == null && !(value.objectReferenceValue is GameObject) && !(value.objectReferenceValue is Component));
+                if (GUI.Button(dropDownButtonRect, "..."))
+                {
+                    GenericMenu menu = new GenericMenu();
+                    Component[] components = null;
+                    GameObject gameObject = null;
+                    switch (value.objectReferenceValue)
+                    {
+                        case GameObject _gameObject:
+                            components = _gameObject.GetComponents<Component>();
+                            gameObject = _gameObject;
+                            break;
+                        case Component _component:
+                            components = _component.GetComponents<Component>();
+                            gameObject = _component.gameObject;
+                            break;
+                    }
+                    menu.AddItem(EditorGUIUtility.TrTextContent($"0:GameObject"), false, () =>
+                    {
+                        Undo.RecordObject(referenceCollector, "Change Component");
+                        value.objectReferenceValue = gameObject;
+                        serializedObject.ApplyModifiedProperties();
+                        serializedObject.UpdateIfRequiredOrScript();
+                    });
+                    for (int i = 0; i < components.Length; i++)
+                    {
+                        var component = components[i];
+                        menu.AddItem(EditorGUIUtility.TrTextContent($"{i + 1}:{component.GetType().Name}"), false, () =>
+                        {
+                            Undo.RecordObject(referenceCollector, "Change Component");
+                            value.objectReferenceValue = component;
+                            serializedObject.ApplyModifiedProperties();
+                            serializedObject.UpdateIfRequiredOrScript();
+                        });
+                    }
+                    menu.DropDown(dropDownButtonRect);
+                }
+                EditorGUI.EndDisabledGroup();
             };
             referencesList.onAddCallback += (list) =>
             {
