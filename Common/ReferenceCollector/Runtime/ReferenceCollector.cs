@@ -77,11 +77,38 @@ namespace CZToolKit.Core
             references.Remove(pair);
         }
 
+        public void ClearEmpty()
+        {
+            references.RemoveAll(pair => string.IsNullOrEmpty(pair.key) || pair.value == null);
+        }
+
         public void Clear()
         {
             references.Clear();
         }
+
+        public void Sort()
+        {
+            references.QuickSort((a, b) =>
+            {
+                return a.key.CompareTo(b.key);
+            });
+        }
 #endif
+
+        public UnityObject Get(string key)
+        {
+            if (InternalReferencesDict.TryGetValue(key, out var value))
+                return value;
+            return null;
+        }
+
+        public T Get<T>(string key) where T : UnityObject
+        {
+            if (InternalReferencesDict.TryGetValue(key, out var value))
+                return value as T;
+            return null;
+        }
 
         private void RefreshDict()
         {

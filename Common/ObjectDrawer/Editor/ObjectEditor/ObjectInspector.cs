@@ -115,10 +115,11 @@ namespace CZToolKit.Core.Editors
 
         public override void OnInspectorGUI()
         {
+            if (ObjectEditor == null)
+                return;
             if (ObjectEditor.Target == null)
-                ObjectEditor = null;
-            if (ObjectEditor != null)
-                ObjectEditor.OnInspectorGUI();
+                return;
+            ObjectEditor.OnInspectorGUI();
         }
 
         public void DrawBaseInspecotrGUI()

@@ -149,13 +149,15 @@ namespace CZToolKit.Core.Editors
                 return editorType;
             if (objectType.BaseType != null)
                 return GetEditorType(objectType.BaseType);
-            else
-                return typeof(ObjectEditor);
+            return null;
         }
 
         public static ObjectEditor CreateEditor(object target)
         {
-            ObjectEditor objectEditor = Activator.CreateInstance(GetEditorType(target.GetType()), true) as ObjectEditor;
+            var editorType = GetEditorType(target.GetType());
+            if (editorType  == null)
+                editorType = typeof(ObjectEditor);
+            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
             if (objectEditor == null)
                 return null;
             objectEditor.Initialize(target);
@@ -164,7 +166,10 @@ namespace CZToolKit.Core.Editors
 
         public static ObjectEditor CreateEditor(object target, UnityObject context)
         {
-            ObjectEditor objectEditor = Activator.CreateInstance(GetEditorType(target.GetType()), true) as ObjectEditor;
+            var editorType = GetEditorType(target.GetType());
+            if (editorType == null)
+                editorType = typeof(ObjectEditor);
+            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
             if (objectEditor == null)
                 return null;
             objectEditor.Initialize(target, context);
@@ -173,7 +178,10 @@ namespace CZToolKit.Core.Editors
 
         public static ObjectEditor CreateEditor(object target, UnityObject context, Editor editor)
         {
-            ObjectEditor objectEditor = Activator.CreateInstance(GetEditorType(target.GetType()), true) as ObjectEditor;
+            var editorType = GetEditorType(target.GetType());
+            if (editorType == null)
+                editorType = typeof(ObjectEditor);
+            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
             if (objectEditor == null)
                 return null;
             objectEditor.Initialize(target, context, editor);
@@ -205,6 +213,21 @@ namespace CZToolKit.Core.Editors
                 return null;
             objectEditor.Initialize(target, context, editor);
             return objectEditor;
+        }
+
+        public static bool HasEditor(object target)
+        {
+            return HasEditor(target.GetType());
+        }
+
+        public static bool HasEditor(Type targetType)
+        {
+            if (ObjectEditorTypeCache.TryGetValue(targetType, out Type editorType))
+                return true;
+            if (targetType.BaseType != null)
+                return HasEditor(targetType.BaseType);
+            return false;
+
         }
 
         public static void DrawObjectInInspector(object target, UnityObject context = null)
