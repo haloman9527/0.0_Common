@@ -42,7 +42,7 @@ namespace CZToolKit.Core.ViewModel
         void SetGetterSetter(Func<T> getter, Action<T> setter);
         void RegisterValueChangedEvent(Action<T> onValueChanged);
         void UnregisterValueChangedEvent(Action<T> onValueChanged);
-        void SetValueWithNotify(object value);
+        void SetValueWithNotify(T value);
         void SetValueWithoutNotify(T value);
         void NotifyValueChanged();
         void ClearValueChagnedEvent();
