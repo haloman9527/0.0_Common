@@ -96,7 +96,7 @@ namespace CZToolKit.Core.ViewModel
         {
             SetValueWithoutNotify((T)value);
         }
-        public void ClearValueChagnedEvent()
+        public void ClearValueChangedEvent()
         {
             while (this.onValueChanged != null)
                 this.onValueChanged -= this.onValueChanged;

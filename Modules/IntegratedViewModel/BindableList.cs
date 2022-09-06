@@ -19,7 +19,7 @@ using System.Collections.Generic;
 
 namespace CZToolKit.Core.ViewModel
 {
-    public class BindableList<T> : BindableProperty<List<T>>, IEnumerable<T>, IList<T>
+    public class BindableList<T> : BindableProperty<List<T>>, IList<T>
     {
         public event Action onAdded;
         public event Action<int> onInserted;
@@ -41,9 +41,8 @@ namespace CZToolKit.Core.ViewModel
             get { return false; }
         }
 
-        public BindableList() : base() { }
+        public BindableList() { }
         public BindableList(Func<List<T>> getter) : base(getter) { }
-
         public BindableList(Func<List<T>> getter, Action<List<T>> setter) : base(getter, setter) { }
 
         public void Add(T item)

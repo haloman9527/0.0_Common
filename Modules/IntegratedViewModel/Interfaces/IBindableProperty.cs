@@ -30,7 +30,7 @@ namespace CZToolKit.Core.ViewModel
         void RegisterValueChangedEvent<T>(Action<T> onValueChanged);
         void UnregisterValueChangedEvent<T>(Action<T> onValueChanged);
         void NotifyValueChanged();
-        void ClearValueChagnedEvent();
+        void ClearValueChangedEvent();
     }
 
     public interface IBindableProperty<T>
@@ -39,12 +39,11 @@ namespace CZToolKit.Core.ViewModel
 
         T Value { get; set; }
 
-        void SetGetterSetter(Func<T> getter, Action<T> setter);
-        void RegisterValueChangedEvent(Action<T> onValueChanged);
-        void UnregisterValueChangedEvent(Action<T> onValueChanged);
         void SetValueWithNotify(T value);
         void SetValueWithoutNotify(T value);
+        void RegisterValueChangedEvent(Action<T> onValueChanged);
+        void UnregisterValueChangedEvent(Action<T> onValueChanged);
         void NotifyValueChanged();
-        void ClearValueChagnedEvent();
+        void ClearValueChangedEvent();
     }
 }

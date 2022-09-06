@@ -19,7 +19,7 @@ using System.Collections.Generic;
 
 namespace CZToolKit.Core.ViewModel
 {
-    public class ViewModel : IViewModel<string, IBindableProperty>, IReadOnlyViewModel<string, IBindableProperty>
+    public class ViewModel : IViewModel<string, IBindableProperty>
     {
         [NonSerialized]
         Dictionary<string, IBindableProperty> internalBindableProperties;
