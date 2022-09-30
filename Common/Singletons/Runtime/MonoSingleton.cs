@@ -59,12 +59,9 @@ namespace CZToolKit.Core.Singletons
         {
             if (instance != null)
             {
-                instance.OnBeforeDestroy();
                 Destroy(instance.gameObject);
                 instance = null;
             }
         }
-
-        protected virtual void OnBeforeDestroy() { }
     }
 }

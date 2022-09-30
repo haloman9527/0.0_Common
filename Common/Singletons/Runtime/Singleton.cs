@@ -16,7 +16,7 @@
 
 namespace CZToolKit.Core.Singletons
 {
-    public class CommonSingleton<T> where T : CommonSingleton<T>, new()
+    public class Singleton<T> where T : Singleton<T>, new()
     {
         /// <summary> 线程锁 </summary>
         private static readonly object _lock = new object();
