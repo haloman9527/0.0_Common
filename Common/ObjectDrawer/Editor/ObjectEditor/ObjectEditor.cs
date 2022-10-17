@@ -245,22 +245,6 @@ namespace CZToolKit.Core.Editors
             instance.Initialize(target, context);
             Selection.activeObject = instance;
         }
-
-        public static void DrawObjectInNewInspector(object target, UnityObject context = null)
-        {
-            if (target is UnityObject)
-                Selection.activeObject = target as UnityObject;
-            else
-                DrawObjectInNewInspector("Inspector", target, context);
-        }
-
-        public static void DrawObjectInNewInspector(string title, object target, UnityObject context = null)
-        {
-            var inspector = ScriptableObject.CreateInstance<ObjectInspector>();
-            inspector.Initialize(target, context);
-            inspector.name = title;
-            Selection.activeObject = inspector;
-        }
         #endregion
     }
 

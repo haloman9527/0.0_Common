@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,36 +13,28 @@
  *  Blog: https://www.crosshair.top/
  *
  */
+
 #endregion
+
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
 using System;
-
 using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Core.Editors
 {
     public class ObjectInspector : ScriptableObject
     {
-        [SerializeField]
-        object target;
-
-        public Action onTargetChanged;
+        [SerializeField] object target;
 
         public object Target
         {
             get { return target; }
-            private set
-            {
-                if (target != value)
-                {
-                    target = value;
-                    onTargetChanged?.Invoke();
-                }
-            }
+            private set { target = value; }
         }
+
         public UnityObject UnityContext { get; private set; }
 
         public void Initialize(object target, UnityObject unityContext)
@@ -58,11 +51,7 @@ namespace CZToolKit.Core.Editors
     public class ObjectInspectorEditor : Editor
 #endif
     {
-        public ObjectEditor ObjectEditor
-        {
-            get;
-            set;
-        }
+        public ObjectEditor ObjectEditor { get; set; }
         public ObjectInspector InspectorObject
         {
             get { return target as ObjectInspector; }
@@ -76,16 +65,13 @@ namespace CZToolKit.Core.Editors
         {
 #endif
             OnEnable(InspectorObject);
+
             void OnEnable(ObjectInspector ispectorObject)
             {
                 if (ispectorObject == null)
                     return;
                 if (ispectorObject.Target == null)
                     return;
-                ispectorObject.onTargetChanged = () =>
-                {
-                    OnEnable(ispectorObject);
-                };
                 ObjectEditor = ObjectEditor.CreateEditor(ispectorObject.Target, ispectorObject.UnityContext, this);
                 if (ObjectEditor == null)
                     return;
