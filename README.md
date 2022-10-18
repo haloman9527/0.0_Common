@@ -1,2 +1,2 @@
-# CZToolKit_Core
-CZToolKit的核心依赖
+# CZToolKit_Common
+CZToolKit的通用依赖库
