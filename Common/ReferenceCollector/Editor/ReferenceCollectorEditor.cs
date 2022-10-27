@@ -92,7 +92,7 @@ namespace CZToolKit.Core.Editors
                     serializedObject.UpdateIfRequiredOrScript();
                 }
 
-                EditorGUI.BeginDisabledGroup(value.objectReferenceValue == null && !(value.objectReferenceValue is GameObject) && !(value.objectReferenceValue is Component));
+                EditorGUI.BeginDisabledGroup(!(value.objectReferenceValue is GameObject) && !(value.objectReferenceValue is Component));
                 if (GUI.Button(dropDownButtonRect, Styles.ComponentsLabel, EditorStyles.toolbarButton))
                 {
                     GenericMenu menu = new GenericMenu();
