@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,7 +13,9 @@
  *  Blog: https://www.crosshair.top/
  *
  */
+
 #endregion
+
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -109,6 +112,7 @@ namespace CZToolKit.Core.Editors
                             gameObject = _component.gameObject;
                             break;
                     }
+
                     menu.AddItem(EditorGUIUtility.TrTextContent($"0:GameObject"), false, () =>
                     {
                         Undo.RecordObject(referenceCollector, "Change Component");
@@ -127,14 +131,16 @@ namespace CZToolKit.Core.Editors
                             serializedObject.UpdateIfRequiredOrScript();
                         });
                     }
+
                     menu.DropDown(dropDownButtonRect);
                 }
+
                 EditorGUI.EndDisabledGroup();
             };
             referencesList.onAddCallback += (list) =>
             {
                 Undo.RecordObject(referenceCollector, "Add ReferenceData");
-                referenceCollector.Add();
+                referenceCollector.Add(null);
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.UpdateIfRequiredOrScript();
             };
@@ -144,12 +150,50 @@ namespace CZToolKit.Core.Editors
                 referenceCollector.RemoveAt(referencesList.index);
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.UpdateIfRequiredOrScript();
+                referencesList.index = Mathf.Clamp(referencesList.index, 0, referencesList.count - 1);
             };
         }
 
         public override void OnInspectorGUI()
         {
+            var evt = Event.current;
+
+            base.OnInspectorGUI();
+            var rect = EditorGUILayout.BeginVertical();
             referencesList.DoLayoutList();
+            EditorGUILayout.EndVertical();
+
+            var results = DragDropArea(rect, DragAndDropVisualMode.Generic);
+            if (results != null)
+            {
+                var referenceCollector = target as ReferenceCollector;
+                foreach (var res in results)
+                {
+                    referenceCollector.Add(res);
+                }
+            }
+        }
+
+        public static Object[] DragDropArea(Rect position, DragAndDropVisualMode dropVisualMode)
+        {
+            Event evt = Event.current;
+
+            if (!position.Contains(evt.mousePosition)) return null;
+            var temp = DragAndDrop.objectReferences;
+            Object[] result = null;
+            switch (evt.type)
+            {
+                case EventType.DragUpdated:
+                    DragAndDrop.visualMode = dropVisualMode;
+                    break;
+                case EventType.DragPerform:
+                    DragAndDrop.AcceptDrag();
+                    Event.current.Use();
+                    result = temp;
+                    break;
+            }
+
+            return result;
         }
     }
 }

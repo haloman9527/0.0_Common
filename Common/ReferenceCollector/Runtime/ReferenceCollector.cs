@@ -32,6 +32,7 @@ namespace CZToolKit.Core
         }
 
         [SerializeField]
+        [HideInInspector]
         private List<ReferencePair> references = new List<ReferencePair>();
 
         private Dictionary<string, UnityObject> referencesDict;
@@ -57,14 +58,14 @@ namespace CZToolKit.Core
         }
 
 #if UNITY_EDITOR
-        public void Add()
+        public void Add(UnityObject value)
         {
             string key = string.Empty;
             do
             {
                 key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
             } while (ReferencesDict.ContainsKey(key));
-            references.Add(new ReferencePair() { key = key });
+            references.Add(new ReferencePair() { key = key, value = value});
         }
 
         public void RemoveAt(int index)
