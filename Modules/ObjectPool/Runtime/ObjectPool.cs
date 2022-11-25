@@ -28,20 +28,12 @@ namespace CZToolKit.Core.ObjectPool
         public const int DEFAULT_SIZE = 32;
 
         internal readonly int maxSize;
-        internal readonly Queue<T> idleQueue;
+        protected readonly Queue<T> idleQueue;
         protected Func<T> createFunction;
         protected Action<T> onSpawn;
         protected Action<T> onRelease;
         protected Action<T> destroyAction;
 
-        public int Count
-        {
-            get; private set;
-        }
-        public int ActiveCount
-        {
-            get { return Count - InactiveCount; }
-        }
         public int InactiveCount
         {
             get { return idleQueue.Count; }
@@ -68,7 +60,6 @@ namespace CZToolKit.Core.ObjectPool
             if (idleQueue.Count == 0)
             {
                 unit = createFunction();
-                Count++;
             }
             else
                 unit = idleQueue.Dequeue();
@@ -87,7 +78,6 @@ namespace CZToolKit.Core.ObjectPool
             else
             {
                 destroyAction?.Invoke(unit);
-                Count--;
             }
         }
 
@@ -98,7 +88,6 @@ namespace CZToolKit.Core.ObjectPool
                 destroyAction?.Invoke(unit);
             }
             idleQueue.Clear();
-            Count = 0;
         }
     }
 }
