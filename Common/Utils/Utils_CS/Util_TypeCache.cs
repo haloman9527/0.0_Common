@@ -32,7 +32,7 @@ namespace CZToolKit.Core
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (assembly.FullName.StartsWith("Unity")) continue;
+                if (assembly.FullName.StartsWith("UnityEngine.CoreModule")) continue;
                 if (!assembly.FullName.Contains("Version=0.0.0")) continue;
                 allTypes.AddRange(assembly.GetTypes());
             }
