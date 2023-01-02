@@ -20,10 +20,8 @@ using System.Collections.Generic;
 
 namespace CZToolKit.Core.ObjectPool
 {
-    public interface IPoolBase { }
-
     [Serializable]
-    public class ObjectPool<T> : IPoolBase, IDisposable where T : class
+    public class ObjectPool<T> : IDisposable where T : class
     {
         public const int DEFAULT_SIZE = 32;
 
@@ -58,9 +56,7 @@ namespace CZToolKit.Core.ObjectPool
         {
             T unit = null;
             if (idleQueue.Count == 0)
-            {
                 unit = createFunction();
-            }
             else
                 unit = idleQueue.Dequeue();
             onSpawn?.Invoke(unit);
@@ -76,9 +72,7 @@ namespace CZToolKit.Core.ObjectPool
                 onRelease?.Invoke(unit);
             }
             else
-            {
                 destroyAction?.Invoke(unit);
-            }
         }
 
         public void Dispose()
