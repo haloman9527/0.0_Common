@@ -1,4 +1,5 @@
 ﻿#region 注 释
+
 /***
  *
  *  Title:
@@ -12,7 +13,9 @@
  *  Blog: https://www.crosshair.top/
  *
  */
+
 #endregion
+
 using UnityEngine;
 
 namespace CZToolKit.Core.Singletons
@@ -23,11 +26,7 @@ namespace CZToolKit.Core.Singletons
         static readonly object _lock = new object();
 
         /// <summary> 单例对象 </summary>
-        public static T instance
-        {
-            get;
-            protected set;
-        }
+        public static T instance { get; protected set; }
 
         /// <summary> 单例对象属性，自动创建 </summary>
         public static T Instance
@@ -35,24 +34,23 @@ namespace CZToolKit.Core.Singletons
             get
             {
                 if (instance == null)
-                {
-                    lock (_lock)
-                    {
-                        Initialize();
-                    }
-                }
+                    Initialize();
+
                 return instance;
             }
         }
-
+        
         public static void Initialize()
         {
-            if (instance != null)
-                return;
-            instance = GameObject.FindObjectOfType<T>();
-            if (instance == null)
-                instance = new GameObject(typeof(T).Name).AddComponent<T>();
-            DontDestroyOnLoad(instance.gameObject);
+            lock (_lock)
+            {
+                if (instance != null)
+                    return;
+                instance = GameObject.FindObjectOfType<T>();
+                if (instance == null)
+                    instance = new GameObject(typeof(T).Name).AddComponent<T>();
+                DontDestroyOnLoad(instance.gameObject);
+            }
         }
 
         public static void Destroy()

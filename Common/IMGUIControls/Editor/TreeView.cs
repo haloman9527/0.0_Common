@@ -78,6 +78,7 @@ namespace CZToolKit.Core.Editors
         public event Action<CZTreeViewItem> onContextClickedItem;
         public event Action<CZTreeViewItem> onSingleClickedItem;
         public event Action<CZTreeViewItem> onDoubleClickedItem;
+        public event Action<CZTreeViewItem, Rect> onItemRowGUI;
         public event Func<CZTreeViewItem, bool> canRename;
         public event Func<CZTreeViewItem, bool> canMultiSelect;
 
@@ -152,7 +153,7 @@ namespace CZToolKit.Core.Editors
                 GUIContent textContent = EditorGUIUtility.TrTextContent(item.displayName);
                 textContent.image = item.icon;
                 GUI.Label(labelRect, textContent, GUIStyles.leftLabelStyle);
-
+                onItemRowGUI?.Invoke(item, args.rowRect);
                 if (item != null)
                     item.itemDrawer?.Invoke(args.rowRect);
             }
