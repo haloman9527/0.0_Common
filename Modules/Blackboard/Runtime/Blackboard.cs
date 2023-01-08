@@ -96,7 +96,7 @@ namespace CZToolKit.Common
         private DataContainer<object> objectDataContainer = new DataContainer<object>();
         private Dictionary<string, IDataContainer> keyContainerMap = new Dictionary<string, IDataContainer>();
         private Dictionary<Type, IDataContainer> structDataContainers = new Dictionary<Type, IDataContainer>();
-        private Dictionary<string, List<Action<object, NotifyType>>> observersMap = new Dictionary<string, List<Action<object, NotifyType>>>();
+        private Dictionary<string, List<Action<object, NotifyType>>> dataObserversMap = new Dictionary<string, List<Action<object, NotifyType>>>();
 
         public T Get<T>(string key)
         {
@@ -153,7 +153,7 @@ namespace CZToolKit.Common
                 ((DataContainer<T>)dataContainer).Set(key, value);
             else
                 ((DataContainer<object>)dataContainer).Set(key, value);
-            if (observersMap.TryGetValue(key, out var observers))
+            if (dataObserversMap.TryGetValue(key, out var observers))
             {
                 var notifyType = exists ? NotifyType.Changed : NotifyType.Added;
                 foreach (var observer in observers)
@@ -167,7 +167,7 @@ namespace CZToolKit.Common
         {
             if (!keyContainerMap.TryGetValue(key, out var dataContainer))
                 return;
-            if (observersMap.TryGetValue(key, out var observers))
+            if (dataObserversMap.TryGetValue(key, out var observers))
             {
                 foreach (var observer in observers)
                 {
@@ -184,21 +184,21 @@ namespace CZToolKit.Common
             objectDataContainer.Clear();
             structDataContainers.Clear();
             keyContainerMap.Clear();
-            observersMap.Clear();
+            dataObserversMap.Clear();
         }
 
         public void RegisterObserver(string key, Action<object, NotifyType> observer)
         {
-            if (observersMap.TryGetValue(key, out var observers))
-                observersMap[key] = observers = new List<Action<object, NotifyType>>();
+            if (dataObserversMap.TryGetValue(key, out var observers))
+                dataObserversMap[key] = observers = new List<Action<object, NotifyType>>();
             if (observers.Contains(observer))
                 return;
             observers.Add(observer);
         }
 
-        public void RemoveObserver(string key, Action<object, NotifyType> observer)
+        public void UnregisterObserver(string key, Action<object, NotifyType> observer)
         {
-            if (!observersMap.TryGetValue(key, out var observers))
+            if (!dataObserversMap.TryGetValue(key, out var observers))
                 return;
             observers.Remove(observer);
         }
