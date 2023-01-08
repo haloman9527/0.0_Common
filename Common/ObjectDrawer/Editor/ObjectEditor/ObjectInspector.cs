@@ -23,7 +23,7 @@ using UnityEngine.UIElements;
 using System;
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     public class ObjectInspector : ScriptableObject
     {

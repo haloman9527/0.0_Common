@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.ReactiveX
+namespace CZToolKit.Common.ReactiveX
 {
     public class Foreach<TIn, TOut> : Operator<TIn, TOut> where TIn : IEnumerable<TOut>
     {

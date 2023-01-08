@@ -19,7 +19,7 @@ using System.Collections.Generic;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Core.SharedVariable
+namespace CZToolKit.Common.SharedVariable
 {
     public interface ISharedObjectList
     {

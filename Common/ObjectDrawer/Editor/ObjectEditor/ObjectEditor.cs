@@ -22,7 +22,7 @@ using UnityEngine.UIElements;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     public class ObjectEditor
     {

@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace CZToolKit.Core.SharedVariable
+namespace CZToolKit.Common.SharedVariable
 {
     [Serializable]
     public class SharedGameObject : SharedObject<GameObject>

@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     public class SerializedPropertyS
     {

@@ -16,7 +16,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core
+namespace CZToolKit.Common
 {
     public abstract class CoroutineService<T> where T : class, ICoroutine
     {

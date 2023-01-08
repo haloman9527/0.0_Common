@@ -19,7 +19,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Core
+namespace CZToolKit.Common
 {
     [DisallowMultipleComponent]
     public class ReferenceCollector : MonoBehaviour, ISerializationCallbackReceiver

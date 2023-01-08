@@ -13,9 +13,9 @@
  *
  */
 #endregion
-using CZToolKit.Core.Singletons;
+using CZToolKit.Common.Singletons;
 
-namespace CZToolKit.Core.ReactiveX
+namespace CZToolKit.Common.ReactiveX
 {
     public class MainThreadDispatcher : MonoSingleton<MainThreadDispatcher>
     {

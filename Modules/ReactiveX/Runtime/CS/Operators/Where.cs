@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.ReactiveX
+namespace CZToolKit.Common.ReactiveX
 {
     public class Where<T> : Operator<IEnumerable<T>, IEnumerable<T>>
     {

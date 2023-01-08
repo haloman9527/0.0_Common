@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.SharedVariable
+namespace CZToolKit.Common.SharedVariable
 {
     public static class SharedVariableUtility
     {

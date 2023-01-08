@@ -20,7 +20,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     public class EditorCoroutineService : CoroutineService<EditorCoroutine>
     {

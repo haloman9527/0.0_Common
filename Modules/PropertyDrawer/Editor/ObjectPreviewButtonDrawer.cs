@@ -14,13 +14,13 @@
  */
 #endregion
 #if UNITY_EDITOR
-using CZToolKit.Core.Editors;
+using CZToolKit.Common.Editors;
 using UnityEditor;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Core.Attributes.Editors
+namespace CZToolKit.Common.Attributes.Editors
 {
 
     [@CustomPropertyDrawer(typeof(ObjectPreviewButtonAttribute), true)]

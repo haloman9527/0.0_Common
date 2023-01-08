@@ -22,7 +22,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     [Serializable]
     public abstract class BasicMenuEditorWindow : EditorWindow

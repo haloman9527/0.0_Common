@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.ViewModel
+namespace CZToolKit.Common.ViewModel
 {
     public class ViewModel : IViewModel<string, IBindableProperty>
     {

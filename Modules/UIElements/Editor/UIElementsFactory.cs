@@ -24,7 +24,7 @@ using UnityEngine.UIElements;
 using UnityObject = UnityEngine.Object;
 using System.Collections;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     public static class UIElementsFactory
     {

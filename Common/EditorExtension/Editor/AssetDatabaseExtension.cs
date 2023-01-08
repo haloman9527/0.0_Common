@@ -22,7 +22,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     public static class AssetDatabaseExtension
     {

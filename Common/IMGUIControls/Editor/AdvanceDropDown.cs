@@ -20,7 +20,7 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     public class CZAdvancedDropDownItem : AdvancedDropdownItem
     {

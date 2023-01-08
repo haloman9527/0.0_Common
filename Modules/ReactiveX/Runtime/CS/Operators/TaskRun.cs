@@ -16,7 +16,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace CZToolKit.Core.ReactiveX
+namespace CZToolKit.Common.ReactiveX
 {
     // 在一个新Task中执行接下来的任务
     public class TaskRun<T> : Operator<T>

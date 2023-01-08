@@ -18,7 +18,7 @@ using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     public abstract class BasicEditorWindow : EditorWindow
     {

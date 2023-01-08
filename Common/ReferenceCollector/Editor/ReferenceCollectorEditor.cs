@@ -20,7 +20,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     [CustomEditor(typeof(ReferenceCollector))]
     public class ReferenceCollectorEditor : Editor

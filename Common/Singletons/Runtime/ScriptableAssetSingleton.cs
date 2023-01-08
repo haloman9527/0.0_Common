@@ -15,7 +15,7 @@
 #endregion
 using UnityEngine;
 
-namespace CZToolKit.Core.Singletons
+namespace CZToolKit.Common.Singletons
 {
 #if ODIN_INSPECTOR
     public abstract class ScriptableAssetSingleton<T> : Sirenix.OdinInspector.SerializedScriptableObject where T : ScriptableAssetSingleton<T>

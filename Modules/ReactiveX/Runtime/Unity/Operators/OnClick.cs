@@ -16,7 +16,7 @@
 using System;
 using UnityEngine.UI;
 
-namespace CZToolKit.Core.ReactiveX
+namespace CZToolKit.Common.ReactiveX
 {
     public class OnClick : Operator<Button>
     {

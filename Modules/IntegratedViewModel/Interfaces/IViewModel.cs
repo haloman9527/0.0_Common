@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Core.ViewModel
+namespace CZToolKit.Common.ViewModel
 {
     public interface IViewModel { }
 

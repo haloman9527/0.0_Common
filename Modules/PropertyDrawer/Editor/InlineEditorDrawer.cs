@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Core.Attributes.Editors
+namespace CZToolKit.Common.Attributes.Editors
 {
     [CustomPropertyDrawer(typeof(InlineEditorAttribute))]
     public class InlineEditorDrawer : PropertyDrawer

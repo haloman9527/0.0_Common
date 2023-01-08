@@ -16,7 +16,7 @@
 using UnityEngine;
 using System;
 
-namespace CZToolKit.Core.Attributes
+namespace CZToolKit.Common.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true,Inherited = true)]
     public class MinMaxSliderAttribute : UnityEngine.PropertyAttribute {

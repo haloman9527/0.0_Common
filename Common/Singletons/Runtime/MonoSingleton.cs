@@ -18,7 +18,7 @@
 
 using UnityEngine;
 
-namespace CZToolKit.Core.Singletons
+namespace CZToolKit.Common.Singletons
 {
     public class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
     {

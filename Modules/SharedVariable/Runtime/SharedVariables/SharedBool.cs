@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Core.SharedVariable
+namespace CZToolKit.Common.SharedVariable
 {
     [Serializable]
     public class SharedBool : SharedVariable<bool>

@@ -18,7 +18,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.ObjectPool
+namespace CZToolKit.Common.ObjectPool
 {
     [Serializable]
     public class ObjectPool<T> : IDisposable where T : class

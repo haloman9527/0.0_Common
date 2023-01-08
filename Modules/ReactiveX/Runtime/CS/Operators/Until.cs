@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Core.ReactiveX
+namespace CZToolKit.Common.ReactiveX
 {
     public class Until<T> : Operator<T>
     {

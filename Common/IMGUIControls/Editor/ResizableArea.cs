@@ -19,7 +19,7 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     [Serializable]
     public class ResizableArea

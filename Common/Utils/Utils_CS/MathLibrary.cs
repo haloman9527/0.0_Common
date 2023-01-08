@@ -14,7 +14,7 @@
  */
 #endregion
 
-namespace CZToolKit.Core
+namespace CZToolKit.Common
 {
     public static partial class MathLibrary
     {

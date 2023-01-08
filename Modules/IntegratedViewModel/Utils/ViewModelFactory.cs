@@ -13,11 +13,11 @@
  *
  */
 #endregion
-using CZToolKit.Core;
+using CZToolKit.Common;
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.ViewModel
+namespace CZToolKit.Common.ViewModel
 {
     public static partial class ViewModelFactory
     {

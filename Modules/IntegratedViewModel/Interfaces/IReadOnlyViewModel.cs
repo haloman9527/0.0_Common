@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.ViewModel
+namespace CZToolKit.Common.ViewModel
 {
     public interface IReadOnlyViewModel<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> { }
 }

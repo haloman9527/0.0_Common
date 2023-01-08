@@ -18,7 +18,7 @@ using System.Collections.Generic;
 // (?<Define>(\w+\s*)+)
 // (?<Generic>(?:<\s*\S+\s*>)*)
 // \((?<Params>[^\(\)\[\]]*)\)
-namespace CZToolKit.Core.SimpleFSM
+namespace CZToolKit.Common.SimpleFSM
 {
     public class FSM : IFSM
     {

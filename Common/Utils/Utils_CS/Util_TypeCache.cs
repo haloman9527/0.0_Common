@@ -17,7 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CZToolKit.Core
+namespace CZToolKit.Common
 {
     public static partial class Util_TypeCache
     {

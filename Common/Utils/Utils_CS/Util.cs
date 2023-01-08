@@ -15,7 +15,7 @@
 #endregion
 using System.Net;
 
-namespace CZToolKit.Core
+namespace CZToolKit.Common
 {
     public static partial class Util
     {

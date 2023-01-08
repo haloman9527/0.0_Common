@@ -14,7 +14,7 @@
  */
 #endregion
 
-namespace CZToolKit.Core
+namespace CZToolKit.Common
 {
     public interface IYield
     {

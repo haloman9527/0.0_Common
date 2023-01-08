@@ -13,7 +13,7 @@
  *
  */
 #endregion
-using CZToolKit.Core;
+using CZToolKit.Common;
 using UnityEngine;
 
 public static partial class ExtMethods

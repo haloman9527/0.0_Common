@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Core.ReactiveX
+namespace CZToolKit.Common.ReactiveX
 {
     public class Select<TIn, TOut> : Operator<IEnumerable<TIn>, IEnumerable<TOut>>
     {

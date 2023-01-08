@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Core.ReactiveX
+namespace CZToolKit.Common.ReactiveX
 {
     class Subscribe<T> : IObserver<T>
     {

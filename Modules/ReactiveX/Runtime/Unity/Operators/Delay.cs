@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace CZToolKit.Core.ReactiveX
+namespace CZToolKit.Common.ReactiveX
 {
     public class Delay<T> : Operator<T>
     {

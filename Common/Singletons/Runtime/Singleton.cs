@@ -14,7 +14,7 @@
  */
 #endregion
 
-namespace CZToolKit.Core.Singletons
+namespace CZToolKit.Common.Singletons
 {
     public class Singleton<T> where T : Singleton<T>, new()
     {

@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.Events;
 
-namespace CZToolKit.Core.Editors
+namespace CZToolKit.Common.Editors
 {
     public abstract class BasicEditor : Editor
     {

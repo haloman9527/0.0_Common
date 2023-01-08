@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace CZToolKit.Core.Attributes
+namespace CZToolKit.Common.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
     public class ProgressBarAttribute : UnityEngine.PropertyAttribute
