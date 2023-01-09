@@ -21,61 +21,68 @@ using System.Collections.Generic;
 
 namespace CZToolKit.Common
 {
-    public class Blackboard
+    public enum NotifyType
+    {
+        Added,
+        Changed,
+        Remove
+    }
+    
+    public class Blackboard<TKey>
     {
         public interface IDataContainer
         {
-            object Get(string key);
+            object Get(TKey key);
 
-            bool TryGet(string key, out object value);
+            bool TryGet(TKey key, out object value);
 
-            void Remove(string key);
+            void Remove(TKey key);
 
             void Clear();
         }
 
         public class DataContainer<T> : IDataContainer
         {
-            private Dictionary<string, T> data = new Dictionary<string, T>();
+            private Dictionary<TKey, T> data = new Dictionary<TKey, T>();
 
-            public T this[string key]
+            public T this[TKey key]
             {
                 get { return Get(key); }
                 set { Set(key, value); }
             }
 
-            object IDataContainer.Get(string key)
+            object IDataContainer.Get(TKey key)
             {
                 if (this.data.TryGetValue(key, out var value))
                     return value;
                 return null;
             }
 
-            bool IDataContainer.TryGet(string key, out object value)
+            bool IDataContainer.TryGet(TKey key, out object value)
             {
                 var result = this.data.TryGetValue(key, out var v);
                 value = v;
                 return result;
             }
 
-            public T Get(string key)
+            public T Get(TKey key)
             {
                 if (this.data.TryGetValue(key, out var value))
                     return value;
                 return default;
             }
 
-            public bool TryGet(string key, out T value)
+            public bool TryGet(TKey key, out T value)
             {
                 return this.data.TryGetValue(key, out value);
             }
 
-            public void Set(string key, T value)
+            public void Set(TKey key, T value)
             {
                 this.data[key] = value;
             }
 
-            public void Remove(string key)
+            public void Remove(TKey key)
             {
                 data.Remove(key);
             }
@@ -86,19 +93,12 @@ namespace CZToolKit.Common
             }
         }
 
-        public enum NotifyType
-        {
-            Added,
-            Changed,
-            Remove
-        }
-
         private DataContainer<object> objectDataContainer = new DataContainer<object>();
-        private Dictionary<string, IDataContainer> keyContainerMap = new Dictionary<string, IDataContainer>();
+        private Dictionary<TKey, IDataContainer> keyContainerMap = new Dictionary<TKey, IDataContainer>();
         private Dictionary<Type, IDataContainer> structDataContainers = new Dictionary<Type, IDataContainer>();
-        private Dictionary<string, List<Action<object, NotifyType>>> dataObserversMap = new Dictionary<string, List<Action<object, NotifyType>>>();
+        private Dictionary<TKey, List<Action<object, NotifyType>>> dataObserversMap = new Dictionary<TKey, List<Action<object, NotifyType>>>();
 
-        public T Get<T>(string key)
+        public T Get<T>(TKey key)
         {
             if (!this.keyContainerMap.TryGetValue(key, out var dataContainer))
                 return default;
@@ -110,7 +110,7 @@ namespace CZToolKit.Common
                 return (T)((DataContainer<object>)dataContainer).Get(key);
         }
 
-        public bool TryGet<T>(string key, out T value)
+        public bool TryGet<T>(TKey key, out T value)
         {
             if (!this.keyContainerMap.TryGetValue(key, out var dataContainer))
             {
@@ -130,7 +130,7 @@ namespace CZToolKit.Common
             }
         }
 
-        public void Set<T>(string key, T value)
+        public void Set<T>(TKey key, T value)
         {
             var type = typeof(T);
             var isValueType = type.IsValueType;
@@ -163,7 +163,7 @@ namespace CZToolKit.Common
             }
         }
 
-        public void Remove(string key)
+        public void Remove(TKey key)
         {
             if (!keyContainerMap.TryGetValue(key, out var dataContainer))
                 return;
@@ -187,16 +187,16 @@ namespace CZToolKit.Common
             dataObserversMap.Clear();
         }
 
-        public void RegisterObserver(string key, Action<object, NotifyType> observer)
+        public void RegisterObserver(TKey key, Action<object, NotifyType> observer)
         {
-            if (dataObserversMap.TryGetValue(key, out var observers))
+            if (!dataObserversMap.TryGetValue(key, out var observers))
                 dataObserversMap[key] = observers = new List<Action<object, NotifyType>>();
             if (observers.Contains(observer))
                 return;
             observers.Add(observer);
         }
 
-        public void UnregisterObserver(string key, Action<object, NotifyType> observer)
+        public void UnregisterObserver(TKey key, Action<object, NotifyType> observer)
         {
             if (!dataObserversMap.TryGetValue(key, out var observers))
                 return;
