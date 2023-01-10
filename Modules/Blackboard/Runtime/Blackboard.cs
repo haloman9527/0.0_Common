@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Common
+namespace CZToolKit.Common.Blackboard
 {
     public enum NotifyType
     {
