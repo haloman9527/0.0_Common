@@ -38,43 +38,47 @@ public static partial class ExtMethods
     {
         if (original.Count <= 1)
             return false;
-        return QuickSort(0, original.Count - 1);
+        return QuickSort(original, 0, original.Count - 1, comparer);
+    }
 
-        bool QuickSort(int left, int right)
+    public static bool QuickSort<T>(this IList<T> original, int left, int right, Func<T, T, int> comparer)
+    {
+        if (left >= right)
+            return false;
+        int middleIndex = (left + right) / 2;
+        T middle = original[middleIndex];
+        int less = left;
+        int greater = right;
+        bool changed = false;
+        while (true)
         {
-            if (left >= right)
-                return false;
-            int middleIndex = (left + right) / 2;
-            T middle = original[middleIndex];
-            int i = left;
-            int j = right;
-            bool changed = false;
-            while (true)
+            // 双指针收缩
+            // 找到一个大于中数的下标和一个小于中数的下标，交换位置
+            while (less < greater && comparer(original[less], middle) < 0)
             {
-                // 双指针收缩
-                // 找到一个大于中数的下标和一个小于中数的下标，交换位置
-                while (i < j && comparer(original[i], middle) < 0)
-                {
-                    i++;
-                }
-
-                while (j > i && comparer(original[j], middle) > 0)
-                {
-                    j--;
-                }
-
-                if (i == j) break;
-
-                T temp = original[i];
-                original[i] = original[j];
-                original[j] = temp;
-                changed = true;
-                if (comparer(original[i], original[j]) == 0) j--;
+                less++;
             }
 
-            changed |= QuickSort(left, i);
-            changed |= QuickSort(i + 1, right);
-            return changed;
+            while (greater > less && comparer(original[greater], middle) > 0)
+            {
+                greater--;
+            }
+
+            if (less >= greater) break;
+
+            if (comparer(original[less], original[greater]) == 0)
+            {
+                greater--;
+                continue;
+            }
+            T temp = original[less];
+            original[less] = original[greater];
+            original[greater] = temp;
+            changed = true;
         }
+
+        changed |= QuickSort(original, left, less, comparer);
+        changed |= QuickSort(original, less + 1, right, comparer);
+        return changed;
     }
 }
