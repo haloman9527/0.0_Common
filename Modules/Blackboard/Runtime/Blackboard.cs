@@ -177,12 +177,17 @@ namespace CZToolKit.Common.Blackboard
             structDataContainers.Clear();
             keyContainerMap.Clear();
             dataObserversMap.Clear();
+            addObservers.Clear();
+            removeObservers.Clear();
         }
 
         private void NotifyObservers(TKey key, object value, NotifyType notifyType)
         {
             if (dataObserversMap.TryGetValue(key, out var observers))
             {
+                addObservers.Clear();
+                removeObservers.Clear();
+                
                 isNotifying = true;
 
                 foreach (var observer in observers)
@@ -201,15 +206,16 @@ namespace CZToolKit.Common.Blackboard
                 {
                     UnregisterObserver(pair.Key, pair.Value);
                 }
+
+                addObservers.Clear();
+                removeObservers.Clear();
             }
         }
 
         public void RegisterObserver(TKey key, Action<object, NotifyType> observer)
         {
             if (isNotifying)
-            {
                 addObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
-            }
             else
             {
                 if (!dataObserversMap.TryGetValue(key, out var observers))
@@ -225,13 +231,9 @@ namespace CZToolKit.Common.Blackboard
             if (!dataObserversMap.TryGetValue(key, out var observers))
                 return;
             if (isNotifying)
-            {
                 removeObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
-            }
             else
-            {
                 observers.Remove(observer);
-            }
         }
     }
 }
