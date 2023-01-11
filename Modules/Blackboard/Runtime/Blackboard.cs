@@ -27,7 +27,7 @@ namespace CZToolKit.Common.Blackboard
         Changed,
         Remove
     }
-    
+
     public class Blackboard<TKey>
     {
         public interface IDataContainer
@@ -97,6 +97,9 @@ namespace CZToolKit.Common.Blackboard
         private Dictionary<TKey, IDataContainer> keyContainerMap = new Dictionary<TKey, IDataContainer>();
         private Dictionary<Type, IDataContainer> structDataContainers = new Dictionary<Type, IDataContainer>();
         private Dictionary<TKey, List<Action<object, NotifyType>>> dataObserversMap = new Dictionary<TKey, List<Action<object, NotifyType>>>();
+        private List<KeyValuePair<TKey, Action<object, NotifyType>>> addObservers = new List<KeyValuePair<TKey, Action<object, NotifyType>>>();
+        private List<KeyValuePair<TKey, Action<object, NotifyType>>> removeObservers = new List<KeyValuePair<TKey, Action<object, NotifyType>>>();
+        private bool isNotifying;
 
         public T Get<T>(TKey key)
         {
@@ -153,27 +156,16 @@ namespace CZToolKit.Common.Blackboard
                 ((DataContainer<T>)dataContainer).Set(key, value);
             else
                 ((DataContainer<object>)dataContainer).Set(key, value);
-            if (dataObserversMap.TryGetValue(key, out var observers))
-            {
-                var notifyType = exists ? NotifyType.Changed : NotifyType.Added;
-                foreach (var observer in observers)
-                {
-                    observer?.Invoke(value, notifyType);
-                }
-            }
+
+            NotifyObservers(key, value, exists ? NotifyType.Changed : NotifyType.Added);
         }
 
         public void Remove(TKey key)
         {
             if (!keyContainerMap.TryGetValue(key, out var dataContainer))
                 return;
-            if (dataObserversMap.TryGetValue(key, out var observers))
-            {
-                foreach (var observer in observers)
-                {
-                    observer?.Invoke(dataContainer.Get(key), NotifyType.Remove);
-                }
-            }
+
+            NotifyObservers(key, dataContainer.Get(key), NotifyType.Remove);
 
             keyContainerMap.Remove(key);
             dataContainer.Remove(key);
@@ -187,20 +179,59 @@ namespace CZToolKit.Common.Blackboard
             dataObserversMap.Clear();
         }
 
+        private void NotifyObservers(TKey key, object value, NotifyType notifyType)
+        {
+            if (dataObserversMap.TryGetValue(key, out var observers))
+            {
+                isNotifying = true;
+
+                foreach (var observer in observers)
+                {
+                    observer?.Invoke(value, notifyType);
+                }
+
+                isNotifying = false;
+
+                foreach (var pair in addObservers)
+                {
+                    RegisterObserver(pair.Key, pair.Value);
+                }
+
+                foreach (var pair in removeObservers)
+                {
+                    UnregisterObserver(pair.Key, pair.Value);
+                }
+            }
+        }
+
         public void RegisterObserver(TKey key, Action<object, NotifyType> observer)
         {
-            if (!dataObserversMap.TryGetValue(key, out var observers))
-                dataObserversMap[key] = observers = new List<Action<object, NotifyType>>();
-            if (observers.Contains(observer))
-                return;
-            observers.Add(observer);
+            if (isNotifying)
+            {
+                addObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
+            }
+            else
+            {
+                if (!dataObserversMap.TryGetValue(key, out var observers))
+                    dataObserversMap[key] = observers = new List<Action<object, NotifyType>>();
+                if (observers.Contains(observer))
+                    return;
+                observers.Add(observer);
+            }
         }
 
         public void UnregisterObserver(TKey key, Action<object, NotifyType> observer)
         {
             if (!dataObserversMap.TryGetValue(key, out var observers))
                 return;
-            observers.Remove(observer);
+            if (isNotifying)
+            {
+                removeObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
+            }
+            else
+            {
+                observers.Remove(observer);
+            }
         }
     }
 }
