@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,7 +13,9 @@
  *  Blog: https://www.crosshair.top/
  *
  */
+
 #endregion
+
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
@@ -29,8 +32,7 @@ namespace CZToolKit.Common.Editors
     {
         static readonly Dictionary<UnityObject, Editor> EditorCache = new Dictionary<UnityObject, Editor>();
 
-        [SerializeField]
-        readonly ResizableArea leftArea = new ResizableArea();
+        [SerializeField] readonly ResizableArea leftArea = new ResizableArea();
 
         string searchText = "";
         SearchField searchField;
@@ -53,13 +55,24 @@ namespace CZToolKit.Common.Editors
                     rightRoot = new VisualElement();
                     rootVisualElement.Add(rightRoot);
                 }
+
                 return rightRoot;
             }
         }
+
         protected float LeftMinWidth { get; set; } = 50;
-        protected Rect LeftRect { get { return leftRect; } }
+
+        protected Rect LeftRect
+        {
+            get { return leftRect; }
+        }
+
         protected virtual float RightMinWidth { get; set; } = 500;
-        protected Rect RightRect { get { return rightRect; } }
+
+        protected Rect RightRect
+        {
+            get { return rightRect; }
+        }
 
         protected virtual void OnEnable()
         {
@@ -82,10 +95,13 @@ namespace CZToolKit.Common.Editors
             MenuTreeView.onSelectionChanged += OnSelectionChanged;
         }
 
-        protected virtual void OnSelectionChanged(IList<int> selection) { }
+        protected virtual void OnSelectionChanged(IList<int> selection)
+        {
+        }
 
         protected virtual void OnGUI()
         {
+            EditorGUILayout.BeginHorizontal();
             var tempCenter = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
             if (Event.current.type != EventType.Layout && Event.current.type != EventType.Used)
@@ -99,36 +115,38 @@ namespace CZToolKit.Common.Editors
 
             leftRect = leftArea.OnGUI(leftRect);
             // 左列表
-            using (var leftScope = new GUILayout.AreaScope(leftRect))
+            using (new GUILayout.AreaScope(leftRect))
             {
                 GUILayout.Space(3);
                 OnLeftGUI();
             }
+
+            EditorGUILayout.EndVertical();
 
             // 分割线
             Rect sideRect = center;
             sideRect.xMin = leftRect.xMax;
             sideRect.width = 1;
             EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
-
+            
             rightRect = center;
             rightRect.xMin = sideRect.xMax + 2;
             rightRect.width = Mathf.Max(rightRect.width, RightMinWidth);
-
             RightRoot.style.left = rightRect.xMin + 50;
             RightRoot.style.width = rightRect.width - 100;
             RightRoot.style.top = rightRect.yMin;
             RightRoot.style.height = rightRect.height;
 
             // 右绘制
-            using (var rightScope = new GUILayout.AreaScope(rightRect))
+            using (new GUILayout.AreaScope(rightRect))
             {
-                rightScroll = GUILayout.BeginScrollView(rightScroll, false, false);
+                rightScroll = EditorGUILayout.BeginScrollView(rightScroll, false, false);
+                
                 OnRightGUI(MenuTreeView.GetSelection());
-                GUILayout.EndScrollView();
-            }
 
-            EditorGUILayout.EndVertical();
+                EditorGUILayout.EndScrollView();
+            }
+            EditorGUILayout.EndHorizontal();
         }
 
         protected virtual void OnSerachFieldGUI(string placeholderText = "")
@@ -140,6 +158,7 @@ namespace CZToolKit.Common.Editors
                 searchText = tempSearchText;
                 MenuTreeView.searchString = searchText;
             }
+
             if (searchField.HasFocus() && (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return))
             {
                 MenuTreeView.SetFocusAndEnsureSelectedItem();
