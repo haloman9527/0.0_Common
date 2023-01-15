@@ -101,6 +101,13 @@ namespace CZToolKit.Common.Blackboard
         private List<KeyValuePair<TKey, Action<object, NotifyType>>> removeObservers = new List<KeyValuePair<TKey, Action<object, NotifyType>>>();
         private bool isNotifying;
 
+        private Dictionary<string, Blackboard<TKey>> subBlackboards = new Dictionary<string, Blackboard<TKey>>();
+
+        public Dictionary<string, Blackboard<TKey>> SubBlackboards
+        {
+            get { return subBlackboards; }
+        }
+
         public T Get<T>(TKey key)
         {
             if (!this.keyContainerMap.TryGetValue(key, out var dataContainer))
@@ -187,7 +194,7 @@ namespace CZToolKit.Common.Blackboard
             {
                 addObservers.Clear();
                 removeObservers.Clear();
-                
+
                 isNotifying = true;
 
                 foreach (var observer in observers)

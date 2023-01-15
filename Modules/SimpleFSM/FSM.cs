@@ -14,10 +14,7 @@
  */
 #endregion
 using System.Collections.Generic;
-// ^\s+
-// (?<Define>(\w+\s*)+)
-// (?<Generic>(?:<\s*\S+\s*>)*)
-// \((?<Params>[^\(\)\[\]]*)\)
+
 namespace CZToolKit.Common.SimpleFSM
 {
     public class FSM : IFSM
