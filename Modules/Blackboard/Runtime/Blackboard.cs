@@ -204,14 +204,14 @@ namespace CZToolKit.Common.Blackboard
 
                 isNotifying = false;
 
-                foreach (var pair in addObservers)
-                {
-                    RegisterObserver(pair.Key, pair.Value);
-                }
-
                 foreach (var pair in removeObservers)
                 {
                     UnregisterObserver(pair.Key, pair.Value);
+                }
+
+                foreach (var pair in addObservers)
+                {
+                    RegisterObserver(pair.Key, pair.Value);
                 }
 
                 addObservers.Clear();
