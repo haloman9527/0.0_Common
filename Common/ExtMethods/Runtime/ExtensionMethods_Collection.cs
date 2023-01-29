@@ -45,15 +45,12 @@ public static partial class ExtMethods
     {
         if (left >= right)
             return false;
-        int middleIndex = (left + right) / 2;
-        T middle = original[middleIndex];
+        T middle = original[left];
         int less = left;
         int greater = right;
         bool changed = false;
         while (true)
         {
-            // 双指针收缩
-            // 找到一个大于中数的下标和一个小于中数的下标，交换位置
             while (less < greater && comparer(original[less], middle) < 0)
             {
                 less++;
@@ -66,11 +63,13 @@ public static partial class ExtMethods
 
             if (less >= greater) break;
 
-            if (comparer(original[less], original[greater]) == 0)
+            var lr = comparer(original[less], original[greater]);
+            if (lr == 0)
             {
                 greater--;
                 continue;
             }
+
             T temp = original[less];
             original[less] = original[greater];
             original[greater] = temp;
