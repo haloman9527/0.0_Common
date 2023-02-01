@@ -50,6 +50,11 @@ namespace CZToolKit.Common.Singletons
 
         public static void Initialize()
         {
+#if UNITY_EDITOR
+            if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new System.Exception();
+#endif
+            
             if (instance != null)
                 return;
 
@@ -74,18 +79,6 @@ namespace CZToolKit.Common.Singletons
                 instance = ts[0];
 #endif
         }
-
-        public static void Destroy()
-        {
-            if (instance != null)
-            {
-                instance.OnBeforeDestroy();
-                instance = null;
-            }
-        }
-
-        protected virtual void OnBeforeDestroy() { }
-
     }
 }
 

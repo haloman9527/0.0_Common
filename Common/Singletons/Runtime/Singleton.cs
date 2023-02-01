@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,6 +13,7 @@
  *  Blog: https://www.crosshair.top/
  *
  */
+
 #endregion
 
 namespace CZToolKit.Common.Singletons
@@ -22,11 +24,7 @@ namespace CZToolKit.Common.Singletons
         private static readonly object _lock = new object();
 
         /// <summary> 单例对象 </summary>
-        public static T instance
-        {
-            get;
-            protected set;
-        }
+        public static T instance { get; protected set; }
 
         /// <summary> 单例对象属性 </summary>
         public static T Instance
@@ -40,12 +38,18 @@ namespace CZToolKit.Common.Singletons
                         Initialize();
                     }
                 }
+
                 return instance;
             }
         }
 
         public static void Initialize()
         {
+#if UNITY_EDITOR
+            if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new System.Exception();
+#endif
+
             if (instance != null)
                 return;
             instance = new T();

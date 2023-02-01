@@ -34,32 +34,30 @@ namespace CZToolKit.Common.Singletons
             get
             {
                 if (instance == null)
-                    Initialize();
+                {
+                    lock (_lock)
+                    {
+                        Initialize();
+                    }
+                }
 
                 return instance;
             }
         }
-        
+
         public static void Initialize()
         {
-            lock (_lock)
-            {
-                if (instance != null)
-                    return;
-                instance = GameObject.FindObjectOfType<T>();
-                if (instance == null)
-                    instance = new GameObject(typeof(T).Name).AddComponent<T>();
-                DontDestroyOnLoad(instance.gameObject);
-            }
-        }
-
-        public static void Destroy()
-        {
+#if UNITY_EDITOR
+            if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new System.Exception();
+#endif
+            
             if (instance != null)
-            {
-                Destroy(instance.gameObject);
-                instance = null;
-            }
+                return;
+            instance = GameObject.FindObjectOfType<T>();
+            if (instance == null)
+                instance = new GameObject(typeof(T).Name).AddComponent<T>();
+            DontDestroyOnLoad(instance.gameObject);
         }
     }
 }
