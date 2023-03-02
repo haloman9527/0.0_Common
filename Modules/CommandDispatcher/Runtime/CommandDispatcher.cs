@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -13,7 +14,9 @@
  *  Blog: https://www.crosshair.top/
  *
  */
+
 #endregion
+
 using System;
 using System.Collections.Generic;
 
@@ -22,6 +25,7 @@ namespace CZToolKit.Common
     public interface ICommand
     {
         void Do();
+        void Redo();
         void Undo();
     }
 
@@ -49,7 +53,7 @@ namespace CZToolKit.Common
 
         public void Do(Action @do, Action @undo)
         {
-            Do(new ActionCommand(@do, @undo));
+            Do(new ActionCommand(@do, @do, @undo));
         }
 
         public void Do(ICommand command)
@@ -72,8 +76,9 @@ namespace CZToolKit.Common
             ICommand command = redo.Pop();
             if (command != null)
             {
-                command.Do();
+                command.Redo();
             }
+
             undo.Push(command);
         }
 
@@ -109,6 +114,10 @@ namespace CZToolKit.Common
                 }
             }
 
+            public void Redo()
+            {
+            }
+
             public void Undo()
             {
                 while (undo.Count != 0)
@@ -123,17 +132,23 @@ namespace CZToolKit.Common
 
         internal class ActionCommand : ICommand
         {
-            Action @do, @undo;
+            Action @do, @redo, @undo;
 
-            public ActionCommand(Action @do, Action @undo)
+            public ActionCommand(Action @do, Action @redo, Action @undo)
             {
                 this.@do = @do;
+                this.@redo = @redo;
                 this.@undo = @undo;
             }
 
             public void Do()
             {
                 @do?.Invoke();
+            }
+
+            public void Redo()
+            {
+                @redo?.Invoke();
             }
 
             public void Undo()
