@@ -16,10 +16,11 @@
 using CZToolKit.Common;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace CZToolKit.Common.ViewModel
 {
-    public static partial class ViewModelFactory
+    public static class ViewModelFactory
     {
         static Dictionary<Type, Type> ViewModelTypeCache;
 
@@ -29,13 +30,8 @@ namespace CZToolKit.Common.ViewModel
             foreach (var type in Util_TypeCache.GetTypesWithAttribute<ViewModelAttribute>())
             {
                 if (type.IsAbstract) continue;
-                foreach (var attribute in type.GetCustomAttributes(false))
-                {
-                    if (!(attribute is ViewModelAttribute viewModelAttribute))
-                        continue;
-                    ViewModelTypeCache[viewModelAttribute.targetType] = type;
-                    break;
-                }
+                var attribute = type.GetCustomAttribute<ViewModelAttribute>(false);
+                ViewModelTypeCache[attribute.targetType] = type;
             }
         }
 
