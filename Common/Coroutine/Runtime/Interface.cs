@@ -1,18 +1,3 @@
-#region ◊¢  Õ
-/***
- *
- *  Title:
- *  
- *  Description:
- *  
- *  Date:
- *  Version:
- *  Writer: ∞Î÷ª¡˙œ∫»À
- *  Github: https://github.com/HalfLobsterMan
- *  Blog: https://www.crosshair.top/
- *
- */
-#endregion
 
 namespace CZToolKit.Common
 {

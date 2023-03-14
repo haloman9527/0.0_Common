@@ -15,6 +15,7 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace CZToolKit.Common.SharedVariable
 {
@@ -23,7 +24,7 @@ namespace CZToolKit.Common.SharedVariable
         public static IEnumerable<SharedVariable> CollectionObjectSharedVariables(object obj)
         {
             Type sharedType = typeof(SharedVariable);
-            foreach (var fieldInfo in Util_Reflection.GetFieldInfos(obj.GetType()))
+            foreach (var fieldInfo in Util_Reflection.GetFields(obj.GetType(), BindingFlags.Public | BindingFlags.Instance, true))
             {
                 if (sharedType.IsAssignableFrom(fieldInfo.FieldType))
                 {

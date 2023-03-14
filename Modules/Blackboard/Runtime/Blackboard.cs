@@ -93,10 +93,10 @@ namespace CZToolKit.Common.Blackboard
             }
         }
 
-        private DataContainer<object> objectDataContainer = new DataContainer<object>();
-        private Dictionary<TKey, IDataContainer> keyContainerMap = new Dictionary<TKey, IDataContainer>();
-        private Dictionary<Type, IDataContainer> structDataContainers = new Dictionary<Type, IDataContainer>();
-        private Dictionary<TKey, List<Action<object, NotifyType>>> dataObserversMap = new Dictionary<TKey, List<Action<object, NotifyType>>>();
+        private DataContainer<object> objectContainer = new DataContainer<object>();
+        private Dictionary<Type, IDataContainer> structContainers = new Dictionary<Type, IDataContainer>();
+        private Dictionary<TKey, IDataContainer> containerMap = new Dictionary<TKey, IDataContainer>();
+        private Dictionary<TKey, List<Action<object, NotifyType>>> observerMap = new Dictionary<TKey, List<Action<object, NotifyType>>>();
         private List<KeyValuePair<TKey, Action<object, NotifyType>>> addObservers = new List<KeyValuePair<TKey, Action<object, NotifyType>>>();
         private List<KeyValuePair<TKey, Action<object, NotifyType>>> removeObservers = new List<KeyValuePair<TKey, Action<object, NotifyType>>>();
         private bool isNotifying;
@@ -110,7 +110,7 @@ namespace CZToolKit.Common.Blackboard
 
         public T Get<T>(TKey key)
         {
-            if (!this.keyContainerMap.TryGetValue(key, out var dataContainer))
+            if (!this.containerMap.TryGetValue(key, out var dataContainer))
                 return default;
             var type = typeof(T);
             var isValueType = type.IsValueType;
@@ -122,7 +122,7 @@ namespace CZToolKit.Common.Blackboard
 
         public bool TryGet<T>(TKey key, out T value)
         {
-            if (!this.keyContainerMap.TryGetValue(key, out var dataContainer))
+            if (!this.containerMap.TryGetValue(key, out var dataContainer))
             {
                 value = default;
                 return false;
@@ -145,18 +145,18 @@ namespace CZToolKit.Common.Blackboard
             var type = typeof(T);
             var isValueType = type.IsValueType;
             var exists = true;
-            if (!keyContainerMap.TryGetValue(key, out var dataContainer))
+            if (!containerMap.TryGetValue(key, out var dataContainer))
             {
                 exists = false;
                 if (isValueType)
                 {
-                    if (!structDataContainers.TryGetValue(type, out dataContainer))
-                        structDataContainers[type] = dataContainer = new DataContainer<T>();
+                    if (!structContainers.TryGetValue(type, out dataContainer))
+                        structContainers[type] = dataContainer = new DataContainer<T>();
 
-                    keyContainerMap[key] = dataContainer;
+                    containerMap[key] = dataContainer;
                 }
                 else
-                    keyContainerMap[key] = dataContainer = objectDataContainer;
+                    containerMap[key] = dataContainer = objectContainer;
             }
 
             if (isValueType)
@@ -169,28 +169,28 @@ namespace CZToolKit.Common.Blackboard
 
         public void Remove(TKey key)
         {
-            if (!keyContainerMap.TryGetValue(key, out var dataContainer))
+            if (!containerMap.TryGetValue(key, out var dataContainer))
                 return;
 
             NotifyObservers(key, dataContainer.Get(key), NotifyType.Remove);
 
-            keyContainerMap.Remove(key);
+            containerMap.Remove(key);
             dataContainer.Remove(key);
         }
 
         public void Clear()
         {
-            objectDataContainer.Clear();
-            structDataContainers.Clear();
-            keyContainerMap.Clear();
-            dataObserversMap.Clear();
+            objectContainer.Clear();
+            structContainers.Clear();
+            containerMap.Clear();
+            observerMap.Clear();
             addObservers.Clear();
             removeObservers.Clear();
         }
 
         private void NotifyObservers(TKey key, object value, NotifyType notifyType)
         {
-            if (dataObserversMap.TryGetValue(key, out var observers))
+            if (observerMap.TryGetValue(key, out var observers))
             {
                 addObservers.Clear();
                 removeObservers.Clear();
@@ -225,8 +225,8 @@ namespace CZToolKit.Common.Blackboard
                 addObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
             else
             {
-                if (!dataObserversMap.TryGetValue(key, out var observers))
-                    dataObserversMap[key] = observers = new List<Action<object, NotifyType>>();
+                if (!observerMap.TryGetValue(key, out var observers))
+                    observerMap[key] = observers = new List<Action<object, NotifyType>>();
                 if (observers.Contains(observer))
                     return;
                 observers.Add(observer);
@@ -235,7 +235,7 @@ namespace CZToolKit.Common.Blackboard
 
         public void UnregisterObserver(TKey key, Action<object, NotifyType> observer)
         {
-            if (!dataObserversMap.TryGetValue(key, out var observers))
+            if (!observerMap.TryGetValue(key, out var observers))
                 return;
             if (isNotifying)
                 removeObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));

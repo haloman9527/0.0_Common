@@ -22,13 +22,6 @@ using System.Collections.Generic;
 
 namespace CZToolKit.Common
 {
-    public interface ICommand
-    {
-        void Do();
-        void Redo();
-        void Undo();
-    }
-
     public class CommandDispatcher
     {
         Stack<ICommand> undo = new Stack<ICommand>();
