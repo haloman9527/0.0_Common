@@ -61,9 +61,6 @@ namespace CZToolKit.RPN
     public unsafe struct Token : IEquatable<Token>
     {
         private bool initialized;
-        private char* source;
-        private int startIndex;
-        private int endIndex;
         private string text;
         private TokenType tokenType;
         private int priority;
@@ -86,9 +83,6 @@ namespace CZToolKit.RPN
         public Token(char* source, int startIndex, int endIndex, TokenType tokenType, int priority)
         {
             this.initialized = true;
-            this.source = source;
-            this.startIndex = startIndex;
-            this.endIndex = endIndex;
             this.tokenType = tokenType;
             this.priority = priority;
             var sb = TextUtil.SpawnSB();
@@ -272,9 +266,7 @@ namespace CZToolKit.RPN
         public Stack<Token> tokenStack = new Stack<Token>();
         public Stack<float> numberStack = new Stack<float>();
 
-        /// <summary>
-        /// 中缀转后缀表达式
-        /// </summary>
+        /// <summary> 中缀转后缀表达式 </summary>
         public IEnumerable<Token> ToRPN(string expr)
         {
             lexer.Begin(expr);
@@ -334,10 +326,10 @@ namespace CZToolKit.RPN
             lexer.End();
         }
 
-        public float Calculate(Token[] rpnExpr)
+        public float Calculate(Token[] tokens)
         {
             numberStack.Clear();
-            foreach (var token in rpnExpr)
+            foreach (var token in tokens)
             {
                 if (token.TokenType == TokenType.Eof)
                     break;
