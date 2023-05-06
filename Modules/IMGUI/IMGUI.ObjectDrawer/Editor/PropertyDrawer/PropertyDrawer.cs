@@ -103,10 +103,9 @@ namespace CZToolKit.Common.IMGUI
 
             foreach (var type in TypeCache.GetTypesDerivedFrom<PropertyDrawer>())
             {
-                foreach (var att in Util_Attribute.GetTypeAttributes(type, false))
+                foreach (var attr in Util_Attribute.GetTypeAttributes<CustomPropertyDrawerAttribute>(type, false))
                 {
-                    if (att is CustomPropertyDrawerAttribute sAtt)
-                        ObjectEditorTypeCache[sAtt.type] = type;
+                     ObjectEditorTypeCache[attr.type] = type;
                 }
             }
         }

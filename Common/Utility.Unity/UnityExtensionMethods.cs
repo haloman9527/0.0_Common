@@ -16,7 +16,7 @@
 using CZToolKit.Common;
 using UnityEngine;
 
-public static partial class ExtMethods
+public static class UnityExtensionMethods
 {
     #region Vector
     public static bool IsZero(this Vector2 self)
@@ -114,9 +114,9 @@ public static partial class ExtMethods
     }
 
     /// <summary> 获取颜色明度 </summary>
-    public static float GetLuminance(this Color color)
+    public static float GetLuminance(this Color self)
     {
-        return 0.299f * color.r + 0.587f * color.g + 0.114f * color.b;
+        return 0.299f * self.r + 0.587f * self.g + 0.114f * self.b;
     }
 
     public static string GetRelativePath(this Transform self, Transform root)
@@ -129,31 +129,5 @@ public static partial class ExtMethods
             trans = trans.parent;
         }
         return path;
-    }
-
-    public static Rect GetSide(this Rect self, UIDirection sideDirection, float sideWidth, float offset = 0)
-    {
-        switch (sideDirection)
-        {
-            case UIDirection.MiddleCenter:
-                return new Rect(self.x + sideWidth / 2, self.y + sideWidth / 2, self.width - sideWidth, self.height - sideWidth);
-            case UIDirection.Top:
-                return new Rect(self.x + sideWidth / 2, self.y - sideWidth / 2 + offset, self.width - sideWidth, sideWidth);
-            case UIDirection.Bottom:
-                return new Rect(self.x + sideWidth / 2, self.y + self.height - sideWidth / 2 + offset, self.width - sideWidth, sideWidth);
-            case UIDirection.Left:
-                return new Rect(self.x - sideWidth / 2 + offset, self.y + sideWidth / 2, sideWidth, self.height - sideWidth);
-            case UIDirection.Right:
-                return new Rect(self.x + self.width - sideWidth / 2 + offset, self.y + sideWidth / 2, sideWidth, self.height - sideWidth);
-            case UIDirection.TopLeft:
-                return new Rect(self.x - sideWidth / 2 + offset, self.y - sideWidth / 2 + offset, sideWidth, sideWidth);
-            case UIDirection.TopRight:
-                return new Rect(self.x + self.width - sideWidth / 2 + offset, self.y - sideWidth / 2 + offset, sideWidth, sideWidth);
-            case UIDirection.BottomLeft:
-                return new Rect(self.x - sideWidth / 2 + offset, self.y + self.height - sideWidth / 2 + offset, sideWidth, sideWidth);
-            case UIDirection.BottomRight:
-                return new Rect(self.x + self.width - sideWidth / 2 + offset, self.y + self.height - sideWidth / 2 + offset, sideWidth, sideWidth);
-        }
-        return new Rect();
     }
 }

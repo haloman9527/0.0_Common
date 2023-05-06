@@ -19,6 +19,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using CZToolKit.Common.IMGUI.Controls;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -28,7 +29,7 @@ using UnityObject = UnityEngine.Object;
 namespace CZToolKit.Common.IMGUI
 {
     [Serializable]
-    public abstract class BasicMenuEditorWindow : EditorWindow
+    public abstract class BaseMenuEditorWindow : EditorWindow
     {
         static readonly Dictionary<UnityObject, Editor> EditorCache = new Dictionary<UnityObject, Editor>();
 
@@ -77,8 +78,7 @@ namespace CZToolKit.Common.IMGUI
         protected virtual void OnEnable()
         {
             leftArea.minSize = new Vector2(LeftMinWidth, 50);
-            leftArea.side = 10;
-            leftArea.SetEnable(ResizableArea.UIDirection.Right, true);
+            leftArea.EnableSide(ResizableArea.Direction.Right);
 
             searchField = new SearchField();
             RefreshTreeView();

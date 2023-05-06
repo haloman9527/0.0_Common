@@ -96,7 +96,7 @@ namespace CZToolKit.Common.IMGUI
 
             var editorType = PropertyDrawer.GetEditorType(propertyType);
             var att = (PropertyAttribute)null;
-            if (editorType == null && Util_Attribute.TryGetTypeAttribute(propertyType, out att))
+            if (editorType == null && Util_Attribute.TryGetTypeAttribute(propertyType, true, out att))
                 editorType = PropertyDrawer.GetEditorType(propertyType);
             if (editorType != null)
                 drawer = PropertyDrawer.CreateEditor(this, att, editorType);
@@ -125,7 +125,7 @@ namespace CZToolKit.Common.IMGUI
 
             var editorType = PropertyDrawer.GetEditorType(propertyType);
             var att = (PropertyAttribute)null;
-            if (editorType == null && Util_Attribute.TryGetFieldAttribute<PropertyAttribute>(fieldInfo, out att))
+            if (editorType == null && Util_Attribute.TryGetFieldAttribute<PropertyAttribute>(fieldInfo, false, out att))
                 editorType = PropertyDrawer.GetEditorType(att.GetType());
             if (editorType != null)
                 drawer = PropertyDrawer.CreateEditor(this, att, editorType);
@@ -183,18 +183,18 @@ namespace CZToolKit.Common.IMGUI
                             {
 #if UNITY_EDITOR
                                 // 如果不带有SerializeField特性
-                                if (!Util_Attribute.TryGetFieldAttribute<SerializeField>(childFieldInfo, out var serializeField))
+                                if (!Util_Attribute.TryGetFieldAttribute<SerializeField>(childFieldInfo, false, out var serializeField))
                                 {
                                     continue;
                                 }
 #endif
                                 // 若带有NonSerialized特性
-                                if (Util_Attribute.TryGetFieldAttribute<NonSerializedAttribute>(childFieldInfo, out var nonSerialized))
+                                if (Util_Attribute.TryGetFieldAttribute<NonSerializedAttribute>(childFieldInfo, false, out var nonSerialized))
                                 {
                                     continue;
                                 }
                                 // 若带有HideInInspector特性
-                                if (Util_Attribute.TryGetFieldAttribute<HideInInspector>(childFieldInfo, out var hideInInspector))
+                                if (Util_Attribute.TryGetFieldAttribute<HideInInspector>(childFieldInfo, false, out var hideInInspector))
                                 {
                                     continue;
                                 }

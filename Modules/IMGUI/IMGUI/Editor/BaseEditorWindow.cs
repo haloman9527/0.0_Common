@@ -20,7 +20,7 @@ using UnityEngine;
 
 namespace CZToolKit.Common.IMGUI
 {
-    public abstract class BasicEditorWindow : EditorWindow
+    public abstract class BaseEditorWindow : EditorWindow
     {
         static GUIStyle csIconStyle;
         static GUIContent csIcon;

@@ -56,7 +56,7 @@ namespace CZToolKit.Common.ReactiveX
 
         public override void OnDispose()
         {
-            if (MainThreadDispatcher.instance != null)
+            if (MainThreadDispatcher.s_Instance != null)
                 MainThreadDispatcher.Instance.StopCoroutine(coroutine);
         }
     }

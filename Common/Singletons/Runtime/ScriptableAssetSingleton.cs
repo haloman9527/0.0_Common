@@ -13,7 +13,6 @@
  *
  */
 #endregion
-using UnityEngine;
 
 namespace CZToolKit.Common.Singletons
 {
@@ -24,10 +23,10 @@ namespace CZToolKit.Common.Singletons
 #endif
     {
         /// <summary> 线程锁 </summary>
-        private static readonly object _lock = new object();
+        private static readonly object @lock = new object();
 
         /// <summary> 单例对象 </summary>
-        public static T instance
+        public static T s_Instance
         {
             get;
             protected set;
@@ -37,41 +36,44 @@ namespace CZToolKit.Common.Singletons
         {
             get
             {
-                if (instance == null)
+                if (s_Instance == null)
                 {
-                    lock (_lock)
+                    lock (@lock)
                     {
-                        Initialize();
+                        if (s_Instance == null)
+                        {
+                            Initialize();
+                        }
                     }
                 }
-                return instance;
+                return s_Instance;
             }
         }
 
         public static void Initialize()
         {
 #if UNITY_EDITOR
-            if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
                 throw new System.Exception();
 #endif
             
-            if (instance != null)
+            if (s_Instance != null)
                 return;
 
 #if UNITY_EDITOR
             foreach (var guid in UnityEditor.AssetDatabase.FindAssets($"t:{typeof(T).Name}"))
             {
-                instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
-                if (instance != null)
+                s_Instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
+                if (s_Instance != null)
                     break;
             }
 
-            if (instance == null)
+            if (s_Instance == null)
             {
-                instance = CreateInstance<T>();
+                s_Instance = CreateInstance<T>();
                 if (!System.IO.Directory.Exists($"Assets/{typeof(T).Name}"))
                     System.IO.Directory.CreateDirectory($"Assets/{typeof(T).Name}");
-                UnityEditor.AssetDatabase.CreateAsset(instance, $"Assets/{typeof(T).Name}/{typeof(T).Name}.asset");
+                UnityEditor.AssetDatabase.CreateAsset(s_Instance, $"Assets/{typeof(T).Name}/{typeof(T).Name}.asset");
             }
 #else
             T[] ts = Resources.LoadAll<T>(typeof(T).Name);

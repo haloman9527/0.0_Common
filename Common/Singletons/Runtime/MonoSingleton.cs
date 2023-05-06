@@ -23,41 +23,39 @@ namespace CZToolKit.Common.Singletons
     public class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
     {
         /// <summary> 线程锁 </summary>
-        static readonly object _lock = new object();
+        static readonly object @lock = new object();
 
         /// <summary> 单例对象 </summary>
-        public static T instance { get; protected set; }
+        public static T s_Instance { get; protected set; }
 
         /// <summary> 单例对象属性，自动创建 </summary>
         public static T Instance
         {
             get
             {
-                if (instance == null)
+                if (s_Instance == null)
                 {
-                    lock (_lock)
+                    lock (@lock)
                     {
-                        Initialize();
+                        if (s_Instance == null)
+                        {
+                            Initialize();
+                        }
                     }
                 }
 
-                return instance;
+                return s_Instance;
             }
         }
 
         public static void Initialize()
         {
-#if UNITY_EDITOR
-            if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-                throw new System.Exception();
-#endif
-            
-            if (instance != null)
+            if (s_Instance != null)
                 return;
-            instance = GameObject.FindObjectOfType<T>();
-            if (instance == null)
-                instance = new GameObject(typeof(T).Name).AddComponent<T>();
-            DontDestroyOnLoad(instance.gameObject);
+            s_Instance = GameObject.FindObjectOfType<T>();
+            if (s_Instance == null)
+                s_Instance = new GameObject(typeof(T).Name).AddComponent<T>();
+            DontDestroyOnLoad(s_Instance.gameObject);
         }
     }
 }

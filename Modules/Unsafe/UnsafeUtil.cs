@@ -83,5 +83,10 @@ namespace CZToolKit.Common.UnsafeEx
         {
             Unsafe.Write(((byte*)destination + (Unsafe.SizeOf<T>() * index)), value);
         }
+        
+        public static void CopyBlock(void* destination, void* source, uint byteCount)
+        {
+            Unsafe.CopyBlock(destination, source, byteCount);
+        }
     }
 }

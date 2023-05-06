@@ -31,9 +31,9 @@ namespace CZToolKit.Common.IMGUI
         /// <returns> 满足以上条件返回<see cref="true"/> </returns>
         public static bool CanDraw(FieldInfo fieldInfo)
         {
-            return ((!fieldInfo.IsPrivate && !fieldInfo.IsFamily) || Util_Attribute.TryGetFieldAttribute(fieldInfo, out SerializeField serAtt))
-                    && !Util_Attribute.TryGetTypeAttribute(fieldInfo.DeclaringType, out NonSerializedAttribute nonAtt)
-                    && !Util_Attribute.TryGetFieldAttribute(fieldInfo, out HideInInspector hideAtt);
+            return ((!fieldInfo.IsPrivate && !fieldInfo.IsFamily) || Util_Attribute.TryGetFieldAttribute(fieldInfo, false, out SerializeField serAtt))
+                    && !Util_Attribute.TryGetTypeAttribute(fieldInfo.DeclaringType, true, out NonSerializedAttribute nonAtt)
+                    && !Util_Attribute.TryGetFieldAttribute(fieldInfo, false, out HideInInspector hideAtt);
         }
 
         public static bool DrawFoldout(int hash, GUIContent guiContent)
@@ -66,7 +66,7 @@ namespace CZToolKit.Common.IMGUI
         public static void DrawField(FieldInfo fieldInfo, object context)
         {
             GUIContent label = null;
-            if (Util_Attribute.TryGetFieldAttribute(fieldInfo, out TooltipAttribute tooltipAtt))
+            if (Util_Attribute.TryGetFieldAttribute(fieldInfo, false, out TooltipAttribute tooltipAtt))
                 label = GUIHelper.TextContent(ObjectNames.NicifyVariableName(fieldInfo.Name), tooltipAtt.tooltip);
             else
                 label = GUIHelper.TextContent(ObjectNames.NicifyVariableName(fieldInfo.Name));

@@ -16,6 +16,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -135,10 +136,9 @@ namespace CZToolKit.Common.IMGUI
 
             foreach (var type in TypeCache.GetTypesDerivedFrom<ObjectEditor>())
             {
-                foreach (var att in Util_Attribute.GetTypeAttributes(type, true))
+                foreach (var attr in Util_Attribute.GetTypeAttributes<CustomObjectEditorAttribute>(type, true))
                 {
-                    if (att is CustomObjectEditorAttribute sAtt)
-                        ObjectEditorTypeCache[sAtt.type] = type;
+                    ObjectEditorTypeCache[attr.type] = type;
                 }
             }
         }
