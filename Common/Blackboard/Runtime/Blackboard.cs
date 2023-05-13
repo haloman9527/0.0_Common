@@ -68,7 +68,10 @@ namespace CZToolKit.Common.Blackboard
             public T Get(TKey key)
             {
                 if (this.data.TryGetValue(key, out var value))
+                {
                     return value;
+                }
+
                 return default;
             }
 
@@ -111,13 +114,17 @@ namespace CZToolKit.Common.Blackboard
         public T Get<T>(TKey key)
         {
             if (!this.containerMap.TryGetValue(key, out var dataContainer))
+            {
                 return default;
+            }
             var type = typeof(T);
             var isValueType = type.IsValueType;
             if (isValueType)
+            {
                 return ((DataContainer<T>)dataContainer).Get(key);
-            else
-                return (T)((DataContainer<object>)dataContainer).Get(key);
+            }
+
+            return (T)((DataContainer<object>)dataContainer).Get(key);
         }
 
         public bool TryGet<T>(TKey key, out T value)
@@ -131,27 +138,29 @@ namespace CZToolKit.Common.Blackboard
             var type = typeof(T);
             var isValueType = type.IsValueType;
             if (isValueType)
-                return ((DataContainer<T>)dataContainer).TryGet(key, out value);
-            else
             {
-                var result = ((DataContainer<object>)dataContainer).TryGet(key, out var v);
-                value = (T)v;
-                return result;
+                return ((DataContainer<T>)dataContainer).TryGet(key, out value);
             }
+
+            var result = ((DataContainer<object>)dataContainer).TryGet(key, out var v);
+            value = (T)v;
+            return result;
         }
 
         public void Set<T>(TKey key, T value)
         {
             var type = typeof(T);
             var isValueType = type.IsValueType;
-            var exists = true;
+            var notifyType = NotifyType.Changed;
             if (!containerMap.TryGetValue(key, out var dataContainer))
             {
-                exists = false;
+                notifyType = NotifyType.Added;
                 if (isValueType)
                 {
                     if (!structContainers.TryGetValue(type, out dataContainer))
+                    {
                         structContainers[type] = dataContainer = new DataContainer<T>();
+                    }
 
                     containerMap[key] = dataContainer;
                 }
@@ -164,13 +173,15 @@ namespace CZToolKit.Common.Blackboard
             else
                 ((DataContainer<object>)dataContainer).Set(key, value);
 
-            NotifyObservers(key, value, exists ? NotifyType.Changed : NotifyType.Added);
+            NotifyObservers(key, value, notifyType);
         }
 
         public void Remove(TKey key)
         {
             if (!containerMap.TryGetValue(key, out var dataContainer))
+            {
                 return;
+            }
 
             NotifyObservers(key, dataContainer.Get(key), NotifyType.Remove);
 
@@ -190,57 +201,70 @@ namespace CZToolKit.Common.Blackboard
 
         private void NotifyObservers(TKey key, object value, NotifyType notifyType)
         {
-            if (observerMap.TryGetValue(key, out var observers))
+            if (!observerMap.TryGetValue(key, out var observers))
+                return;
+
+            addObservers.Clear();
+            removeObservers.Clear();
+
+            isNotifying = true;
+
+            foreach (var observer in observers)
             {
-                addObservers.Clear();
-                removeObservers.Clear();
-
-                isNotifying = true;
-
-                foreach (var observer in observers)
-                {
-                    observer?.Invoke(value, notifyType);
-                }
-
-                isNotifying = false;
-
-                foreach (var pair in removeObservers)
-                {
-                    UnregisterObserver(pair.Key, pair.Value);
-                }
-
-                foreach (var pair in addObservers)
-                {
-                    RegisterObserver(pair.Key, pair.Value);
-                }
-
-                addObservers.Clear();
-                removeObservers.Clear();
+                observer?.Invoke(value, notifyType);
             }
+
+            isNotifying = false;
+
+            foreach (var pair in removeObservers)
+            {
+                UnregisterObserver(pair.Key, pair.Value);
+            }
+
+            foreach (var pair in addObservers)
+            {
+                RegisterObserver(pair.Key, pair.Value);
+            }
+
+            addObservers.Clear();
+            removeObservers.Clear();
         }
 
         public void RegisterObserver(TKey key, Action<object, NotifyType> observer)
         {
             if (isNotifying)
-                addObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
-            else
             {
-                if (!observerMap.TryGetValue(key, out var observers))
-                    observerMap[key] = observers = new List<Action<object, NotifyType>>();
-                if (observers.Contains(observer))
-                    return;
-                observers.Add(observer);
+                addObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
+                return;
             }
+
+            if (!observerMap.TryGetValue(key, out var observers))
+            {
+                return;
+            }
+
+            if (observers.Contains(observer))
+            {
+                return;
+            }
+
+            observers.Add(observer);
         }
 
         public void UnregisterObserver(TKey key, Action<object, NotifyType> observer)
         {
-            if (!observerMap.TryGetValue(key, out var observers))
-                return;
             if (isNotifying)
+            {
                 removeObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
-            else
-                observers.Remove(observer);
+                return;
+            }
+
+            if (!observerMap.TryGetValue(key, out var observers))
+            {
+                return;
+            }
+
+            observers.Remove(observer);
         }
     }
 }
