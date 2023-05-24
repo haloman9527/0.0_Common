@@ -94,7 +94,6 @@ namespace CZToolKit.Common.ViewModel
             InternalBindableProperties.Clear();
         }
         
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return InternalBindableProperties.GetEnumerator();
@@ -108,6 +107,16 @@ namespace CZToolKit.Common.ViewModel
         void ICollection<KeyValuePair<string, IBindableProperty>>.CopyTo(KeyValuePair<string, IBindableProperty>[] array, int arrayIndex)
         {
             (InternalBindableProperties as ICollection<KeyValuePair<string, IBindableProperty>>).CopyTo(array, arrayIndex);
+        }
+
+        public void RegisterProperty(string propertyName, IBindableProperty property)
+        {
+            this.Add(propertyName, property);
+        }
+
+        public void UnregisterProperty(string propertyName)
+        {
+            this.Remove(propertyName);
         }
 
         public T GetPropertyValue<T>(string propertyName)

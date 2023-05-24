@@ -60,8 +60,6 @@ namespace CZToolKit.Common.ViewModel
 
         public bool IsReadOnly => false;
 
-        public BindableDictionary(Func<Dictionary<TKey, TValue>> getter) : base(getter) { }
-
         public BindableDictionary(Func<Dictionary<TKey, TValue>> getter, Action<Dictionary<TKey, TValue>> setter) : base(getter, setter) { }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()

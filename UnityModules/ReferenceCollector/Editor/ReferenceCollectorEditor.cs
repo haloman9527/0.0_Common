@@ -140,7 +140,12 @@ namespace CZToolKit.Common.Editors
             referencesList.onAddCallback += (list) =>
             {
                 Undo.RecordObject(referenceCollector, "Add ReferenceData");
-                referenceCollector.Add(null);
+                string key = string.Empty;
+                do
+                {
+                    key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
+                } while (referenceCollector.ReferencesDict.ContainsKey(key));
+                referenceCollector.Add(key, null);
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.UpdateIfRequiredOrScript();
             };
@@ -169,7 +174,12 @@ namespace CZToolKit.Common.Editors
                 var referenceCollector = target as ReferenceCollector;
                 foreach (var res in results)
                 {
-                    referenceCollector.Add(res);
+                    string key = string.Empty;
+                    do
+                    {
+                        key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
+                    } while (referenceCollector.ReferencesDict.ContainsKey(key));
+                    referenceCollector.Add(key, res);
                 }
             }
         }

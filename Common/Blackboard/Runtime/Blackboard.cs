@@ -21,16 +21,19 @@ using System.Collections.Generic;
 
 namespace CZToolKit.Common.Blackboard
 {
-    public enum NotifyType
+    public abstract class Blackboard
     {
-        Added,
-        Changed,
-        Remove
+        public enum NotifyType
+        {
+            Added,
+            Changed,
+            Remove
+        }
     }
-
-    public class Blackboard<TKey>
+    
+    public class Blackboard<TKey> : Blackboard
     {
-        public interface IDataContainer
+        private interface IDataContainer
         {
             object Get(TKey key);
 
@@ -41,7 +44,7 @@ namespace CZToolKit.Common.Blackboard
             void Clear();
         }
 
-        public class DataContainer<T> : IDataContainer
+        private class DataContainer<T> : IDataContainer
         {
             private Dictionary<TKey, T> data = new Dictionary<TKey, T>();
 

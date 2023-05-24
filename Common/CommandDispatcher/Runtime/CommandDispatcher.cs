@@ -24,16 +24,16 @@ namespace CZToolKit.Common
 {
     public class CommandDispatcher
     {
-        Stack<ICommand> undo = new Stack<ICommand>();
-        Stack<ICommand> redo = new Stack<ICommand>();
+        private Stack<ICommand> undo = new Stack<ICommand>();
+        private Stack<ICommand> redo = new Stack<ICommand>();
 
-        bool isGrouping = false;
+        private bool isGrouping = false;
 
         public void BeginGroup()
         {
             if (isGrouping)
                 return;
-            undo.Push(new CommandsGroup());
+            undo.Push(new CommandGroup());
             isGrouping = true;
         }
 
@@ -55,7 +55,7 @@ namespace CZToolKit.Common
             redo.Clear();
             if (isGrouping)
             {
-                CommandsGroup group = undo.Peek() as CommandsGroup;
+                CommandGroup group = undo.Peek() as CommandGroup;
                 group.undo.Push(command);
             }
             else
@@ -91,7 +91,7 @@ namespace CZToolKit.Common
             redo.Clear();
         }
 
-        internal class CommandsGroup : ICommand
+        internal class CommandGroup : ICommand
         {
             internal Stack<ICommand> undo = new Stack<ICommand>();
             internal Stack<ICommand> redo = new Stack<ICommand>();
@@ -109,6 +109,13 @@ namespace CZToolKit.Common
 
             public void Redo()
             {
+                while (redo.Count != 0)
+                {
+                    ICommand command = redo.Pop();
+                    if (command != null)
+                        command.Redo();
+                    undo.Push(command);
+                }
             }
 
             public void Undo()

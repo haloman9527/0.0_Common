@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,7 +13,9 @@
  *  Blog: https://www.crosshair.top/
  *
  */
+
 #endregion
+
 using System;
 
 namespace CZToolKit.Common.ViewModel
@@ -43,64 +46,71 @@ namespace CZToolKit.Common.ViewModel
                 NotifyValueChanged();
             }
         }
+
         public object ValueBoxed
         {
             get { return Value; }
             set { Value = (T)value; }
         }
-        public Type ValueType { get { return typeof(T); } }
-        public BindableProperty() { }
-        public BindableProperty(Func<T> getter) { this.Getter = getter; }
-        public BindableProperty(Func<T> getter, Action<T> setter) { this.Getter = getter; this.Setter = setter; }
 
-        public void SetGetterSetter(Func<T> getter, Action<T> setter)
+        public Type ValueType
+        {
+            get { return typeof(T); }
+        }
+
+        public BindableProperty()
+        {
+        }
+
+        public BindableProperty(Func<T> getter, Action<T> setter)
         {
             this.Getter = getter;
             this.Setter = setter;
         }
-        public IBindableProperty<T1> AsBindableProperty<T1>()
+
+        public IBindableProperty<TOut> AsBindableProperty<TOut>()
         {
-            return this as BindableProperty<T1>;
+            return this as BindableProperty<TOut>;
         }
+
         public void RegisterValueChangedEvent(Action<T> onValueChanged)
         {
             this.onValueChanged += onValueChanged;
         }
-        public void RegisterValueChangedEvent<T1>(Action<T1> onValueChanged)
-        {
-            AsBindableProperty<T1>().RegisterValueChangedEvent(onValueChanged);
-        }
+
         public void UnregisterValueChangedEvent(Action<T> onValueChanged)
         {
             this.onValueChanged -= onValueChanged;
         }
-        public void UnregisterValueChangedEvent<T1>(Action<T1> onValueChanged)
-        {
-            AsBindableProperty<T1>().UnregisterValueChangedEvent(onValueChanged);
-        }
+
         public void SetValueWithNotify(T value)
         {
             Setter?.Invoke(value);
             NotifyValueChanged();
         }
+
         public void SetValueWithoutNotify(T value)
         {
             Setter?.Invoke(value);
         }
+
         public void SetValueWithNotify(object value)
         {
             SetValueWithoutNotify((T)value);
             NotifyValueChanged();
         }
+
         public void SetValueWithoutNotify(object value)
         {
             SetValueWithoutNotify((T)value);
         }
+
         public void ClearValueChangedEvent()
         {
             while (this.onValueChanged != null)
                 this.onValueChanged -= this.onValueChanged;
         }
+
         public override string ToString()
         {
             return (Value != null ? Value.ToString() : "null");

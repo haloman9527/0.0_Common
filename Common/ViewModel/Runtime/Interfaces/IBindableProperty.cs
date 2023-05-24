@@ -26,14 +26,12 @@ namespace CZToolKit.Common.ViewModel
 
         void SetValueWithNotify(object value);
         void SetValueWithoutNotify(object value);
-        IBindableProperty<T> AsBindableProperty<T>();
-        void RegisterValueChangedEvent<T>(Action<T> onValueChanged);
-        void UnregisterValueChangedEvent<T>(Action<T> onValueChanged);
+        IBindableProperty<TOut> AsBindableProperty<TOut>();
         void NotifyValueChanged();
         void ClearValueChangedEvent();
     }
 
-    public interface IBindableProperty<T>
+    public interface IBindableProperty<T> : IBindableProperty
     {
         event Action<T> onValueChanged;
 

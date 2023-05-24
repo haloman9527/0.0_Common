@@ -43,12 +43,12 @@ namespace CZToolKit.Common
             get
             {
                 if (referencesDict == null)
-                    referencesDict = new Dictionary<string, UnityObject>();
+                    referencesDict = new Dictionary<string, UnityObject>();  
                 return referencesDict;
             }
         }
 
-        public IReadOnlyDictionary<string, UnityObject> ReferencesDict
+        public Dictionary<string, UnityObject> ReferencesDict
         {
             get
             {
@@ -59,13 +59,9 @@ namespace CZToolKit.Common
         }
 
 #if UNITY_EDITOR
-        public void Add(UnityObject value)
+        public void Add(string key, UnityObject value)
         {
-            string key = string.Empty;
-            do
-            {
-                key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
-            } while (ReferencesDict.ContainsKey(key));
+            ReferencesDict.Add(key, value);
             references.Add(new ReferencePair() { key = key, value = value});
         }
 
