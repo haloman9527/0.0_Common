@@ -105,6 +105,11 @@ namespace CZToolKit.Common.IMGUI
         {
             Dictionary<string, IContextData> ContextDatas = new Dictionary<string, IContextData>();
 
+            public bool ContainsContextData(string key)
+            {
+                return ContextDatas.ContainsKey(key);
+            }
+            
             public bool TryGetContextData<T>(string key, out ContextData<T> contextData)
             {
                 if (ContextDatas.TryGetValue(key, out IContextData _data))
@@ -143,6 +148,11 @@ namespace CZToolKit.Common.IMGUI
 
         static ContextDataCache ContextDatas = new ContextDataCache();
 
+        public static bool ContainsContextData(string key)
+        {
+            return ContextDatas.ContainsContextData(key);
+        }
+        
         public static bool TryGetContextData<T>(string key, out ContextData<T> contextData)
         {
             return ContextDatas.TryGetContextData(key, out contextData);

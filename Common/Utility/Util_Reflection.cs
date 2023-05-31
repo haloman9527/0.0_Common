@@ -61,6 +61,11 @@ namespace CZToolKit.Common
             return type.GetField(name);
         }
 
+        public static FieldInfo GetField(Type type, string name, BindingFlags bindingFlags)
+        {
+            return type.GetField(name, bindingFlags);
+        }
+
         public static IEnumerable<PropertyInfo> GetProperties(Type type, BindingFlags bindingFlags, bool declaredOnly)
         {
             foreach (var p in type.GetProperties(bindingFlags))
@@ -79,7 +84,12 @@ namespace CZToolKit.Common
 
         public static PropertyInfo GetProperty(Type type, string name)
         {
-            return GetProperties(type, BindingFlags.Default, true).FirstOrDefault(f => f.Name == name);
+            return type.GetProperty(name);
+        }
+
+        public static PropertyInfo GetProperty(Type type, string name, BindingFlags bindingFlags)
+        {
+            return type.GetProperty(name, bindingFlags);
         }
 
         public static IEnumerable<MethodInfo> GetMethods(Type type, BindingFlags bindingFlags, bool declaredOnly)
@@ -100,7 +110,12 @@ namespace CZToolKit.Common
 
         public static MethodInfo GetMethod(Type type, string name)
         {
-            return GetMethods(type, BindingFlags.Default, true).FirstOrDefault(t => t.Name == name);
+            return type.GetMethod(name);
+        }
+
+        public static MethodInfo GetMethod(Type type, string name, BindingFlags bindingFlags)
+        {
+            return type.GetMethod(name, bindingFlags);
         }
         
         // ----- Attributes -----
