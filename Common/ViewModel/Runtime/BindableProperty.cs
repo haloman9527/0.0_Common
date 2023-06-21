@@ -25,8 +25,8 @@ namespace CZToolKit.Common.ViewModel
     {
         public event Func<T> Getter;
         public event Action<T> Setter;
-        public event Action<T> onValueChanged;
-        public event Action<object> onBoxedValueChanged;
+        public event ValueChangedEvent<T> onValueChanged;
+        public event ValueChangedEvent<object> onBoxedValueChanged;
 
         public T Value
         {
@@ -42,8 +42,9 @@ namespace CZToolKit.Common.ViewModel
                     throw new NotImplementedException("haven't set method");
                 if (Equals(Value, value))
                     return;
+                var oldValue = Value;
                 Setter(value);
-                NotifyValueChanged();
+                NotifyValueChanged_Internal(oldValue, value);
             }
         }
 
@@ -68,17 +69,23 @@ namespace CZToolKit.Common.ViewModel
             this.Setter = setter;
         }
 
+        private void NotifyValueChanged_Internal(T oldValue, T newValue)
+        {
+            onValueChanged?.Invoke(oldValue, newValue);
+            onBoxedValueChanged?.Invoke(oldValue, newValue);
+        }
+
         public IBindableProperty<TOut> AsBindableProperty<TOut>()
         {
             return this as BindableProperty<TOut>;
         }
 
-        public void RegisterValueChangedEvent(Action<T> onValueChanged)
+        public void RegisterValueChangedEvent(ValueChangedEvent<T> onValueChanged)
         {
             this.onValueChanged += onValueChanged;
         }
 
-        public void UnregisterValueChangedEvent(Action<T> onValueChanged)
+        public void UnregisterValueChangedEvent(ValueChangedEvent<T> onValueChanged)
         {
             this.onValueChanged -= onValueChanged;
         }
@@ -118,8 +125,8 @@ namespace CZToolKit.Common.ViewModel
 
         public void NotifyValueChanged()
         {
-            onValueChanged?.Invoke(Value);
-            onBoxedValueChanged?.Invoke(Value);
+            onValueChanged?.Invoke(Value, Value);
+            onBoxedValueChanged?.Invoke(Value, Value);
         }
     }
 }

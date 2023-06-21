@@ -129,12 +129,12 @@ namespace CZToolKit.Common.ViewModel
             this[propertyName].AsBindableProperty<T>().Value = value;
         }
 
-        public void BindingProperty<T>(string propertyName, Action<T> onValueChangedCallback)
+        public void BindingProperty<T>(string propertyName, ValueChangedEvent<T> onValueChangedCallback)
         {
             this[propertyName].AsBindableProperty<T>().RegisterValueChangedEvent(onValueChangedCallback);
         }
 
-        public void UnBindingProperty<T>(string propertyName, Action<T> onValueChangedCallback)
+        public void UnBindingProperty<T>(string propertyName, ValueChangedEvent<T> onValueChangedCallback)
         {
             this[propertyName].AsBindableProperty<T>().UnregisterValueChangedEvent(onValueChangedCallback);
         }

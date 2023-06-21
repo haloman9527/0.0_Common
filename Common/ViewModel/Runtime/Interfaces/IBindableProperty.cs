@@ -19,7 +19,7 @@ namespace CZToolKit.Common.ViewModel
 {
     public interface IBindableProperty
     {
-        event Action<object> onBoxedValueChanged;
+        event ValueChangedEvent<object> onBoxedValueChanged;
 
         object ValueBoxed { get; set; }
         Type ValueType { get; }
@@ -33,14 +33,14 @@ namespace CZToolKit.Common.ViewModel
 
     public interface IBindableProperty<T> : IBindableProperty
     {
-        event Action<T> onValueChanged;
+        event ValueChangedEvent<T> onValueChanged;
 
         T Value { get; set; }
 
         void SetValueWithNotify(T value);
         void SetValueWithoutNotify(T value);
-        void RegisterValueChangedEvent(Action<T> onValueChanged);
-        void UnregisterValueChangedEvent(Action<T> onValueChanged);
+        void RegisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);
+        void UnregisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);
         void NotifyValueChanged();
         void ClearValueChangedEvent();
     }
