@@ -48,6 +48,11 @@ namespace CZToolKit.Common.Singletons
             }
         }
 
+        public MonoSingleton()
+        {
+            
+        }
+
         public static void Initialize()
         {
             if (s_Instance != null)

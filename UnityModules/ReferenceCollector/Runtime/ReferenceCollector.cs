@@ -36,32 +36,22 @@ namespace CZToolKit.Common
         [HideInInspector]
         private List<ReferencePair> references = new List<ReferencePair>();
 
-        private Dictionary<string, UnityObject> referencesDict;
+        private Dictionary<string, UnityObject> referencesMap_Internal;
 
-        private Dictionary<string, UnityObject> InternalReferencesDict
+        internal Dictionary<string, UnityObject> ReferencesMap_Internal
         {
             get
             {
-                if (referencesDict == null)
-                    referencesDict = new Dictionary<string, UnityObject>();  
-                return referencesDict;
-            }
-        }
-
-        public Dictionary<string, UnityObject> ReferencesDict
-        {
-            get
-            {
-                if (referencesDict == null)
-                    referencesDict = new Dictionary<string, UnityObject>();
-                return referencesDict;
+                if (referencesMap_Internal == null)
+                    referencesMap_Internal = new Dictionary<string, UnityObject>();
+                return referencesMap_Internal;
             }
         }
 
 #if UNITY_EDITOR
         public void Add(string key, UnityObject value)
         {
-            ReferencesDict.Add(key, value);
+            ReferencesMap_Internal.Add(key, value);
             references.Add(new ReferencePair() { key = key, value = value});
         }
 
@@ -70,19 +60,19 @@ namespace CZToolKit.Common
             references.RemoveAt(index);
         }
 
-        public void RemoveAt(ReferencePair pair)
+        public void Remove(ReferencePair pair)
         {
             references.Remove(pair);
-        }
-
-        public void ClearEmpty()
-        {
-            references.RemoveAll(pair => string.IsNullOrEmpty(pair.key) || pair.value == null);
         }
 
         public void Clear()
         {
             references.Clear();
+        }
+
+        public void ClearEmpty()
+        {
+            references.RemoveAll(pair => string.IsNullOrEmpty(pair.key) || pair.value == null);
         }
 
         public void Sort()
@@ -96,26 +86,26 @@ namespace CZToolKit.Common
 
         public UnityObject Get(string key)
         {
-            if (InternalReferencesDict.TryGetValue(key, out var value))
+            if (ReferencesMap_Internal.TryGetValue(key, out var value))
                 return value;
             return null;
         }
 
         public T Get<T>(string key) where T : UnityObject
         {
-            if (InternalReferencesDict.TryGetValue(key, out var value))
+            if (ReferencesMap_Internal.TryGetValue(key, out var value))
                 return value as T;
             return null;
         }
 
         private void RefreshDict()
         {
-            InternalReferencesDict.Clear();
+            ReferencesMap_Internal.Clear();
             foreach (var pair in references)
             {
                 if (string.IsNullOrEmpty(pair.key))
                     continue;
-                InternalReferencesDict[pair.key] = pair.value;
+                ReferencesMap_Internal[pair.key] = pair.value;
             }
         }
 

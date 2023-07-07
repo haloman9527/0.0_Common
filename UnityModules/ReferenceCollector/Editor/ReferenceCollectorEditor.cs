@@ -84,7 +84,7 @@ namespace CZToolKit.Common.Editors
                 EditorGUI.BeginChangeCheck();
                 var sourceK = key.stringValue;
                 var k = EditorGUI.DelayedTextField(keyFieldRect, sourceK);
-                if (!string.IsNullOrEmpty(k) && k != sourceK && !referenceCollector.ReferencesDict.ContainsKey(k))
+                if (!string.IsNullOrEmpty(k) && k != sourceK && !referenceCollector.ReferencesMap_Internal.ContainsKey(k))
                     key.stringValue = k;
 
                 var sourceV = value.objectReferenceValue;
@@ -144,7 +144,7 @@ namespace CZToolKit.Common.Editors
                 do
                 {
                     key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
-                } while (referenceCollector.ReferencesDict.ContainsKey(key));
+                } while (referenceCollector.ReferencesMap_Internal.ContainsKey(key));
                 referenceCollector.Add(key, null);
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.UpdateIfRequiredOrScript();
@@ -178,7 +178,7 @@ namespace CZToolKit.Common.Editors
                     do
                     {
                         key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
-                    } while (referenceCollector.ReferencesDict.ContainsKey(key));
+                    } while (referenceCollector.ReferencesMap_Internal.ContainsKey(key));
                     referenceCollector.Add(key, res);
                 }
             }
