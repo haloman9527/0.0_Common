@@ -20,27 +20,38 @@ using System;
 
 namespace CZToolKit.Common.Singletons
 {
-    public abstract class Singleton<T> : ISingleton where T : Singleton<T>, new()
+    public abstract class AutoSingleton<T> : ISingleton where T : AutoSingleton<T>, new()
     {
+        private static object @lock = new object();
         private bool isDisposed;
         
-        private static T instance;
+        private static T s_instance;
 
         public static T Instance
         {
             get
             {
-                return instance;
+                if (s_instance == null)
+                {
+                    lock (@lock)
+                    {
+                        if (s_instance == null)
+                        {
+                            Game.AddSingleton(new T());
+                        }
+                    }
+                }
+                return s_instance;
             }
         }
 
         void ISingleton.Register()
         {
-            if (instance != null)
+            if (s_instance != null)
             {
                 throw new Exception($"singleton register twice! {typeof (T).Name}");
             }
-            instance = (T)this;
+            s_instance = (T)this;
         }
 
         void ISingleton.Destroy()
@@ -51,8 +62,8 @@ namespace CZToolKit.Common.Singletons
             }
             this.isDisposed = true;
             
-            instance.Dispose();
-            instance = null;
+            s_instance.Dispose();
+            s_instance = null;
         }
 
         bool ISingleton.IsDisposed()

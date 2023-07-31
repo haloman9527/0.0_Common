@@ -50,16 +50,6 @@ namespace CZToolKit.Common
         private const int SEQUENCE_BITS = 12;
 
         /// <summary>
-        /// 最大机器ID所占的位数(32). 
-        /// </summary>
-        private const long MAX_WORKER_ID = -1L ^ (-1L << WORKER_ID_BITS);
-
-        /// <summary>
-        /// 最大数据ID(32). 
-        /// </summary>
-        private const long MAX_DATACENTER_ID = -1L ^ (-1L << DATACENTER_ID_BITS);
-
-        /// <summary>
         /// 机器码数据左移位数, 就是后面计数器占用的位数(12). 
         /// </summary>
         private const int WORKER_ID_SHIFT = SEQUENCE_BITS;
@@ -78,6 +68,16 @@ namespace CZToolKit.Common
         /// 一微秒内可以产生计数, 如果达到该值(4096)则等到下一微妙在进行生成. 
         /// </summary>
         private const long SEQUENCE_MASK = -1L ^ (-1L << SEQUENCE_BITS);
+
+        /// <summary>
+        /// 最大机器ID(5位:0-31). 
+        /// </summary>
+        private const long MAX_WORKER_ID = -1L ^ (-1L << WORKER_ID_BITS);
+
+        /// <summary>
+        /// 最大数据ID(5位:0-31). 
+        /// </summary>
+        private const long MAX_DATACENTER_ID = -1L ^ (-1L << DATACENTER_ID_BITS);
 
         #endregion
 
@@ -117,8 +117,8 @@ namespace CZToolKit.Common
         /// <summary>
         /// 基于Twitter的snowflake算法. 
         /// </summary>
-        /// <param name="workerID"> 10位的数据机器位中的高位, 默认不应该超过5位(32) </param>
-        /// <param name="datacenterID"> 10位的数据机器位中的低位, 默认不应该超过5位(32) </param>
+        /// <param name="workerID"> 10位的数据机器位中的低位, 默认不应该超过5位(31) </param>
+        /// <param name="datacenterID"> 10位的数据机器位中的高位, 默认不应该超过5位(31) </param>
         public Snowflake64(byte workerID, byte datacenterID) : this(workerID, datacenterID, DEFAULT_BASE_TIMESTAMP)
         {
         }
@@ -126,8 +126,8 @@ namespace CZToolKit.Common
         /// <summary>
         /// 基于Twitter的snowflake算法. 
         /// </summary>
-        /// <param name="workerID"> 10位的数据机器位中的高位, 默认不应该超过5位(32) </param>
-        /// <param name="datacenterID"> 10位的数据机器位中的低位, 默认不应该超过5位(32) </param>
+        /// <param name="workerID"> 10位的数据机器位中的低位, 默认不应该超过5位(31) </param>
+        /// <param name="datacenterID"> 10位的数据机器位中的高位, 默认不应该超过5位(31) </param>
         /// <param name="baseTimestamp">  </param>
         public Snowflake64(byte workerID, byte datacenterID, long baseTimestamp)
         {
@@ -140,9 +140,9 @@ namespace CZToolKit.Common
                 throw new ArgumentException($"worker Id can't be greater than {MAX_WORKER_ID} or less than 0");
             }
 
-            if (datacenterID > DATACENTER_ID_BITS)
+            if (datacenterID > MAX_DATACENTER_ID)
             {
-                throw new ArgumentException($"datacenter Id can't be greater than {DATACENTER_ID_BITS} or less than 0");
+                throw new ArgumentException($"datacenter Id can't be greater than {MAX_DATACENTER_ID} or less than 0");
             }
         }
 
