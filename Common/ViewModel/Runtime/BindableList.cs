@@ -41,8 +41,6 @@ namespace CZToolKit.Common.ViewModel
             get { return false; }
         }
 
-        public BindableList() { }
-        
         public BindableList(Func<List<T>> getter, Action<List<T>> setter) : base(getter, setter) { }
 
         public void Add(T item)

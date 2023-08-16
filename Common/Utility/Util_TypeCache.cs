@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,7 +13,9 @@
  *  Blog: https://www.crosshair.top/
  *
  */
+
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -30,6 +33,12 @@ namespace CZToolKit.Common
 
         static Util_TypeCache()
         {
+            Refresh();
+        }
+
+        public static void Refresh()
+        {
+            s_AllTypes.Clear();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 if (assembly.FullName.StartsWith("UnityEngine.CoreModule")) continue;

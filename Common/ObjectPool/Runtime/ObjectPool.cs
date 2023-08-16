@@ -42,7 +42,7 @@ namespace CZToolKit.Common.ObjectPool
             if (unusedObjects.Count > 0)
                 unit = unusedObjects.Dequeue();
             else
-                unit = Generate();
+                unit = Create();
             OnSpawn(unit);
             return unit;
         }
@@ -54,19 +54,19 @@ namespace CZToolKit.Common.ObjectPool
             OnRecycle(unit);
         }
 
-        public void Release()
+        public void Dispose()
         {
             foreach (T unit in unusedObjects)
             {
-                Release(unit);
+                Destroy(unit);
             }
             unusedObjects.Clear();
         }
 
-        protected abstract T Generate();
+        protected abstract T Create();
         
-        protected virtual void Release(T unit) { }
-
+        protected virtual void Destroy(T unit) { }
+        
         protected virtual void OnSpawn(T unit) { }
         
         protected virtual void OnRecycle(T unit) { }

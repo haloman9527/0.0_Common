@@ -22,46 +22,44 @@ namespace CZToolKit.Common.Singletons
 {
     public abstract class Singleton<T> : ISingleton where T : Singleton<T>, new()
     {
-        private bool isDisposed;
-        
+        #region Static
         private static T instance;
 
         public static T Instance
         {
-            get
-            {
-                return instance;
-            }
+            get { return instance; }
         }
+        
+        public bool IsInitialized()
+        {
+            return instance != null;
+        }
+        #endregion
+        
+        private bool isDisposed;
 
-        void ISingleton.Register()
+        public void Register()
         {
             if (instance != null)
-            {
-                throw new Exception($"singleton register twice! {typeof (T).Name}");
-            }
+                throw new Exception($"singleton register twice! {typeof(T).Name}");
+
             instance = (T)this;
         }
 
-        void ISingleton.Destroy()
+        public void Dispose()
         {
             if (this.isDisposed)
-            {
                 return;
-            }
+
             this.isDisposed = true;
-            
-            instance.Dispose();
+            if (instance is ISingletonDestory iSingletonDestory)
+                iSingletonDestory.Destroy();
             instance = null;
         }
 
-        bool ISingleton.IsDisposed()
+        public bool IsDisposed()
         {
             return this.isDisposed;
-        }
-
-        public virtual void Dispose()
-        {
         }
     }
 }

@@ -34,8 +34,6 @@ namespace CZToolKit.Common.ViewModel
             get { return false; }
         }
 
-        public BindableStack() { }
-        
         public BindableStack(Func<Stack<T>> getter, Action<Stack<T>> setter) : base(getter, setter) { }
 
         public void Push(T item)

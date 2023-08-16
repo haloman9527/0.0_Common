@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,12 +13,12 @@
  *  Blog: https://www.crosshair.top/
  *
  */
+
 #endregion
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using CZToolKit.Common.Collection;
-
 using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit.Common
@@ -26,80 +27,50 @@ namespace CZToolKit.Common
     public class ReferenceCollector : MonoBehaviour, ISerializationCallbackReceiver
     {
         [Serializable]
-        public class ReferencePair
+        public struct ReferencePair
         {
             public string key;
             public UnityObject value;
         }
 
-        [SerializeField]
+#if UNITY_EDITOR
+        /// <summary>
+        /// Warning: Edit Only In Editor !!!
+        /// </summary>
         [HideInInspector]
+        public List<ReferencePair> references = new List<ReferencePair>();
+#else
+        [SerializeField]
         private List<ReferencePair> references = new List<ReferencePair>();
+#endif
 
-        private Dictionary<string, UnityObject> referencesMap_Internal;
+        private Dictionary<string, UnityObject> referencesMap;
 
-        internal Dictionary<string, UnityObject> ReferencesMap_Internal
+        private Dictionary<string, UnityObject> ReferencesMap_Internal
         {
             get
             {
-                if (referencesMap_Internal == null)
-                    referencesMap_Internal = new Dictionary<string, UnityObject>();
-                return referencesMap_Internal;
+                if (referencesMap == null)
+                    referencesMap = new Dictionary<string, UnityObject>();
+                return referencesMap;
+            }
+        }
+        
+        public IReadOnlyDictionary<string, UnityObject> ReferencesMap
+        {
+            get
+            {
+                return ReferencesMap_Internal;
             }
         }
 
+        public void OnBeforeSerialize()
+        {
+        }
+
+        public void OnAfterDeserialize()
+        {
 #if UNITY_EDITOR
-        public void Add(string key, UnityObject value)
-        {
-            ReferencesMap_Internal.Add(key, value);
-            references.Add(new ReferencePair() { key = key, value = value});
-        }
-
-        public void RemoveAt(int index)
-        {
-            references.RemoveAt(index);
-        }
-
-        public void Remove(ReferencePair pair)
-        {
-            references.Remove(pair);
-        }
-
-        public void Clear()
-        {
-            references.Clear();
-        }
-
-        public void ClearEmpty()
-        {
-            references.RemoveAll(pair => string.IsNullOrEmpty(pair.key) || pair.value == null);
-        }
-
-        public void Sort()
-        {
-            references.QuickSort((a, b) =>
-            {
-                return a.key.CompareTo(b.key);
-            });
-        }
-#endif
-
-        public UnityObject Get(string key)
-        {
-            if (ReferencesMap_Internal.TryGetValue(key, out var value))
-                return value;
-            return null;
-        }
-
-        public T Get<T>(string key) where T : UnityObject
-        {
-            if (ReferencesMap_Internal.TryGetValue(key, out var value))
-                return value as T;
-            return null;
-        }
-
-        private void RefreshDict()
-        {
             ReferencesMap_Internal.Clear();
             foreach (var pair in references)
             {
@@ -107,16 +78,7 @@ namespace CZToolKit.Common
                     continue;
                 ReferencesMap_Internal[pair.key] = pair.value;
             }
-        }
-
-        public void OnBeforeSerialize()
-        {
-
-        }
-
-        public void OnAfterDeserialize()
-        {
-            RefreshDict();
+#endif
         }
     }
 }

@@ -94,7 +94,7 @@ namespace CZToolKit.Common.IMGUI
                 if (DrawFoldout(hashCode, label))
                 {
                     EditorGUI.indentLevel++;
-                    foreach (var field in Util_Reflection.GetFields(type, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, true))
+                    foreach (var field in Util_Reflection.GetFields(type, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
                     {
                         if (!CanDraw(field)) continue;
 

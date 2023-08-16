@@ -24,7 +24,7 @@ namespace CZToolKit.Common.SharedVariable
         public static IEnumerable<SharedVariable> CollectionObjectSharedVariables(object obj)
         {
             Type sharedType = typeof(SharedVariable);
-            foreach (var fieldInfo in Util_Reflection.GetFields(obj.GetType(), BindingFlags.Public | BindingFlags.Instance, false))
+            foreach (var fieldInfo in Util_Reflection.GetFields(obj.GetType(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
                 if (sharedType.IsAssignableFrom(fieldInfo.FieldType))
                 {

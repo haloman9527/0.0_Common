@@ -24,7 +24,7 @@ namespace CZToolKit.Common.Singletons
             {
                 throw new Exception($"already exist singleton: {singletonType.Name}");
             }
-
+  
             singletonTypes.Add(singletonType, singleton);
             singletons.Push(singleton);
             
@@ -109,8 +109,8 @@ namespace CZToolKit.Common.Singletons
             // 顺序反过来清理
             while (singletons.Count > 0)
             {
-                ISingleton iSingleton = singletons.Pop();
-                iSingleton.Destroy();
+                ISingleton singleton = singletons.Pop();
+                singleton.Dispose();
             }
             singletonTypes.Clear();
         }

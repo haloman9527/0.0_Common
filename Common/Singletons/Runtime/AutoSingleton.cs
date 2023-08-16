@@ -22,57 +22,65 @@ namespace CZToolKit.Common.Singletons
 {
     public abstract class AutoSingleton<T> : ISingleton where T : AutoSingleton<T>, new()
     {
+        #region Static
+
         private static object @lock = new object();
         private bool isDisposed;
-        
-        private static T s_instance;
+
+        private static T instance;
 
         public static T Instance
         {
             get
             {
-                if (s_instance == null)
+                if (instance == null)
                 {
                     lock (@lock)
                     {
-                        if (s_instance == null)
-                        {
-                            Game.AddSingleton(new T());
-                        }
+                        Initialize();
                     }
                 }
-                return s_instance;
+
+                return instance;
             }
         }
 
-        void ISingleton.Register()
+        public static bool IsInitialized()
         {
-            if (s_instance != null)
-            {
-                throw new Exception($"singleton register twice! {typeof (T).Name}");
-            }
-            s_instance = (T)this;
+            return instance != null;
         }
 
-        void ISingleton.Destroy()
+        public static void Initialize()
+        {
+            if (instance != null)
+                return;
+            Game.AddSingleton(new T());
+        }
+
+        #endregion
+
+        public void Register()
+        {
+            if (instance != null)
+                throw new Exception($"singleton register twice! {typeof(T).Name}");
+
+            instance = (T)this;
+        }
+
+        public void Dispose()
         {
             if (this.isDisposed)
-            {
                 return;
-            }
+
             this.isDisposed = true;
-            
-            s_instance.Dispose();
-            s_instance = null;
+            if (instance is ISingletonDestory iSingletonDestory)
+                iSingletonDestory.Destroy();
+            instance = null;
         }
 
-        bool ISingleton.IsDisposed()
+        public bool IsDisposed()
         {
             return this.isDisposed;
-        }
-
-        public virtual void Dispose()
-        {
         }
     }
 }

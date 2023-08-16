@@ -16,29 +16,34 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using CZToolKit.Common.IMGUI;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
+using UnityObject = UnityEngine.Object;
+
 namespace CZToolKit.Common.Editors
 {
     [CustomEditor(typeof(ReferenceCollector))]
-    public class ReferenceCollectorEditor : Editor
+    public class ReferenceCollectorInspector : Editor
     {
         public static class Styles
         {
             public static readonly GUIContent ClearLabel = new GUIContent(EditorGUIUtility.FindTexture("Refresh"), "Clear All");
-            public static readonly GUIContent CleanLabel = new GUIContent(EditorGUIUtility.FindTexture("UnityEditor.ConsoleWindow"), "Clear Empty");
+            public static readonly GUIContent CleanUpLabel = new GUIContent(EditorGUIUtility.FindTexture("UnityEditor.ConsoleWindow"), "Clear Empty");
+            public static readonly GUIContent CleanUpDuplicateLabel = new GUIContent("C", "Clear Duplicate");
             public static readonly GUIContent SortLabel = new GUIContent(EditorGUIUtility.FindTexture("AlphabeticalSorting"), "Sort");
             public static readonly GUIContent ComponentsLabel = new GUIContent(EditorGUIUtility.FindTexture("UnityEditor.HierarchyWindow"), "Components");
         }
 
         private ReorderableList referencesList;
-        private ReferenceCollector referenceCollector;
 
         private void OnEnable()
         {
-            referenceCollector = serializedObject.targetObject as ReferenceCollector;
+            var referenceCollector = serializedObject.targetObject as ReferenceCollector;
             referencesList = new ReorderableList(serializedObject, serializedObject.FindProperty("references"), true, true, true, true);
             referencesList.drawHeaderCallback = (a) =>
             {
@@ -48,28 +53,48 @@ namespace CZToolKit.Common.Editors
                 if (GUI.Button(clearButtonRect, Styles.ClearLabel, EditorStyles.toolbarButton))
                 {
                     Undo.RecordObject(referenceCollector, "Clear All");
-                    referenceCollector.Clear();
+                    referenceCollector.references.Clear();
                     serializedObject.ApplyModifiedProperties();
                     serializedObject.UpdateIfRequiredOrScript();
                 }
 
                 var cleanButtonRect = new Rect(a.x + a.width - 60, a.y, 30, a.height);
-                if (GUI.Button(cleanButtonRect, Styles.CleanLabel, EditorStyles.toolbarButton))
+                if (GUI.Button(cleanButtonRect, Styles.CleanUpLabel, EditorStyles.toolbarButton))
                 {
                     Undo.RecordObject(referenceCollector, "Clear Empty");
-                    referenceCollector.ClearEmpty();
+                    referenceCollector.references.RemoveAll(pair => string.IsNullOrEmpty(pair.key) || pair.value == null);
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.UpdateIfRequiredOrScript();
+                }
+                
+                var clearSameButtonRect = new Rect(a.x + a.width - 90, a.y, 30, a.height);
+                if (GUI.Button(clearSameButtonRect, Styles.CleanUpDuplicateLabel, EditorStyles.toolbarButton))
+                {
+                    Undo.RecordObject(referenceCollector, "Clear Duplicates");
+                    var set = new HashSet<UnityObject>();
+                    for (int i = 0; i < referenceCollector.references.Count; i++)
+                    {
+                        var obj = referenceCollector.references[i].value;
+                        if (obj == null)
+                            continue;
+                        if (set.Add(obj))
+                            continue;
+                        referenceCollector.references.RemoveAt(i);
+                        i--;
+                    }
                     serializedObject.ApplyModifiedProperties();
                     serializedObject.UpdateIfRequiredOrScript();
                 }
 
-                var sortButtonRect = new Rect(a.x + a.width - 90, a.y, 30, a.height);
+                var sortButtonRect = new Rect(a.x + a.width - 120, a.y, 30, a.height);
                 if (GUI.Button(sortButtonRect, Styles.SortLabel, EditorStyles.toolbarButton))
                 {
                     Undo.RecordObject(referenceCollector, "Sort ReferenceData");
-                    referenceCollector.Sort();
+                    referenceCollector.references.QuickSort((l, r) => { return String.Compare(l.key, r.key, StringComparison.Ordinal); });
                     serializedObject.ApplyModifiedProperties();
                     serializedObject.UpdateIfRequiredOrScript();
                 }
+
             };
             referencesList.drawElementCallback += (a, b, c, d) =>
             {
@@ -84,7 +109,7 @@ namespace CZToolKit.Common.Editors
                 EditorGUI.BeginChangeCheck();
                 var sourceK = key.stringValue;
                 var k = EditorGUI.DelayedTextField(keyFieldRect, sourceK);
-                if (!string.IsNullOrEmpty(k) && k != sourceK && !referenceCollector.ReferencesMap_Internal.ContainsKey(k))
+                if (!string.IsNullOrEmpty(k) && k != sourceK && !referenceCollector.ReferencesMap.ContainsKey(k))
                     key.stringValue = k;
 
                 var sourceV = value.objectReferenceValue;
@@ -144,15 +169,15 @@ namespace CZToolKit.Common.Editors
                 do
                 {
                     key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
-                } while (referenceCollector.ReferencesMap_Internal.ContainsKey(key));
-                referenceCollector.Add(key, null);
+                } while (referenceCollector.ReferencesMap.ContainsKey(key));
+                referenceCollector.references.Add(new ReferenceCollector.ReferencePair() { key = key, value = null });
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.UpdateIfRequiredOrScript();
             };
             referencesList.onRemoveCallback += (a) =>
             {
                 Undo.RecordObject(referenceCollector, "Remove ReferenceData");
-                referenceCollector.RemoveAt(referencesList.index);
+                referenceCollector.references.RemoveAt(referencesList.index);
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.UpdateIfRequiredOrScript();
                 referencesList.index = Mathf.Clamp(referencesList.index, 0, referencesList.count - 1);
@@ -168,42 +193,24 @@ namespace CZToolKit.Common.Editors
             referencesList.DoLayoutList();
             EditorGUILayout.EndVertical();
 
-            var results = DragDropArea(rect, DragAndDropVisualMode.Generic);
+            var results = EditorGUIExtension.DragDropAreaMulti(rect, DragAndDropVisualMode.Generic);
             if (results != null)
             {
-                var referenceCollector = target as ReferenceCollector;
-                foreach (var res in results)
+                var referenceCollector = serializedObject.targetObject as ReferenceCollector;
+                foreach (var obj in results)
                 {
                     string key = string.Empty;
                     do
                     {
                         key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
-                    } while (referenceCollector.ReferencesMap_Internal.ContainsKey(key));
-                    referenceCollector.Add(key, res);
+                    } while (referenceCollector.ReferencesMap.ContainsKey(key));
+                    Undo.RecordObjects(targets, "Add ReferenceData");   
+                    referenceCollector.references.Add(new ReferenceCollector.ReferencePair() { key = key, value = obj });
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.UpdateIfRequiredOrScript();
                 }
             }
         }
-
-        public static Object[] DragDropArea(Rect position, DragAndDropVisualMode dropVisualMode)
-        {
-            Event evt = Event.current;
-
-            if (!position.Contains(evt.mousePosition)) return null;
-            var temp = DragAndDrop.objectReferences;
-            Object[] result = null;
-            switch (evt.type)
-            {
-                case EventType.DragUpdated:
-                    DragAndDrop.visualMode = dropVisualMode;
-                    break;
-                case EventType.DragPerform:
-                    DragAndDrop.AcceptDrag();
-                    Event.current.Use();
-                    result = temp;
-                    break;
-            }
-
-            return result;
-        }
+        
     }
 }

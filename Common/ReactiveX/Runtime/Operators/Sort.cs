@@ -23,7 +23,7 @@ namespace CZToolKit.Common.ReactiveX
         {
             if (original.Count <= 1)
                 return false;
-            return CZToolKit.Common.Collection.ExtensionMethods.QuickSort(original, 0, original.Count - 1, comparer);
+            return Common.Util_Collections.QuickSort(original, 0, original.Count - 1, comparer);
         }
     }
 

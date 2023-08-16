@@ -23,18 +23,13 @@ namespace CZToolKit.Common.Singletons
     public interface ISingleton : IDisposable
     {
         void Register();
-        void Destroy();
+        
         bool IsDisposed();
     }
 
     public interface ISingletonAwake
     {
         void Awake();
-    }
-
-    public interface ISingletonFixedUpdate
-    {
-        void FixedUpdate();
     }
 
     public interface ISingletonUpdate
@@ -45,5 +40,10 @@ namespace CZToolKit.Common.Singletons
     public interface ISingletonLateUpdate
     {
         void LateUpdate();
+    }
+
+    public interface ISingletonDestory
+    {
+        void Destroy();
     }
 }

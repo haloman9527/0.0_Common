@@ -41,7 +41,5 @@ namespace CZToolKit.Common.ViewModel
         void SetValueWithoutNotify(T value);
         void RegisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);
         void UnregisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);
-        void NotifyValueChanged();
-        void ClearValueChangedEvent();
     }
 }

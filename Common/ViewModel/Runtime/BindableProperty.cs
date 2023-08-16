@@ -21,10 +21,11 @@ using System;
 namespace CZToolKit.Common.ViewModel
 {
     [Serializable]
-    public class BindableProperty<T> : IBindableProperty, IBindableProperty<T>
+    public class BindableProperty<T> : IBindableProperty<T>
     {
-        public event Func<T> Getter;
-        public event Action<T> Setter;
+        private event Func<T> Getter;
+        private event Action<T> Setter;
+        
         public event ValueChangedEvent<T> onValueChanged;
         public event ValueChangedEvent<object> onBoxedValueChanged;
 
@@ -58,12 +59,13 @@ namespace CZToolKit.Common.ViewModel
         {
             get { return typeof(T); }
         }
-
-        public BindableProperty()
-        {
-        }
-
+        
         public BindableProperty(Func<T> getter, Action<T> setter)
+        {
+            InitValue_Insternal(getter, setter);
+        }
+        
+        private void InitValue_Insternal(Func<T> getter, Action<T> setter)
         {
             this.Getter = getter;
             this.Setter = setter;
@@ -118,15 +120,14 @@ namespace CZToolKit.Common.ViewModel
                 this.onValueChanged -= this.onValueChanged;
         }
 
+        public void NotifyValueChanged()
+        {
+            NotifyValueChanged_Internal(Value, Value);
+        }
+
         public override string ToString()
         {
             return (Value != null ? Value.ToString() : "null");
-        }
-
-        public void NotifyValueChanged()
-        {
-            onValueChanged?.Invoke(Value, Value);
-            onBoxedValueChanged?.Invoke(Value, Value);
         }
     }
 }

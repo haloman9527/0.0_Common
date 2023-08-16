@@ -174,7 +174,7 @@ namespace CZToolKit.Common.IMGUI
                     if (hasChildren)
                     {
                         int id = 0;
-                        foreach (var childFieldInfo in Util_Reflection.GetFields(propertyType, BindingFlags.Instance, true))
+                        foreach (var childFieldInfo in Util_Reflection.GetFields(propertyType, BindingFlags.Instance))
                         {
                             if (childFieldInfo.Name.StartsWith("<"))
                                 continue;

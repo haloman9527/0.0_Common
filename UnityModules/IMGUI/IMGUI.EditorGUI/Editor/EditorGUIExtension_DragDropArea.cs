@@ -53,20 +53,28 @@ namespace CZToolKit.Common.IMGUI
             switch (evt.type)
             {
                 case EventType.DragUpdated:
+                {
                     DragAndDrop.visualMode = dropVisualMode;
+                    Event.current.Use();
                     break;
+                }
                 case EventType.DragPerform:
+                {
                     if (evt.type == EventType.DragPerform)
                     {
                         DragAndDrop.AcceptDrag();
                         result = temp;
                         Event.current.Use();
                     }
+
                     break;
+                }
                 case EventType.Repaint:
+                {
                     if (temp != null && temp.Length > 0)
                         EditorGUI.DrawRect(position, hightlightColor);
                     break;
+                }
             }
             return result;
         }
