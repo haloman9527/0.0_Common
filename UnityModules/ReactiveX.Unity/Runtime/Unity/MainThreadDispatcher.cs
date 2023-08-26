@@ -13,9 +13,10 @@
  *
  */
 #endregion
-using CZToolKit.Common.Singletons;
 
-namespace CZToolKit.Common.ReactiveX
+using CZToolKit.Singletons;
+
+namespace CZToolKit.ReactiveX
 {
     public class MainThreadDispatcher : AutoMonoSingleton<MainThreadDispatcher>
     {

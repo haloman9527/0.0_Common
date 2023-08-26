@@ -19,7 +19,7 @@
 using System;
 using UnityEngine;
 
-namespace CZToolKit.Common.Singletons
+namespace CZToolKit.Singletons
 {
     public class AutoMonoSingleton<T> : MonoBehaviour, ISingleton where T : AutoMonoSingleton<T>
     {

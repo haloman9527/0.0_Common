@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace CZToolKit.Common.Easing
+namespace CZToolKit
 {
     public enum EasingType
     {

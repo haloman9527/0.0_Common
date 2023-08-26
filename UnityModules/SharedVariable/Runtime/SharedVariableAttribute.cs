@@ -14,7 +14,9 @@
  */
 #endregion
 
-namespace CZToolKit.Common.SharedVariable
+using CZToolKit;
+
+namespace CZToolKit.SharedVariable
 {
     public class SharedVariableAttribute : PropertyAttribute { }
 }

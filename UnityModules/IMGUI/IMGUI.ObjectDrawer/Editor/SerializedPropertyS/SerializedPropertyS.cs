@@ -19,10 +19,12 @@ using System.Linq;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using CZToolKit;
 using UnityEngine;
 using UnityEditor;
+using PropertyAttribute = UnityEngine.PropertyAttribute;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKitEditor
 {
     public class SerializedPropertyS
     {

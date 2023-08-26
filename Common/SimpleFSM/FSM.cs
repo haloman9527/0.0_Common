@@ -15,7 +15,7 @@
 #endregion
 using System.Collections.Generic;
 
-namespace CZToolKit.Common.SimpleFSM
+namespace CZToolKit.SimpleFSM
 {
     public class FSM : IFSM
     {

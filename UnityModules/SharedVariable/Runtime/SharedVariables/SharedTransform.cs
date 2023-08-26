@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace CZToolKit.Common.SharedVariable
+namespace CZToolKit.SharedVariable
 {
     [Serializable]
     public class SharedTransform : SharedObject<Transform>

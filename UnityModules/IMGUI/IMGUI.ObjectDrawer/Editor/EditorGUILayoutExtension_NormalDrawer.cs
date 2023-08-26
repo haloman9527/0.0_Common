@@ -18,12 +18,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using CZToolKit;
 using UnityEditor;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKitEditor
 {
     public static partial class EditorGUILayoutExtension
     {

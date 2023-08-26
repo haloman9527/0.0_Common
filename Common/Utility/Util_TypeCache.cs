@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CZToolKit.Common
+namespace CZToolKit
 {
     public static class Util_TypeCache
     {

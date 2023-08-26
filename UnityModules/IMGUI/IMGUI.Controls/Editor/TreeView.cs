@@ -20,7 +20,7 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace CZToolKit.Common.IMGUI.Controls
+namespace CZToolKitEditor.IMGUI.Controls
 {
     public class CZTreeViewItem : TreeViewItem
     {

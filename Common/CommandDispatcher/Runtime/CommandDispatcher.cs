@@ -20,7 +20,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Common
+namespace CZToolKit
 {
     public class CommandDispatcher
     {

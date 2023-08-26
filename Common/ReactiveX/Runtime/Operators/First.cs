@@ -17,7 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CZToolKit.Common.ReactiveX
+namespace CZToolKit.ReactiveX
 {
     public class First<T> : Operator<IEnumerable<T>, T>
     {

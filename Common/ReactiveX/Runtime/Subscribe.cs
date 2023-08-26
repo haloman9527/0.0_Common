@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Common.ReactiveX
+namespace CZToolKit.ReactiveX
 {
     class Subscribe<T> : IObserver<T>
     {
@@ -75,6 +75,34 @@ namespace CZToolKit.Common.ReactiveX
         public void OnCompleted()
         {
             onCompleted();
+        }
+    }
+    
+    public static partial class Extension
+    {
+        public static IDisposable Subscribe<T>(this IObservable<T> src)
+        {
+            return src.Subscribe(new Subscribe<T>());
+        }
+
+        public static IDisposable Subscribe<T>(this IObservable<T> src, Action<T> onNext)
+        {
+            return src.Subscribe(new Subscribe<T>(onNext));
+        }
+
+        public static IDisposable Subscribe<T>(this IObservable<T> src, Action<T> onNext, Action<Exception> onError)
+        {
+            return src.Subscribe(new Subscribe<T>(onNext, onError));
+        }
+
+        public static IDisposable Subscribe<T>(this IObservable<T> src, Action<T> onNext, Action onCompleted)
+        {
+            return src.Subscribe(new Subscribe<T>(onNext, onCompleted));
+        }
+
+        public static IDisposable Subscribe<T>(this IObservable<T> src, Action<T> onNext, Action<Exception> onError, Action onCompleted)
+        {
+            return src.Subscribe(new Subscribe<T>(onNext, onError, onCompleted));
         }
     }
 }

@@ -16,14 +16,14 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using CZToolKit;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKitEditor
 {
     public class ObjectEditor
     {

@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Common.ReactiveX
+namespace CZToolKit.ReactiveX
 {
     public class Execute<T> : Operator<T, T>
     {

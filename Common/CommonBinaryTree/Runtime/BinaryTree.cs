@@ -15,7 +15,7 @@
 #endregion
 using System.Collections.Generic;
 
-namespace CZToolKit.Common.CommonBinaryTree
+namespace CZToolKit.CommonBinaryTree
 {
     public interface IBinaryTreeNode<T> where T : IBinaryTreeNode<T>
     {

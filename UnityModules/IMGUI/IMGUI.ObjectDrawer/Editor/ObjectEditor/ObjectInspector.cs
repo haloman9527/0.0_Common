@@ -23,7 +23,7 @@ using UnityEngine.UIElements;
 using System;
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKitEditor
 {
     public class ObjectInspector : ScriptableObject
     {

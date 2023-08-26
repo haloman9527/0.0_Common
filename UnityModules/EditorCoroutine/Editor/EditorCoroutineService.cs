@@ -16,7 +16,7 @@
 #if UNITY_EDITOR
 using System.Collections;
 
-namespace CZToolKit.Common
+namespace CZToolKit.EditorCoroutine
 {
     public partial class EditorCoroutineService : CoroutineService<EditorCoroutine>
     {

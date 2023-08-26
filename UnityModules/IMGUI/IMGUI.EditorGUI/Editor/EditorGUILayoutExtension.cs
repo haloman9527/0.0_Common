@@ -17,10 +17,11 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.AnimatedValues;
+using CZToolKit;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKitEditor
 {
     public static partial class EditorGUILayoutExtension
     {

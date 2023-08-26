@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CZToolKit.Common.ObjectPool
+namespace CZToolKit.ObjectPool
 {
     public interface IObjectPool<T> : IDisposable where T : class
     {

@@ -18,7 +18,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CZToolKit.Common.Attributes
+namespace CZToolKit.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
     public class PreviewObjectFieldAttribute : UnityEngine.PropertyAttribute

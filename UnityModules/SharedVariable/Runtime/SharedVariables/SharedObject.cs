@@ -19,7 +19,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Common.SharedVariable
+namespace CZToolKit.SharedVariable
 {
     public interface ISharedObject
     {

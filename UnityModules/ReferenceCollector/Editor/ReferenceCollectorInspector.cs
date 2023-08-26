@@ -18,14 +18,15 @@
 
 using System;
 using System.Collections.Generic;
-using CZToolKit.Common.IMGUI;
+using CZToolKit;
+using CZToolKitEditor;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Common.Editors
+namespace CZToolKitEditor
 {
     [CustomEditor(typeof(ReferenceCollector))]
     public class ReferenceCollectorInspector : Editor

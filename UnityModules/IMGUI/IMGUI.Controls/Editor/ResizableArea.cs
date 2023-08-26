@@ -21,7 +21,7 @@ using UnityEngine;
 using UnityEditor;
 using System;
 
-namespace CZToolKit.Common.IMGUI.Controls
+namespace CZToolKitEditor.IMGUI.Controls
 {
     [Serializable]
     public class ResizableArea

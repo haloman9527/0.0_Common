@@ -14,7 +14,7 @@
  */
 #endregion
 
-namespace CZToolKit.Common.CommonQuadTree
+namespace CZToolKit.CommonQuadTree
 {
     public interface IQuadTreeNode<T> where T : IQuadTreeNode<T>
     {

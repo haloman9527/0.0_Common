@@ -14,7 +14,7 @@
 using System;
 using UnityEngine.Events;
 
-namespace CZToolKit.Common.ReactiveX
+namespace CZToolKit.ReactiveX
 {
     public class OnTrigger<TIn> : Operator<UnityEvent<TIn>, TIn>
     {

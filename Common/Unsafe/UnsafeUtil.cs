@@ -20,7 +20,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace CZToolKit.Common.UnsafeEx
+namespace CZToolKit.UnsafeEx
 {
     public unsafe static class UnsafeUtil
     {

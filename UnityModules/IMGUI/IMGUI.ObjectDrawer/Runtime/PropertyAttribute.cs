@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Common
+namespace CZToolKit
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Interface, Inherited = true)]
     public abstract class PropertyAttribute : Attribute { }

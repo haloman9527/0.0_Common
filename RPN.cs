@@ -265,6 +265,7 @@ namespace CZToolKit.RPN
         public Lexer lexer = new Lexer();
         public Stack<Token> tokenStack = new Stack<Token>();
         public Stack<float> numberStack = new Stack<float>();
+        public Stack<float> boolStack = new Stack<float>();
 
         /// <summary> 中缀转后缀表达式 </summary>
         public IEnumerable<Token> ToRPN(string expr)
@@ -291,7 +292,7 @@ namespace CZToolKit.RPN
                             while (tokenStack.Count > 0)
                             {
                                 var t = tokenStack.Pop();
-                                if (t.TokenType == TokenType.Symbol && t.ToString() == "(")
+                                if (t.ToString() == "(")
                                     break;
 
                                 yield return t;

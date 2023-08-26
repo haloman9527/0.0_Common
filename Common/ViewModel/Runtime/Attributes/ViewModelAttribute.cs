@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CZToolKit.Common.ViewModel
+namespace CZToolKit.VM
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class ViewModelAttribute : Attribute

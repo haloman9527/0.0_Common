@@ -17,7 +17,7 @@ using System.Text.RegularExpressions;
 using System;
 using System.Text;
 
-namespace CZToolKit.Common
+namespace CZToolKit
 {
     public static class CSVLoader
     {

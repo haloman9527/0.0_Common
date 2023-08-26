@@ -13,12 +13,12 @@
  *
  */
 #endregion
-using CZToolKit.Common;
+using CZToolKit;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CZToolKit.Common.ViewModel
+namespace CZToolKit.VM
 {
     public static class ViewModelFactory
     {

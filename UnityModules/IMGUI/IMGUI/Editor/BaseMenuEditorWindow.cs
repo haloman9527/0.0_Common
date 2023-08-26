@@ -19,14 +19,14 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using CZToolKit.Common.IMGUI.Controls;
+using CZToolKitEditor.IMGUI.Controls;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKitEditor
 {
     [Serializable]
     public abstract class BaseMenuEditorWindow : EditorWindow

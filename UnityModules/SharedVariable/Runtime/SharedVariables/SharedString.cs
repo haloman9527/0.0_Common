@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Common.SharedVariable
+namespace CZToolKit.SharedVariable
 {
     [Serializable]
     public class SharedString : SharedVariable<string>

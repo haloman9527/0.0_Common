@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKitEditor
 {
     public static partial class EditorGUIExtension
     {

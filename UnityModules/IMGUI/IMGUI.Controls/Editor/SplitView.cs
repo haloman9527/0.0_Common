@@ -21,7 +21,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace CZToolKit.Common.IMGUI.Controls
+namespace CZToolKitEditor.IMGUI.Controls
 {
     public class EditorGUISplitView
     {

@@ -18,7 +18,7 @@
 
 using System;
 
-namespace CZToolKit.Common.Singletons
+namespace CZToolKit.Singletons
 {
     public abstract class Singleton<T> : ISingleton where T : Singleton<T>, new()
     {

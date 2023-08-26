@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.Common.ViewModel
+namespace CZToolKit.VM
 {
     public interface IBindableProperty
     {

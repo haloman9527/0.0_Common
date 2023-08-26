@@ -15,29 +15,37 @@
 #endregion
 using System;
 
-namespace CZToolKit.Common.ReactiveX
+namespace CZToolKit.ReactiveX
 {
     public class Observable<T> : IDisposable, IObservable<T>
     {
-        readonly T _value;
-        IObserver<T> observer;
+        private readonly T _value;
+        private IObserver<T> observer;
 
         public Observable(T value)
         {
             _value = value;
         }
 
-        public IDisposable Subscribe(IObserver<T> _observer)
+        public IDisposable Subscribe(IObserver<T> observer)
         {
-            observer = _observer;
-            observer.OnNext(_value);
-            observer.OnCompleted();
+            this.observer = observer;
+            this.observer.OnNext(_value);
+            this.observer.OnCompleted();
             return this;
         }
 
         public void Dispose()
         {
             (observer as IDisposable)?.Dispose();
+        }
+    }
+
+    public static partial class Extension
+    {
+        public static Observable<T> ToObservable<T>(this T src)
+        {
+            return new Observable<T>(src);
         }
     }
 }

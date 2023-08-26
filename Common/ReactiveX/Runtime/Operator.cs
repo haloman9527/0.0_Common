@@ -15,15 +15,20 @@
 #endregion
 using System;
 
-namespace CZToolKit.Common.ReactiveX
+namespace CZToolKit.ReactiveX
 {
     public interface IOperator : IDisposable { }
 
     public abstract class Operator<T> : IOperator, IObservable<T>, IObserver<T>
     {
+        /// <summary>
+        /// previos
+        /// </summary>
         protected IObservable<T> src;
+        /// <summary>
+        /// next
+        /// </summary>
         protected IObserver<T> observer;
-
 
         public Operator(IObservable<T> src)
         {
@@ -45,7 +50,7 @@ namespace CZToolKit.Common.ReactiveX
             observer.OnCompleted();
         }
 
-        public virtual IDisposable Subscribe(IObserver<T> observer)
+        public IDisposable Subscribe(IObserver<T> observer)
         {
             this.observer = observer;
             return src.Subscribe(this);

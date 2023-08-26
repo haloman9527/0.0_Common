@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Common.SharedVariable.Editors
+namespace CZToolKit.SharedVariable.Editors
 {
     [CustomPropertyDrawer(typeof(SharedVariable), true)]
     public class SharedVariablePropertyDrawer : PropertyDrawer

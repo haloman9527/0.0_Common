@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Common.Attributes.Editors
+namespace CZToolKit.Attributes.Editors
 {
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute), true)]
     public class ReadOnlyDrawer : PropertyDrawer

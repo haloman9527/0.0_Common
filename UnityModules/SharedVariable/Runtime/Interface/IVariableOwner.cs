@@ -15,7 +15,7 @@
 #endregion
 using System.Collections.Generic;
 
-namespace CZToolKit.Common.SharedVariable
+namespace CZToolKit.SharedVariable
 {
     public interface IVariableOwner
     {

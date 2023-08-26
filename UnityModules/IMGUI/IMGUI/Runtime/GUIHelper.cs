@@ -16,7 +16,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKit
 {
     public static class GUIHelper
     {

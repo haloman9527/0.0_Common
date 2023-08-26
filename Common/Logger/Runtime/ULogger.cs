@@ -1,6 +1,7 @@
 ﻿using System;
+using CZToolKit.Singletons;
 
-namespace CZToolKit.Common.Logger
+namespace CZToolKit.Logger
 {
     public class ULogger : ILogger
     {

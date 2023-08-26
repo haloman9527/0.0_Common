@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CZToolKit.Common.Logger
+namespace CZToolKit.Logger
 {
     public interface ILogger
     {

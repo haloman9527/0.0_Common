@@ -16,7 +16,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKitEditor
 {
     public abstract class BaseEditor : Editor
     {

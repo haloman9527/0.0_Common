@@ -17,7 +17,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace CZToolKit.Common.Attributes.Editors
+namespace CZToolKit.Attributes.Editors
 {
     [CustomPropertyDrawer(typeof(HideLabelAttribute))]
     public class HideLabelDrawer : PropertyDrawer

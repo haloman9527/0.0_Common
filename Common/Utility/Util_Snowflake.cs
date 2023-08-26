@@ -18,7 +18,7 @@
 
 using System;
 
-namespace CZToolKit.Common
+namespace CZToolKit
 {
     /// <summary>
     /// 分布式ID自增算法 Snowflake 雪花算法

@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace CZToolKit.Common.ReactiveX
+namespace CZToolKit.ReactiveX
 {
     public class Looper<T> : Operator<T>
     {

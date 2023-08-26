@@ -20,7 +20,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Common
+namespace CZToolKit.EditorCoroutine
 {
     public class EditorCoroutine : ICoroutine, IYield
     {

@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace CZToolKit.Common.ReactiveX
+namespace CZToolKit.ReactiveX
 {
     public enum UpdateType { FixedUpdate, Update, LateUpdate }
     public class EveryUpdate<T> : Operator<T>

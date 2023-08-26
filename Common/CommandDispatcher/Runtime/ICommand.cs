@@ -17,7 +17,7 @@
 
 #endregion
 
-namespace CZToolKit.Common
+namespace CZToolKit
 {
     public interface ICommand
     {

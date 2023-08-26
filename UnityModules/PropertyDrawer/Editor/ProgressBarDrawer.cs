@@ -14,11 +14,11 @@
  */
 #endregion
 #if UNITY_EDITOR
-using CZToolKit.Common.IMGUI;
+using CZToolKitEditor;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Common.Attributes.Editors
+namespace CZToolKit.Attributes.Editors
 {
     [@CustomPropertyDrawer(typeof(ProgressBarAttribute))]
     public class ProgressBarDrawer : UnityEditor.PropertyDrawer

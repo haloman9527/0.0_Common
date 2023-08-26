@@ -15,10 +15,11 @@
 #endregion
 #if UNITY_EDITOR
 using System.Collections;
+using CZToolKit.EditorCoroutine;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Common.IMGUI
+namespace CZToolKitEditor
 {
     public abstract class BaseEditorWindow : EditorWindow
     {

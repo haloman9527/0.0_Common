@@ -17,7 +17,7 @@ using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Common
+namespace CZToolKit.EditorCoroutine
 {
     [InitializeOnLoad]
     public class GlobalEditorCoroutineService

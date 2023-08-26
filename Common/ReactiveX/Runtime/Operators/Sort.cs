@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Common.ReactiveX
+namespace CZToolKit.ReactiveX
 {
     public class Sort<T> : Operator<IList<T>, IList<T>>
     {
@@ -23,7 +23,7 @@ namespace CZToolKit.Common.ReactiveX
         {
             if (original.Count <= 1)
                 return false;
-            return Common.Util_Collections.QuickSort(original, 0, original.Count - 1, comparer);
+            return Util_Collections.QuickSort(original, 0, original.Count - 1, comparer);
         }
     }
 

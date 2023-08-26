@@ -1,10 +1,14 @@
 ﻿using System;
 
-namespace CZToolKit.Common.Logger
+namespace CZToolKit.Logger
 {
     public static class Log
     {
+#if UNITY_5_3_OR_NEWER
+        private static ILogger logger = new ULogger();
+#else
         private static ILogger logger;
+#endif
 
         public static ILogger Logger
         {

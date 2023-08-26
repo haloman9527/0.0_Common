@@ -18,7 +18,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Common.ObjectPool
+namespace CZToolKit.ObjectPool
 {
     [Serializable]
     public abstract class ObjectPool<T> : IObjectPool<T> where T : class
