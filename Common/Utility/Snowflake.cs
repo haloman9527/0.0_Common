@@ -160,8 +160,6 @@ namespace CZToolKit
             }
         }
         
-        
-        
         /// <summary>
         /// 获取当提前时间戳(毫秒). 
         /// </summary>
