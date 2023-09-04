@@ -16,7 +16,7 @@
 using System;
 using UnityEngine.UI;
 
-namespace CZToolKit.ReactiveX
+namespace CZToolKit.RX
 {
     public class OnClick : Operator<Button>
     {
@@ -42,10 +42,10 @@ namespace CZToolKit.ReactiveX
 
         private void OnBtnClick()
         {
-            base.OnNext(button);
+            Next(button);
         }
     }
-    public static partial class Extension
+    public static partial class ReactiveExtension
     {
         public static IObservable<Button> OnClick(this IObservable<Button> src)
         {

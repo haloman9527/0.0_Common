@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.ReactiveX
+namespace CZToolKit.RX
 {
     public interface IOnDestory
     {
@@ -34,13 +34,13 @@ namespace CZToolKit.ReactiveX
         public override void OnNext(TIn onDestroy)
         {
             onDestroy.onDestroy += action;
-            observer.OnNext(onDestroy as TOut);
+            Next(onDestroy as TOut);
         }
 
         public override void OnDispose() { }
     }
 
-    public static partial class Extension
+    public static partial class ReactiveExtension
     {
         public static IObservable<TIn> OnDestroy<TIn>(this IObservable<TIn> src, Action action) where TIn : class, IOnDestory
         {

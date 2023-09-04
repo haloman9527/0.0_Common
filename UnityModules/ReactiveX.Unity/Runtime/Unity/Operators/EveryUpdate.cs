@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace CZToolKit.ReactiveX
+namespace CZToolKit.RX
 {
     public enum UpdateType { FixedUpdate, Update, LateUpdate }
     public class EveryUpdate<T> : Operator<T>
@@ -26,7 +26,6 @@ namespace CZToolKit.ReactiveX
 
         public EveryUpdate(IObservable<T> src, UpdateType updateType) : base(src)
         {
-            base.src = src;
             this.updateType = updateType;
         }
 
@@ -35,7 +34,7 @@ namespace CZToolKit.ReactiveX
         {
             coroutine = MainThreadDispatcher.Instance.StartCoroutine(Update(() =>
             {
-                observer.OnNext(value);
+                Next(value);
             }));
         }
 
@@ -72,7 +71,7 @@ namespace CZToolKit.ReactiveX
         }
     }
 
-    public static partial class Extension
+    public static partial class ReactiveExtension
     {
         public static IObservable<T> EveryUpdate<T>(this IObservable<T> src, UpdateType updateType = UpdateType.Update)
         {

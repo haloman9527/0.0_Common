@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace CZToolKit.ReactiveX
+namespace CZToolKit.RX
 {
     public class Looper<T> : Operator<T>
     {
@@ -43,14 +43,14 @@ namespace CZToolKit.ReactiveX
             if (this.delay != 0)
                 yield return new WaitForSeconds(delay);
 
-            base.OnNext(value);
+            Next(value);
 
             WaitForSeconds seconds = new WaitForSeconds(this.interval);
             int currentLoops = 0;
             while (this.loopTime < 0 || this.loopTime > currentLoops++)
             {
                 yield return seconds;
-                base.OnNext(value);
+                Next(value);
             }
         }
 
@@ -61,7 +61,7 @@ namespace CZToolKit.ReactiveX
         }
     }
 
-    public static partial class Extension
+    public static partial class ReactiveExtension
     {
         public static IObservable<T> Looper<T>(this IObservable<T> src, float delay, float interval, int loopTimes = -1)
         {

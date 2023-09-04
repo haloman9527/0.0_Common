@@ -14,7 +14,7 @@
 using System;
 using UnityEngine.Events;
 
-namespace CZToolKit.ReactiveX
+namespace CZToolKit.RX
 {
     public class OnTrigger<TIn> : Operator<UnityEvent<TIn>, TIn>
     {
@@ -24,7 +24,7 @@ namespace CZToolKit.ReactiveX
         {
             value.AddListener(v =>
             {
-                observer.OnNext(v);
+                Next(v);
             });
         }
     }

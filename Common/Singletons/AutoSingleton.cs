@@ -1,9 +1,9 @@
-﻿#region 注 释
+#region 注 释
 
 /***
  *
  *  Title:
- *      主题: Mono单例基类
+ *      主题: 单例基类
  *  Description:
  *      功能: 自动创建单例对象
  *  Date:
@@ -17,15 +17,16 @@
 #endregion
 
 using System;
-using UnityEngine;
 
 namespace CZToolKit.Singletons
 {
-    public class AutoMonoSingleton<T> : MonoBehaviour, ISingleton where T : AutoMonoSingleton<T>
+    public abstract class AutoSingleton<T> : ISingleton where T : AutoSingleton<T>, new()
     {
         #region Static
 
-        private static readonly object @lock = new object();
+        private static object @lock = new object();
+        private bool isDisposed;
+
         private static T instance;
 
         public static T Instance
@@ -43,7 +44,7 @@ namespace CZToolKit.Singletons
                 return instance;
             }
         }
-        
+
         public static bool IsInitialized()
         {
             return instance != null;
@@ -53,19 +54,17 @@ namespace CZToolKit.Singletons
         {
             if (instance != null)
                 return;
-            instance = GameObject.FindObjectOfType<T>();
-            if (instance == null)
-                instance = new GameObject(typeof(T).Name).AddComponent<T>();
-            Game.AddSingleton(instance);
+            Game.AddSingleton(new T());
         }
-        #endregion
 
-        private bool isDisposed;
+        #endregion
 
         public void Register()
         {
-            instance = this as T;
-            DontDestroyOnLoad(gameObject);
+            if (instance != null)
+                throw new Exception($"singleton register twice! {typeof(T).Name}");
+
+            instance = (T)this;
         }
 
         public void Dispose()
@@ -76,7 +75,6 @@ namespace CZToolKit.Singletons
             this.isDisposed = true;
             if (instance is ISingletonDestory iSingletonDestory)
                 iSingletonDestory.Destroy();
-            Destroy(gameObject);
             instance = null;
         }
 

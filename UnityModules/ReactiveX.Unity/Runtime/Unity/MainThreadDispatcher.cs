@@ -16,7 +16,7 @@
 
 using CZToolKit.Singletons;
 
-namespace CZToolKit.ReactiveX
+namespace CZToolKit.RX
 {
     public class MainThreadDispatcher : AutoMonoSingleton<MainThreadDispatcher>
     {

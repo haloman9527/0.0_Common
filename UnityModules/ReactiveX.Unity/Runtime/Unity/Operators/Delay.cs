@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace CZToolKit.ReactiveX
+namespace CZToolKit.RX
 {
     public class Delay<T> : Operator<T>
     {
@@ -37,7 +37,7 @@ namespace CZToolKit.ReactiveX
         IEnumerator DDelay(T value)
         {
             yield return new WaitForSeconds(delay);
-            observer.OnNext(value);
+            Next(value);
         }
 
         public override void OnDispose()
@@ -64,10 +64,10 @@ namespace CZToolKit.ReactiveX
             coroutine = obs.StartCoroutine(DDelay(obs));
         }
 
-        IEnumerator DDelay(T _value)
+        IEnumerator DDelay(T value)
         {
             yield return new WaitForSeconds(delay);
-            observer.OnNext(_value);
+            Next(value);
         }
 
         public override void OnDispose()
@@ -75,7 +75,7 @@ namespace CZToolKit.ReactiveX
             obs.StopCoroutine(coroutine);
         }
     }
-    public static partial class Extension
+    public static partial class ReactiveExtension
     {
         /// <summary> 通过协程实现的延迟 </summary>
         public static IObservable<T> Delay<T>(this IObservable<T> _src, float delayTime)
