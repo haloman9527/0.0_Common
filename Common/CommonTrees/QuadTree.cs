@@ -16,8 +16,6 @@
 
 #endregion
 
-using System;
-
 namespace CZToolKit.CommonQuadTree
 {
     public enum QuadTreeNodeType
