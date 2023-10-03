@@ -4,10 +4,16 @@
     {
         
     }
-    
+
     public static partial class Game
     {
-        public static RootModule RootModule { get; private set; } = GameModule.NewModule<RootModule>();
+        public static RootModule RootModule { get; private set; }
+
+        private static void InitRootModule()
+        {
+            RootModule = new RootModule();
+            RootModule.Open(null);
+        }
 
         private static void UpdateModules()
         {
@@ -19,13 +25,9 @@
             RootModule.LateUpdate();
         }
 
-        private static void CloseModules()
+        private static void CloseSubModules()
         {
-            var modules = RootModule.GetSubModules();
-            foreach (var module in modules)
-            {
-                module.Close();
-            }
+            RootModule.CloseSubModules();
         }
     }
 }

@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace CZToolKit.CommonQuadTree
+namespace CZToolKit
 {
     public enum QuadTreeNodeType
     {
@@ -52,7 +52,7 @@ namespace CZToolKit.CommonQuadTree
     public class QuadTreeNode : IQuadTreeNode, IQuadTreeNode<QuadTreeNode>
     {
         private int type;
-        public object userData;
+        private object userData;
         public QuadTreeNode parent;
         public QuadTreeNode[] children = new QuadTreeNode[4];
 

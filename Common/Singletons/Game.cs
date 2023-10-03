@@ -3,22 +3,27 @@ namespace CZToolKit.Singletons
 {
     public static partial class Game
     {
+        static Game()
+        {
+            InitRootModule();
+        }
+        
         public static void Update()
         {
-            UpdateSingletons();
             UpdateModules();
+            UpdateSingletons();
         }
 
         public static void LateUpdate()
         {
-            LateUpdateSingletons();
             LateUpdateModules();
+            LateUpdateSingletons();
         }
 
         public static void Close()
         {
             CloseSingletons();
-            CloseModules();
+            CloseSubModules();
         }
-    }
+    }   
 }

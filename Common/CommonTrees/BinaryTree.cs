@@ -17,9 +17,9 @@
 #endregion
 using System.Collections.Generic;
 
-namespace CZToolKit.CommonBinaryTree
+namespace CZToolKit
 {
-    public enum OctreeNodeType
+    public enum BinaryTreeNodeType
     {
         Left = 0,           // 左
         Right,              // 右
@@ -46,7 +46,7 @@ namespace CZToolKit.CommonBinaryTree
     public class BinaryTreeNode : IBindaryTreeNode, IBinaryTreeNode<BinaryTreeNode>
     {
         private int type;
-        public object userData;
+        private object userData;
         public BinaryTreeNode parent;
         public BinaryTreeNode[] children = new BinaryTreeNode[2];
 

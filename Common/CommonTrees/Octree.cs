@@ -46,7 +46,7 @@ namespace CZToolKit
     public class OctreeNode : IOctreeNode, IOctreeNode<OctreeNode>
     {
         private int type;
-        public object userData;
+        private object userData;
         public OctreeNode parent;
         public OctreeNode[] children = new OctreeNode[8];
 

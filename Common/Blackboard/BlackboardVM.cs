@@ -109,10 +109,6 @@ namespace CZToolKit.Blackboard
                     observer?.Invoke(value, notifyType);
                 }
             }
-            catch (Exception e)
-            {
-                throw;
-            }
             finally
             {
                 isNotifying = false;

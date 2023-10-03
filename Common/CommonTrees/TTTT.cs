@@ -79,7 +79,7 @@ public class TTTT : MonoBehaviour
             return;
         }
 
-        var data = node.userData as SpaceOctreeNodeData;
+        var data = node.UserData as SpaceOctreeNodeData;
         Gizmos.DrawWireCube(data.bounds.center, data.bounds.size);
 
         for (int i = 0; i < node.children.Length; i++)
@@ -121,7 +121,7 @@ public class SpaceOctree
         root = new OctreeNode();
         var bounds = new Bounds(Vector3.zero, Vector3.one * size);
         var rootSpaceOctreeNodeData = new SpaceOctreeNodeData(bounds);
-        root.userData = rootSpaceOctreeNodeData;
+        root.UserData = rootSpaceOctreeNodeData;
     }
 
     public void Add(Collider collider)
@@ -143,7 +143,7 @@ public class SpaceOctree
 
     private void DivideAndAdd(OctreeNode node, Collider collider)
     {
-        var nodeData = node.userData as SpaceOctreeNodeData;
+        var nodeData = node.UserData as SpaceOctreeNodeData;
         var intersectsMap = 0;
         var index = 0;
         if (nodeData.bounds.size.x > gridMinSize)
@@ -165,7 +165,7 @@ public class SpaceOctree
             if (child == null)
             {
                 child = node.GetOrCreateChild(index);
-                child.userData = new SpaceOctreeNodeData(nodeData.childBounds[index]);
+                child.UserData = new SpaceOctreeNodeData(nodeData.childBounds[index]);
             }
 
             DivideAndAdd(child, collider);
@@ -183,7 +183,7 @@ public class SpaceOctree
             return;
 
         nodeMap.Remove(collider);
-        var nodeData = node.userData as SpaceOctreeNodeData;
+        var nodeData = node.UserData as SpaceOctreeNodeData;
         nodeData.colliders.Remove(collider);
         while (node != root)
         {
