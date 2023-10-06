@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CZToolKit.ObjectPool;
 
 namespace CZToolKit
 {
@@ -18,20 +19,61 @@ namespace CZToolKit
             LateUpdate = 1 << 5,
         }
 
+        public class SubModulesQueueCachePool : ObjectPool<Queue<GameModule>>
+        {
+            protected override Queue<GameModule> Create()
+            {
+                return new Queue<GameModule>();
+            }
+
+            protected override void OnSpawn(Queue<GameModule> unit)
+            {
+                base.OnSpawn(unit);
+                unit.Clear();
+            }
+
+            protected override void OnRecycle(Queue<GameModule> unit)
+            {
+                base.OnRecycle(unit);
+                unit.Clear();
+            }
+        }
+
+        public class SubModulesStackCachePool : ObjectPool<Stack<GameModule>>
+        {
+            protected override Stack<GameModule> Create()
+            {
+                return new Stack<GameModule>();
+            }
+
+            protected override void OnSpawn(Stack<GameModule> unit)
+            {
+                base.OnSpawn(unit);
+                unit.Clear();
+            }
+
+            protected override void OnRecycle(Stack<GameModule> unit)
+            {
+                base.OnRecycle(unit);
+                unit.Clear();
+            }
+        }
+
+        protected readonly static SubModulesQueueCachePool QueueCachePool = new SubModulesQueueCachePool();
+        protected readonly static SubModulesStackCachePool StackCachePool = new SubModulesStackCachePool();
+
         private EventMark mark;
         private bool isUsing;
         private bool isActive;
         private bool isActiveSelf;
         private GameModule parent;
         private List<GameModule> subModules = new List<GameModule>();
-        private Queue<GameModule> subModulesQueue = new Queue<GameModule>();
-        private Stack<GameModule> subModulesStack = new Stack<GameModule>();
 
         public bool IsUsing
         {
             get { return isUsing; }
         }
-        
+
         public bool Active
         {
             get { return isActive; }
@@ -105,7 +147,7 @@ namespace CZToolKit
             if (this.parent == newParent)
                 return;
 
-            subModulesQueue.Clear();
+            var subModulesQueue = QueueCachePool.Spawn();
             subModulesQueue.Enqueue(this);
             foreach (var module in EnumerateSubModulesWithoutUnused_Internal(false))
             {
@@ -144,6 +186,8 @@ namespace CZToolKit
                 module.OnParentChanged();
             }
 
+            QueueCachePool.Recycle(subModulesQueue);
+
             this.parent?.OnChildChanged();
         }
 
@@ -155,7 +199,7 @@ namespace CZToolKit
 
         private void Close_Internal()
         {
-            subModulesStack.Clear();
+            var subModulesStack = StackCachePool.Spawn();
             subModulesStack.Push(this);
             foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
             {
@@ -170,11 +214,13 @@ namespace CZToolKit
                 module.Mark(EventMark.Close);
                 module.OnClose();
             }
+
+            StackCachePool.Recycle(subModulesStack);
         }
 
         private void ValidActive_Internal()
         {
-            subModulesQueue.Clear();
+            var subModulesQueue = QueueCachePool.Spawn();
             subModulesQueue.Enqueue(this);
             foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
             {
@@ -195,6 +241,52 @@ namespace CZToolKit
                 else
                     OnInactive();
             }
+
+            QueueCachePool.Recycle(subModulesQueue);
+        }
+
+        private void Update_Internal()
+        {
+            var subModulesQueue = QueueCachePool.Spawn();
+            subModulesQueue.Enqueue(this);
+            foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
+            {
+                subModulesQueue.Enqueue(module);
+            }
+
+            while (subModulesQueue.Count > 0)
+            {
+                var module = subModulesQueue.Dequeue();
+                if (!module.isUsing)
+                    continue;
+                if (!module.isActive)
+                    continue;
+                module.OnUpdate();
+            }
+
+            QueueCachePool.Recycle(subModulesQueue);
+        }
+
+        private void LateUpdate_Internal()
+        {
+            var subModulesQueue = QueueCachePool.Spawn();
+            subModulesQueue.Enqueue(this);
+            foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
+            {
+                subModulesQueue.Enqueue(module);
+            }
+
+            while (subModulesQueue.Count > 0)
+            {
+                var module = subModulesQueue.Dequeue();
+                if (!module.isUsing)
+                    continue;
+                if (!module.isActive)
+                    continue;
+                module.OnLateUpdate();
+            }
+
+            QueueCachePool.Recycle(subModulesQueue);
         }
 
         /// <summary>
@@ -206,7 +298,7 @@ namespace CZToolKit
         {
             if (!this.isUsing)
                 throw new InvalidOperationException();
-                
+
             return EnumerateSubModulesWithoutUnused_Internal(recursive);
         }
 
@@ -233,7 +325,7 @@ namespace CZToolKit
         {
             if (!this.isUsing)
                 throw new InvalidOperationException();
-                
+
             result.Clear();
             result.AddRange(EnumerateSubModulesWithoutUnused_Internal(recursive));
         }
@@ -251,7 +343,7 @@ namespace CZToolKit
             if (!this.isUsing)
                 throw new InvalidOperationException();
 
-            subModulesStack.Clear();
+            var subModulesStack = StackCachePool.Spawn();
             foreach (var module in EnumerateSubModulesWithoutUnused_Internal(false))
             {
                 subModulesStack.Push(module);
@@ -264,6 +356,8 @@ namespace CZToolKit
                     continue;
                 module.Close();
             }
+
+            StackCachePool.Recycle(subModulesStack);
         }
 
         /// <summary>
@@ -290,7 +384,7 @@ namespace CZToolKit
         {
             if (!this.isUsing)
                 throw new InvalidOperationException();
-            
+
             this.isActiveSelf = false;
             this.ValidActive_Internal();
             this.Close_Internal();
@@ -304,46 +398,14 @@ namespace CZToolKit
         {
             if (!this.isUsing)
                 throw new InvalidOperationException();
-                
-            subModulesQueue.Clear();
-            subModulesQueue.Enqueue(this);
-            foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
-            {
-                subModulesQueue.Enqueue(module);
-            }
-
-            while (subModulesQueue.Count > 0)
-            {
-                var module = subModulesQueue.Dequeue();
-                if (!module.isUsing)
-                    continue;
-                if (!module.isActive)
-                    continue;
-                module.OnUpdate();
-            }
+            Update_Internal();
         }
 
         public void LateUpdate()
         {
             if (!this.isUsing)
                 throw new InvalidOperationException();
-                
-            subModulesQueue.Clear();
-            subModulesQueue.Enqueue(this);
-            foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
-            {
-                subModulesQueue.Enqueue(module);
-            }
-
-            while (subModulesQueue.Count > 0)
-            {
-                var module = subModulesQueue.Dequeue();
-                if (!module.isUsing)
-                    continue;
-                if (!module.isActive)
-                    continue;
-                module.OnLateUpdate();
-            }
+            LateUpdate_Internal();
         }
 
         /// <summary>
