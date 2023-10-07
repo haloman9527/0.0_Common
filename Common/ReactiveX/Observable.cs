@@ -38,7 +38,6 @@ namespace CZToolKit.RX
             catch (Exception e)
             {
                 this.observer.OnError(e);
-                throw;
             }
             return this;
         }
