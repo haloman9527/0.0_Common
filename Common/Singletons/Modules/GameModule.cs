@@ -245,50 +245,6 @@ namespace CZToolKit
             QueueCachePool.Recycle(subModulesQueue);
         }
 
-        private void Update_Internal()
-        {
-            var subModulesQueue = QueueCachePool.Spawn();
-            subModulesQueue.Enqueue(this);
-            foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
-            {
-                subModulesQueue.Enqueue(module);
-            }
-
-            while (subModulesQueue.Count > 0)
-            {
-                var module = subModulesQueue.Dequeue();
-                if (!module.isUsing)
-                    continue;
-                if (!module.isActive)
-                    continue;
-                module.OnUpdate();
-            }
-
-            QueueCachePool.Recycle(subModulesQueue);
-        }
-
-        private void LateUpdate_Internal()
-        {
-            var subModulesQueue = QueueCachePool.Spawn();
-            subModulesQueue.Enqueue(this);
-            foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
-            {
-                subModulesQueue.Enqueue(module);
-            }
-
-            while (subModulesQueue.Count > 0)
-            {
-                var module = subModulesQueue.Dequeue();
-                if (!module.isUsing)
-                    continue;
-                if (!module.isActive)
-                    continue;
-                module.OnLateUpdate();
-            }
-
-            QueueCachePool.Recycle(subModulesQueue);
-        }
-
         /// <summary>
         /// 遍历所有子模块.
         /// </summary>
@@ -398,14 +354,50 @@ namespace CZToolKit
         {
             if (!this.isUsing)
                 throw new InvalidOperationException();
-            Update_Internal();
+            
+            var subModulesQueue = QueueCachePool.Spawn();
+            subModulesQueue.Enqueue(this);
+            foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
+            {
+                subModulesQueue.Enqueue(module);
+            }
+
+            while (subModulesQueue.Count > 0)
+            {
+                var module = subModulesQueue.Dequeue();
+                if (!module.isUsing)
+                    continue;
+                if (!module.isActive)
+                    continue;
+                module.OnUpdate();
+            }
+
+            QueueCachePool.Recycle(subModulesQueue);
         }
 
         public void LateUpdate()
         {
             if (!this.isUsing)
                 throw new InvalidOperationException();
-            LateUpdate_Internal();
+            
+            var subModulesQueue = QueueCachePool.Spawn();
+            subModulesQueue.Enqueue(this);
+            foreach (var module in EnumerateSubModulesWithoutUnused_Internal(true))
+            {
+                subModulesQueue.Enqueue(module);
+            }
+
+            while (subModulesQueue.Count > 0)
+            {
+                var module = subModulesQueue.Dequeue();
+                if (!module.isUsing)
+                    continue;
+                if (!module.isActive)
+                    continue;
+                module.OnLateUpdate();
+            }
+
+            QueueCachePool.Recycle(subModulesQueue);
         }
 
         /// <summary>
