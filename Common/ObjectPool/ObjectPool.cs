@@ -35,40 +35,49 @@ namespace CZToolKit.ObjectPool
             this.unusedObjects = new Queue<T>();
         }
 
+        object IObjectPool.Acquire()
+        {
+            return Acquire();
+        }
+        
         /// <summary> 生成 </summary>
-        public T Spawn()
+        public T Acquire()
         {
             T unit = null;
             if (unusedObjects.Count > 0)
                 unit = unusedObjects.Dequeue();
             else
                 unit = Create();
-            OnSpawn(unit);
+            OnAcquire(unit);
             return unit;
         }
 
+        void IObjectPool.Release(object unit)
+        {
+            Release(unit as T);
+        }
+
         /// <summary> 回收 </summary>
-        public void Recycle(T unit)
+        public void Release(T unit)
         {
             unusedObjects.Enqueue(unit);
-            OnRecycle(unit);
+            OnRelease(unit);
         }
 
         public void Dispose()
         {
-            foreach (T unit in unusedObjects)
+            while (unusedObjects.Count > 0)
             {
-                Destroy(unit);
+                Destroy(unusedObjects.Dequeue());
             }
-            unusedObjects.Clear();
         }
 
         protected abstract T Create();
         
         protected virtual void Destroy(T unit) { }
         
-        protected virtual void OnSpawn(T unit) { }
+        protected virtual void OnAcquire(T unit) { }
         
-        protected virtual void OnRecycle(T unit) { }
+        protected virtual void OnRelease(T unit) { }
     }
 }

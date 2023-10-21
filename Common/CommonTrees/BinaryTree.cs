@@ -15,6 +15,8 @@
  */
 
 #endregion
+
+using System;
 using System.Collections.Generic;
 
 namespace CZToolKit
@@ -76,8 +78,8 @@ namespace CZToolKit
         public void SetChild(int nodeType, BinaryTreeNode child)
         {
             if (child == null)
-                return;
-            
+                throw new NullReferenceException();
+
             child.parent = this;
             child.type = nodeType;
             children[nodeType] = child;
@@ -98,10 +100,13 @@ namespace CZToolKit
         public void RemoveChild(BinaryTreeNode child)
         {
             if (child == null)
-                return;
+                throw new NullReferenceException();
+            
+            if (child.parent != this)
+                throw new InvalidOperationException();
             
             if (child != children[child.type])
-                return;
+                throw new InvalidOperationException();
             
             child.parent = null;
             children[child.type] = null;

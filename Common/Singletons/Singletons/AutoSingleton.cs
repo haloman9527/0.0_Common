@@ -37,7 +37,10 @@ namespace CZToolKit.Singletons
                 {
                     lock (@lock)
                     {
-                        Initialize();
+                        if (instance == null)
+                        {
+                            Game.AddSingleton(new T());
+                        }
                     }
                 }
 
@@ -48,13 +51,6 @@ namespace CZToolKit.Singletons
         public static bool IsInitialized()
         {
             return instance != null;
-        }
-
-        public static void Initialize()
-        {
-            if (instance != null)
-                return;
-            Game.AddSingleton(new T());
         }
 
         #endregion

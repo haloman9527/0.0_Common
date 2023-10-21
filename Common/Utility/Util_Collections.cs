@@ -8,15 +8,22 @@ namespace CZToolKit
         public static bool TryGet<T>(this IList<T> array, int index, out T element)
         {
             element = default;
-            if (array.Count > index)
+            if (index >= 0 && index < array.Count)
             {
                 element = array[index];
                 return true;
             }
-
+            
             return false;
         }
         
+        /// <summary>
+        /// 二分查找
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="comparer"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static int BinarySearch<T>(this IList<T> original, Func<T, int> comparer)
         {
             return BinarySearch(original, 0, original.Count - 1, comparer);
@@ -38,6 +45,13 @@ namespace CZToolKit
             return -1;
         }
 
+        /// <summary>
+        /// 快速排序
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="comparer"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static bool QuickSort<T>(this IList<T> original, Func<T, T, int> comparer)
         {
             if (original.Count <= 1)

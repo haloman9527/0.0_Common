@@ -1,4 +1,6 @@
 
+using System;
+
 namespace CZToolKit
 {
     public enum OctreeNodeType
@@ -112,7 +114,7 @@ namespace CZToolKit
         public void SetChild(int nodeType, OctreeNode child)
         {
             if (child == null)
-                return;
+                throw new NullReferenceException();
             
             child.parent = this;
             child.type = nodeType;
@@ -134,11 +136,14 @@ namespace CZToolKit
         public void RemoveChild(OctreeNode child)
         {
             if (child == null)
-                return;
+                throw new NullReferenceException();
+            
+            if (child.parent != this)
+                throw new InvalidOperationException();
             
             if (child != children[child.type])
-                return;
-            
+                throw new InvalidOperationException();
+
             child.parent = null;
             children[child.type] = null;
         }

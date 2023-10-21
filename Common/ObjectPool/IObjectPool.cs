@@ -2,11 +2,19 @@
 
 namespace CZToolKit.ObjectPool
 {
-    public interface IObjectPool<T> : IDisposable where T : class
+    public interface IObjectPool : IDisposable
     {
         int UnusedCount { get; }
 
-        T Spawn();
-        void Recycle(T unit);
+        object Acquire();
+
+        void Release(object unit);
+    }
+    
+    public interface IObjectPool<T> : IObjectPool
+    {
+        T Acquire();
+        
+        void Release(T unit);
     }
 }
