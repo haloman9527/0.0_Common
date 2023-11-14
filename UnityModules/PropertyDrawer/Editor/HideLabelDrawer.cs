@@ -25,7 +25,7 @@ namespace CZToolKit.Attributes.Editors
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             //base.OnGUI(position, property, label);
-            EditorGUI.PropertyField(position, property, new GUIContent(""));
+            EditorGUI.PropertyField(position, property, GUIContent.none);
         }
     }
 }

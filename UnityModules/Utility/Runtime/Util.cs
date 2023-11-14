@@ -26,24 +26,23 @@ namespace CZToolKit
         /// </summary>
         /// <param name="absolutePath"></param>
         /// <returns></returns>
-        public static string ConvertToRelativePath(string absolutePath)
+        public static string ConvertToAssetsPath(string absolutePath)
         {
-            var path = absolutePath.Replace('\\', '/');
-            return path.Substring(path.LastIndexOf("/Assets/", StringComparison.Ordinal) + 1);
+            return absolutePath.Substring(Application.dataPath.Length - 6);
         }
 #endif
 
         public static string TextureToBase64(Texture2D texture)
         {
-            byte[] bytes = texture.EncodeToJPG();
-            string baser64 = Convert.ToBase64String(bytes);
+            var bytes = texture.EncodeToJPG();
+            var baser64 = Convert.ToBase64String(bytes);
             return baser64;
         }
 
         public static Texture2D Base64ToTexture(string base64)
         {
-            byte[] bytes = Convert.FromBase64String(base64);
-            Texture2D texture = new Texture2D(100, 100);
+            var bytes = Convert.FromBase64String(base64);
+            var texture = new Texture2D(100, 100);
             texture.LoadImage(bytes);
             return texture;
         }
