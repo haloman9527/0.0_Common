@@ -29,6 +29,7 @@ namespace CZToolKit.VM
 
         static ViewModelFactory()
         {
+            Init(true);
         }
 
         public static void Init(bool force)
