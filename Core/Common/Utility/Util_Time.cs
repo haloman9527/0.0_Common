@@ -1,10 +1,17 @@
-﻿namespace CZToolKit
+﻿using System;
+
+namespace CZToolKit
 {
-    public class Util_Time
+    public static class Util_Time
     {
-        public static long UTCtoGMT(long fileTimeutc)
+        public static long ToFileTimeUtcMs(this DateTime dateTime)
         {
-            return fileTimeutc / 10000 - 11644473600000;
+            return dateTime.ToFileTimeUtc() / 10000;
+        }
+        
+        public static long UTCToGMT(long utc)
+        {
+            return utc - 116444736000000000;
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿
-namespace CZToolKit.ConfigManagement
+namespace CZToolKit
 {
     public interface IConfigManager
     {

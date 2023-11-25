@@ -3,7 +3,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace CZToolKit
 {
-    public interface ILocalAssetLoader : IReference
+    public interface ILocalAssetLoader
     {
         T LoadAsset<T>(string path);
 

@@ -8,6 +8,7 @@ namespace CZToolKit
     public class Snowflake
     {
         #region Const
+
         // 前41位就可以使用69年, 10位的可支持1023台机器, 最后12位序列号可以在1毫秒内产生4095个自增的ID
 
         /// <summary>
@@ -61,8 +62,9 @@ namespace CZToolKit
         private const long MAX_DATACENTER_ID = -1L ^ (-1L << DATACENTER_ID_BITS);
 
         #endregion
-        
+
         #region Static
+
         private static readonly Snowflake s_Snowflake = new Snowflake(0, 0);
 
         /// <summary>
@@ -73,6 +75,7 @@ namespace CZToolKit
         {
             return s_Snowflake.NextID();
         }
+
         #endregion
 
         /// <summary>
@@ -106,9 +109,9 @@ namespace CZToolKit
         /// <summary>
         /// 基于Twitter的snowflake算法. 
         /// </summary>
-        /// <param name="workerID"> 10位的数据机器位中的低位, 默认不应该超过5位(31) </param>
-        /// <param name="datacenterID"> 10位的数据机器位中的高位, 默认不应该超过5位(31) </param>
-        /// <param name="baseTimestamp"> 基准时间戳(GMT时间) </param>
+        /// <param name="workerID"> 10位的数据机器位中的低位, 默认不应该超过31(5位) </param>
+        /// <param name="datacenterID"> 10位的数据机器位中的高位, 默认不应该超过31(5位) </param>
+        /// <param name="baseTimestamp"> 基准时间戳(UTC时间2020-01-01 00:00:00) </param>
         public Snowflake(byte workerID, byte datacenterID, long baseTimestamp = DEFAULT_BASE_TIMESTAMP)
         {
             this.baseTimestamp = baseTimestamp;
@@ -126,9 +129,9 @@ namespace CZToolKit
         /// <summary>
         /// 基于Twitter的snowflake算法. 
         /// </summary>
-        /// <param name="workerID"> 10位ID, 默认不应该超过10位(1024) </param>
-        /// <param name="baseTimestamp"> 基准时间戳(GMT时间) </param>
-        public Snowflake(uint workerID, long baseTimestamp = DEFAULT_BASE_TIMESTAMP)
+        /// <param name="workerID"> 不超过1024 </param>
+        /// <param name="baseTimestamp"> 基准时间戳(UTC时间2020-01-01 00:00:00) </param>
+        public Snowflake(int workerID, long baseTimestamp = DEFAULT_BASE_TIMESTAMP)
         {
             this.baseTimestamp = baseTimestamp;
             this.lastTimestamp = baseTimestamp;
@@ -168,9 +171,9 @@ namespace CZToolKit
                 }
                 else
                     sequence = 0L;
-                
+
                 // 把当前时间戳保存为最后生成ID的时间戳
-                lastTimestamp = timestamp; 
+                lastTimestamp = timestamp;
                 LastID = ((timestamp - baseTimestamp) << TIMESTAMP_LEFT_SHIFT) |
                          (DatacenterID << DATACENTER_ID_SHIFT) |
                          (WorkerID << WORKER_ID_SHIFT) | sequence;
@@ -178,14 +181,14 @@ namespace CZToolKit
                 return LastID;
             }
         }
-        
+
         /// <summary>
-        /// 获取当提前时间戳(毫秒). 
+        /// 获取当前时间戳(毫秒). 
         /// </summary>
         /// <returns></returns>
         private long GetCurrentTimestamp()
         {
-            return DateTime.Now.ToFileTimeUtc() / 10000 - 11644473600000L;
+            return DateTimeOffset.Now.ToUnixTimeMilliseconds() - baseTimestamp;
         }
 
         /// <summary>
@@ -194,7 +197,7 @@ namespace CZToolKit
         /// <returns></returns>
         private long TilNextTimestamp()
         {
-            var timestamp =GetCurrentTimestamp();
+            var timestamp = GetCurrentTimestamp();
             while (timestamp <= lastTimestamp)
             {
                 timestamp = GetCurrentTimestamp();

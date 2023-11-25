@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,7 +13,9 @@
  *  Blog: https://www.mindgear.net/
  *
  */
+
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -21,17 +24,32 @@ namespace CZToolKit.VM
 {
     public static class ViewModelFactory
     {
-        static Dictionary<Type, Type> ViewModelTypeCache;
+        private static bool s_Initialized;
+        private static Dictionary<Type, Type> s_ViewModelTypeCache;
 
         static ViewModelFactory()
         {
-            ViewModelTypeCache = new Dictionary<Type, Type>();
+        }
+
+        public static void Init(bool force)
+        {
+            if (!force && s_Initialized)
+                return;
+
+            if (s_ViewModelTypeCache == null)
+                s_ViewModelTypeCache = new Dictionary<Type, Type>();
+            else
+                s_ViewModelTypeCache.Clear();
+
             foreach (var type in Util_TypeCache.GetTypesWithAttribute<ViewModelAttribute>())
             {
-                if (type.IsAbstract) continue;
+                if (type.IsAbstract)
+                    continue;
                 var attribute = type.GetCustomAttribute<ViewModelAttribute>(true);
-                ViewModelTypeCache[attribute.targetType] = type;
+                s_ViewModelTypeCache[attribute.targetType] = type;
             }
+
+            s_Initialized = true;
         }
 
         public static Type GetViewModelType(Type modelType)
@@ -39,11 +57,12 @@ namespace CZToolKit.VM
             var viewModelType = (Type)null;
             while (viewModelType == null)
             {
-                ViewModelTypeCache.TryGetValue(modelType, out viewModelType);
+                s_ViewModelTypeCache.TryGetValue(modelType, out viewModelType);
                 if (modelType.BaseType == null)
                     break;
                 modelType = modelType.BaseType;
             }
+
             return viewModelType;
         }
 

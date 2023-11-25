@@ -5,7 +5,7 @@ namespace CZToolKit
 {
     public static class Util_Collections
     {
-        public static bool TryGet<T>(this IList<T> array, int index, out T element)
+        public static bool TryGetElement<T>(this IList<T> array, int index, out T element)
         {
             element = default;
             if (index >= 0 && index < array.Count)
@@ -38,9 +38,9 @@ namespace CZToolKit
                 if (dir == 0)
                     return mid;
                 if (dir < 0)
-                    right = mid - 1;
-                else
                     left = mid + 1;
+                else
+                    right = mid - 1;
             }
             return -1;
         }

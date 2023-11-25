@@ -1,5 +1,5 @@
 ﻿
-namespace CZToolKit.ResourceManagement
+namespace CZToolKit
 {
     public interface IResourceManager
     {

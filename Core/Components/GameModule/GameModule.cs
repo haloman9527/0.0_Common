@@ -16,7 +16,7 @@ namespace CZToolKit
         protected override void OnOpen()
         {
             base.OnOpen();
-            assetLoader = ReferencePool.Acquire<LocalAssetLoader>();
+            assetLoader = ObjectPool.Instance.Acquire<LocalAssetLoader>();
         }
 
         private async void B()
@@ -27,7 +27,7 @@ namespace CZToolKit
 
         protected override void OnClose()
         {
-            ReferencePool.Release(assetLoader);
+            ObjectPool.Instance.Release(assetLoader);
             base.OnClose();
         }
     }

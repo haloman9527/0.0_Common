@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit.ResourceManagement
+namespace CZToolKit
 {
     public class ResourceManager : Singleton<ResourceManager>, IResourceManager
     {

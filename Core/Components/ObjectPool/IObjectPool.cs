@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CZToolKit.ObjectPool
+namespace CZToolKit
 {
     public interface IObjectPool : IDisposable
     {

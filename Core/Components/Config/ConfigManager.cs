@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using CZToolKit.ResourceManagement;
+using CZToolKit;
 using CZToolKit.Singletons;
 using UnityEngine;
 
-namespace CZToolKit.ConfigManagement
+namespace CZToolKit
 {
     public class ConfigManager : Singleton<ConfigManager>, IConfigManager
     {

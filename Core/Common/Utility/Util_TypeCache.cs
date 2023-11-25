@@ -24,7 +24,8 @@ namespace CZToolKit
 {
     public static class Util_TypeCache
     {
-        private static readonly List<Type> s_AllTypes = new List<Type>(512);
+        private static bool s_Initialized;
+        private static List<Type> s_AllTypes;
 
         public static IReadOnlyList<Type> AllTypes
         {
@@ -33,18 +34,27 @@ namespace CZToolKit
 
         static Util_TypeCache()
         {
-            Refresh();
+            Init(true);
         }
 
-        public static void Refresh()
+        public static void Init(bool force)
         {
-            s_AllTypes.Clear();
+            if (!force && s_Initialized)
+                return;
+
+            if (s_AllTypes == null)
+                s_AllTypes = new List<Type>(512);
+            else
+                s_AllTypes.Clear();
+
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 if (assembly.FullName.StartsWith("UnityEngine.CoreModule")) continue;
                 if (!assembly.FullName.Contains("Version=0.0.0")) continue;
                 s_AllTypes.AddRange(assembly.GetTypes());
             }
+
+            s_Initialized = true;
         }
 
         public static IEnumerable<Type> GetTypesWithAttribute(Type attributeType, bool inherit = true)

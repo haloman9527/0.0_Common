@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CZToolKit.ObjectPool;
 
 namespace CZToolKit
 {
@@ -427,7 +426,7 @@ namespace CZToolKit
             LateUpdate = 1 << 5,
         }
 
-        public class SubModulesQueueCachePool : ObjectPool<Queue<Module>>
+        public class SubModulesQueueCachePool : BaseObjectPool<Queue<Module>>
         {
             protected override Queue<Module> Create()
             {
@@ -447,7 +446,7 @@ namespace CZToolKit
             }
         }
 
-        public class SubModulesStackCachePool : ObjectPool<Stack<Module>>
+        public class SubModulesStackCachePool : BaseObjectPool<Stack<Module>>
         {
             protected override Stack<Module> Create()
             {
