@@ -12,7 +12,12 @@ namespace CZToolKit
         // 前41位就可以使用69年, 10位的可支持1023台机器, 最后12位序列号可以在1毫秒内产生4095个自增的ID
 
         /// <summary>
-        /// 毫秒, 默认基准时间戳(2020-01-01 00:00:00)
+        /// MS 2020-01-01 00:00:00
+        /// </summary>
+        private const long TWEPOCH = 62135596800000L;
+
+        /// <summary>
+        /// UTC 2020-01-01 00:00:00
         /// </summary>
         public const long DEFAULT_BASE_TIMESTAMP = 1577836800000L;
 
@@ -111,7 +116,7 @@ namespace CZToolKit
         /// </summary>
         /// <param name="workerID"> 10位的数据机器位中的低位, 默认不应该超过31(5位) </param>
         /// <param name="datacenterID"> 10位的数据机器位中的高位, 默认不应该超过31(5位) </param>
-        /// <param name="baseTimestamp"> 基准时间戳(UTC时间2020-01-01 00:00:00) </param>
+        /// <param name="baseTimestamp"> 默认基准时间戳(UTC时间2020-01-01 00:00:00) </param>
         public Snowflake(byte workerID, byte datacenterID, long baseTimestamp = DEFAULT_BASE_TIMESTAMP)
         {
             this.baseTimestamp = baseTimestamp;
@@ -131,18 +136,8 @@ namespace CZToolKit
         /// </summary>
         /// <param name="workerID"> 不超过1024 </param>
         /// <param name="baseTimestamp"> 基准时间戳(UTC时间2020-01-01 00:00:00) </param>
-        public Snowflake(int workerID, long baseTimestamp = DEFAULT_BASE_TIMESTAMP)
+        public Snowflake(int workerID, long baseTimestamp = DEFAULT_BASE_TIMESTAMP) : this((byte)(workerID & 32), (byte)((workerID >> 5) & 32), baseTimestamp)
         {
-            this.baseTimestamp = baseTimestamp;
-            this.lastTimestamp = baseTimestamp;
-            this.WorkerID = workerID & 32;
-            this.DatacenterID = (workerID >> 5) & 32;
-
-            if (WorkerID > MAX_WORKER_ID)
-                throw new ArgumentException($"worker Id can't be greater than {MAX_WORKER_ID} or less than 0");
-
-            if (DatacenterID > MAX_DATACENTER_ID)
-                throw new ArgumentException($"datacenter Id can't be greater than {MAX_DATACENTER_ID} or less than 0");
         }
 
         /// <summary>
@@ -188,7 +183,7 @@ namespace CZToolKit
         /// <returns></returns>
         private long GetCurrentTimestamp()
         {
-            return DateTimeOffset.Now.ToUnixTimeMilliseconds() - baseTimestamp;
+            return (DateTime.UtcNow.Ticks / 10000) - TWEPOCH - baseTimestamp;
         }
 
         /// <summary>
