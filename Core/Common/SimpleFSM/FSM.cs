@@ -8,7 +8,7 @@
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
- *  Github: https://github.com/HalfLobsterMan
+ *  Github: https://github.com/haloman9527
  *  Blog: https://www.mindgear.net/
  *
  */
@@ -21,6 +21,18 @@ namespace CZToolKit.SimpleFSM
     {
         private Dictionary<string, IFSMState> states = new Dictionary<string, IFSMState>();
         private IFSMState currentState;
+        
+        private IFSMAgent agent;
+
+        public IFSMAgent Agent
+        {
+            get { return agent; }
+        }
+
+        public void Init(IFSMAgent agent)
+        {
+            this.agent = agent;
+        }
 
         public virtual void Update()
         {
@@ -47,8 +59,15 @@ namespace CZToolKit.SimpleFSM
         }
     }
 
+    public interface IFSMAgent
+    {
+        
+    }
+    
     public interface IFSM
     {
+        IFSMAgent Agent { get; }
+        
         void Update();
 
         void PushState(string stateName, IFSMState state);
