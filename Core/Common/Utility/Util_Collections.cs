@@ -52,6 +52,60 @@ namespace CZToolKit
         /// <param name="comparer"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
+        public static bool QuickSort<T>(this IList<T> original, IComparer<T> comparer)
+        {
+            if (original.Count <= 1)
+                return false;
+            return QuickSort(original, 0, original.Count - 1, comparer);
+        }
+        
+        public static bool QuickSort<T>(this IList<T> original, int left, int right, IComparer<T> comparer)
+        {
+            if (left >= right)
+                return false;
+            T middle = original[left];
+            int less = left;
+            int greater = right;
+            bool changed = false;
+            while (true)
+            {
+                while (less < greater && comparer.Compare(original[less], middle) < 0)
+                {
+                    less++;
+                }
+
+                while (greater > less && comparer.Compare(original[greater], middle) > 0)
+                {
+                    greater--;
+                }
+
+                if (less >= greater) break;
+
+                var lr = comparer.Compare(original[less], original[greater]);
+                if (lr == 0)
+                {
+                    greater--;
+                    continue;
+                }
+
+                T temp = original[less];
+                original[less] = original[greater];
+                original[greater] = temp;
+                changed = true;
+            }
+
+            changed |= QuickSort(original, left, less, comparer);
+            changed |= QuickSort(original, less + 1, right, comparer);
+            return changed;
+        }
+
+        /// <summary>
+        /// 快速排序
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="comparer"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static bool QuickSort<T>(this IList<T> original, Func<T, T, int> comparer)
         {
             if (original.Count <= 1)
