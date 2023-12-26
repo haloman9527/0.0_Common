@@ -1,29 +1,27 @@
-﻿
-namespace CZToolKit.Singletons
+﻿namespace CZToolKit.Singletons
 {
     public static partial class Game
     {
         static Game()
         {
-            InitRootModule();
         }
-        
+
         public static void Update()
         {
             UpdateSingletons();
-            UpdateModules();
+            UpdateEntites();
         }
 
         public static void LateUpdate()
         {
             LateUpdateSingletons();
-            LateUpdateModules();
+            LateUpdateEntites();
         }
 
         public static void Close()
         {
-            CloseSubModules();
+            CloseEntities();
             CloseSingletons();
         }
-    }   
+    }
 }

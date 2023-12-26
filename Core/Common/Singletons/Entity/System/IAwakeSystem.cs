@@ -1,0 +1,91 @@
+﻿using System;
+
+namespace CZToolKit.ET
+{
+    public interface IAwake
+    {
+    }
+
+    public interface IAwake<A>
+    {
+    }
+
+    public interface IAwake<A, B>
+    {
+    }
+
+    public interface IAwakeSystem : ISystem
+    {
+        void Execute(Entity o);
+    }
+
+    public interface IAwakeSystem<A> : ISystem
+    {
+        void Execute(Entity o, A a);
+    }
+
+    public interface IAwakeSystem<A, B> : ISystem
+    {
+        void Execute(Entity o, A a, B b);
+    }
+
+    public abstract class AwakeSystem<T> : IAwakeSystem where T : Entity
+    {
+        public Type Type()
+        {
+            return typeof(T);
+        }
+
+        public Type SystemType()
+        {
+            return typeof(IAwakeSystem);
+        }
+
+        public void Execute(Entity o)
+        {
+            Awake((T)o);
+        }
+
+        protected abstract void Awake(T o);
+    }
+
+    public abstract class AwakeSystem<T, A> : IAwakeSystem<A> where T : Entity
+    {
+        public Type Type()
+        {
+            return typeof(T);
+        }
+
+        public Type SystemType()
+        {
+            return typeof(IAwakeSystem<A>);
+        }
+
+        public void Execute(Entity o, A a)
+        {
+            Awake((T)o, a);
+        }
+
+        protected abstract void Awake(T o, A a);
+    }
+
+    public abstract class AwakeSystem<T, A, B> : IAwakeSystem<A, B> where T : Entity
+    {
+        public Type Type()
+        {
+            return typeof(T);
+        }
+
+        public Type SystemType()
+        {
+            return typeof(IAwakeSystem<A, B>);
+        }
+
+        public void Execute(Entity o, A a, B b)
+        {
+            Awake((T)o, a, b);
+        }
+
+        protected abstract void Awake(T o, A a, B b);
+    }
+}
