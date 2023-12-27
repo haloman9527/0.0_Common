@@ -21,7 +21,6 @@ namespace CZToolKit.ET
                     return;
                 }
 
-
                 if (value == 0)
                 {
                     Root.Instance.Remove(this.instanceId);
@@ -58,7 +57,6 @@ namespace CZToolKit.ET
                     return;
                 }
 
-                var oldDomain = this.domain;
                 this.domain = value;
 
                 if (this.children != null)
@@ -164,10 +162,9 @@ namespace CZToolKit.ET
             return entity;
         }
 
-        public T AddChild<T>() where T : Entity
+        public T AddChild<T>() where T : Entity, new()
         {
-            var type = typeof(T);
-            var entity = (T)Activator.CreateInstance(type);
+            var entity = new T();
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
 
@@ -179,10 +176,9 @@ namespace CZToolKit.ET
             return entity;
         }
 
-        public T AddChild<T, A>(A a) where T : Entity
+        public T AddChild<T, A>(A a) where T : Entity, new()
         {
-            var type = typeof(T);
-            var entity = (T)Activator.CreateInstance(type);
+            var entity = new T();
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
 
@@ -194,10 +190,9 @@ namespace CZToolKit.ET
             return entity;
         }
 
-        public T AddChild<T, A, B>(A a, B b) where T : Entity
+        public T AddChild<T, A, B>(A a, B b) where T : Entity, new()
         {
-            var type = typeof(T);
-            var entity = (T)Activator.CreateInstance(type);
+            var entity = new T();
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
 
@@ -290,7 +285,7 @@ namespace CZToolKit.ET
                 throw new Exception($"entity already has component: {typeof(T).FullName}");
             }
 
-            var component = Activator.CreateInstance(type) as Entity;
+            var component = new T();
             component.instanceId = this.instanceId;
             component.ComponentParent = this;
 
@@ -304,7 +299,7 @@ namespace CZToolKit.ET
                 Systems.AddComponent(this, component);
             }
 
-            return component as T;
+            return component;
         }
 
         public Entity GetComponent(Type type)
