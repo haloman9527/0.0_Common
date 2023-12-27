@@ -153,6 +153,11 @@ namespace CZToolKit.ET
             get { return this.children; }
         }
 
+        public Dictionary<Type, Entity> Components
+        {
+            get { return this.components; }
+        }
+
         public Entity AddChild(Entity entity)
         {
             entity.Parent = this;
@@ -356,7 +361,7 @@ namespace CZToolKit.ET
             this.components.Remove(component.GetType());
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (this is IDestroy)
             {
