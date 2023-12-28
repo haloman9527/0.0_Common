@@ -24,10 +24,10 @@ namespace CZToolKit.UnsafeEx
 {
     public unsafe static class UnsafeUtil
     {
-        // public static int SizeOf<T>()
-        // {
-        //     return Unsafe.SizeOf<T>();
-        // }
+        public static int SizeOf<T>()
+        {
+            return Marshal.SizeOf<T>();
+        }
         
         public static IntPtr Malloc(int size)
         {
@@ -49,28 +49,21 @@ namespace CZToolKit.UnsafeEx
         //     // destination = Unsafe.Read<T>(ptr);
         //     dest = default;
         // }
-        //
-        // public static T Read<T>(void* ptr)
-        // {
-        //     // return Unsafe.Read<T>(ptr);
-        // }
-        //
+        
+        public static T Read<T>(void* ptr) where T : unmanaged
+        {
+            return *(T*)ptr;
+        }
+        
         public static ref T AsRef<T>(void* ptr) where T : unmanaged
         {
-            // return ref Unsafe.AsRef<T>(ptr);
             return ref *(T*)ptr;
         }
         
         public static ref T AsRef<T>(IntPtr ptr) where T : unmanaged
         {
-            // return ref Unsafe.AsRef<T>((void*)ptr);
             return ref *(T*)ptr;
         }
-        
-        // public static ref T AsRef<T>(in T source)
-        // {
-        //     // return ref Unsafe.AsRef(source);
-        // }
         
         // public static ref TTo As<TFrom, TTo>(ref TFrom from)
         // {
@@ -84,12 +77,12 @@ namespace CZToolKit.UnsafeEx
         //
         // public static void WirteArrayElement<T>(void* destination, int index, T value)
         // {
-        //     Unsafe.Write(((byte*)destination + (Unsafe.SizeOf<T>() * index)), value);
+        //     Unsafe.Write(((byte*)destination + (SizeOf<T>() * index)), value);
         // }
-        //
-        // public static void CopyBlock(void* destination, void* source, uint byteCount)
-        // {
-        //     Unsafe.CopyBlock(destination, source, byteCount);
-        // }
+        
+        public static void CopyBlock(void* destination, void* source, uint byteCount)
+        {
+            Buffer.MemoryCopy(source, destination, byteCount, byteCount);
+        }
     }
 }

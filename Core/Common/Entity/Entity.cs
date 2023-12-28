@@ -3,8 +3,13 @@ using System.Collections.Generic;
 
 namespace CZToolKit.ET
 {
+    [Serializable]
     public class Entity : IDisposable
     {
+#if UNITY_EDITOR
+        private UnityEngine.GameObject viewGO;
+#endif
+
         private int instanceId;
         protected Entity domain;
         protected Entity parent;
@@ -31,6 +36,19 @@ namespace CZToolKit.ET
                     instanceId = value;
                     Root.Instance.Add(this);
                 }
+
+#if UNITY_EDITOR
+                if (instanceId != 0)
+                {
+                    this.viewGO = new UnityEngine.GameObject(this.GetType().Name);
+                    this.viewGO.AddComponent<ComponentView>().Component = this;
+                    this.viewGO.transform.SetParent(this.Parent == null ? UnityEngine.GameObject.Find("Global").transform : this.Parent.viewGO.transform);
+                }
+                else
+                {
+                    UnityEngine.GameObject.Destroy(viewGO);
+                }
+#endif
             }
         }
 
@@ -105,6 +123,17 @@ namespace CZToolKit.ET
                 this.parent = value;
                 this.parent.AddToChildren(this);
                 this.Domain = parent.Domain;
+
+
+#if UNITY_EDITOR
+                if (parent.viewGO.transform.Find("---------------") == null)
+                {
+                    new UnityEngine.GameObject("---------------").transform.SetParent(parent.viewGO.transform, false);
+                }
+                
+                this.viewGO.transform.SetParent(parent.viewGO.transform, false);
+                this.viewGO.transform.SetAsLastSibling();
+#endif
             }
         }
 
@@ -114,12 +143,12 @@ namespace CZToolKit.ET
             {
                 if (value == null)
                 {
-                    throw new Exception($"cant set parent null: {this.GetType().Name}");
+                    throw new Exception($"cant set parent be null: {this.GetType().Name}");
                 }
 
                 if (value == this)
                 {
-                    throw new Exception($"cant set parent self: {this.GetType().Name}");
+                    throw new Exception($"cant set parent be self: {this.GetType().Name}");
                 }
 
                 // 严格限制parent必须要有domain,也就是说parent必须在数据树上面
@@ -143,6 +172,16 @@ namespace CZToolKit.ET
                 this.parent = value;
                 this.parent.AddToComponents(this);
                 this.domain = this.parent.domain;
+                
+#if UNITY_EDITOR
+                if (parent.viewGO.transform.Find("---------------") == null)
+                {
+                    new UnityEngine.GameObject("---------------").transform.SetParent(parent.viewGO.transform, false);
+                }
+
+                this.viewGO.transform.SetParent(parent.viewGO.transform, false);
+                this.viewGO.transform.SetAsFirstSibling();
+#endif
             }
         }
 
@@ -243,6 +282,7 @@ namespace CZToolKit.ET
                 throw new Exception($"entity already has component: {type.FullName}");
             }
 
+            component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
             if (this is IAddComponent)
@@ -261,7 +301,7 @@ namespace CZToolKit.ET
             }
 
             var component = Activator.CreateInstance(type) as Entity;
-            component.instanceId = this.instanceId;
+            component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
             if (this is IAwake)
@@ -279,27 +319,7 @@ namespace CZToolKit.ET
 
         public T AddComponent<T>() where T : Entity, new()
         {
-            var type = typeof(T);
-            if (this.components != null && this.components.ContainsKey(typeof(T)))
-            {
-                throw new Exception($"entity already has component: {typeof(T).FullName}");
-            }
-
-            var component = new T();
-            component.instanceId = this.instanceId;
-            component.ComponentParent = this;
-
-            if (this is IAwake)
-            {
-                Systems.Awake(component);
-            }
-
-            if (this is IAddComponent)
-            {
-                Systems.AddComponent(this, component);
-            }
-
-            return component;
+            return (T)AddComponent(typeof(T));
         }
 
         public Entity GetComponent(Type type)
@@ -363,7 +383,7 @@ namespace CZToolKit.ET
                 Systems.Destroy(this);
             }
 
-            this.instanceId = 0;
+            this.InstanceId = 0;
 
             if (this.children != null)
             {
