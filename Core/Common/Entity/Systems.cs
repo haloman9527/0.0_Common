@@ -82,7 +82,7 @@ namespace CZToolKit.ET
                             pair.Value.systems[pair1.Key] = lst = new List<ISystem>();
                         }
 
-                        lst.AddRange(pair1.Value);
+                        lst.InsertRange(0, pair1.Value);
                     }
 
                     type = type.BaseType;
