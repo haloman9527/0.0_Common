@@ -82,7 +82,7 @@ namespace CZToolKit.ET
                             pair.Value.systems[pair1.Key] = lst = new List<ISystem>();
                         }
 
-                        lst.InsertRange(0, pair1.Value);
+                        lst.AddRange(pair1.Value);
                     }
 
                     type = type.BaseType;
@@ -110,9 +110,9 @@ namespace CZToolKit.ET
             if (systems == null)
                 return;
 
-            foreach (var system in systems)
+            for (int i = 0; i < systems.Count; i++)
             {
-                ((IAwakeSystem)system).Execute(entity);
+                ((IAwakeSystem)systems[i]).Execute(entity);
             }
         }
 
@@ -123,9 +123,9 @@ namespace CZToolKit.ET
             if (systems == null)
                 return;
 
-            foreach (var system in systems)
+            for (int i = 0; i < systems.Count; i++)
             {
-                ((IAwakeSystem<A>)system).Execute(entity, a);
+                ((IAwakeSystem<A>)systems[i]).Execute(entity, a);
             }
         }
 
@@ -136,9 +136,35 @@ namespace CZToolKit.ET
             if (systems == null)
                 return;
 
-            foreach (var system in systems)
+            for (int i = 0; i < systems.Count; i++)
             {
-                ((IAwakeSystem<A, B>)system).Execute(entity, a, b);
+                ((IAwakeSystem<A, B>)systems[i]).Execute(entity, a, b);
+            }
+        }
+
+        public static void Awake<A, B, C>(Entity entity, A a, B b, C c)
+        {
+            var type = entity.GetType();
+            var systems = GetSystems(type, typeof(IAwakeSystem<A, B, C>));
+            if (systems == null)
+                return;
+
+            for (int i = 0; i < systems.Count; i++)
+            {
+                ((IAwakeSystem<A, B, C>)systems[i]).Execute(entity, a, b, c);
+            }
+        }
+
+        public static void Awake<A, B, C, D>(Entity entity, A a, B b, C c, D d)
+        {
+            var type = entity.GetType();
+            var systems = GetSystems(type, typeof(IAwakeSystem<A, B, C, D>));
+            if (systems == null)
+                return;
+
+            for (int i = 0; i < systems.Count; i++)
+            {
+                ((IAwakeSystem<A, B, C, D>)systems[i]).Execute(entity, a, b, c, d);
             }
         }
 
@@ -155,7 +181,7 @@ namespace CZToolKit.ET
             }
         }
 
-        public static void FixedUpdate(Queue<int> entitiesQueue)
+        public static void Update(Queue<int> entitiesQueue)
         {
             int count = entitiesQueue.Count;
             while (count-- > 0)
@@ -173,15 +199,15 @@ namespace CZToolKit.ET
                 }
 
                 entitiesQueue.Enqueue(instanceId);
-                
-                var systems = GetSystems(component.GetType(), typeof(IFixedUpdateSystem));
+
+                var systems = GetSystems(component.GetType(), typeof(IUpdateSystem));
                 if (systems != null)
                 {
-                    foreach (var system in systems)
+                    for (int i = 0; i < systems.Count; i++)
                     {
                         try
                         {
-                            ((IFixedUpdateSystem)system).Execute(component);
+                            ((IUpdateSystem)systems[i]).Execute(component);
                         }
                         catch (Exception e)
                         {
@@ -213,11 +239,11 @@ namespace CZToolKit.ET
                 var systems = GetSystems(component.GetType(), typeof(ILateUpdateSystem));
                 if (systems != null)
                 {
-                    foreach (var system in systems)
+                    for (int i = 0; i < systems.Count; i++)
                     {
                         try
                         {
-                            ((ILateUpdateSystem)system).Execute(component);
+                            ((ILateUpdateSystem)systems[i]).Execute(component);
                         }
                         catch (Exception e)
                         {
@@ -235,9 +261,9 @@ namespace CZToolKit.ET
             if (systems == null)
                 return;
 
-            foreach (var system in systems)
+            for (int i = 0; i < systems.Count; i++)
             {
-                ((IAddComponentSystem)system).Execute(entity, component);
+                ((IAddComponentSystem)systems[i]).Execute(entity, component);
             }
         }
     }

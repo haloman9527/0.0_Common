@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using CZToolKit.Singletons;
+using UnityEngine;
 
 namespace CZToolKit.ET
 {
-    public class Root : Singleton<Root>, ISingletonAwake, ISingletonDestory
+    public class Root : Singleton<Root>, ISingletonAwake, ISingletonDestory, ISingletonUpdate, ISingletonLateUpdate
     {
         private Queue<int> entitiesQueue;
         private Dictionary<int, Entity> entities;
@@ -52,6 +53,18 @@ namespace CZToolKit.ET
         {
             this.entities.TryGetValue(instanceId, out var component);
             return component;
+        }
+
+        public void Update()
+        {
+            var currentTime = Time.time;
+            
+            Systems.Update(entitiesQueue);
+        }
+
+        public void LateUpdate()
+        {
+            Systems.LateUpdate(entitiesQueue);
         }
     }
 }

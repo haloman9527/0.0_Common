@@ -7,7 +7,7 @@ namespace CZToolKit.ET
     public class Entity : IDisposable
     {
 #if UNITY_EDITOR
-        private UnityEngine.GameObject viewGO;
+        protected UnityEngine.GameObject viewGO;
 #endif
 
         private int instanceId;
@@ -41,8 +41,8 @@ namespace CZToolKit.ET
                 if (instanceId != 0)
                 {
                     this.viewGO = new UnityEngine.GameObject(this.GetType().Name);
-                    this.viewGO.AddComponent<ComponentView>().Component = this;
-                    this.viewGO.transform.SetParent(this.Parent == null ? UnityEngine.GameObject.Find("Global").transform : this.Parent.viewGO.transform);
+                    this.viewGO.AddComponent<EntityPreview>().Component = this;
+                    this.viewGO.transform.SetParent(this.Parent == null ? EntityPreviewRoot.Instance.transform : this.Parent.viewGO.transform);
                 }
                 else
                 {
@@ -62,8 +62,8 @@ namespace CZToolKit.ET
         /// </summary>
         public Entity Domain
         {
-            get { return domain; }
-            private set
+            get { return domain; } 
+            protected set
             {
                 if (value == null)
                 {
@@ -322,11 +322,37 @@ namespace CZToolKit.ET
             return (T)AddComponent(typeof(T));
         }
 
+        public T GetComponent<T>()
+        {
+            var type = typeof(T);
+            if (!this.components.TryGetValue(type, out var component))
+            {
+                foreach (var pair in components)
+                {
+                    if (type.IsAssignableFrom(pair.Key))
+                    {
+                        component = pair.Value;
+                        break;
+                    }
+                }
+            }
+            return (T)(component as object);
+        }
+            
         public Entity GetComponent(Type type)
         {
-            if (this.components.TryGetValue(type, out var component))
-                return component;
-            return null;
+            if (!this.components.TryGetValue(type, out var component))
+            {
+                foreach (var pair in components)
+                {
+                    if (type.IsAssignableFrom(pair.Key))
+                    {
+                        component = pair.Value;
+                        break;
+                    }
+                }
+            }
+            return component;
         }
 
         public void RemoveComponent(Type type)

@@ -1,29 +1,34 @@
 ﻿
+using System;
+
 namespace CZToolKit.ET
 {
     public class Scene : Entity
     {
-        public string Name { get; }
+        private string name;
 
-        public new Entity Domain
+        public string Name
         {
-            get => this.domain;
-            private set => this.domain = value;
+            get
+            {
+                return name;
+            }
+            set
+            {
+                name = value;
+                
+#if UNITY_EDITOR
+                viewGO.name = name;
+#endif
+            }
         }
 
         public new Entity Parent
         {
-            get { return this.parent; }
-            private set
+            get { return base.Parent; }
+            set
             {
-                if (value == null)
-                {
-                    //this.parent = this;
-                    return;
-                }
-
-                this.parent = value;
-                this.parent.Children.Add(this.InstanceId, this);
+                throw new Exception("Scene cannot set parent");
             }
         }
 
@@ -31,8 +36,22 @@ namespace CZToolKit.ET
         {
             this.InstanceId = Root.Instance.GenerateInstanceId();
             this.Name = name;
-            this.Domain = this;
-            this.Parent = parent;
+            if (parent == null)
+            {
+                base.Domain = this;
+            }
+            else
+            {
+                base.Parent = parent;
+            }
+        }
+    }
+
+    public static class SceneSystems
+    {
+        public static Scene AddScene(this Entity self, string name)
+        {
+            return new Scene(name, self);
         }
     }
 }
