@@ -62,7 +62,7 @@ namespace CZToolKit.ET
         /// </summary>
         public Entity Domain
         {
-            get { return domain; } 
+            get { return domain; }
             protected set
             {
                 if (value == null)
@@ -130,7 +130,7 @@ namespace CZToolKit.ET
                 {
                     new UnityEngine.GameObject("---------------").transform.SetParent(parent.viewGO.transform, false);
                 }
-                
+
                 this.viewGO.transform.SetParent(parent.viewGO.transform, false);
                 this.viewGO.transform.SetAsLastSibling();
 #endif
@@ -172,7 +172,7 @@ namespace CZToolKit.ET
                 this.parent = value;
                 this.parent.AddToComponents(this);
                 this.domain = this.parent.domain;
-                
+
 #if UNITY_EDITOR
                 if (parent.viewGO.transform.Find("---------------") == null)
                 {
@@ -193,6 +193,11 @@ namespace CZToolKit.ET
         public Dictionary<Type, Entity> Components
         {
             get { return this.components; }
+        }
+
+        public T GetParent<T>() where T : Entity
+        {
+            return (T)Parent;
         }
 
         public Entity AddChild(Entity entity)
@@ -238,6 +243,34 @@ namespace CZToolKit.ET
             if (entity is IAwake<A, B>)
             {
                 Systems.Awake(entity, a, b);
+            }
+
+            return entity;
+        }
+
+        public T AddChild<T, A, B, C>(A a, B b, C c) where T : Entity, new()
+        {
+            var entity = new T();
+            entity.InstanceId = Root.Instance.GenerateInstanceId();
+            entity.Parent = this;
+
+            if (entity is IAwake<A, B, C>)
+            {
+                Systems.Awake(entity, a, b, c);
+            }
+
+            return entity;
+        }
+
+        public T AddChild<T, A, B, C, D>(A a, B b, C c, D d) where T : Entity, new()
+        {
+            var entity = new T();
+            entity.InstanceId = Root.Instance.GenerateInstanceId();
+            entity.Parent = this;
+
+            if (entity is IAwake<A, B, C, D>)
+            {
+                Systems.Awake(entity, a, b, c, d);
             }
 
             return entity;
@@ -317,9 +350,100 @@ namespace CZToolKit.ET
             return component;
         }
 
-        public T AddComponent<T>() where T : Entity, new()
+        public Entity AddComponent<A>(Type type, A a)
         {
-            return (T)AddComponent(typeof(T));
+            if (this.components != null && this.components.ContainsKey(type))
+            {
+                throw new Exception($"entity already has component: {type.FullName}");
+            }
+
+            var component = Activator.CreateInstance(type) as Entity;
+            component.InstanceId = Root.Instance.GenerateInstanceId();
+            component.ComponentParent = this;
+
+            if (this is IAwake<A>)
+            {
+                Systems.Awake(component, a);
+            }
+
+            if (this is IAddComponent)
+            {
+                Systems.AddComponent(this, component);
+            }
+
+            return component;
+        }
+
+        public Entity AddComponent<A, B>(Type type, A a, B b)
+        {
+            if (this.components != null && this.components.ContainsKey(type))
+            {
+                throw new Exception($"entity already has component: {type.FullName}");
+            }
+
+            var component = Activator.CreateInstance(type) as Entity;
+            component.InstanceId = Root.Instance.GenerateInstanceId();
+            component.ComponentParent = this;
+
+            if (this is IAwake<A, B>)
+            {
+                Systems.Awake(component, a, b);
+            }
+
+            if (this is IAddComponent)
+            {
+                Systems.AddComponent(this, component);
+            }
+
+            return component;
+        }
+
+        public Entity AddComponent<A, B, C>(Type type, A a, B b, C c)
+        {
+            if (this.components != null && this.components.ContainsKey(type))
+            {
+                throw new Exception($"entity already has component: {type.FullName}");
+            }
+
+            var component = Activator.CreateInstance(type) as Entity;
+            component.InstanceId = Root.Instance.GenerateInstanceId();
+            component.ComponentParent = this;
+
+            if (this is IAwake<A, B, C>)
+            {
+                Systems.Awake(component, a, b, c);
+            }
+
+            if (this is IAddComponent)
+            {
+                Systems.AddComponent(this, component);
+            }
+
+            return component;
+        }
+
+        public Entity AddComponent<A, B, C, D>(Type type, A a, B b, C c, D d)
+        {
+            if (this.components != null && this.components.ContainsKey(type))
+            {
+                throw new Exception($"entity already has component: {type.FullName}");
+            }
+
+            var component = Activator.CreateInstance(type) as Entity;
+            component.InstanceId = Root.Instance.GenerateInstanceId();
+            component.ComponentParent = this;
+
+            if (this is IAwake<A, B, C, D>)
+            {
+                Systems.Awake(component, a, b, c, d);
+            }
+
+            if (this is IAddComponent)
+            {
+                Systems.AddComponent(this, component);
+            }
+
+            return component;
         }
 
         public T GetComponent<T>()
@@ -336,9 +460,10 @@ namespace CZToolKit.ET
                     }
                 }
             }
+
             return (T)(component as object);
         }
-            
+
         public Entity GetComponent(Type type)
         {
             if (!this.components.TryGetValue(type, out var component))
@@ -352,6 +477,7 @@ namespace CZToolKit.ET
                     }
                 }
             }
+
             return component;
         }
 

@@ -16,7 +16,7 @@ namespace CZToolKit
             this.resourceManager = resourceManager;
         }
 
-        public void Init()
+        public void Init(bool force = false)
         {
             var textAsset = resourceManager.Load<TextAsset>("");
         }
@@ -28,22 +28,22 @@ namespace CZToolKit
 
         public bool HasBool(string key)
         {
-            return configValues.TryGetValue(key, out var configValue) && configValue.type == ConfigValueType.Bool;
+            return configValues.TryGetValue(key, out var configValue) && (configValue.type & ConfigValueType.Bool) != 0;
         }
 
         public bool HasInt(string key)
         {
-            return configValues.TryGetValue(key, out var configValue) && configValue.type == ConfigValueType.Int;
+            return configValues.TryGetValue(key, out var configValue) && (configValue.type & ConfigValueType.Int) != 0;
         }
 
         public bool HasFloat(string key)
         {
-            return configValues.TryGetValue(key, out var configValue) && configValue.type == ConfigValueType.Float;
+            return configValues.TryGetValue(key, out var configValue) && (configValue.type & ConfigValueType.Float) != 0;
         }
 
         public bool HasString(string key)
         {
-            return configValues.TryGetValue(key, out var configValue) && configValue.type == ConfigValueType.String;
+            return configValues.TryGetValue(key, out var configValue) && (configValue.type & ConfigValueType.String) != 0;
         }
 
         public bool GetBool(string key)

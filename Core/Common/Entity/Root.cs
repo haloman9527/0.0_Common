@@ -57,8 +57,6 @@ namespace CZToolKit.ET
 
         public void Update()
         {
-            var currentTime = Time.time;
-            
             Systems.Update(entitiesQueue);
         }
 
