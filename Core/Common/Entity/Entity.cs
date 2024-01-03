@@ -120,10 +120,15 @@ namespace CZToolKit.ET
                     this.parent.RemoveFromChildren(this);
                 }
 
+                var oldParent = this.parent;
                 this.parent = value;
                 this.parent.AddToChildren(this);
                 this.Domain = parent.Domain;
 
+                if (oldParent != null)
+                {
+                    Systems.ParentChanged(this, oldParent);
+                }
 
 #if UNITY_EDITOR
                 if (parent.viewGO.transform.Find("---------------") == null)
@@ -195,9 +200,9 @@ namespace CZToolKit.ET
             get { return this.components; }
         }
 
-        public T GetParent<T>() where T : Entity
+        public T ParentAs<T>() where T : class
         {
-            return (T)Parent;
+            return (object)Parent as T;
         }
 
         public Entity AddChild(Entity entity)
@@ -557,7 +562,7 @@ namespace CZToolKit.ET
                 this.components.Clear();
             }
 
-            if (this.parent != null && this.parent.IsDisposed == false)
+            if (this.parent != null && !this.parent.IsDisposed)
             {
                 this.parent.RemoveComponent(this);
                 this.parent.RemoveFromChildren(this);

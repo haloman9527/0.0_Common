@@ -18,7 +18,7 @@ namespace CZToolKit.ET
             Init(true);
         }
 
-        public static void Init(bool force)
+        public static void Init(bool force = false)
         {
             if (!force && s_Initialized)
             {
@@ -264,6 +264,19 @@ namespace CZToolKit.ET
             for (int i = 0; i < systems.Count; i++)
             {
                 ((IAddComponentSystem)systems[i]).Execute(entity, component);
+            }
+        }
+
+        public static void ParentChanged(Entity entity, Entity oldParent)
+        {
+            var type = entity.GetType();
+            var systems = GetSystems(type, typeof(IParentChangedSystem));
+            if (systems == null)
+                return;
+
+            for (int i = 0; i < systems.Count; i++)
+            {
+                ((IParentChangedSystem)systems[i]).Execute(entity, oldParent);
             }
         }
     }

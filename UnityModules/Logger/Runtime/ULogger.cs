@@ -109,7 +109,6 @@ namespace CZToolKit
 
         #endregion
 
-
         #region
 
         public void Trace(string msg)
