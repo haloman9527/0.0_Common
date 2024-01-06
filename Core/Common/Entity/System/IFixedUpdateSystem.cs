@@ -2,16 +2,16 @@
 
 namespace CZToolKit.ET
 {
-    public interface IUpdate
+    public interface IFixedUpdate
     {
     }
 
-    public interface IUpdateSystem : ISystem
+    public interface IFixedUpdateSystem : ISystem
     {
         void Execute(Entity o);
     }
 
-    public abstract class UpdateSystem<T> : IUpdateSystem where T : Entity
+    public abstract class FixedUpdateSystem<T> : IFixedUpdateSystem where T : Entity
     {
         public Type Type()
         {
@@ -25,9 +25,9 @@ namespace CZToolKit.ET
 
         public void Execute(Entity o)
         {
-            Update((T)o);
+            FixedUpdate((T)o);
         }
 
-        protected abstract void Update(T o);
+        protected abstract void FixedUpdate(T o);
     }
 }

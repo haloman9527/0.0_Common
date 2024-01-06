@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CZToolKit.ET
 {
-    public class Root : Singleton<Root>, ISingletonAwake, ISingletonDestory, ISingletonUpdate, ISingletonLateUpdate
+    public class Root : Singleton<Root>, ISingletonAwake, ISingletonDestory, ISingletonFixedUpdate, ISingletonUpdate, ISingletonLateUpdate
     {
         private Queue<int> entitiesQueue;
         private Dictionary<int, Entity> entities;
@@ -53,6 +53,11 @@ namespace CZToolKit.ET
         {
             this.entities.TryGetValue(instanceId, out var component);
             return component;
+        }
+
+        public void FixedUpdate()
+        {
+            Systems.FixedUpdate(entitiesQueue);
         }
 
         public void Update()

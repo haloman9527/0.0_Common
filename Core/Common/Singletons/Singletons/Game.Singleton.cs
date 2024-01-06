@@ -26,7 +26,7 @@ namespace CZToolKit.Singletons
 
             return singleton;
         }
-        
+
         private static void AddSingleton_Internal(ISingleton singleton, Type singletonType)
         {
             singletonTypes.Add(singletonType, singleton);
@@ -42,6 +42,31 @@ namespace CZToolKit.Singletons
 
             if (singleton is ISingletonLateUpdate)
                 lateUpdates.Enqueue(singleton);
+        }
+
+        private static void FixedUpdateSingletons()
+        {
+            int count = updates.Count;
+            while (count-- > 0)
+            {
+                ISingleton singleton = updates.Dequeue();
+
+                if (singleton.IsDisposed())
+                    continue;
+
+                if (!(singleton is ISingletonFixedUpdate fixedUpdate))
+                    continue;
+
+                updates.Enqueue(singleton);
+                try
+                {
+                    fixedUpdate.FixedUpdate();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
         }
 
         private static void UpdateSingletons()
@@ -115,7 +140,7 @@ namespace CZToolKit.Singletons
         {
             return GetSingleton_Internal(singletonType);
         }
-        
+
         public static T GetSingleton<T>()
         {
             return (T)GetSingleton_Internal(typeof(T));

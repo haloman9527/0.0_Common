@@ -181,6 +181,43 @@ namespace CZToolKit.ET
             }
         }
 
+        public static void FixedUpdate(Queue<int> entitiesQueue)
+        {
+            int count = entitiesQueue.Count;
+            while (count-- > 0)
+            {
+                var instanceId = entitiesQueue.Dequeue();
+                var component = Root.Instance.Get(instanceId);
+                if (component == null)
+                {
+                    continue;
+                }
+
+                if (component.IsDisposed)
+                {
+                    continue;
+                }
+
+                entitiesQueue.Enqueue(instanceId);
+
+                var systems = GetSystems(component.GetType(), typeof(IFixedUpdateSystem));
+                if (systems != null)
+                {
+                    for (int i = 0; i < systems.Count; i++)
+                    {
+                        try
+                        {
+                            ((IFixedUpdateSystem)systems[i]).Execute(component);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e);
+                        }
+                    }
+                }
+            }
+        }
+
         public static void Update(Queue<int> entitiesQueue)
         {
             int count = entitiesQueue.Count;

@@ -32,6 +32,11 @@ namespace CZToolKit.Singletons
         void Awake();
     }
 
+    public interface ISingletonFixedUpdate
+    {
+        void FixedUpdate();
+    }
+
     public interface ISingletonUpdate
     {
         void Update();

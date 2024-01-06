@@ -6,6 +6,11 @@
         {
         }
 
+        public static void FixedUpdate()
+        {
+            FixedUpdateSingletons();
+        }
+
         public static void Update()
         {
             UpdateSingletons();
