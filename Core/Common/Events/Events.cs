@@ -20,7 +20,14 @@ namespace CZToolKit
                 return;
             }
 
-            s_AllEvents = new Dictionary<Type, List<IEvent>>(128);
+            if (s_AllEvents == null)
+            {
+                s_AllEvents = new Dictionary<Type, List<IEvent>>(128);
+            }
+            else
+            {
+                s_AllEvents.Clear();
+            }
 
             foreach (var type in Util_TypeCache.GetTypesDerivedFrom<IEvent>())
             {
@@ -62,7 +69,7 @@ namespace CZToolKit
 
             foreach (var evt in evts)
             {
-                (evt as IEvent<A>).Invoke(arg);
+                (evt as IEvent<A>).Handle(arg);
             }
         }
     }

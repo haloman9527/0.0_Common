@@ -8,10 +8,10 @@ namespace CZToolKit.ET
     {
         private Queue<int> entitiesQueue;
         private Dictionary<int, Entity> entities;
-        private Entity scene;
+        private Scene scene;
         private int lastInstanceId;
 
-        public Entity Scene
+        public Scene Scene
         {
             get { return scene; }
         }

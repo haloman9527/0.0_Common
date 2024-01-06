@@ -29,7 +29,7 @@ namespace CZToolKit
         }
     }
 
-    public class ObjectPool : Singleton<ObjectPool> , ISingletonAwake
+    public class ObjectPool : AutoSingleton<ObjectPool> , ISingletonAwake
     {
         private Dictionary<Type, IObjectPool> pools;
 
@@ -50,13 +50,18 @@ namespace CZToolKit
         
         public T Acquire<T>() where T : class, new()
         {
-            return (T)GetPool(typeof(T)).Acquire();
+            return (T)GetPool(typeof(T)).Spawn();
+        }
+        
+        public object Acquire(Type unitType)
+        {
+            return GetPool(unitType).Spawn();
         }
 
-        public void Release(object reference)
+        public void Recycle(object reference)
         {
             var unitType = reference.GetType(); 
-            GetPool(unitType).Release(reference);
+            GetPool(unitType).Recycle(reference);
         }
     }
 }

@@ -13,8 +13,8 @@ namespace CZToolKit.ET
         private int instanceId;
         protected Entity domain;
         protected Entity parent;
-        private Dictionary<int, Entity> children = new Dictionary<int, Entity>();
-        private Dictionary<Type, Entity> components = new Dictionary<Type, Entity>();
+        protected Dictionary<int, Entity> children;
+        protected Dictionary<Type, Entity> components;
 
         public int InstanceId
         {
@@ -185,19 +185,35 @@ namespace CZToolKit.ET
                 }
 
                 this.viewGO.transform.SetParent(parent.viewGO.transform, false);
-                this.viewGO.transform.SetAsFirstSibling();
+                this.viewGO.transform.SetSiblingIndex(parent.components.Count - 1);
 #endif
             }
         }
 
         public Dictionary<int, Entity> Children
         {
-            get { return this.children; }
+            get
+            {
+                if (children == null)
+                {
+                    children = new Dictionary<int, Entity>();
+                }
+
+                return this.children;
+            }
         }
 
         public Dictionary<Type, Entity> Components
         {
-            get { return this.components; }
+            get
+            {
+                if (components == null)
+                {
+                    components = new Dictionary<Type, Entity>();
+                }
+
+                return this.components;
+            }
         }
 
         public T ParentAs<T>() where T : class
@@ -283,8 +299,16 @@ namespace CZToolKit.ET
 
         public Entity GetChild(int instanceId)
         {
+            if (children == null)
+            {
+                return null;
+            }
+
             if (this.children.TryGetValue(instanceId, out var entity))
+            {
                 return entity;
+            }
+
             return null;
         }
 
@@ -304,11 +328,16 @@ namespace CZToolKit.ET
 
         private void AddToChildren(Entity entity)
         {
-            this.children.Add(entity.instanceId, entity);
+            this.Children.Add(entity.instanceId, entity);
         }
 
         public void RemoveFromChildren(Entity entity)
         {
+            if (children == null)
+            {
+                return;
+            }
+
             this.children.Remove(entity.instanceId);
         }
 
@@ -353,6 +382,11 @@ namespace CZToolKit.ET
             }
 
             return component;
+        }
+
+        public T AddComponent<T>() where T : Entity
+        {
+            return (T)AddComponent(typeof(T));
         }
 
         public Entity AddComponent<A>(Type type, A a)
@@ -451,27 +485,31 @@ namespace CZToolKit.ET
             return component;
         }
 
-        public T GetComponent<T>()
+        /// <summary>
+        /// 获取组件，如果没有则返回null
+        /// </summary>
+        /// <param name="deriveMatch"> 是否匹配派生类 </param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetComponent<T>(bool deriveMatch = true)
         {
-            var type = typeof(T);
-            if (!this.components.TryGetValue(type, out var component))
-            {
-                foreach (var pair in components)
-                {
-                    if (type.IsAssignableFrom(pair.Key))
-                    {
-                        component = pair.Value;
-                        break;
-                    }
-                }
-            }
-
-            return (T)(component as object);
+            return (T)(GetComponent(typeof(T), deriveMatch) as object);
         }
 
-        public Entity GetComponent(Type type)
+        /// <summary>
+        /// 获取组件，如果没有则返回null
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="deriveMatch"> 是否匹配派生类 </param>
+        /// <returns></returns>
+        public Entity GetComponent(Type type, bool deriveMatch = true)
         {
-            if (!this.components.TryGetValue(type, out var component))
+            if (components == null)
+            {
+                return null;
+            }
+
+            if (!this.components.TryGetValue(type, out var component) && deriveMatch)
             {
                 foreach (var pair in components)
                 {
@@ -502,6 +540,11 @@ namespace CZToolKit.ET
             c.Dispose();
         }
 
+        public void RemoveComponent<T>() where T : Entity
+        {
+            RemoveComponent(typeof(T));
+        }
+
         public void RemoveComponent(Entity component)
         {
             if (this.IsDisposed)
@@ -515,21 +558,21 @@ namespace CZToolKit.ET
                 return;
             }
 
-            if (c.instanceId != component.instanceId)
-            {
-                return;
-            }
-
             c.Dispose();
         }
 
         private void AddToComponents(Entity component)
         {
-            this.components.Add(component.GetType(), component);
+            this.Components.Add(component.GetType(), component);
         }
 
         public void RemoveFromComponents(Entity component)
         {
+            if (components == null)
+            {
+                return;
+            }
+
             this.components.Remove(component.GetType());
         }
 
@@ -564,7 +607,7 @@ namespace CZToolKit.ET
 
             if (this.parent != null && !this.parent.IsDisposed)
             {
-                this.parent.RemoveComponent(this);
+                this.parent.RemoveFromComponents(this);
                 this.parent.RemoveFromChildren(this);
             }
 

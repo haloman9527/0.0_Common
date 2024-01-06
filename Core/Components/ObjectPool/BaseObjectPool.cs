@@ -4,7 +4,7 @@ namespace CZToolKit
 {
     public abstract class BaseObjectPool<T> : IObjectPool<T> where T : class
     {
-        private Queue<T> unusedObjects;
+        protected Queue<T> unusedObjects;
 
         public int UnusedCount
         {
@@ -16,13 +16,13 @@ namespace CZToolKit
             this.unusedObjects = new Queue<T>();
         }
 
-        object IObjectPool.Acquire()
+        object IObjectPool.Spawn()
         {
-            return Acquire();
+            return Spawn();
         }
 
         /// <summary> 生成 </summary>
-        public T Acquire()
+        public T Spawn()
         {
             T unit = null;
             if (unusedObjects.Count > 0)
@@ -33,13 +33,13 @@ namespace CZToolKit
             return unit;
         }
 
-        void IObjectPool.Release(object unit)
+        void IObjectPool.Recycle(object unit)
         {
-            Release(unit as T);
+            Recycle(unit as T);
         }
 
         /// <summary> 回收 </summary>
-        public void Release(T unit)
+        public void Recycle(T unit)
         {
             unusedObjects.Enqueue(unit);
             OnRelease(unit);

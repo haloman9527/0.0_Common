@@ -6,15 +6,15 @@ namespace CZToolKit
     {
         int UnusedCount { get; }
 
-        object Acquire();
+        object Spawn();
 
-        void Release(object unit);
+        void Recycle(object unit);
     }
     
     public interface IObjectPool<T> : IObjectPool
     {
-        T Acquire();
+        T Spawn();
         
-        void Release(T unit);
+        void Recycle(T unit);
     }
 }

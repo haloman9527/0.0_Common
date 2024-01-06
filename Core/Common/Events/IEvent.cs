@@ -7,6 +7,6 @@ namespace CZToolKit
 
     public interface IEvent<A> : IEvent where A : struct
     {
-        void Invoke(A arg);
+        void Handle(A arg);
     }
 }
