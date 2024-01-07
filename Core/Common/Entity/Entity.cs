@@ -9,7 +9,7 @@ namespace CZToolKit.ET
 #if UNITY_EDITOR
         protected UnityEngine.GameObject viewGO;
 #endif
-
+        
         private int instanceId;
         protected Entity domain;
         protected Entity parent;
@@ -352,6 +352,11 @@ namespace CZToolKit.ET
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
+            if (component is IAwake)
+            {
+                Systems.Awake(component);
+            }
+
             if (this is IAddComponent)
             {
                 Systems.AddComponent(this, component);
@@ -371,12 +376,12 @@ namespace CZToolKit.ET
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
-            if (this is IAwake)
+            if (component is IAwake)
             {
                 Systems.Awake(component);
             }
 
-            if (this is IAddComponent)
+            if (component is IAddComponent)
             {
                 Systems.AddComponent(this, component);
             }

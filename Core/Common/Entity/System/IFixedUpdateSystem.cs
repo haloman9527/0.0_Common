@@ -20,7 +20,7 @@ namespace CZToolKit.ET
 
         public Type SystemType()
         {
-            return typeof(IUpdateSystem);
+            return typeof(IFixedUpdateSystem);
         }
 
         public void Execute(Entity o)
