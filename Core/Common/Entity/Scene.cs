@@ -17,7 +17,7 @@ namespace CZToolKit.ET
             {
                 name = value;
                 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && ENTITY_PREVIEW
                 viewGO.name = name;
 #endif
             }

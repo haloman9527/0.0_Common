@@ -6,7 +6,7 @@ namespace CZToolKit.ET
     [Serializable]
     public class Entity : IDisposable
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && ENTITY_PREVIEW
         protected UnityEngine.GameObject viewGO;
 #endif
         
@@ -37,7 +37,7 @@ namespace CZToolKit.ET
                     Root.Instance.Add(this);
                 }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && ENTITY_PREVIEW
                 if (instanceId != 0)
                 {
                     this.viewGO = new UnityEngine.GameObject(this.GetType().Name);
@@ -130,7 +130,7 @@ namespace CZToolKit.ET
                     Systems.ParentChanged(this, oldParent);
                 }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && ENTITY_PREVIEW
                 if (parent.viewGO.transform.Find("---------------") == null)
                 {
                     new UnityEngine.GameObject("---------------").transform.SetParent(parent.viewGO.transform, false);
@@ -178,7 +178,7 @@ namespace CZToolKit.ET
                 this.parent.AddToComponents(this);
                 this.domain = this.parent.domain;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && ENTITY_PREVIEW
                 if (parent.viewGO.transform.Find("---------------") == null)
                 {
                     new UnityEngine.GameObject("---------------").transform.SetParent(parent.viewGO.transform, false);
