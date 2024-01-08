@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
 
 namespace CZToolKit
 {
@@ -62,6 +63,62 @@ namespace CZToolKit
             }
 
             PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, string.Join(";", defs));
+        }
+
+        [MenuItem("Tools/CZToolKit/Path Print/DataPath")]
+        public static void PrintDataPath()
+        {
+            Debug.Log(Application.dataPath);
+        }
+
+        [MenuItem("Tools/CZToolKit/Path Print/StreamingAssetsPath")]
+        public static void PrintStreamingAssetsPath()
+        {
+            Debug.Log(Application.streamingAssetsPath);
+        }
+
+        [MenuItem("Tools/CZToolKit/Path Print/PersistentDataPath")]
+        public static void PrintPersistentDataPath()
+        {
+            Debug.Log(Application.persistentDataPath);
+        }
+
+        [MenuItem("Tools/CZToolKit/Path Print/TemporaryCachePath")]
+        public static void PrintTemporaryCachePath()
+        {
+            Debug.Log(Application.temporaryCachePath);
+        }
+
+        [MenuItem("Tools/CZToolKit/Path Print/ComsoleLogPath")]
+        public static void PrintComsoleLogPath()
+        {
+            Debug.Log(Application.consoleLogPath);
+        }
+
+        [MenuItem("Assets/Copy Paths", priority = 100)]
+        public static void CopySelectionPath()
+        {
+            var count = Selection.objects.Length;
+            var paths = new string[count];
+            for (int i = 0; i < count; i++)
+            {
+                paths[i] = AssetDatabase.GetAssetPath(Selection.objects[i]);
+            }
+
+            GUIUtility.systemCopyBuffer = string.Join('\n', paths);
+        }
+
+        [MenuItem("Assets/Print Paths", priority = 100)]
+        public static void PrintSelectionPath()
+        {
+            var count = Selection.objects.Length;
+            var paths = new string[count];
+            for (int i = 0; i < count; i++)
+            {
+                paths[i] = AssetDatabase.GetAssetPath(Selection.objects[i]);
+            }
+
+            Debug.Log(string.Join('\n', paths));
         }
     }
 }

@@ -7,7 +7,7 @@ namespace CZToolKit.ET.Editors
     {
         public const string ENTITY_PREVIEW_DEFINE = "ENTITY_PREVIEW";
 
-        [MenuItem("Tools/CZToolKit/ET/Entity Preview")]
+        [MenuItem("Tools/CZToolKit/ET/Enable Entity Preview")]
         public static void SwitchPreview()
         {
             var targetGroup = BuildTargetGroup.Standalone; // 选择目标平台
@@ -19,12 +19,12 @@ namespace CZToolKit.ET.Editors
             PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, defines.ToArray());
         }
 
-        [MenuItem("Tools/CZToolKit/ET/Entity Preview", validate = true)]
+        [MenuItem("Tools/CZToolKit/ET/Enable Entity Preview", validate = true)]
         public static bool EnablePreviewValid()
         {
             var targetGroup = BuildTargetGroup.Standalone; // 选择目标平台
             var defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup).Split(';').ToList();
-            Menu.SetChecked("Tools/CZToolKit/ET/Entity Preview", defines.Contains(ENTITY_PREVIEW_DEFINE));
+            Menu.SetChecked("Tools/CZToolKit/ET/Enable Entity Preview", defines.Contains(ENTITY_PREVIEW_DEFINE));
             return true;
         }
     }

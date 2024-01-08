@@ -1,6 +1,7 @@
 ﻿#if UNITY_5_3_OR_NEWER
 using System;
 using System.Reflection;
+using UnityEngine;
 
 namespace CZToolKit
 {
@@ -11,21 +12,35 @@ namespace CZToolKit
         public ULogger()
         {
             var defaultLoggerField = typeof(UnityEngine.Debug).GetField("s_DefaultLogger", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            var loggerField = typeof(UnityEngine.Debug).GetField("s_Logger", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             defaultLogger = defaultLoggerField.GetValue(null) as UnityEngine.ILogger;
-
-            this.logHandler = defaultLogger.logHandler;
-            this.logEnabled = true;
-            this.filterLogType = UnityEngine.LogType.Log;
-
+            var loggerField = typeof(UnityEngine.Debug).GetField("s_Logger", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             loggerField.SetValue(null, this);
+        }
+
+        public ULogger(LogType filterLogType) : this()
+        {
+            this.filterLogType = filterLogType;
         }
 
         #region Unity ILogger
 
-        public UnityEngine.ILogHandler logHandler { get; set; }
-        public bool logEnabled { get; set; }
-        public UnityEngine.LogType filterLogType { get; set; }
+        public UnityEngine.ILogHandler logHandler
+        {
+            get { return defaultLogger.logHandler; }
+            set { defaultLogger.logHandler = value; }
+        }
+
+        public bool logEnabled
+        {
+            get { return defaultLogger.logEnabled; }
+            set { defaultLogger.logEnabled = value; }
+        }
+
+        public UnityEngine.LogType filterLogType
+        {
+            get { return defaultLogger.filterLogType; }
+            set { defaultLogger.filterLogType = value; }
+        }
 
         public void LogFormat(UnityEngine.LogType logType, UnityEngine.Object context, string format, params object[] args)
         {

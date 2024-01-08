@@ -7,6 +7,9 @@ namespace CZToolKit.ET
     public class Root : Singleton<Root>, ISingletonAwake, ISingletonDestory, ISingletonFixedUpdate, ISingletonUpdate, ISingletonLateUpdate
     {
         private Queue<int> entitiesQueue;
+        private Queue<int> fixedUpdateEntitiesQueue;
+        private Queue<int> updateEntitiesQueue;
+        private Queue<int> lateUpdateEntitiesQueue;
         private Dictionary<int, Entity> entities;
         private Scene scene;
         private int lastInstanceId;
@@ -15,7 +18,7 @@ namespace CZToolKit.ET
         {
             get { return scene; }
         }
-        
+
         public Queue<int> EntitiesQueue
         {
             get { return entitiesQueue; }
@@ -24,6 +27,9 @@ namespace CZToolKit.ET
         public void Awake()
         {
             this.entitiesQueue = new Queue<int>(256);
+            this.fixedUpdateEntitiesQueue = new Queue<int>(256);
+            this.updateEntitiesQueue = new Queue<int>(256);
+            this.lateUpdateEntitiesQueue = new Queue<int>(256);
             this.entities = new Dictionary<int, Entity>(256);
             this.scene = new Scene("Root", null);
         }
@@ -42,6 +48,12 @@ namespace CZToolKit.ET
         {
             this.entities.Add(entity.InstanceId, entity);
             this.entitiesQueue.Enqueue(entity.InstanceId);
+            if (entity is IFixedUpdate)
+                fixedUpdateEntitiesQueue.Enqueue(entity.InstanceId);
+            if (entity is IUpdate)
+                updateEntitiesQueue.Enqueue(entity.InstanceId);
+            if (entity is ILateUpdate)
+                lateUpdateEntitiesQueue.Enqueue(entity.InstanceId);
         }
 
         public void Remove(int instanceId)
@@ -57,17 +69,17 @@ namespace CZToolKit.ET
 
         public void FixedUpdate()
         {
-            Systems.FixedUpdate(entitiesQueue);
+            Systems.FixedUpdate(fixedUpdateEntitiesQueue);
         }
 
         public void Update()
         {
-            Systems.Update(entitiesQueue);
+            Systems.Update(updateEntitiesQueue);
         }
 
         public void LateUpdate()
         {
-            Systems.LateUpdate(entitiesQueue);
+            Systems.LateUpdate(lateUpdateEntitiesQueue);
         }
     }
 }

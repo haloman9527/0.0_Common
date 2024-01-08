@@ -32,18 +32,23 @@ namespace CZToolKit.ET
             }
         }
 
+        public new Entity Domain
+        {
+            get { return base.Domain; }
+            set
+            {
+                throw new Exception("Scene cannot set domain");
+            }
+        }
+
         public Scene(string name, Entity parent)
         {
             this.InstanceId = Root.Instance.GenerateInstanceId();
             this.Name = name;
             if (parent == null)
-            {
                 base.Domain = this;
-            }
             else
-            {
                 base.Parent = parent;
-            }
         }
     }
 
