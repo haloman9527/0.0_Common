@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,11 +10,12 @@ namespace CZToolKit.ET
     public class EntityPreview : MonoBehaviour
     {
 #if ODIN_INSPECTOR
+        [FormerlySerializedAs("Component")]
         [Sirenix.OdinInspector.HideReferenceObjectPicker]
         [Sirenix.OdinInspector.HideLabel]
 #endif
         [SerializeReference]
-        public Entity Component;
+        public Entity component;
     }
 
 #if UNITY_EDITOR
@@ -36,7 +38,7 @@ namespace CZToolKit.ET
         {
             var preview = target as EntityPreview;
             EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.IntField("Instance Id", preview.Component.InstanceId);
+            EditorGUILayout.IntField("Instance Id", preview.component.InstanceId);
             EditorGUI.EndDisabledGroup();
             base.OnInspectorGUI();
         }

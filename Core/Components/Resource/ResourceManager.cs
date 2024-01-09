@@ -6,7 +6,7 @@ namespace CZToolKit
 {
     public class ResourceManager : Singleton<ResourceManager>, IResourceManager
     {
-        public T Load<T>(string path) where T : UnityObject
+        public T LoadSync<T>(string path) where T : UnityObject
         {
             return Resources.Load<T>(path);
         }

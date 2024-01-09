@@ -18,7 +18,7 @@ namespace CZToolKit
 
         public void Init(bool force = false)
         {
-            var textAsset = resourceManager.Load<TextAsset>("");
+            var textAsset = resourceManager.LoadSync<TextAsset>("");
         }
 
         public bool HasConfig(string key)
