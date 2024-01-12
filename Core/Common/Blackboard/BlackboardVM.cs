@@ -28,17 +28,37 @@ namespace CZToolKit.Blackboard
         Remove
     }
 
+    public struct BBEventArg
+    {
+        public object value;
+        public NotifyType notifyType;
+        
+        public BBEventArg(object value, NotifyType notifyType)
+        {
+            this.value = value;
+            this.notifyType = notifyType;
+        }
+    }
+
     public class BlackboardVM<TKey> : IBlackboard<TKey>
     {
         public Blackboard<TKey> blackboard;
-        private Dictionary<TKey, List<Action<object, NotifyType>>> observerMap = new Dictionary<TKey, List<Action<object, NotifyType>>>();
-        private List<KeyValuePair<TKey, Action<object, NotifyType>>> addObservers = new List<KeyValuePair<TKey, Action<object, NotifyType>>>();
-        private List<KeyValuePair<TKey, Action<object, NotifyType>>> removeObservers = new List<KeyValuePair<TKey, Action<object, NotifyType>>>();
+        public Events<TKey> events;
+        private List<KeyValuePair<TKey, Action<BBEventArg>>> addObservers;
+        private List<KeyValuePair<TKey, Action<BBEventArg>>> removeObservers;
         private bool isNotifying;
 
-        public BlackboardVM(Blackboard<TKey> blackboard)
+        public BlackboardVM(Blackboard<TKey> blackboard) : this(blackboard, new Events<TKey>())
+        {
+        }
+
+        public BlackboardVM(Blackboard<TKey> blackboard, Events<TKey> events)
         {
             this.blackboard = blackboard;
+            this.events = events;
+            this.events = new Events<TKey>();
+            this.addObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
+            this.removeObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
         }
 
         public bool Contains(TKey key)
@@ -88,14 +108,14 @@ namespace CZToolKit.Blackboard
         public void Clear()
         {
             blackboard.Clear();
-            observerMap.Clear();
+            events.Clear();
             addObservers.Clear();
             removeObservers.Clear();
         }
 
         private void NotifyObservers(TKey key, object value, NotifyType notifyType)
         {
-            if (!observerMap.TryGetValue(key, out var observers))
+            if (!events.HasEvent(key))
                 return;
 
             addObservers.Clear();
@@ -104,10 +124,7 @@ namespace CZToolKit.Blackboard
             isNotifying = true;
             try
             {
-                foreach (var observer in observers)
-                {
-                    observer?.Invoke(value, notifyType);
-                }
+                events.Invoke(key, new BBEventArg(value, notifyType));
             }
             finally
             {
@@ -128,41 +145,26 @@ namespace CZToolKit.Blackboard
             removeObservers.Clear();
         }
 
-        public void RegisterObserver(TKey key, Action<object, NotifyType> observer)
+        public void RegisterObserver(TKey key, Action<BBEventArg> observer)
         {
             if (isNotifying)
             {
-                addObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
+                addObservers.Add(new KeyValuePair<TKey, Action<BBEventArg>>(key, observer));
                 return;
             }
 
-            if (!observerMap.TryGetValue(key, out var observers))
-            {
-                return;
-            }
-
-            if (observers.Contains(observer))
-            {
-                return;
-            }
-
-            observers.Add(observer);
+            events.RegisterEvent(key, observer);
         }
 
-        public void UnregisterObserver(TKey key, Action<object, NotifyType> observer)
+        public void UnregisterObserver(TKey key, Action<BBEventArg> observer)
         {
             if (isNotifying)
             {
-                removeObservers.Add(new KeyValuePair<TKey, Action<object, NotifyType>>(key, observer));
+                removeObservers.Add(new KeyValuePair<TKey, Action<BBEventArg>>(key, observer));
                 return;
             }
 
-            if (!observerMap.TryGetValue(key, out var observers))
-            {
-                return;
-            }
-
-            observers.Remove(observer);
+            events.UnregisterEvent(key, observer);
         }
     }
 }

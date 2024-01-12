@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title: ""
@@ -14,7 +15,9 @@
  *  Blog: https://www.mindgear.net/
  *
  */
+
 #endregion
+
 using System;
 using System.Collections.Generic;
 using CZToolKit.Singletons;
@@ -29,7 +32,7 @@ namespace CZToolKit
         }
     }
 
-    public class ObjectPool : AutoSingleton<ObjectPool> , ISingletonAwake
+    public class ObjectPool : AutoSingleton<ObjectPool>, ISingletonAwake
     {
         private Dictionary<Type, IObjectPool> pools;
 
@@ -45,23 +48,34 @@ namespace CZToolKit
                 var poolType = typeof(ObjectPool<>).MakeGenericType(unitType);
                 pools[unitType] = pool = (IObjectPool)Activator.CreateInstance(poolType);
             }
+
             return pool;
         }
-        
-        public T Acquire<T>() where T : class, new()
+
+        public T Spawn<T>() where T : class, new()
         {
             return (T)GetPool(typeof(T)).Spawn();
         }
-        
-        public object Acquire(Type unitType)
+
+        public object Spawn(Type unitType)
         {
             return GetPool(unitType).Spawn();
         }
 
         public void Recycle(object reference)
         {
-            var unitType = reference.GetType(); 
+            var unitType = reference.GetType();
             GetPool(unitType).Recycle(reference);
+        }
+
+        public void ReleasePool(Type unitType)
+        {
+            var pool = GetPool(unitType);
+            if (pool == null)
+                return;
+
+            pool.Dispose();
+            pools.Remove(unitType);
         }
     }
 }

@@ -221,9 +221,24 @@ namespace CZToolKit.ET
             return (object)Parent as T;
         }
 
+        /// <summary>
+        /// 注意：传入的Entity会Dispose并重新分配InstanceId
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public Entity AddChild(Entity entity)
         {
+            if (!entity.IsDisposed)
+                entity.Dispose();
+
+            entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
+
+            if (entity is IAwake)
+            {
+                Systems.Awake(entity);
+            }
+
             return entity;
         }
 
@@ -331,7 +346,7 @@ namespace CZToolKit.ET
             this.Children.Add(entity.instanceId, entity);
         }
 
-        public void RemoveFromChildren(Entity entity)
+        private void RemoveFromChildren(Entity entity)
         {
             if (children == null)
             {
@@ -341,6 +356,12 @@ namespace CZToolKit.ET
             this.children.Remove(entity.instanceId);
         }
 
+        /// <summary>
+        /// 注意：传入的Entity会Dispose并重新分配InstanceId
+        /// </summary>
+        /// <param name="component"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public Entity AddComponent(Entity component)
         {
             var type = component.GetType();
@@ -348,6 +369,9 @@ namespace CZToolKit.ET
             {
                 throw new Exception($"entity already has component: {type.FullName}");
             }
+
+            if (!component.IsDisposed)
+                component.Dispose();
 
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
@@ -591,7 +615,7 @@ namespace CZToolKit.ET
             this.Components.Add(component.GetType(), component);
         }
 
-        public void RemoveFromComponents(Entity component)
+        private void RemoveFromComponents(Entity component)
         {
             if (components == null)
             {
