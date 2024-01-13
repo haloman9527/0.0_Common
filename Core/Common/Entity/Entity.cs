@@ -540,7 +540,7 @@ namespace CZToolKit.ET
         /// <param name="deriveMatch"> 是否匹配派生类 </param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetComponent<T>(bool deriveMatch = true)
+        public T GetComponent<T>(bool deriveMatch = false)
         {
             return (T)(GetComponent(typeof(T), deriveMatch) as object);
         }
@@ -551,7 +551,7 @@ namespace CZToolKit.ET
         /// <param name="type"></param>
         /// <param name="deriveMatch"> 是否匹配派生类 </param>
         /// <returns></returns>
-        public Entity GetComponent(Type type, bool deriveMatch = true)
+        public Entity GetComponent(Type type, bool deriveMatch = false)
         {
             if (components == null)
             {

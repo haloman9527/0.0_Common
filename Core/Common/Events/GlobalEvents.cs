@@ -71,7 +71,7 @@ namespace CZToolKit
             s_Initialized = true;
         }
 
-        public static void Invoke<A>(A arg) where A : struct
+        public static void Publish<A>(A arg) where A : struct
         {
             var evtType = typeof(A);
             if (!s_AllEvents.TryGetValue(evtType, out var evts))

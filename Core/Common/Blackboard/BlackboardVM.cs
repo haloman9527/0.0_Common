@@ -124,7 +124,7 @@ namespace CZToolKit.Blackboard
             isNotifying = true;
             try
             {
-                events.Invoke(key, new BBEventArg(value, notifyType));
+                events.Publish(key, new BBEventArg(value, notifyType));
             }
             finally
             {
@@ -153,7 +153,7 @@ namespace CZToolKit.Blackboard
                 return;
             }
 
-            events.RegisterEvent(key, observer);
+            events.Subscribe(key, observer);
         }
 
         public void UnregisterObserver(TKey key, Action<BBEventArg> observer)
@@ -164,7 +164,7 @@ namespace CZToolKit.Blackboard
                 return;
             }
 
-            events.UnregisterEvent(key, observer);
+            events.Unsubscribe(key, observer);
         }
     }
 }

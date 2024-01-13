@@ -36,7 +36,7 @@ namespace CZToolKit
 
         private Dictionary<TKey, IEvent> events = new Dictionary<TKey, IEvent>();
 
-        public void RegisterEvent<T>(TKey key, Action<T> handler) where T : struct
+        public void Subscribe<T>(TKey key, Action<T> handler) where T : struct
         {
             if (!events.TryGetValue(key, out var evts))
             {
@@ -46,7 +46,7 @@ namespace CZToolKit
             ((Event<T>)evts).handler += handler;
         }
 
-        public void UnregisterEvent<T>(TKey key, Action<T> handler) where T : struct
+        public void Unsubscribe<T>(TKey key, Action<T> handler) where T : struct
         {
             if (!events.TryGetValue(key, out var evts))
             {
@@ -56,7 +56,7 @@ namespace CZToolKit
             ((Event<T>)evts).handler -= handler;
         }
 
-        public void Invoke<T>(TKey key, T arg) where T : struct
+        public void Publish<T>(TKey key, T arg) where T : struct
         {
             if (!events.TryGetValue(key, out var evts))
             {
@@ -66,7 +66,7 @@ namespace CZToolKit
             ((Event<T>)evts).Handle(arg);
         }
 
-        public void RegisterEvent(TKey key, Action handler)
+        public void Subscribe(TKey key, Action handler)
         {
             if (!events.TryGetValue(key, out var evts))
             {
@@ -76,7 +76,7 @@ namespace CZToolKit
             ((Event)evts).handler += handler;
         }
 
-        public void UnregisterEvent(TKey key, Action handler)
+        public void Unsubscribe(TKey key, Action handler)
         {
             if (!events.TryGetValue(key, out var evts))
             {
@@ -86,7 +86,7 @@ namespace CZToolKit
             ((Event)evts).handler -= handler;
         }
 
-        public void Invoke(TKey key)
+        public void Publish(TKey key)
         {
             if (!events.TryGetValue(key, out var evts))
             {
@@ -98,7 +98,7 @@ namespace CZToolKit
 
         public bool HasEvent(TKey key)
         {
-            return events.ContainsKey(key);
+            return events.TryGetValue(key, out var evts) && !evts.IsNull;
         }
 
         public void Clear()
