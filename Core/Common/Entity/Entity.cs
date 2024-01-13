@@ -10,7 +10,7 @@ namespace CZToolKit.ET
         protected UnityEngine.GameObject viewGO;
 #endif
 
-        private int instanceId;
+        private int m_instanceId;
         protected Entity domain;
         protected Entity parent;
         protected Dictionary<int, Entity> children;
@@ -18,33 +18,33 @@ namespace CZToolKit.ET
 
         public int InstanceId
         {
-            get { return instanceId; }
+            get { return m_instanceId; }
             protected set
             {
-                if (this.instanceId == value)
+                if (this.m_instanceId == value)
                 {
                     return;
                 }
 
                 if (value == 0)
                 {
-                    Root.Instance.Remove(this.instanceId);
-                    instanceId = value;
+                    Root.Instance.Remove(this.m_instanceId);
+                    m_instanceId = value;
                 }
                 else
                 {
-                    instanceId = value;
+                    m_instanceId = value;
                     Root.Instance.Add(this);
                 }
 
 #if UNITY_EDITOR && ENTITY_PREVIEW
-                if (instanceId != 0)
+                if (m_instanceId != 0)
                 {
                     this.viewGO = new UnityEngine.GameObject(this.GetType().Name);
                     this.viewGO.AddComponent<EntityPreview>().component = this;
                     this.viewGO.transform.SetParent(this.Parent == null ? EntityPreviewRoot.Instance.transform : this.Parent.viewGO.transform);
                 }
-                else
+                else if(parent == null ||　!parent.IsDisposed)
                 {
                     UnityEngine.GameObject.Destroy(viewGO);
                 }
@@ -54,7 +54,7 @@ namespace CZToolKit.ET
 
         public bool IsDisposed
         {
-            get { return instanceId == 0; }
+            get { return m_instanceId == 0; }
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace CZToolKit.ET
 
         private void AddToChildren(Entity entity)
         {
-            this.Children.Add(entity.instanceId, entity);
+            this.Children.Add(entity.m_instanceId, entity);
         }
 
         private void RemoveFromChildren(Entity entity)
@@ -353,7 +353,7 @@ namespace CZToolKit.ET
                 return;
             }
 
-            this.children.Remove(entity.instanceId);
+            this.children.Remove(entity.m_instanceId);
         }
 
         /// <summary>
