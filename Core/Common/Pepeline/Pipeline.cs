@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CZToolKit
 {
@@ -32,8 +33,16 @@ namespace CZToolKit
         public interface ITask
         {
             string Desc { get; }
+        }
 
-            void Run(Pipeline pipeline);
+        public interface ISyncTask : ITask
+        {
+            void Execute(Pipeline pipeline);
+        }
+
+        public interface IAsyncTask : ITask
+        {
+            Task Execute(Pipeline pipeline);
         }
 
         public static void Run(List<ITask> tasks, Context context)
@@ -50,13 +59,19 @@ namespace CZToolKit
 
         public readonly Pipeline.Context context;
 
+        public Pipeline()
+        {
+            this.tasks = new List<ITask>();
+            this.context = new Context();
+        }
+
         public Pipeline(List<ITask> tasks, Context context)
         {
             this.tasks = tasks;
             this.context = context;
         }
 
-        public void Run()
+        public async void Run()
         {
             for (int i = 0; i < tasks.Count; i++)
             {
@@ -66,7 +81,14 @@ namespace CZToolKit
 
                 try
                 {
-                    task.Run(this);
+                    if (task is IAsyncTask asyncTask)
+                    {
+                        await asyncTask.Execute(this);
+                    }
+                    else if (task is ISyncTask syncTask)
+                    {
+                        syncTask.Execute(this);
+                    }
                 }
                 catch (Exception e)
                 {

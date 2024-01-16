@@ -10,11 +10,14 @@ namespace CZToolKit.ET
         protected UnityEngine.GameObject viewGO;
 #endif
 
-        private int m_instanceId;
-        protected Entity domain;
-        protected Entity parent;
-        protected Dictionary<int, Entity> children;
-        protected Dictionary<Type, Entity> components;
+        [NonSerialized] private int m_instanceId;
+        [NonSerialized] protected Entity domain;
+        [NonSerialized] protected Entity parent;
+        [NonSerialized] protected Dictionary<int, Entity> children;
+        [NonSerialized] protected Dictionary<Type, Entity> components;
+
+        private HashSet<Entity> childrenDB;
+        private HashSet<Entity> componentsDB;
 
         public int InstanceId
         {
@@ -44,7 +47,7 @@ namespace CZToolKit.ET
                     this.viewGO.AddComponent<EntityPreview>().component = this;
                     this.viewGO.transform.SetParent(this.Parent == null ? EntityPreviewRoot.Instance.transform : this.Parent.viewGO.transform);
                 }
-                else if(parent == null ||　!parent.IsDisposed)
+                else if (parent == null || !parent.IsDisposed)
                 {
                     UnityEngine.GameObject.Destroy(viewGO);
                 }
@@ -117,7 +120,13 @@ namespace CZToolKit.ET
 
                 if (this.parent != null)
                 {
-                    this.parent.RemoveFromChildren(this);
+                    this.parent.RemoveFromChildren(this, this.m_instanceId);
+                }
+
+                if (parent != null && parent.componentsDB != null && parent.componentsDB.Contains(this))
+                {
+                    ComponentParent = value;
+                    return;
                 }
 
                 var oldParent = this.parent;
@@ -171,7 +180,7 @@ namespace CZToolKit.ET
                         return;
                     }
 
-                    this.parent.RemoveFromChildren(this);
+                    this.parent.RemoveFromChildren(this, this.m_instanceId);
                 }
 
                 this.parent = value;
@@ -344,16 +353,30 @@ namespace CZToolKit.ET
         private void AddToChildren(Entity entity)
         {
             this.Children.Add(entity.m_instanceId, entity);
+
+            if (childrenDB == null)
+            {
+                childrenDB = new HashSet<Entity>();
+            }
+
+            childrenDB.Add(entity);
         }
 
-        private void RemoveFromChildren(Entity entity)
+        private void RemoveFromChildren(Entity entity, int instanceId)
         {
             if (children == null)
             {
                 return;
             }
 
-            this.children.Remove(entity.m_instanceId);
+            children.Remove(instanceId);
+
+            if (childrenDB == null)
+            {
+                return;
+            }
+
+            childrenDB.Remove(entity);
         }
 
         /// <summary>
@@ -613,6 +636,13 @@ namespace CZToolKit.ET
         private void AddToComponents(Entity component)
         {
             this.Components.Add(component.GetType(), component);
+
+            if (componentsDB == null)
+            {
+                componentsDB = new HashSet<Entity>();
+            }
+
+            componentsDB.Add(component);
         }
 
         private void RemoveFromComponents(Entity component)
@@ -623,6 +653,13 @@ namespace CZToolKit.ET
             }
 
             this.components.Remove(component.GetType());
+
+            if (componentsDB == null)
+            {
+                return;
+            }
+
+            componentsDB.Remove(component);
         }
 
         public virtual void Dispose()
@@ -632,6 +669,7 @@ namespace CZToolKit.ET
                 Systems.Destroy(this);
             }
 
+            var instanceId = this.m_instanceId;
             this.InstanceId = 0;
 
             if (this.children != null)
@@ -657,7 +695,7 @@ namespace CZToolKit.ET
             if (this.parent != null && !this.parent.IsDisposed)
             {
                 this.parent.RemoveFromComponents(this);
-                this.parent.RemoveFromChildren(this);
+                this.parent.RemoveFromChildren(this, instanceId);
             }
 
             this.parent = null;
