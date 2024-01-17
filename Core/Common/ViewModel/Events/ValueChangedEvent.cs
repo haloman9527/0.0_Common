@@ -15,7 +15,7 @@
 
 #endregion
 
-namespace CZToolKit.VM
+namespace CZToolKit
 {
     public delegate void ValueChangedEvent<T>(T oldValue, T newValue);
 }

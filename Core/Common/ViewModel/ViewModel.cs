@@ -20,7 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.VM
+namespace CZToolKit
 {
     public class ViewModel : IDictionary<string, IBindableProperty>, IReadOnlyDictionary<string, IBindableProperty>
     {

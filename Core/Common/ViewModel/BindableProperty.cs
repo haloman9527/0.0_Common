@@ -18,7 +18,7 @@
 
 using System;
 
-namespace CZToolKit.VM
+namespace CZToolKit
 {
     [Serializable]
     public class BindableProperty<T> : IBindableProperty<T>

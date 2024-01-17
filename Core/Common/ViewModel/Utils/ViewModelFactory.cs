@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CZToolKit.VM
+namespace CZToolKit
 {
     public static class ViewModelFactory
     {

@@ -40,7 +40,7 @@ namespace CZToolKit.Blackboard
         }
     }
 
-    public class BlackboardVM<TKey> : IBlackboard<TKey>
+    public class BlackboardProcessor<TKey> : IBlackboard<TKey>
     {
         public Blackboard<TKey> blackboard;
         public Events<TKey> events;
@@ -48,11 +48,11 @@ namespace CZToolKit.Blackboard
         private List<KeyValuePair<TKey, Action<BBEventArg>>> removeObservers;
         private bool isNotifying;
 
-        public BlackboardVM(Blackboard<TKey> blackboard) : this(blackboard, new Events<TKey>())
+        public BlackboardProcessor(Blackboard<TKey> blackboard) : this(blackboard, new Events<TKey>())
         {
         }
 
-        public BlackboardVM(Blackboard<TKey> blackboard, Events<TKey> events)
+        public BlackboardProcessor(Blackboard<TKey> blackboard, Events<TKey> events)
         {
             this.blackboard = blackboard;
             this.events = events;

@@ -1,4 +1,4 @@
-﻿namespace CZToolKit.VM
+﻿namespace CZToolKit
 {
     public static class BindablePropertyEX
     {

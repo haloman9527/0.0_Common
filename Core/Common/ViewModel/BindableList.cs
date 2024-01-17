@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CZToolKit.VM
+namespace CZToolKit
 {
     public class BindableList<T> : BindableProperty<List<T>>, IList<T>
     {
