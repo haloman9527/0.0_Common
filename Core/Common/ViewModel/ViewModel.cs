@@ -53,7 +53,7 @@ namespace CZToolKit
             get { return InternalBindableProperties[propertyName]; }
             set { InternalBindableProperties[propertyName] = value; }
         }
-        
+
         public IEnumerator<KeyValuePair<string, IBindableProperty>> GetEnumerator()
         {
             return InternalBindableProperties.GetEnumerator();
@@ -93,12 +93,12 @@ namespace CZToolKit
         {
             InternalBindableProperties.Clear();
         }
-        
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return InternalBindableProperties.GetEnumerator();
         }
-        
+
         void ICollection<KeyValuePair<string, IBindableProperty>>.Add(KeyValuePair<string, IBindableProperty> item)
         {
             (InternalBindableProperties as ICollection<KeyValuePair<string, IBindableProperty>>).Add(item);
@@ -137,6 +137,11 @@ namespace CZToolKit
         public void UnBindProperty<T>(string propertyName, ValueChangedEvent<T> onValueChangedCallback)
         {
             this[propertyName].AsBindableProperty<T>().UnregisterValueChangedEvent(onValueChangedCallback);
+        }
+
+        public void ClearValueChangedEvent(string propertyName)
+        {
+            this[propertyName].ClearValueChangedEvent();
         }
     }
 }
