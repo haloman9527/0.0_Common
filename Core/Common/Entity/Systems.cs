@@ -303,18 +303,5 @@ namespace CZToolKit.ET
                 ((IAddComponentSystem)systems[i]).Execute(entity, component);
             }
         }
-
-        public static void ParentChanged(Entity entity, Entity oldParent)
-        {
-            var type = entity.GetType();
-            var systems = GetSystems(type, typeof(IParentChangedSystem));
-            if (systems == null)
-                return;
-
-            for (int i = 0; i < systems.Count; i++)
-            {
-                ((IParentChangedSystem)systems[i]).Execute(entity, oldParent);
-            }
-        }
     }
 }

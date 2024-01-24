@@ -79,7 +79,7 @@ namespace CZToolKit.ET
                 }
 
                 this.domain = value;
-
+                
                 if (this.children != null)
                 {
                     foreach (Entity entity in this.children.Values)
@@ -100,7 +100,7 @@ namespace CZToolKit.ET
 
         public Entity Parent
         {
-            get { return parent; }
+            get { return parent; } 
             set
             {
                 if (value == null)
@@ -129,15 +129,9 @@ namespace CZToolKit.ET
                     return;
                 }
 
-                var oldParent = this.parent;
                 this.parent = value;
                 this.parent.AddToChildren(this);
                 this.Domain = parent.Domain;
-
-                if (oldParent != null)
-                {
-                    Systems.ParentChanged(this, oldParent);
-                }
 
 #if UNITY_EDITOR && ENTITY_PREVIEW
                 if (parent.viewGO.transform.Find("---------------") == null)
@@ -230,15 +224,12 @@ namespace CZToolKit.ET
             return (object)Parent as T;
         }
 
-        /// <summary>
-        /// 注意：传入的Entity会Dispose并重新分配InstanceId
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
         public Entity AddChild(Entity entity)
         {
             if (!entity.IsDisposed)
-                entity.Dispose();
+            {
+                throw new Exception($"entity has not disposed!");
+            }
 
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
@@ -379,22 +370,18 @@ namespace CZToolKit.ET
             childrenDB.Remove(entity);
         }
 
-        /// <summary>
-        /// 注意：传入的Entity会Dispose并重新分配InstanceId
-        /// </summary>
-        /// <param name="component"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public Entity AddComponent(Entity component)
+        public void AddComponent(Entity component)
         {
+            if (!component.IsDisposed)
+            {
+                throw new Exception($"component has not disposed!");
+            }
+
             var type = component.GetType();
             if (this.components != null && this.components.ContainsKey(type))
             {
                 throw new Exception($"entity already has component: {type.FullName}");
             }
-
-            if (!component.IsDisposed)
-                component.Dispose();
 
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
@@ -408,8 +395,6 @@ namespace CZToolKit.ET
             {
                 Systems.AddComponent(this, component);
             }
-
-            return component;
         }
 
         public Entity AddComponent(Type type)

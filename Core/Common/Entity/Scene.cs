@@ -9,13 +9,21 @@ namespace CZToolKit.ET
         public new Entity Parent
         {
             get { return base.Parent; }
-            set { throw new Exception("Scene cannot set parent"); }
+            private set { throw new Exception("Scene cannot set parent"); }
         }
 
         public new Entity Domain
         {
             get { return base.Domain; }
-            set { throw new Exception("Scene cannot set domain"); }
+            private set
+            {
+                if (value == null)
+                {
+                    throw new Exception($"domain cant set null: {this.GetType().Name}");
+                }
+
+                this.domain = value;
+            }
         }
 
         public Scene(string name, Entity parent)
@@ -23,7 +31,7 @@ namespace CZToolKit.ET
             this.InstanceId = Root.Instance.GenerateInstanceId();
             this.Name = name;
             if (parent == null)
-                base.Domain = this;
+                this.Domain = this;
             else
                 base.Parent = parent;
 
