@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using CZToolKit;
-using CZToolKit.Singletons;
 using UnityEngine;
 
 namespace CZToolKit

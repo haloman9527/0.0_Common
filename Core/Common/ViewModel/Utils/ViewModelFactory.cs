@@ -56,11 +56,8 @@ namespace CZToolKit
         public static Type GetViewModelType(Type modelType)
         {
             var viewModelType = (Type)null;
-            while (viewModelType == null)
+            while (modelType != null && !s_ViewModelTypeCache.TryGetValue(modelType, out viewModelType))
             {
-                s_ViewModelTypeCache.TryGetValue(modelType, out viewModelType);
-                if (modelType.BaseType == null)
-                    break;
                 modelType = modelType.BaseType;
             }
 
@@ -69,7 +66,12 @@ namespace CZToolKit
 
         public static object CreateViewModel(object model)
         {
-            return Activator.CreateInstance(GetViewModelType(model.GetType()), model);
+            var modelType = model.GetType();
+            var viewModelType = GetViewModelType(modelType);
+            if (viewModelType == null)
+                return null;
+
+            return Activator.CreateInstance(viewModelType, model);
         }
     }
 }

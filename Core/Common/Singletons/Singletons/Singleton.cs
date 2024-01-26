@@ -18,25 +18,30 @@
 
 using System;
 
-namespace CZToolKit.Singletons
+namespace CZToolKit
 {
+    [Serializable]
     public abstract class Singleton<T> : ISingleton where T : Singleton<T>, new()
     {
         #region Static
+
         private static T instance;
 
         public static T Instance
         {
             get { return instance; }
         }
-        
+
         public static bool IsInitialized()
         {
             return instance != null;
         }
+
         #endregion
-        
+
         private bool isDisposed;
+
+        public bool IsDisposed => this.isDisposed;
 
         public void Register()
         {
@@ -55,11 +60,6 @@ namespace CZToolKit.Singletons
             if (instance is ISingletonDestory iSingletonDestory)
                 iSingletonDestory.Destroy();
             instance = null;
-        }
-
-        public bool IsDisposed()
-        {
-            return this.isDisposed;
         }
     }
 }

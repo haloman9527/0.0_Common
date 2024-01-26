@@ -20,7 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using CZToolKit.Singletons;
 
 namespace CZToolKit
 {

@@ -18,7 +18,7 @@
 
 using System;
 
-namespace CZToolKit.Singletons
+namespace CZToolKit
 {
     public abstract class AutoSingleton<T> : ISingleton where T : AutoSingleton<T>, new()
     {
@@ -55,6 +55,8 @@ namespace CZToolKit.Singletons
 
         #endregion
 
+        public bool IsDisposed => this.isDisposed;
+
         public void Register()
         {
             if (instance != null)
@@ -73,11 +75,6 @@ namespace CZToolKit.Singletons
                 iSingletonDestory.Destroy();
             if (this == instance)
                 instance = null;
-        }
-
-        public bool IsDisposed()
-        {
-            return this.isDisposed;
         }
     }
 }

@@ -14,7 +14,7 @@
  */
 #endregion
 
-using CZToolKit.Singletons;
+using CZToolKit;
 
 namespace CZToolKit.RX
 {

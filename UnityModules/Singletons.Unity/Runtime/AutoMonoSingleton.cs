@@ -19,7 +19,7 @@
 using System;
 using UnityEngine;
 
-namespace CZToolKit.Singletons
+namespace CZToolKit
 {
     public class AutoMonoSingleton<T> : MonoBehaviour, ISingleton where T : AutoMonoSingleton<T>
     {
@@ -43,7 +43,7 @@ namespace CZToolKit.Singletons
                 return instance;
             }
         }
-        
+
         public static bool IsInitialized()
         {
             return instance != null;
@@ -58,9 +58,12 @@ namespace CZToolKit.Singletons
                 instance = new GameObject(typeof(T).Name).AddComponent<T>();
             Game.AddSingleton(instance);
         }
+
         #endregion
 
         private bool isDisposed;
+
+        public bool IsDisposed => this.isDisposed;
 
         public void Register()
         {
@@ -78,11 +81,6 @@ namespace CZToolKit.Singletons
                 iSingletonDestory.Destroy();
             Destroy(gameObject);
             instance = null;
-        }
-
-        public bool IsDisposed()
-        {
-            return this.isDisposed;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using CZToolKit.Singletons;
+﻿using CZToolKit;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 

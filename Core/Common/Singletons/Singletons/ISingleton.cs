@@ -18,13 +18,13 @@
 
 using System;
 
-namespace CZToolKit.Singletons
+namespace CZToolKit
 {
     public interface ISingleton : IDisposable
     {
-        void Register();
+        bool IsDisposed { get; }
         
-        bool IsDisposed();
+        void Register();
     }
 
     public interface ISingletonAwake
