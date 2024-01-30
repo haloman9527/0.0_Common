@@ -55,10 +55,20 @@ namespace CZToolKit
 
         public static Type GetViewModelType(Type modelType)
         {
-            var viewModelType = (Type)null;
-            while (modelType != null && !s_ViewModelTypeCache.TryGetValue(modelType, out viewModelType))
+            if (modelType == null)
             {
-                modelType = modelType.BaseType;
+                return null;
+            }
+
+            if (!s_ViewModelTypeCache.TryGetValue(modelType, out var viewModelType))
+            {
+                var sourceModelType = modelType;
+                do
+                {
+                    modelType = modelType.BaseType;
+                } while (modelType != null && !s_ViewModelTypeCache.TryGetValue(modelType, out viewModelType));
+
+                s_ViewModelTypeCache.Add(sourceModelType, viewModelType);
             }
 
             return viewModelType;

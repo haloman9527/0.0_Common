@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CZToolKit.ET
+namespace CZToolKit
 {
     public class Root : Singleton<Root>, ISingletonAwake, ISingletonDestory, ISingletonFixedUpdate, ISingletonUpdate, ISingletonLateUpdate
     {

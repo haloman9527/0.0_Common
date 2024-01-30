@@ -10,6 +10,13 @@ namespace CZToolKit
         private StringBuilder tempBuilder = new StringBuilder();
         public int indentLevel = 0;
 
+        public void Clear()
+        {
+            codeBuilder.Clear();
+            tempBuilder.Clear();
+            indentLevel = 0;
+        }
+
         public void WriteLine()
         {
             codeBuilder.AppendLine();

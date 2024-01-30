@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CZToolKit.ET
+namespace CZToolKit
 {
     public interface IAwake
     {

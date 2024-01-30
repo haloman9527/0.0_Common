@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEditor;
 
-namespace CZToolKit.ET.Editors
+namespace CZToolKit.Editors
 {
     public class Menus
     {

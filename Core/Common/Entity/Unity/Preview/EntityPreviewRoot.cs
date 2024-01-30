@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CZToolKit.ET
+namespace CZToolKit
 {
     public class EntityPreviewRoot : MonoBehaviour
     {

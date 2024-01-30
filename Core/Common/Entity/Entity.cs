@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.ET
+namespace CZToolKit
 {
     [Serializable]
     public class Entity : IDisposable
@@ -79,7 +79,7 @@ namespace CZToolKit.ET
                 }
 
                 this.domain = value;
-                
+
                 if (this.children != null)
                 {
                     foreach (Entity entity in this.children.Values)
@@ -100,7 +100,7 @@ namespace CZToolKit.ET
 
         public Entity Parent
         {
-            get { return parent; } 
+            get { return parent; }
             set
             {
                 if (value == null)
@@ -334,11 +334,38 @@ namespace CZToolKit.ET
                 return;
             }
 
-            var entity = this.GetChild(instanceId);
-            if (entity != null)
+            var child = this.GetChild(instanceId);
+            if (child == null)
             {
-                entity.Dispose();
+                return;
             }
+
+            child.Dispose();
+        }
+
+        public void RemoveChild(Entity child)
+        {
+            if (this.IsDisposed)
+            {
+                return;
+            }
+
+            if (child == null)
+            {
+                return;
+            }
+
+            if (child.IsDisposed)
+            {
+                return;
+            }
+
+            if (child.parent != this)
+            {
+                return;
+            }
+
+            child.Dispose();
         }
 
         private void AddToChildren(Entity entity)
@@ -588,13 +615,13 @@ namespace CZToolKit.ET
                 return;
             }
 
-            Entity c = this.GetComponent(type);
-            if (c == null)
+            var component = this.GetComponent(type);
+            if (component == null)
             {
                 return;
             }
 
-            c.Dispose();
+            component.Dispose();
         }
 
         public void RemoveComponent<T>() where T : Entity
@@ -604,18 +631,27 @@ namespace CZToolKit.ET
 
         public void RemoveComponent(Entity component)
         {
+            if (component == null)
+            {
+                return;
+            }
+
             if (this.IsDisposed)
             {
                 return;
             }
 
-            Entity c = this.GetComponent(component.GetType());
-            if (c == null)
+            if (component.IsDisposed)
             {
                 return;
             }
 
-            c.Dispose();
+            if (component.parent != this)
+            {
+                return;
+            }
+
+            component.Dispose();
         }
 
         private void AddToComponents(Entity component)

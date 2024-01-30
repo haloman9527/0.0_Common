@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 using UnityEditor;
 #endif
 
-namespace CZToolKit.ET
+namespace CZToolKit
 {
     public class EntityPreview : MonoBehaviour
     {

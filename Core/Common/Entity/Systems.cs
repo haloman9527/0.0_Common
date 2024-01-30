@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.ET
+namespace CZToolKit
 {
     public static class Systems
     {
