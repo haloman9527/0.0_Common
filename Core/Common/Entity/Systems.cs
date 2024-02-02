@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CZToolKit
 {
@@ -7,6 +8,7 @@ namespace CZToolKit
     {
         private class OneTypeSystems
         {
+            public Dictionary<Type, List<ISystem>> originSystems = new Dictionary<Type, List<ISystem>>();
             public Dictionary<Type, List<ISystem>> systems = new Dictionary<Type, List<ISystem>>();
         }
 
@@ -34,7 +36,18 @@ namespace CZToolKit
                 s_Systems.Clear();
             }
 
-            foreach (var systemType in Util_TypeCache.GetTypesDerivedFrom<ISystem>())
+            if (s_Systems == null)
+            {
+                s_Systems = new Dictionary<Type, OneTypeSystems>();
+            }
+            else
+            {
+                s_Systems.Clear();
+            }
+
+            var systemTypes = Util_TypeCache.GetTypesDerivedFrom<ISystem>();
+
+            foreach (var systemType in systemTypes)
             {
                 if (!systemType.IsClass)
                 {
@@ -57,9 +70,9 @@ namespace CZToolKit
                     s_Systems[system.Type()] = systems = new OneTypeSystems();
                 }
 
-                if (!systems.systems.TryGetValue(systemType, out var lst))
+                if (!systems.originSystems.TryGetValue(systemType, out var lst))
                 {
-                    systems.systems[system.SystemType()] = lst = new List<ISystem>();
+                    systems.originSystems[system.SystemType()] = lst = new List<ISystem>();
                 }
 
                 lst.Add(system);
@@ -67,15 +80,16 @@ namespace CZToolKit
 
             foreach (var pair in s_Systems)
             {
-                var type = pair.Key.BaseType;
+                var type = pair.Key;
                 while (type != null)
                 {
                     if (!s_Systems.TryGetValue(type, out var systems))
                     {
-                        break;
+                        type = type.BaseType;
+                        continue;
                     }
 
-                    foreach (var pair1 in systems.systems)
+                    foreach (var pair1 in systems.originSystems)
                     {
                         if (!pair.Value.systems.TryGetValue(pair1.Key, out var lst))
                         {

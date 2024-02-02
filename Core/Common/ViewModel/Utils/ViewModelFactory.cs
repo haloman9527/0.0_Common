@@ -46,6 +46,9 @@ namespace CZToolKit
             {
                 if (type.IsAbstract)
                     continue;
+                if (type.IsGenericType)
+                    continue;
+                
                 var attribute = type.GetCustomAttribute<ViewModelAttribute>(true);
                 s_ViewModelTypeCache[attribute.targetType] = type;
             }

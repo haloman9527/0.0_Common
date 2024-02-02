@@ -22,7 +22,7 @@ namespace CZToolKit
             }
         }
 
-        private class Event<T> : IEvent where T : struct
+        private class Event<T> : IEvent
         {
             public event Action<T> handler;
 
@@ -36,7 +36,7 @@ namespace CZToolKit
 
         private Dictionary<TKey, IEvent> events = new Dictionary<TKey, IEvent>();
 
-        public void Subscribe<T>(TKey key, Action<T> handler) where T : struct
+        public void Subscribe<T>(TKey key, Action<T> handler)
         {
             if (!events.TryGetValue(key, out var evts))
             {
@@ -46,7 +46,7 @@ namespace CZToolKit
             ((Event<T>)evts).handler += handler;
         }
 
-        public void Unsubscribe<T>(TKey key, Action<T> handler) where T : struct
+        public void Unsubscribe<T>(TKey key, Action<T> handler)
         {
             if (!events.TryGetValue(key, out var evts))
             {
@@ -56,7 +56,7 @@ namespace CZToolKit
             ((Event<T>)evts).handler -= handler;
         }
 
-        public void Publish<T>(TKey key, T arg) where T : struct
+        public void Publish<T>(TKey key, T arg)
         {
             if (!events.TryGetValue(key, out var evts))
             {

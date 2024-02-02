@@ -31,22 +31,22 @@ namespace CZToolKit
             var declaredOnly = (bindingFlags & BindingFlags.DeclaredOnly) != 0;
             bindingFlags &= ~BindingFlags.DeclaredOnly;
             
-            foreach (var m in _GetMemberInfos(type))
+            foreach (var m in InnerGetMemberInfos(type))
             {
                 yield return m;
             }
 
-            IEnumerable<MemberInfo> _GetMemberInfos(Type _type)
+            IEnumerable<MemberInfo> InnerGetMemberInfos(Type t)
             {
-                if (!declaredOnly && _type.BaseType != null)
+                if (!declaredOnly && t.BaseType != null)
                 {
-                    foreach (var m in _GetMemberInfos(_type.BaseType))
+                    foreach (var m in InnerGetMemberInfos(t.BaseType))
                     {
                         yield return m;
                     }
                 }
 
-                foreach (var m in _type.GetMembers(bindingFlags))
+                foreach (var m in t.GetMembers(bindingFlags))
                 {
                     yield return m;
                 }
@@ -58,22 +58,22 @@ namespace CZToolKit
             var declaredOnly = (bindingFlags & BindingFlags.DeclaredOnly) != 0;
             bindingFlags &= ~BindingFlags.DeclaredOnly;
             
-            foreach (var f in _GetFields(type))
+            foreach (var f in InnerGetFields(type))
             {
                 yield return f;
             }
             
-            IEnumerable<FieldInfo> _GetFields(Type _type)
+            IEnumerable<FieldInfo> InnerGetFields(Type t)
             {
-                if (!declaredOnly && _type.BaseType != null)
+                if (!declaredOnly && t.BaseType != null)
                 {
-                    foreach (var f in _GetFields(_type.BaseType))
+                    foreach (var f in InnerGetFields(t.BaseType))
                     {
                         yield return f;
                     }
                 }
 
-                foreach (var f in _type.GetFields(bindingFlags))
+                foreach (var f in t.GetFields(bindingFlags))
                 {
                     yield return f;
                 }
@@ -85,22 +85,22 @@ namespace CZToolKit
             var declaredOnly = (bindingFlags & BindingFlags.DeclaredOnly) != 0;
             bindingFlags &= ~BindingFlags.DeclaredOnly;
             
-            foreach (var p in _GetProperties(type))
+            foreach (var p in InnerGetProperties(type))
             {
                 yield return p;
             }
             
-            IEnumerable<PropertyInfo> _GetProperties(Type _type)
+            IEnumerable<PropertyInfo> InnerGetProperties(Type t)
             {
-                if (!declaredOnly && _type.BaseType != null)
+                if (!declaredOnly && t.BaseType != null)
                 {
-                    foreach (var p in _GetProperties(_type.BaseType))
+                    foreach (var p in InnerGetProperties(t.BaseType))
                     {
                         yield return p;
                     }
                 }
 
-                foreach (var p in _type.GetProperties(bindingFlags))
+                foreach (var p in t.GetProperties(bindingFlags))
                 {
                     yield return p;
                 }
@@ -112,22 +112,22 @@ namespace CZToolKit
             var declaredOnly = (bindingFlags & BindingFlags.DeclaredOnly) != 0;
             bindingFlags &= ~BindingFlags.DeclaredOnly;
             
-            foreach (var m in _GetGetMethods(type))
+            foreach (var m in InnerGetGetMethods(type))
             {
                 yield return m;
             }
             
-            IEnumerable<MethodInfo> _GetGetMethods(Type _type)
+            IEnumerable<MethodInfo> InnerGetGetMethods(Type t)
             {
-                if (!declaredOnly && _type.BaseType != null)
+                if (!declaredOnly && t.BaseType != null)
                 {
-                    foreach (var m in _GetGetMethods(_type.BaseType))
+                    foreach (var m in InnerGetGetMethods(t.BaseType))
                     {
                         yield return m;
                     }
                 }
 
-                foreach (var m in _type.GetMethods(bindingFlags))
+                foreach (var m in t.GetMethods(bindingFlags))
                 {
                     yield return m;
                 }

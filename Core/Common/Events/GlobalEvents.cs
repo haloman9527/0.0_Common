@@ -15,10 +15,36 @@ namespace CZToolKit
         public abstract void Handle(A arg);
     }
 
-    public static class GlobalEvents
+    public interface IEvtTask<K>
+    {
+        public K EvtName { get; }
+        public Type ArgType { get; }
+        public object Arg { get; }
+    }
+
+    public class EvtTask<K> : IEvtTask<K>
+    {
+        public K evtName;
+
+        public K EvtName => evtName;
+        public Type ArgType => null;
+        public object Arg => null;
+    }
+
+    public class EvtTask<K, A> : IEvtTask<K>
+    {
+        public K evtName;
+        public A arg;
+
+        public K EvtName => evtName;
+        public Type ArgType => typeof(A);
+        public object Arg => arg;
+    }
+
+    public partial class GlobalEvents
     {
         private static bool s_Initialized;
-        private static Dictionary<Type, List<IGlobalEvent>> s_AllEvents;
+        private static Dictionary<Type, List<IGlobalEvent>> s_AllGlobalEvents;
 
         static GlobalEvents()
         {
@@ -32,13 +58,13 @@ namespace CZToolKit
                 return;
             }
 
-            if (s_AllEvents == null)
+            if (s_AllGlobalEvents == null)
             {
-                s_AllEvents = new Dictionary<Type, List<IGlobalEvent>>(128);
+                s_AllGlobalEvents = new Dictionary<Type, List<IGlobalEvent>>(128);
             }
             else
             {
-                s_AllEvents.Clear();
+                s_AllGlobalEvents.Clear();
             }
 
             foreach (var type in Util_TypeCache.GetTypesDerivedFrom<IGlobalEvent>())
@@ -60,9 +86,9 @@ namespace CZToolKit
                 }
 
                 var evtType = evt.EventType;
-                if (!s_AllEvents.TryGetValue(evtType, out var evts))
+                if (!s_AllGlobalEvents.TryGetValue(evtType, out var evts))
                 {
-                    s_AllEvents[evtType] = evts = new List<IGlobalEvent>();
+                    s_AllGlobalEvents[evtType] = evts = new List<IGlobalEvent>();
                 }
 
                 evts.Add(evt);
@@ -74,7 +100,7 @@ namespace CZToolKit
         public static void Publish<A>(A arg) where A : struct
         {
             var evtType = typeof(A);
-            if (!s_AllEvents.TryGetValue(evtType, out var evts))
+            if (!s_AllGlobalEvents.TryGetValue(evtType, out var evts))
             {
                 return;
             }
@@ -83,6 +109,98 @@ namespace CZToolKit
             {
                 (evt as GlobalEvent<A>).Handle(arg);
             }
+        }
+    }
+
+    public partial class GlobalEvents : ISingleton, ISingletonFixedUpdate
+    {
+        private static GlobalEvents s_Instance;
+
+        public static GlobalEvents Instance
+        {
+            get { return s_Instance; }
+        }
+
+        private Events<string> events;
+        private Queue<IEvtTask<string>> eventTasks;
+
+        public bool IsDisposed { get; private set; }
+
+        public void Register()
+        {
+            if (s_Instance != null)
+                throw new Exception($"singleton register twice! {typeof(Events<string>).Name}");
+
+            s_Instance = this;
+            events = new Events<string>();
+            eventTasks = new Queue<IEvtTask<string>>();
+        }
+
+        public void Dispose()
+        {
+            if (this.IsDisposed)
+                return;
+
+            this.IsDisposed = true;
+            s_Instance = null;
+            eventTasks.Clear();
+            eventTasks = null;
+        }
+
+        public void FixedUpdate()
+        {
+            while (eventTasks.Count > 0)
+            {
+                var task = eventTasks.Dequeue();
+                if (task.ArgType == null)
+                {
+                    events.Publish(task.EvtName);
+                }
+                else
+                {
+                    events.Publish(task.EvtName, task.Arg);
+                }
+            }
+        }
+        
+        public void Subscribe<T>(string key, Action<T> handler)
+        {
+            events.Subscribe(key, handler);
+        }
+
+        public void Unsubscribe<T>(string key, Action<T> handler)
+        {
+            events.Unsubscribe(key, handler);
+        }
+
+        public void Publish<T>(string key, T arg)
+        {
+            events.Publish(key, arg);
+        }
+
+        public void Subscribe(string key, Action handler)
+        {
+            events.Subscribe(key, handler);
+        }
+
+        public void Unsubscribe(string key, Action handler)
+        {
+            events.Unsubscribe(key, handler);
+        }
+
+        public void Publish(string key)
+        {
+            events.Publish(key);
+        }
+
+        public bool HasEvent(string key)
+        {
+            return events.HasEvent(key);
+        }
+
+        public void Clear()
+        {
+            events.Clear();
         }
     }
 }
