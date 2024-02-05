@@ -131,7 +131,11 @@ namespace CZToolKit
 
                 this.parent = value;
                 this.parent.AddToChildren(this);
-                this.Domain = parent.Domain;
+                
+                if (this.parent is Scene)
+                    this.domain = this.parent;
+                else
+                    this.domain = this.parent.domain;
 
 #if UNITY_EDITOR && ENTITY_PREVIEW
                 if (parent.viewGO.transform.Find("---------------") == null)
@@ -179,7 +183,11 @@ namespace CZToolKit
 
                 this.parent = value;
                 this.parent.AddToComponents(this);
-                this.domain = this.parent.domain;
+                
+                if (this.parent is Scene)
+                    this.domain = this.parent;
+                else
+                    this.domain = this.parent.domain;
 
 #if UNITY_EDITOR && ENTITY_PREVIEW
                 if (parent.viewGO.transform.Find("---------------") == null)
@@ -685,6 +693,11 @@ namespace CZToolKit
 
         public virtual void Dispose()
         {
+            if (this.IsDisposed)
+            {
+                return;
+            }
+            
             if (this is IDestroy)
             {
                 Systems.Destroy(this);

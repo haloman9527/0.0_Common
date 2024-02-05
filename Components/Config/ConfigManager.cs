@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using CZToolKit;
 using UnityEngine;
 
 namespace CZToolKit
 {
-    public class ConfigManager : Singleton<ConfigManager>, IConfigManager
+    public class ConfigManager : Singleton<ConfigManager>, ISingletonAwake, IConfigManager
     {
         private IResourceManager resourceManager;
-        private Dictionary<string, ConfigValue> configValues = new Dictionary<string, ConfigValue>();
+        private DataNode dataNode;
+
+        public void Awake()
+        {
+            dataNode = new DataNode();
+        }
 
         public void SetResourceManager(IResourceManager resourceManager)
         {
@@ -22,38 +26,38 @@ namespace CZToolKit
 
         public bool HasConfig(string key)
         {
-            return configValues.ContainsKey(key);
+            return dataNode.data.ContainsKey(key);
         }
 
         public bool HasBool(string key)
         {
-            return configValues.TryGetValue(key, out var configValue) && (configValue.type & ConfigValueType.Bool) != 0;
+            return dataNode.data.TryGetValue(key, out var configValue) && (configValue.type & DataValueType.Bool) != 0;
         }
 
         public bool HasInt(string key)
         {
-            return configValues.TryGetValue(key, out var configValue) && (configValue.type & ConfigValueType.Int) != 0;
+            return dataNode.data.TryGetValue(key, out var configValue) && (configValue.type & DataValueType.Int) != 0;
         }
 
         public bool HasFloat(string key)
         {
-            return configValues.TryGetValue(key, out var configValue) && (configValue.type & ConfigValueType.Float) != 0;
+            return dataNode.data.TryGetValue(key, out var configValue) && (configValue.type & DataValueType.Float) != 0;
         }
 
         public bool HasString(string key)
         {
-            return configValues.TryGetValue(key, out var configValue) && (configValue.type & ConfigValueType.String) != 0;
+            return dataNode.data.TryGetValue(key, out var configValue) && (configValue.type & DataValueType.String) != 0;
         }
 
         public bool GetBool(string key)
         {
-            configValues.TryGetValue(key, out var configValue);
+            dataNode.data.TryGetValue(key, out var configValue);
             return configValue.boolValue;
         }
 
         public bool GetBool(string key, bool defaultValue)
         {
-            if (!configValues.TryGetValue(key, out var configValue))
+            if (!dataNode.data.TryGetValue(key, out var configValue))
                 return defaultValue;
 
             return configValue.boolValue;
@@ -61,13 +65,13 @@ namespace CZToolKit
 
         public int GetInt(string key)
         {
-            configValues.TryGetValue(key, out var configValue);
+            dataNode.data.TryGetValue(key, out var configValue);
             return configValue.intValue;
         }
 
         public int GetInt(string key, int defaultValue)
         {
-            if (!configValues.TryGetValue(key, out var configValue))
+            if (!dataNode.data.TryGetValue(key, out var configValue))
                 return defaultValue;
 
             return configValue.intValue;
@@ -75,13 +79,13 @@ namespace CZToolKit
 
         public float GetFloat(string key)
         {
-            configValues.TryGetValue(key, out var configValue);
+            dataNode.data.TryGetValue(key, out var configValue);
             return configValue.floatValue;
         }
 
         public float GetFloat(string key, float defaultValue)
         {
-            if (!configValues.TryGetValue(key, out var configValue))
+            if (!dataNode.data.TryGetValue(key, out var configValue))
                 return defaultValue;
 
             return configValue.floatValue;
@@ -89,13 +93,13 @@ namespace CZToolKit
 
         public string GetString(string key)
         {
-            configValues.TryGetValue(key, out var configValue);
+            dataNode.data.TryGetValue(key, out var configValue);
             return configValue.stringValue;
         }
 
         public string GetString(string key, string defaultValue)
         {
-            if (!configValues.TryGetValue(key, out var configValue))
+            if (!dataNode.data.TryGetValue(key, out var configValue))
                 return defaultValue;
 
             return configValue.stringValue;
@@ -103,116 +107,122 @@ namespace CZToolKit
 
         public void SetBool(string key, bool value)
         {
-            configValues.TryGetValue(key, out var configValue);
+            dataNode.data.TryGetValue(key, out var configValue);
             configValue.boolValue = value;
-            configValue.type |= ConfigValueType.Bool;
-            configValues[key] = configValue;
+            configValue.type |= DataValueType.Bool;
+            dataNode.data[key] = configValue;
         }
 
         public void SetInt(string key, int value)
         {
-            configValues.TryGetValue(key, out var configValue);
+            dataNode.data.TryGetValue(key, out var configValue);
             configValue.intValue = value;
-            configValue.type |= ConfigValueType.Int;
-            configValues[key] = configValue;
+            configValue.type |= DataValueType.Int;
+            dataNode.data[key] = configValue;
         }
 
         public void SetFloat(string key, float value)
         {
-            configValues.TryGetValue(key, out var configValue);
+            dataNode.data.TryGetValue(key, out var configValue);
             configValue.floatValue = value;
-            configValue.type |= ConfigValueType.Float;
-            configValues[key] = configValue;
+            configValue.type |= DataValueType.Float;
+            dataNode.data[key] = configValue;
         }
 
         public void SetString(string key, string value)
         {
-            configValues.TryGetValue(key, out var configValue);
+            dataNode.data.TryGetValue(key, out var configValue);
             configValue.stringValue = value;
-            configValue.type |= ConfigValueType.String;
-            configValues[key] = configValue;
+            configValue.type |= DataValueType.String;
+            dataNode.data[key] = configValue;
         }
 
         public void RemoveConfig(string key)
         {
-            if (!configValues.ContainsKey(key))
+            if (!dataNode.data.ContainsKey(key))
                 return;
 
-            configValues.Remove(key);
+            dataNode.data.Remove(key);
         }
 
         public void RemoveBool(string key)
         {
-            if (!configValues.TryGetValue(key, out var configValue))
+            if (!dataNode.data.TryGetValue(key, out var configValue))
                 return;
 
             configValue.boolValue = default;
-            configValue.type &= ~ConfigValueType.Bool;
-            configValues[key] = configValue;
+            configValue.type &= ~DataValueType.Bool;
+            dataNode.data[key] = configValue;
         }
 
         public void RemoveInt(string key)
         {
-            if (!configValues.TryGetValue(key, out var configValue))
+            if (!dataNode.data.TryGetValue(key, out var configValue))
                 return;
 
             configValue.intValue = default;
-            configValue.type &= ~ConfigValueType.Int;
-            configValues[key] = configValue;
+            configValue.type &= ~DataValueType.Int;
+            dataNode.data[key] = configValue;
         }
 
         public void RemoveFloat(string key)
         {
-            if (!configValues.TryGetValue(key, out var configValue))
+            if (!dataNode.data.TryGetValue(key, out var configValue))
                 return;
 
             configValue.floatValue = default;
-            configValue.type &= ~ConfigValueType.Float;
-            configValues[key] = configValue;
+            configValue.type &= ~DataValueType.Float;
+            dataNode.data[key] = configValue;
         }
 
         public void RemoveString(string key)
         {
-            if (!configValues.TryGetValue(key, out var configValue))
+            if (!dataNode.data.TryGetValue(key, out var configValue))
                 return;
 
             configValue.stringValue = default;
-            configValue.type &= ~ConfigValueType.String;
-            configValues[key] = configValue;
+            configValue.type &= ~DataValueType.String;
+            dataNode.data[key] = configValue;
         }
 
         public void RemoveAllConfigs()
         {
-            throw new System.NotImplementedException();
+            dataNode.data.Clear();
+            dataNode.children.Clear();
         }
-        
-        
-        [Flags]
-        public enum ConfigValueType : byte
-        {
-            None = 0,
-            Bool = 1 << 0,
-            Int = 1 << 1,
-            Float = 1 << 2,
-            String = 1 << 3,
-        }
-    
-        public struct ConfigValue
-        {
-            public ConfigValueType type;
-            public bool boolValue;
-            public int intValue;
-            public float floatValue;
-            public string stringValue;
+    }
 
-            public ConfigValue(ConfigValueType type, bool boolValue = default, int intValue = default, float floatValue = default, string stringValue = default)
-            {
-                this.type = type;
-                this.boolValue = boolValue;
-                this.intValue = intValue;
-                this.floatValue = floatValue;
-                this.stringValue = stringValue;
-            }        
+    [Flags]
+    public enum DataValueType : byte
+    {
+        None = 0,
+        Bool = 1 << 0,
+        Int = 1 << 1,
+        Float = 1 << 2,
+        String = 1 << 3,
+    }
+
+    public class DataNode
+    {
+        public readonly Dictionary<string, DataValue> data = new Dictionary<string, DataValue>();
+        public readonly Dictionary<string, DataNode> children = new Dictionary<string, DataNode>();
+    }
+
+    public struct DataValue
+    {
+        public DataValueType type;
+        public bool boolValue;
+        public int intValue;
+        public float floatValue;
+        public string stringValue;
+
+        public DataValue(DataValueType type, bool boolValue = default, int intValue = default, float floatValue = default, string stringValue = default)
+        {
+            this.type = type;
+            this.boolValue = boolValue;
+            this.intValue = intValue;
+            this.floatValue = floatValue;
+            this.stringValue = stringValue;
         }
     }
 }

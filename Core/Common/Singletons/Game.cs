@@ -64,14 +64,7 @@ namespace CZToolKit
                     continue;
 
                 fixedUpdates.Enqueue(singleton);
-                try
-                {
-                    fixedUpdate.FixedUpdate();
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
+                fixedUpdate.FixedUpdate();
             }
         }
 
@@ -89,14 +82,7 @@ namespace CZToolKit
                     continue;
 
                 updates.Enqueue(singleton);
-                try
-                {
-                    update.Update();
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
+                update.Update();
             }
         }
 
@@ -114,14 +100,7 @@ namespace CZToolKit
                     continue;
 
                 lateUpdates.Enqueue(singleton);
-                try
-                {
-                    lateUpdate.LateUpdate();
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
+                lateUpdate.LateUpdate();
             }
         }
 

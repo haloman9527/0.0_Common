@@ -14,12 +14,7 @@ namespace CZToolKit
         /// <summary>
         /// MS 2020-01-01 00:00:00
         /// </summary>
-        private const long TWEPOCH = 62135596800000L;
-
-        /// <summary>
-        /// UTC 2020-01-01 00:00:00
-        /// </summary>
-        public const long DEFAULT_BASE_TIMESTAMP = 1577836800000L;
+        public const long TWEPOCH = 63713433600000L;
 
         /// <summary>
         /// 机器ID位数
@@ -87,7 +82,7 @@ namespace CZToolKit
         /// 基准时间戳(毫秒), 小于当前时间即可, 一旦确定不能变动. 
         /// 分布式项目请保持此时间戳一致. 
         /// </summary>
-        private readonly long baseTimestamp;
+        private readonly long twepoch;
 
         /// <summary>
         /// 最后一次的时间戳(毫秒). 
@@ -116,11 +111,11 @@ namespace CZToolKit
         /// </summary>
         /// <param name="workerID"> 10位的数据机器位中的低位, 默认不应该超过31(5位) </param>
         /// <param name="datacenterID"> 10位的数据机器位中的高位, 默认不应该超过31(5位) </param>
-        /// <param name="baseTimestamp"> 默认基准时间戳(UTC时间2020-01-01 00:00:00) </param>
-        public Snowflake(byte workerID, byte datacenterID, long baseTimestamp = DEFAULT_BASE_TIMESTAMP)
+        /// <param name="twepoch"> 基准时间戳(UTC MS) </param>
+        public Snowflake(byte workerID, byte datacenterID, long twepoch = TWEPOCH)
         {
-            this.baseTimestamp = baseTimestamp;
-            this.lastTimestamp = baseTimestamp;
+            this.twepoch = twepoch;
+            this.lastTimestamp = twepoch;
             this.WorkerID = workerID;
             this.DatacenterID = datacenterID;
 
@@ -135,8 +130,8 @@ namespace CZToolKit
         /// 基于Twitter的snowflake算法. 
         /// </summary>
         /// <param name="workerID"> 不超过1024 </param>
-        /// <param name="baseTimestamp"> 基准时间戳(UTC时间2020-01-01 00:00:00) </param>
-        public Snowflake(int workerID, long baseTimestamp = DEFAULT_BASE_TIMESTAMP) : this((byte)(workerID & 32), (byte)((workerID >> 5) & 32), baseTimestamp)
+        /// <param name="twepoch"> 基准时间戳(UTC时间2020-01-01 00:00:00) </param>
+        public Snowflake(int workerID, long twepoch = TWEPOCH) : this((byte)(workerID & 32), (byte)((workerID >> 5) & 32), twepoch)
         {
         }
 
@@ -169,7 +164,7 @@ namespace CZToolKit
 
                 // 把当前时间戳保存为最后生成ID的时间戳
                 lastTimestamp = timestamp;
-                LastID = ((timestamp - baseTimestamp) << TIMESTAMP_LEFT_SHIFT) |
+                LastID = ((timestamp - twepoch) << TIMESTAMP_LEFT_SHIFT) |
                          (DatacenterID << DATACENTER_ID_SHIFT) |
                          (WorkerID << WORKER_ID_SHIFT) | sequence;
 
@@ -183,7 +178,7 @@ namespace CZToolKit
         /// <returns></returns>
         private long GetCurrentTimestamp()
         {
-            return (DateTime.UtcNow.Ticks / 10000) - TWEPOCH - baseTimestamp;
+            return (DateTime.UtcNow.Ticks / 10000) - twepoch;
         }
 
         /// <summary>
