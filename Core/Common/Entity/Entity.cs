@@ -226,10 +226,10 @@ namespace CZToolKit
                 return this.components;
             }
         }
-
-        public T ParentAs<T>() where T : class
+        
+        public T As<T>() where T : class
         {
-            return (object)Parent as T;
+            return this as T;
         }
 
         public Entity AddChild(Entity entity)

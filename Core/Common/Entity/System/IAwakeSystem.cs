@@ -49,7 +49,7 @@ namespace CZToolKit
 
     public abstract class AwakeSystem<T> : IAwakeSystem where T : Entity
     {
-        public Type Type()
+        public Type EntityType()
         {
             return typeof(T);
         }
@@ -69,7 +69,7 @@ namespace CZToolKit
 
     public abstract class AwakeSystem<T, A> : IAwakeSystem<A> where T : Entity
     {
-        public Type Type()
+        public Type EntityType()
         {
             return typeof(T);
         }
@@ -89,7 +89,7 @@ namespace CZToolKit
 
     public abstract class AwakeSystem<T, A, B> : IAwakeSystem<A, B> where T : Entity
     {
-        public Type Type()
+        public Type EntityType()
         {
             return typeof(T);
         }
@@ -109,7 +109,7 @@ namespace CZToolKit
 
     public abstract class AwakeSystem<T, A, B, C> : IAwakeSystem<A, B, C> where T : Entity
     {
-        public Type Type()
+        public Type EntityType()
         {
             return typeof(T);
         }
@@ -129,7 +129,7 @@ namespace CZToolKit
     
     public abstract class AwakeSystem<T, A, B, C, D> : IAwakeSystem<A, B, C, D> where T : Entity
     {
-        public Type Type()
+        public Type EntityType()
         {
             return typeof(T);
         }

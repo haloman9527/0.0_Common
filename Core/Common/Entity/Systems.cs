@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CZToolKit
 {
@@ -46,6 +45,7 @@ namespace CZToolKit
             }
 
             var systemTypes = Util_TypeCache.GetTypesDerivedFrom<ISystem>();
+            var entityTypes = Util_TypeCache.GetTypesDerivedFrom<Entity>();
 
             foreach (var systemType in systemTypes)
             {
@@ -65,9 +65,9 @@ namespace CZToolKit
                     continue;
                 }
 
-                if (!s_Systems.TryGetValue(system.Type(), out var systems))
+                if (!s_Systems.TryGetValue(system.EntityType(), out var systems))
                 {
-                    s_Systems[system.Type()] = systems = new OneTypeSystems();
+                    s_Systems[system.EntityType()] = systems = new OneTypeSystems();
                 }
 
                 if (!systems.originSystems.TryGetValue(systemType, out var lst))
@@ -78,9 +78,9 @@ namespace CZToolKit
                 lst.Add(system);
             }
 
-            foreach (var pair in s_Systems)
+            foreach (var entityType in entityTypes)
             {
-                var type = pair.Key;
+                var type = entityType;
                 while (type != null)
                 {
                     if (!s_Systems.TryGetValue(type, out var systems))
@@ -88,15 +88,20 @@ namespace CZToolKit
                         type = type.BaseType;
                         continue;
                     }
-
-                    foreach (var pair1 in systems.originSystems)
+                    
+                    if (!s_Systems.TryGetValue(entityType, out var entitySystems))
                     {
-                        if (!pair.Value.systems.TryGetValue(pair1.Key, out var lst))
+                        s_Systems[entityType] = entitySystems = new OneTypeSystems();
+                    }
+
+                    foreach (var pair in systems.originSystems)
+                    {
+                        if (!entitySystems.systems.TryGetValue(pair.Key, out var lst))
                         {
-                            pair.Value.systems[pair1.Key] = lst = new List<ISystem>();
+                            entitySystems.systems[pair.Key] = lst = new List<ISystem>();
                         }
 
-                        lst.InsertRange(0, pair1.Value);
+                        lst.InsertRange(0, pair.Value);
                     }
 
                     type = type.BaseType;

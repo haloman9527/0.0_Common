@@ -4,7 +4,7 @@ namespace CZToolKit
 {
     public interface ISystem
     {
-        Type Type();
+        Type EntityType();
         
         Type SystemType();
     }

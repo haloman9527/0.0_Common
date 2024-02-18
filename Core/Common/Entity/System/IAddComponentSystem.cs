@@ -14,7 +14,7 @@ namespace CZToolKit
 
     public abstract class AddComponentSystem<T> : IAddComponentSystem where T : Entity
     {
-        public Type Type()
+        public Type EntityType()
         {
             return typeof(T);
         }

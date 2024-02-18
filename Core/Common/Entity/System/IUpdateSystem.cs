@@ -13,7 +13,7 @@ namespace CZToolKit
 
     public abstract class UpdateSystem<T> : IUpdateSystem where T : Entity
     {
-        public Type Type()
+        public Type EntityType()
         {
             return typeof(T);
         }
