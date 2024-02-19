@@ -6,7 +6,6 @@ namespace CZToolKit
     {
     }
 
-
     public interface ILateUpdateSystem : ISystem
     {
         void Execute(Entity o);

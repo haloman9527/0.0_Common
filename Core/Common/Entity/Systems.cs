@@ -88,7 +88,7 @@ namespace CZToolKit
                         type = type.BaseType;
                         continue;
                     }
-                    
+
                     if (!s_Systems.TryGetValue(entityType, out var entitySystems))
                     {
                         s_Systems[entityType] = entitySystems = new OneTypeSystems();
@@ -111,9 +111,9 @@ namespace CZToolKit
             s_Initialized = true;
         }
 
-        public static List<ISystem> GetSystems(Type type, Type systemType)
+        public static List<ISystem> GetSystems(Type entityType, Type systemType)
         {
-            if (!s_Systems.TryGetValue(type, out var systems))
+            if (!s_Systems.TryGetValue(entityType, out var systems))
                 return null;
 
             if (!systems.systems.TryGetValue(systemType, out var lst))
@@ -220,18 +220,20 @@ namespace CZToolKit
                 entitiesQueue.Enqueue(instanceId);
 
                 var systems = GetSystems(component.GetType(), typeof(IFixedUpdateSystem));
-                if (systems != null)
+                if (systems == null)
                 {
-                    for (int i = 0; i < systems.Count; i++)
+                    continue;
+                }
+
+                for (int i = 0; i < systems.Count; i++)
+                {
+                    try
                     {
-                        try
-                        {
-                            ((IFixedUpdateSystem)systems[i]).Execute(component);
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error(e);
-                        }
+                        ((IFixedUpdateSystem)systems[i]).Execute(component);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e);
                     }
                 }
             }
@@ -257,18 +259,20 @@ namespace CZToolKit
                 entitiesQueue.Enqueue(instanceId);
 
                 var systems = GetSystems(component.GetType(), typeof(IUpdateSystem));
-                if (systems != null)
+                if (systems == null)
                 {
-                    for (int i = 0; i < systems.Count; i++)
+                    continue;
+                }
+
+                for (int i = 0; i < systems.Count; i++)
+                {
+                    try
                     {
-                        try
-                        {
-                            ((IUpdateSystem)systems[i]).Execute(component);
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error(e);
-                        }
+                        ((IUpdateSystem)systems[i]).Execute(component);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e);
                     }
                 }
             }
@@ -293,18 +297,20 @@ namespace CZToolKit
 
                 entitiesQueue.Enqueue(instanceId);
                 var systems = GetSystems(component.GetType(), typeof(ILateUpdateSystem));
-                if (systems != null)
+                if (systems == null)
                 {
-                    for (int i = 0; i < systems.Count; i++)
+                    continue;
+                }
+
+                for (int i = 0; i < systems.Count; i++)
+                {
+                    try
                     {
-                        try
-                        {
-                            ((ILateUpdateSystem)systems[i]).Execute(component);
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error(e);
-                        }
+                        ((ILateUpdateSystem)systems[i]).Execute(component);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e);
                     }
                 }
             }

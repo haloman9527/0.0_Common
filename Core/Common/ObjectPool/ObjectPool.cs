@@ -40,7 +40,7 @@ namespace CZToolKit
             pools = new Dictionary<Type, IObjectPool>();
         }
 
-        private IObjectPool GetPool(Type unitType)
+        private IObjectPool GetOrCreatePool(Type unitType)
         {
             if (!pools.TryGetValue(unitType, out var pool))
             {
@@ -51,20 +51,19 @@ namespace CZToolKit
             return pool;
         }
 
-        public T Spawn<T>() where T : class, new()
+        public IObjectPool GetPool(Type unitType)
         {
-            return (T)GetPool(typeof(T)).Spawn();
+            if (!pools.TryGetValue(unitType, out var pool))
+            {
+                return null;
+            }
+
+            return pool;
         }
 
-        public object Spawn(Type unitType)
+        public void RegisterPool(Type unitType, IObjectPool pool)
         {
-            return GetPool(unitType).Spawn();
-        }
-
-        public void Recycle(object reference)
-        {
-            var unitType = reference.GetType();
-            GetPool(unitType).Recycle(reference);
+            pools.Add(unitType, pool);
         }
 
         public void ReleasePool(Type unitType)
@@ -75,6 +74,42 @@ namespace CZToolKit
 
             pool.Dispose();
             pools.Remove(unitType);
+        }
+
+        public T Spawn<T>() where T : class, new()
+        {
+            return (T)GetOrCreatePool(typeof(T)).Spawn();
+        }
+
+        public object Spawn(Type unitType)
+        {
+            if (unitType.IsValueType)
+            {
+                throw new Exception("Can't spawn value type");
+            }
+            
+            var pool = GetPool(unitType);
+            if (pool == null)
+            {
+                var constructor = unitType.GetConstructor(Type.EmptyTypes);
+                if (constructor != null)
+                    pool = GetOrCreatePool(unitType);
+            }
+
+            if (pool == null)
+            {
+                throw new Exception($"Can't spawn {unitType.Name}, please register the pool first");
+            }
+            else
+            {
+                return GetOrCreatePool(unitType).Spawn();
+            }
+        }
+
+        public void Recycle(object reference)
+        {
+            var unitType = reference.GetType();
+            GetOrCreatePool(unitType).Recycle(reference);
         }
     }
 }
