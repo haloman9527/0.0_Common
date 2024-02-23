@@ -2,15 +2,10 @@
 
 namespace CZToolKit
 {
-    public interface IAddComponent
-    {
-    }
-
     public interface IAddComponentSystem : ISystem
     {
         void Execute(Entity o, Entity c);
     }
-
 
     public abstract class AddComponentSystem<T> : IAddComponentSystem where T : Entity
     {

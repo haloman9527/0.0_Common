@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CZToolKit
 {
     public class Root : Singleton<Root>, ISingletonAwake, ISingletonDestory, ISingletonFixedUpdate, ISingletonUpdate, ISingletonLateUpdate
     {
-        private Queue<int> entitiesQueue;
+        private static Dictionary<Type, HashSet<Type>> s_CustomMarkTypes = new Dictionary<Type, HashSet<Type>>();
+
         private Queue<int> fixedUpdateEntitiesQueue;
         private Queue<int> updateEntitiesQueue;
         private Queue<int> lateUpdateEntitiesQueue;
@@ -17,14 +19,8 @@ namespace CZToolKit
             get { return scene; }
         }
 
-        public Queue<int> EntitiesQueue
-        {
-            get { return entitiesQueue; }
-        }
-
         public void Awake()
         {
-            this.entitiesQueue = new Queue<int>(256);
             this.fixedUpdateEntitiesQueue = new Queue<int>(256);
             this.updateEntitiesQueue = new Queue<int>(256);
             this.lateUpdateEntitiesQueue = new Queue<int>(256);
@@ -45,17 +41,21 @@ namespace CZToolKit
         public void Add(Entity entity)
         {
             this.entities.Add(entity.InstanceId, entity);
-            this.entitiesQueue.Enqueue(entity.InstanceId);
-            if (entity is IFixedUpdate)
+            var entityType = entity.GetType();
+            if (Systems.GetSystems(entityType, typeof(IFixedUpdateSystem)) != null)
                 fixedUpdateEntitiesQueue.Enqueue(entity.InstanceId);
-            if (entity is IUpdate)
+            if (Systems.GetSystems(entityType, typeof(IUpdateSystem)) != null)
                 updateEntitiesQueue.Enqueue(entity.InstanceId);
-            if (entity is ILateUpdate)
+            if (Systems.GetSystems(entityType, typeof(ILateUpdateSystem)) != null)
                 lateUpdateEntitiesQueue.Enqueue(entity.InstanceId);
         }
 
         public void Remove(int instanceId)
         {
+            if (this.entities.TryGetValue(instanceId, out var entity))
+            {
+                
+            }
             this.entities.Remove(instanceId);
         }
 

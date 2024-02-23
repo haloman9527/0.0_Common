@@ -26,26 +26,17 @@ namespace CZToolKit
                 return;
             }
 
-            if (s_Systems == null)
-            {
-                s_Systems = new Dictionary<Type, OneTypeSystems>();
-            }
-            else
-            {
-                s_Systems.Clear();
-            }
-
-            if (s_Systems == null)
-            {
-                s_Systems = new Dictionary<Type, OneTypeSystems>();
-            }
-            else
-            {
-                s_Systems.Clear();
-            }
-
             var systemTypes = Util_TypeCache.GetTypesDerivedFrom<ISystem>();
             var entityTypes = Util_TypeCache.GetTypesDerivedFrom<Entity>();
+
+            if (s_Systems == null)
+            {
+                s_Systems = new Dictionary<Type, OneTypeSystems>();
+            }
+            else
+            {
+                s_Systems.Clear();
+            }
 
             foreach (var systemType in systemTypes)
             {
@@ -187,6 +178,32 @@ namespace CZToolKit
             }
         }
 
+        public static void AddComponent(Entity entity, Entity component)
+        {
+            var type = entity.GetType();
+            var systems = GetSystems(type, typeof(IAddComponentSystem));
+            if (systems == null)
+                return;
+
+            for (int i = 0; i < systems.Count; i++)
+            {
+                ((IAddComponentSystem)systems[i]).Execute(entity, component);
+            }
+        }
+
+        public static void OnCreate(Entity entity)
+        {
+            var type = entity.GetType();
+            var systems = GetSystems(type, typeof(IOnCreateSystem));
+            if (systems == null)
+                return;
+
+            for (int i = 0; i < systems.Count; i++)
+            {
+                ((IOnCreateSystem)systems[i]).Execute(entity);
+            }
+        }
+
         public static void Destroy(Entity entity)
         {
             var type = entity.GetType();
@@ -313,19 +330,6 @@ namespace CZToolKit
                         Log.Error(e);
                     }
                 }
-            }
-        }
-
-        public static void AddComponent(Entity entity, Entity component)
-        {
-            var type = entity.GetType();
-            var systems = GetSystems(type, typeof(IAddComponentSystem));
-            if (systems == null)
-                return;
-
-            for (int i = 0; i < systems.Count; i++)
-            {
-                ((IAddComponentSystem)systems[i]).Execute(entity, component);
             }
         }
     }

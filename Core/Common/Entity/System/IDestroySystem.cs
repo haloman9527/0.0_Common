@@ -2,10 +2,6 @@
 
 namespace CZToolKit
 {
-    public interface IDestroy
-    {
-    }
-
     public interface IDestroySystem : ISystem
     {
         void Execute(Entity o);

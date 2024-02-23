@@ -2,10 +2,6 @@
 
 namespace CZToolKit
 {
-    public interface IFixedUpdate
-    {
-    }
-
     public interface IFixedUpdateSystem : ISystem
     {
         void Execute(Entity o);

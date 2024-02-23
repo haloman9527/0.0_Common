@@ -45,7 +45,7 @@ namespace CZToolKit
                 {
                     this.viewGO = new UnityEngine.GameObject(this.GetType().Name);
                     this.viewGO.AddComponent<EntityPreview>().component = this;
-                    this.viewGO.transform.SetParent(this.Parent == null ? EntityPreviewRoot.Instance.transform : this.Parent.viewGO.transform);
+                    this.viewGO.transform.SetParent(EntityPreviewRoot.Instance.transform);
                 }
                 else if (parent == null || !parent.IsDisposed)
                 {
@@ -131,7 +131,7 @@ namespace CZToolKit
 
                 this.parent = value;
                 this.parent.AddToChildren(this);
-                
+
                 if (this.parent is Scene)
                     this.domain = this.parent;
                 else
@@ -145,6 +145,10 @@ namespace CZToolKit
 
                 this.viewGO.transform.SetParent(parent.viewGO.transform, false);
                 this.viewGO.transform.SetAsLastSibling();
+                if (parent.componentsDB != null && parent.componentsDB.Contains(this))
+                    this.viewGO.name = this.GetType().Name;
+                else
+                    this.viewGO.name = this.GetType().Name + $"({this.m_instanceId})";
 #endif
             }
         }
@@ -183,7 +187,7 @@ namespace CZToolKit
 
                 this.parent = value;
                 this.parent.AddToComponents(this);
-                
+
                 if (this.parent is Scene)
                     this.domain = this.parent;
                 else
@@ -226,7 +230,7 @@ namespace CZToolKit
                 return this.components;
             }
         }
-        
+
         public T As<T>() where T : class
         {
             return this as T;
@@ -242,10 +246,8 @@ namespace CZToolKit
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
 
-            if (entity is IAwake)
-            {
-                Systems.Awake(entity);
-            }
+            Systems.Awake(entity);
+            Systems.OnCreate(entity);
 
             return entity;
         }
@@ -256,10 +258,8 @@ namespace CZToolKit
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
 
-            if (entity is IAwake)
-            {
-                Systems.Awake(entity);
-            }
+            Systems.Awake(entity);
+            Systems.OnCreate(entity);
 
             return entity;
         }
@@ -270,10 +270,8 @@ namespace CZToolKit
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
 
-            if (entity is IAwake<A>)
-            {
-                Systems.Awake(entity, a);
-            }
+            Systems.Awake(entity, a);
+            Systems.OnCreate(entity);
 
             return entity;
         }
@@ -284,10 +282,8 @@ namespace CZToolKit
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
 
-            if (entity is IAwake<A, B>)
-            {
-                Systems.Awake(entity, a, b);
-            }
+            Systems.Awake(entity, a, b);
+            Systems.OnCreate(entity);
 
             return entity;
         }
@@ -298,10 +294,8 @@ namespace CZToolKit
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
 
-            if (entity is IAwake<A, B, C>)
-            {
-                Systems.Awake(entity, a, b, c);
-            }
+            Systems.Awake(entity, a, b, c);
+            Systems.OnCreate(entity);
 
             return entity;
         }
@@ -312,10 +306,8 @@ namespace CZToolKit
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
 
-            if (entity is IAwake<A, B, C, D>)
-            {
-                Systems.Awake(entity, a, b, c, d);
-            }
+            Systems.Awake(entity, a, b, c, d);
+            Systems.OnCreate(entity);
 
             return entity;
         }
@@ -421,15 +413,9 @@ namespace CZToolKit
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
-            if (component is IAwake)
-            {
-                Systems.Awake(component);
-            }
-
-            if (this is IAddComponent)
-            {
-                Systems.AddComponent(this, component);
-            }
+            Systems.Awake(component);
+            Systems.OnCreate(component);
+            Systems.AddComponent(this, component);
         }
 
         public Entity AddComponent(Type type)
@@ -443,15 +429,9 @@ namespace CZToolKit
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
-            if (component is IAwake)
-            {
-                Systems.Awake(component);
-            }
-
-            if (component is IAddComponent)
-            {
-                Systems.AddComponent(this, component);
-            }
+            Systems.Awake(component);
+            Systems.OnCreate(component);
+            Systems.AddComponent(this, component);
 
             return component;
         }
@@ -467,15 +447,9 @@ namespace CZToolKit
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
-            if (component is IAwake<A>)
-            {
-                Systems.Awake(component, a);
-            }
-
-            if (this is IAddComponent)
-            {
-                Systems.AddComponent(this, component);
-            }
+            Systems.Awake(component, a);
+            Systems.OnCreate(component);
+            Systems.AddComponent(this, component);
 
             return component;
         }
@@ -491,15 +465,9 @@ namespace CZToolKit
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
-            if (component is IAwake<A, B>)
-            {
-                Systems.Awake(component, a, b);
-            }
-
-            if (this is IAddComponent)
-            {
-                Systems.AddComponent(this, component);
-            }
+            Systems.Awake(component, a, b);
+            Systems.OnCreate(component);
+            Systems.AddComponent(this, component);
 
             return component;
         }
@@ -515,15 +483,9 @@ namespace CZToolKit
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
-            if (component is IAwake<A, B, C>)
-            {
-                Systems.Awake(component, a, b, c);
-            }
-
-            if (this is IAddComponent)
-            {
-                Systems.AddComponent(this, component);
-            }
+            Systems.Awake(component, a, b, c);
+            Systems.OnCreate(component);
+            Systems.AddComponent(this, component);
 
             return component;
         }
@@ -539,40 +501,34 @@ namespace CZToolKit
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
-            if (component is IAwake<A, B, C, D>)
-            {
-                Systems.Awake(component, a, b, c, d);
-            }
-
-            if (this is IAddComponent)
-            {
-                Systems.AddComponent(this, component);
-            }
+            Systems.Awake(component, a, b, c, d);
+            Systems.OnCreate(component);
+            Systems.AddComponent(this, component);
 
             return component;
         }
 
-        public T AddComponent<T>() where T : Entity
+        public T AddComponent<T>() where T : Entity, new()
         {
             return (T)AddComponent(typeof(T));
         }
 
-        public T AddComponent<T, A>(A a) where T : Entity
+        public T AddComponent<T, A>(A a) where T : Entity, new()
         {
             return (T)AddComponent(typeof(T), a);
         }
 
-        public T AddComponent<T, A, B>(A a, B b) where T : Entity
+        public T AddComponent<T, A, B>(A a, B b) where T : Entity, new()
         {
             return (T)AddComponent(typeof(T), a, b);
         }
 
-        public T AddComponent<T, A, B, C>(A a, B b, C c) where T : Entity
+        public T AddComponent<T, A, B, C>(A a, B b, C c) where T : Entity, new()
         {
             return (T)AddComponent(typeof(T), a, b, c);
         }
 
-        public T AddComponent<T, A, B, C, D>(A a, B b, C c, D d) where T : Entity
+        public T AddComponent<T, A, B, C, D>(A a, B b, C c, D d) where T : Entity, new()
         {
             return (T)AddComponent(typeof(T), a, b, c, d);
         }
@@ -697,11 +653,8 @@ namespace CZToolKit
             {
                 return;
             }
-            
-            if (this is IDestroy)
-            {
-                Systems.Destroy(this);
-            }
+
+            Systems.Destroy(this);
 
             var instanceId = this.m_instanceId;
             this.InstanceId = 0;

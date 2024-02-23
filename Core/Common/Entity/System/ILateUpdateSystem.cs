@@ -2,10 +2,6 @@
 
 namespace CZToolKit
 {
-    public interface ILateUpdate
-    {
-    }
-
     public interface ILateUpdateSystem : ISystem
     {
         void Execute(Entity o);

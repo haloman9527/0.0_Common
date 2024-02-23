@@ -2,26 +2,6 @@
 
 namespace CZToolKit
 {
-    public interface IAwake
-    {
-    }
-
-    public interface IAwake<A>
-    {
-    }
-
-    public interface IAwake<A, B>
-    {
-    }
-
-    public interface IAwake<A, B, C>
-    {
-    }
-
-    public interface IAwake<A, B, C, D>
-    {
-    }
-
     public interface IAwakeSystem : ISystem
     {
         void Execute(Entity o);

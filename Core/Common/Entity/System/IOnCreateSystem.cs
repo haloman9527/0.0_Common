@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 
 namespace CZToolKit
 {
-    public interface IUpdateSystem : ISystem
+    public interface IOnCreateSystem : ISystem
     {
         void Execute(Entity o);
     }
 
-    public abstract class UpdateSystem<T> : IUpdateSystem where T : Entity
+    public abstract class OnCreateSystem<T> : IOnCreateSystem where T : Entity
     {
         public Type EntityType()
         {
@@ -16,14 +16,14 @@ namespace CZToolKit
 
         public Type SystemType()
         {
-            return typeof(IUpdateSystem);
+            return typeof(IOnCreateSystem);
         }
 
         public void Execute(Entity o)
         {
-            Update((T)o);
+            OnCreate((T)o);
         }
 
-        protected abstract void Update(T o);
+        protected abstract void OnCreate(T o);
     }
 }
