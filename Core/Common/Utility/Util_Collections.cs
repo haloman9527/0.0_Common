@@ -5,18 +5,6 @@ namespace CZToolKit
 {
     public static class Util_Collections
     {
-        public static bool TryGetElement<T>(this IList<T> array, int index, out T element)
-        {
-            element = default;
-            if (index >= 0 && index < array.Count)
-            {
-                element = array[index];
-                return true;
-            }
-
-            return false;
-        }
-
         /// <summary>
         /// 二分匹配, 返回item在数组中的合适索引
         /// </summary>
