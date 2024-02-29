@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,7 +13,9 @@
  *  Blog: https://www.haloman.net/
  *
  */
+
 #endregion
+
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
@@ -25,9 +28,6 @@ namespace CZToolKitEditor.IMGUI.Controls
     public class CZTreeViewItem : TreeViewItem
     {
         public object userData;
-        public Action<Rect> itemDrawer;
-        public Action onContextClicked;
-        public Action onDoubleClicked;
 
         public new List<TreeViewItem> children
         {
@@ -53,16 +53,17 @@ namespace CZToolKitEditor.IMGUI.Controls
             }
         }
 
-        private static void SplitMenuPath(string menuPath, out string path, out string name)
+        private static void SplitMenuPath(string menuPath, char separator, out string path, out string name)
         {
-            menuPath = menuPath.Trim('/');
-            int num = menuPath.LastIndexOf('/');
+            menuPath = menuPath.Trim(separator);
+            int num = menuPath.LastIndexOf(separator);
             if (num == -1)
             {
                 path = "";
                 name = menuPath;
                 return;
             }
+
             path = menuPath.Substring(0, num);
             name = menuPath.Substring(num + 1);
         }
@@ -70,28 +71,41 @@ namespace CZToolKitEditor.IMGUI.Controls
         TreeViewItem root;
         Styles styles;
 
-        public event Action<IList<int>> onSelectionChanged;
-        public event Action onKeyEvent;
-        public event Action onContextClicked;
-        public event Action<CZTreeViewItem> onContextClickedItem;
-        public event Action<CZTreeViewItem> onSingleClickedItem;
-        public event Action<CZTreeViewItem> onDoubleClickedItem;
-        public event Action<CZTreeViewItem, Rect> onItemRowGUI;
-        public event Func<CZTreeViewItem, bool> canRename;
-        public event Func<CZTreeViewItem, bool> canMultiSelect;
+        public Action<IList<int>> onSelectionChanged;
+        public Action onKeyEvent;
+        public Action onContextClicked;
+        public Action<CZTreeViewItem> onItemContextClicked;
+        public Action<CZTreeViewItem> onItemSingleClicked;
+        public Action<CZTreeViewItem> onItemDoubleClicked;
+        public Action<CZTreeViewItem, string, string> renameEnded;
+        
+        public Action<RowGUIArgsBridge> onItemRowGUI;
+        public Func<CZTreeViewItem, bool> canRename;
+        public Func<CZTreeViewItem, bool> canMultiSelect;
 
-        public Styles GUIStyles
+        public float RowHeight
         {
-            get
-            {
-                if (styles == null) styles = new Styles();
-                return styles;
-            }
-            set { styles = value; }
+            get => rowHeight;
+            set => rowHeight = value;
         }
-        public float RowHeight { get => rowHeight; set => rowHeight = value; }
-        public bool ShowBoder { get => showBorder; set => showBorder = value; }
-        public bool ShowAlternatingRowBackgrounds { get => showAlternatingRowBackgrounds; set => showAlternatingRowBackgrounds = value; }
+
+        public bool ShowBoder
+        {
+            get => showBorder;
+            set => showBorder = value;
+        }
+
+        public bool ShowAlternatingRowBackgrounds
+        {
+            get => showAlternatingRowBackgrounds;
+            set => showAlternatingRowBackgrounds = value;
+        }
+        
+        public float DepthIndentWidth
+        {
+            get => this.depthIndentWidth;
+        }
+
         public TreeViewItem RootItem
         {
             get
@@ -100,17 +114,25 @@ namespace CZToolKitEditor.IMGUI.Controls
                 {
                     root = new CZTreeViewItem() { id = -1, depth = -1, displayName = "Root" };
                 }
+
                 if (root.children == null)
                 {
                     root.children = new List<TreeViewItem>();
                 }
+
                 return root;
             }
         }
 
-        public CZTreeView(TreeViewState state) : base(state) { }
+        public CZTreeView(TreeViewState state) : base(state)
+        {
+            onItemRowGUI += DefaultRowGUI;
+        }
 
-        public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader) { }
+        public CZTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
+        {
+            onItemRowGUI += DefaultRowGUI;
+        }
 
         protected override TreeViewItem BuildRoot()
         {
@@ -134,12 +156,29 @@ namespace CZToolKitEditor.IMGUI.Controls
 
         protected override void RenameEnded(RenameEndedArgs args)
         {
+            var item = FindItem(args.itemID);
 
+            renameEnded?.Invoke(item, args.originalName, args.newName);
         }
 
         protected override void RowGUI(RowGUIArgs args)
         {
-            CZTreeViewItem item = args.item as CZTreeViewItem;
+            var argsBridge = new RowGUIArgsBridge()
+            {
+                item = args.item,
+                label = args.label,
+                rowRect = args.rowRect,
+                row = args.row,
+                selected = args.selected,
+                focused = args.focused,
+                isRenaming = args.isRenaming
+            };
+            onItemRowGUI?.Invoke(argsBridge);
+        }
+
+        protected void DefaultRowGUI(RowGUIArgsBridge args)
+        {
+            var item = args.item as CZTreeViewItem;
 
             if (!args.isRenaming)
             {
@@ -148,28 +187,25 @@ namespace CZToolKitEditor.IMGUI.Controls
                     labelRect.xMin += depthIndentWidth;
                 else
                     labelRect.xMin += item.depth * depthIndentWidth + depthIndentWidth;
-                GUIContent textContent = EditorGUIUtility.TrTextContent(item.displayName);
-                textContent.image = item.icon;
-                GUI.Label(labelRect, textContent, GUIStyles.leftLabelStyle);
-                onItemRowGUI?.Invoke(item, args.rowRect);
-                if (item != null)
-                    item.itemDrawer?.Invoke(args.rowRect);
+                var label = EditorGUIUtility.TrTextContent(args.label);
+                label.image = item.icon;
+                GUI.Label(labelRect, label);
             }
         }
 
-        public void AddMenuItem<T>(string path, T treeViewItem) where T : CZTreeViewItem, new()
+        public void AddMenuItem<T>(string path, T treeViewItem, char separator = '/') where T : CZTreeViewItem, new()
         {
             if (string.IsNullOrEmpty(path)) return;
 
-            CZTreeViewItem parentItem = RootItem as CZTreeViewItem;
+            var parentItem = RootItem as CZTreeViewItem;
 
-            SplitMenuPath(path, out path, out string name);
+            SplitMenuPath(path, separator, out path, out string name);
             if (!string.IsNullOrEmpty(path))
             {
-                string[] tmpPath = path.Split('/');
+                string[] tmpPath = path.Split(separator);
                 for (int i = 0; i < tmpPath.Length; i++)
                 {
-                    CZTreeViewItem tempItem = parentItem.children.Find(item => item.displayName == tmpPath[i]) as CZTreeViewItem;
+                    var tempItem = parentItem.children.Find(item => item.displayName == tmpPath[i]) as CZTreeViewItem;
                     if (tempItem != null)
                     {
                         parentItem = tempItem;
@@ -189,18 +225,18 @@ namespace CZToolKitEditor.IMGUI.Controls
             parentItem.children.Add(treeViewItem);
         }
 
-        public T AddMenuItem<T>(string _path) where T : CZTreeViewItem, new()
+        public T AddMenuItem<T>(string path, char separator = '/') where T : CZTreeViewItem, new()
         {
-            return AddMenuItem<T>(_path, (Texture2D)null);
+            return AddMenuItem<T>(path, (Texture2D)null, separator);
         }
 
-        public T AddMenuItem<T>(string _path, Texture2D _icon) where T : CZTreeViewItem, new()
+        public T AddMenuItem<T>(string path, Texture2D icon, char separator = '/') where T : CZTreeViewItem, new()
         {
-            if (string.IsNullOrEmpty(_path))
+            if (string.IsNullOrEmpty(path))
                 return null;
             T item = new T();
-            item.icon = _icon;
-            AddMenuItem(_path, item);
+            item.icon = icon;
+            AddMenuItem(path, item, separator);
             return item;
         }
 
@@ -211,9 +247,9 @@ namespace CZToolKitEditor.IMGUI.Controls
             treeViewItem.parent.children.Remove(treeViewItem);
         }
 
-        public CZTreeViewItem FindItem(int _id)
+        public CZTreeViewItem FindItem(int id)
         {
-            return FindItem(_id, rootItem) as CZTreeViewItem;
+            return FindItem(id, rootItem) as CZTreeViewItem;
         }
 
         protected override void SelectionChanged(IList<int> selectedIds)
@@ -231,6 +267,10 @@ namespace CZToolKitEditor.IMGUI.Controls
                 foreach (var item in parent.children)
                 {
                     yield return item as CZTreeViewItem;
+                    foreach (var child in Foreach(item as CZTreeViewItem))
+                    {
+                        yield return child;
+                    }
                 }
             }
         }
@@ -245,15 +285,14 @@ namespace CZToolKitEditor.IMGUI.Controls
         {
             base.SingleClickedItem(id);
             CZTreeViewItem item = FindItem(id);
-            onSingleClickedItem?.Invoke(item);
+            onItemSingleClicked?.Invoke(item);
         }
 
         protected override void DoubleClickedItem(int id)
         {
             base.DoubleClickedItem(id);
             CZTreeViewItem item = FindItem(id);
-            onDoubleClickedItem?.Invoke(item);
-            item.onDoubleClicked?.Invoke();
+            onItemDoubleClicked?.Invoke(item);
         }
 
         protected override void ContextClicked()
@@ -266,8 +305,7 @@ namespace CZToolKitEditor.IMGUI.Controls
         {
             base.ContextClickedItem(id);
             CZTreeViewItem item = FindItem(id);
-            onContextClickedItem?.Invoke(item);
-            item.onContextClicked?.Invoke();
+            onItemContextClicked?.Invoke(item);
         }
 
         public void Clear()
@@ -278,6 +316,7 @@ namespace CZToolKitEditor.IMGUI.Controls
 
 
         int id = 0;
+
         int GenerateID()
         {
             return id++;
@@ -286,6 +325,38 @@ namespace CZToolKitEditor.IMGUI.Controls
         public void IDAlloc(CZTreeViewItem item)
         {
             item.id = GenerateID();
+        }
+
+        public struct RowGUIArgsBridge
+        {
+            /// <summary>
+            ///   <para>Item for the current row being handled in TreeView.RowGUI.</para>
+            /// </summary>
+            public TreeViewItem item;
+            /// <summary>
+            ///   <para>Label used for text rendering of the item displayName. Note this is an empty string when isRenaming == true.</para>
+            /// </summary>
+            public string label;
+            /// <summary>
+            ///   <para>Row rect for the current row being handled.</para>
+            /// </summary>
+            public Rect rowRect;
+            /// <summary>
+            ///   <para>Row index into the list of current rows.</para>
+            /// </summary>
+            public int row;
+            /// <summary>
+            ///   <para>This value is true when the current row's item is part of the current selection.</para>
+            /// </summary>
+            public bool selected;
+            /// <summary>
+            ///   <para>This value is true only when the TreeView has keyboard focus and the TreeView's window has focus.</para>
+            /// </summary>
+            public bool focused;
+            /// <summary>
+            ///   <para>This value is true when the ::item is currently being renamed.</para>
+            /// </summary>
+            public bool isRenaming;
         }
     }
 }
