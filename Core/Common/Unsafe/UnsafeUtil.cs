@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace CZToolKit.UnsafeEx
@@ -28,7 +27,12 @@ namespace CZToolKit.UnsafeEx
         {
             return Marshal.SizeOf<T>();
         }
-        
+
+        public static int SizeOf(Type type)
+        {
+            return Marshal.SizeOf(type);
+        }
+
         public static IntPtr Malloc(int size)
         {
             return Marshal.AllocHGlobal(size);
@@ -38,38 +42,37 @@ namespace CZToolKit.UnsafeEx
         {
             Marshal.FreeHGlobal(ptr);
         }
-        //
+
         // public static void Wirte<T>(void* dest, T value)
         // {
-        //     // Unsafe.Write(destination, value);
+        //     Unsafe.Write(dest, value);
         // }
-        //
+
         // public static void CopyPtrToStructure<T>(void* ptr, out T dest) where T : struct
         // {
-        //     // destination = Unsafe.Read<T>(ptr);
-        //     dest = default;
+        //     dest = Unsafe.Read<T>(ptr);
         // }
-        
-        public static T Read<T>(void* ptr) where T : unmanaged
-        {
-            return *(T*)ptr;
-        }
-        
+
+        // public static T Read<T>(void* ptr)
+        // {
+        //     return Unsafe.Read<T>(ptr);
+        // }
+
         public static ref T AsRef<T>(void* ptr) where T : unmanaged
         {
             return ref *(T*)ptr;
         }
-        
+
         public static ref T AsRef<T>(IntPtr ptr) where T : unmanaged
         {
             return ref *(T*)ptr;
         }
-        
+
         // public static ref TTo As<TFrom, TTo>(ref TFrom from)
         // {
         //     return ref Unsafe.As<TFrom, TTo>(ref from);
         // }
-        //
+
         // public static T ReadArrayElement<T>(void* destination, int index)
         // {
         //     return Unsafe.Read<T>((byte*)destination + (Unsafe.SizeOf<T>() * index));
@@ -79,10 +82,10 @@ namespace CZToolKit.UnsafeEx
         // {
         //     Unsafe.Write(((byte*)destination + (SizeOf<T>() * index)), value);
         // }
-        
-        public static void CopyBlock(void* destination, void* source, uint byteCount)
-        {
-            Buffer.MemoryCopy(source, destination, byteCount, byteCount);
-        }
+        //
+        // public static void CopyBlock(void* destination, void* source, uint byteCount)
+        // {
+        //     Buffer.MemoryCopy(source, destination, byteCount, byteCount);
+        // }
     }
 }

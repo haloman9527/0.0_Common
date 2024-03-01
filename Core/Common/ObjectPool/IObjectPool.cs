@@ -13,8 +13,6 @@ namespace CZToolKit
     
     public interface IObjectPool<T> : IObjectPool
     {
-        T Spawn();
-        
         void Recycle(T unit);
     }
 }

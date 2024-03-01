@@ -245,7 +245,7 @@ namespace CZToolKit
 
             entity.InstanceId = Root.Instance.GenerateInstanceId();
             entity.Parent = this;
-
+            
             Systems.Awake(entity);
             Systems.OnCreate(entity);
 

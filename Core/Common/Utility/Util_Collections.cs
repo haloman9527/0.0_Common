@@ -96,20 +96,24 @@ namespace CZToolKit
         /// <param name="comparer"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static int BinarySearch<T>(this IList<T> original, T item, Func<T, T, int> comparer)
+        public static bool BinarySearch<T>(this IList<T> original, T item, Func<T, T, int> comparer, out int index)
         {
-            return BinarySearch(original, 0, original.Count - 1, item, comparer);
+            return BinarySearch(original, 0, original.Count - 1, item, comparer, out index);
         }
 
-        public static int BinarySearch<T>(this IList<T> original, int startIndex, int endIndex, T item, Func<T, T, int> comparer)
+        public static bool BinarySearch<T>(this IList<T> original, int startIndex, int endIndex, T item, Func<T, T, int> comparer, out int index)
         {
             while (startIndex <= endIndex)
             {
                 var mid = (startIndex + endIndex) / 2;
                 var dir = comparer(item, original[mid]);
 
+
                 if (dir == 0)
-                    return mid;
+                {
+                    index = mid;
+                    return true;
+                }
 
                 if (dir < 0)
                     endIndex = mid - 1;
@@ -117,15 +121,16 @@ namespace CZToolKit
                     startIndex = mid + 1;
             }
 
-            return -1;
+            index = -1;
+            return false;
         }
 
-        public static int BinarySearch<T>(this IList<T> original, T item, IComparer<T> comparer)
+        public static bool BinarySearch<T>(this IList<T> original, T item, IComparer<T> comparer, out int index)
         {
-            return BinarySearch(original, 0, original.Count - 1, item, comparer);
+            return BinarySearch(original, 0, original.Count - 1, item, comparer, out index);
         }
 
-        public static int BinarySearch<T>(this IList<T> original, int startIndex, int endIndex, T item, IComparer<T> comparer)
+        public static bool BinarySearch<T>(this IList<T> original, int startIndex, int endIndex, T item, IComparer<T> comparer, out int index)
         {
             while (startIndex <= endIndex)
             {
@@ -133,7 +138,10 @@ namespace CZToolKit
                 var dir = comparer.Compare(item, original[mid]);
 
                 if (dir == 0)
-                    return mid;
+                {
+                    index = mid;
+                    return true;
+                }
 
                 if (dir < 0)
                     endIndex = mid - 1;
@@ -141,7 +149,8 @@ namespace CZToolKit
                     startIndex = mid + 1;
             }
 
-            return -1;
+            index = -1;
+            return false;
         }
 
         /// <summary>
@@ -158,13 +167,13 @@ namespace CZToolKit
             return QuickSort(original, 0, original.Count - 1, comparer);
         }
 
-        public static bool QuickSort<T>(this IList<T> original, int left, int right, IComparer<T> comparer)
+        public static bool QuickSort<T>(this IList<T> original, int startIndex, int endIndex, IComparer<T> comparer)
         {
-            if (left >= right)
+            if (startIndex >= endIndex)
                 return false;
-            T middle = original[left];
-            int less = left;
-            int greater = right;
+            T middle = original[startIndex];
+            int less = startIndex;
+            int greater = endIndex;
             bool changed = false;
             while (true)
             {
@@ -193,8 +202,8 @@ namespace CZToolKit
                 changed = true;
             }
 
-            changed |= QuickSort(original, left, less, comparer);
-            changed |= QuickSort(original, less + 1, right, comparer);
+            changed |= QuickSort(original, startIndex, less, comparer);
+            changed |= QuickSort(original, less + 1, endIndex, comparer);
             return changed;
         }
 
@@ -212,13 +221,13 @@ namespace CZToolKit
             return QuickSort(original, 0, original.Count - 1, comparer);
         }
 
-        public static bool QuickSort<T>(this IList<T> original, int left, int right, Func<T, T, int> comparer)
+        public static bool QuickSort<T>(this IList<T> original, int startIndex, int endIndex, Func<T, T, int> comparer)
         {
-            if (left >= right)
+            if (startIndex >= endIndex)
                 return false;
-            T middle = original[left];
-            int less = left;
-            int greater = right;
+            T middle = original[startIndex];
+            int less = startIndex;
+            int greater = endIndex;
             bool changed = false;
             while (true)
             {
@@ -247,8 +256,111 @@ namespace CZToolKit
                 changed = true;
             }
 
-            changed |= QuickSort(original, left, less, comparer);
-            changed |= QuickSort(original, less + 1, right, comparer);
+            changed |= QuickSort(original, startIndex, less, comparer);
+            changed |= QuickSort(original, less + 1, endIndex, comparer);
+            return changed;
+        }
+
+        public static unsafe bool BinarySerach<T>(T* original, int startIndex, int endIndex, T item, Func<T, T, int> comparer, out int index) where T : unmanaged
+        {
+            while (startIndex <= endIndex)
+            {
+                var mid = (startIndex + endIndex) / 2;
+                var dir = comparer(item, original[mid]);
+
+                if (dir == 0)
+                {
+                    index = mid;
+                    return true;
+                }
+
+                if (dir < 0)
+                    endIndex = mid - 1;
+                else
+                    startIndex = mid + 1;
+            }
+
+            index = -1;
+            return false;
+        }
+
+        public static unsafe bool QuickSort<T>(T* original, int startIndex, int endIndex, Func<T, T, int> comparer) where T : unmanaged
+        {
+            if (startIndex >= endIndex)
+                return false;
+            T middle = original[startIndex];
+            int less = startIndex;
+            int greater = endIndex;
+            bool changed = false;
+            while (true)
+            {
+                while (less < greater && comparer(original[less], middle) < 0)
+                {
+                    less++;
+                }
+
+                while (greater > less && comparer(original[greater], middle) > 0)
+                {
+                    greater--;
+                }
+
+                if (less >= greater) break;
+
+                var lr = comparer(original[less], original[greater]);
+                if (lr == 0)
+                {
+                    greater--;
+                    continue;
+                }
+
+                T temp = original[less];
+                original[less] = original[greater];
+                original[greater] = temp;
+                changed = true;
+            }
+
+            changed |= QuickSort(original, startIndex, less, comparer);
+            changed |= QuickSort(original, less + 1, endIndex, comparer);
+            return changed;
+        }
+
+        public static unsafe bool QuickSort<T>(T* original, int startIndex, int endIndex, IComparer<T> comparer) where T : unmanaged
+        {
+            if (startIndex >= endIndex)
+                return false;
+            T middle = original[startIndex];
+            int less = startIndex;
+            int greater = endIndex;
+            bool changed = false;
+            while (true)
+            {
+                while (less < greater && comparer.Compare(original[less], middle) < 0)
+                {
+                    less++;
+                }
+
+                while (greater > less && comparer.Compare(original[greater], middle) > 0)
+                {
+                    greater--;
+                }
+
+                if (less >= greater) break;
+
+                var lr = comparer.Compare(original[less], original[greater]);
+                if (lr == 0)
+                {
+                    greater--;
+                    continue;
+                }
+
+                T temp = original[less];
+                original[less] = original[greater];
+                original[greater] = temp;
+                changed = true;
+            }
+
+            changed |= QuickSort(original, startIndex, less, comparer);
+            changed |= QuickSort(original, less + 1, endIndex, comparer);
             return changed;
         }
     }

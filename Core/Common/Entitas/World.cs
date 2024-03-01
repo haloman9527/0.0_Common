@@ -1,7 +1,11 @@
-﻿namespace CZToolKit.Entitas
+﻿using System;
+
+namespace CZToolKit.Entitas
 {
-    public class World
+    public class World : IDisposable
     {
-        
+        public void Dispose()
+        {
+        }
     }
 }
