@@ -20,6 +20,7 @@ using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine;
 
 namespace CZToolKit.UnsafeEx
 {
@@ -29,6 +30,16 @@ namespace CZToolKit.UnsafeEx
         {
             return UnsafeUtility.AlignOf<T>();
         }
+        
+        public static bool IsUnmanaged<T>()
+        {
+            return UnsafeUtility.IsUnmanaged<T>();
+        }
+        
+        public static bool IsUnmanaged(Type type)
+        {
+            return UnsafeUtility.IsUnmanaged(type);
+        }
 
         public static int SizeOf<T>()
         {
@@ -37,6 +48,7 @@ namespace CZToolKit.UnsafeEx
 
         public static int SizeOf(Type type)
         {
+            Debug.Log(type.FullName);
             return Marshal.SizeOf(type);
         }
 
@@ -65,9 +77,9 @@ namespace CZToolKit.UnsafeEx
             ((T*)dest)[0] = value;
         }
 
-        public static void CopyPtrToStructure<T>(void* ptr, out T dest) where T : unmanaged
+        public static void CopyPtrToStructure<T>(IntPtr ptr, out T dest) where T : unmanaged
         {
-            dest = Marshal.PtrToStructure<T>((IntPtr)ptr);
+            dest = Marshal.PtrToStructure<T>(ptr);
         }
 
         public static T Read<T>(void* ptr) where T : unmanaged
