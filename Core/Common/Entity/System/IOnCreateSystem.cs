@@ -4,12 +4,12 @@ namespace CZToolKit
 {
     public interface IOnCreateSystem : ISystem
     {
-        void Execute(Entity o);
+        void Execute(Node o);
     }
 
-    public abstract class OnCreateSystem<T> : IOnCreateSystem where T : Entity
+    public abstract class OnCreateSystem<T> : IOnCreateSystem where T : Node
     {
-        public Type EntityType()
+        public Type NodeType()
         {
             return typeof(T);
         }
@@ -19,7 +19,7 @@ namespace CZToolKit
             return typeof(IOnCreateSystem);
         }
 
-        public void Execute(Entity o)
+        public void Execute(Node o)
         {
             OnCreate((T)o);
         }

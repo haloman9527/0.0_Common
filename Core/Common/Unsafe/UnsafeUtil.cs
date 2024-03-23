@@ -20,7 +20,6 @@ using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 
 namespace CZToolKit.UnsafeEx
 {
@@ -48,7 +47,6 @@ namespace CZToolKit.UnsafeEx
 
         public static int SizeOf(Type type)
         {
-            Debug.Log(type.FullName);
             return Marshal.SizeOf(type);
         }
 

@@ -4,12 +4,12 @@ namespace CZToolKit
 {
     public interface IFixedUpdateSystem : ISystem
     {
-        void Execute(Entity o);
+        void Execute(Node o);
     }
 
-    public abstract class FixedUpdateSystem<T> : IFixedUpdateSystem where T : Entity
+    public abstract class FixedUpdateSystem<T> : IFixedUpdateSystem where T : Node
     {
-        public Type EntityType()
+        public Type NodeType()
         {
             return typeof(T);
         }
@@ -19,7 +19,7 @@ namespace CZToolKit
             return typeof(IFixedUpdateSystem);
         }
 
-        public void Execute(Entity o)
+        public void Execute(Node o)
         {
             FixedUpdate((T)o);
         }

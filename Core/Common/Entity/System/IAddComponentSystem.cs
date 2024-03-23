@@ -4,12 +4,12 @@ namespace CZToolKit
 {
     public interface IAddComponentSystem : ISystem
     {
-        void Execute(Entity o, Entity c);
+        void Execute(Node o, Node c);
     }
 
-    public abstract class AddComponentSystem<T> : IAddComponentSystem where T : Entity
+    public abstract class AddComponentSystem<T> : IAddComponentSystem where T : Node
     {
-        public Type EntityType()
+        public Type NodeType()
         {
             return typeof(T);
         }
@@ -19,11 +19,11 @@ namespace CZToolKit
             return typeof(IAddComponentSystem);
         }
 
-        public void Execute(Entity o, Entity c)
+        public void Execute(Node o, Node c)
         {
             AddComponent((T)o, c);
         }
 
-        protected abstract void AddComponent(T self, Entity component);
+        protected abstract void AddComponent(T self, Node component);
     }
 }

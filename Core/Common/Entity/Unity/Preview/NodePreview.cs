@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace CZToolKit
 {
-    public class EntityPreview : MonoBehaviour
+    public class NodePreview : MonoBehaviour
     {
 #if ODIN_INSPECTOR
         [FormerlySerializedAs("Component")]
@@ -15,15 +15,15 @@ namespace CZToolKit
         [Sirenix.OdinInspector.HideLabel]
 #endif
         [SerializeReference]
-        public Entity component;
+        public Node component;
     }
 
 #if UNITY_EDITOR
-    [UnityEditor.CustomEditor(typeof(EntityPreview))]
+    [UnityEditor.CustomEditor(typeof(NodePreview))]
 #if ODIN_INSPECTOR
-    public class EntityPreviewInspector : Sirenix.OdinInspector.Editor.OdinEditor
+    public class NodePreviewInspector : Sirenix.OdinInspector.Editor.OdinEditor
 #else
-    public class EntityPreviewInspector : Editor
+    public class NodePreviewInspector : Editor
 #endif
     {
 #if ODIN_INSPECTOR
@@ -36,7 +36,7 @@ namespace CZToolKit
         
         public override void OnInspectorGUI()
         {
-            var preview = target as EntityPreview;
+            var preview = target as NodePreview;
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.IntField("Instance Id", preview.component.InstanceId);
             EditorGUI.EndDisabledGroup();

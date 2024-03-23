@@ -82,6 +82,7 @@ namespace CZToolKitEditor.IMGUI.Controls
         public Action<RowGUIArgsBridge> onItemRowGUI;
         public Func<CZTreeViewItem, bool> canRename;
         public Func<CZTreeViewItem, bool> canMultiSelect;
+        public Func<CZTreeViewItem, bool> canBeParent;
 
         public float RowHeight
         {
@@ -152,6 +153,13 @@ namespace CZToolKitEditor.IMGUI.Controls
             if (canRename == null)
                 return false;
             return canRename(item as CZTreeViewItem);
+        }
+
+        protected override bool CanBeParent(TreeViewItem item)
+        {
+            if (canBeParent == null)
+                return base.CanBeParent(item);
+            return canBeParent(item as CZTreeViewItem);
         }
 
         protected override void RenameEnded(RenameEndedArgs args)

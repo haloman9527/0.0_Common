@@ -4,12 +4,12 @@ namespace CZToolKit
 {
     public interface IDestroySystem : ISystem
     {
-        void Execute(Entity o);
+        void Execute(Node o);
     }
 
-    public abstract class DestroySystem<T> : IDestroySystem where T : Entity
+    public abstract class DestroySystem<T> : IDestroySystem where T : Node
     {
-        public Type EntityType()
+        public Type NodeType()
         {
             return typeof(T);
         }
@@ -19,7 +19,7 @@ namespace CZToolKit
             return typeof(IDestroySystem);
         }
 
-        public void Execute(Entity o)
+        public void Execute(Node o)
         {
             Destroy((T)o);
         }
