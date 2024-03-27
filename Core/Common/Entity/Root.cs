@@ -10,7 +10,7 @@ namespace CZToolKit
         private Queue<int> fixedUpdateEntitiesQueue;
         private Queue<int> updateEntitiesQueue;
         private Queue<int> lateUpdateEntitiesQueue;
-        private Dictionary<int, Node> entities;
+        private Dictionary<int, Entity> entities;
         private Scene scene;
         private int lastInstanceId;
 
@@ -24,7 +24,7 @@ namespace CZToolKit
             this.fixedUpdateEntitiesQueue = new Queue<int>(256);
             this.updateEntitiesQueue = new Queue<int>(256);
             this.lateUpdateEntitiesQueue = new Queue<int>(256);
-            this.entities = new Dictionary<int, Node>(256);
+            this.entities = new Dictionary<int, Entity>(256);
             this.scene = new Scene("Root", null);
         }
 
@@ -38,16 +38,16 @@ namespace CZToolKit
             return ++lastInstanceId;
         }
 
-        public void Add(Node node)
+        public void Add(Entity entity)
         {
-            this.entities.Add(node.InstanceId, node);
-            var nodeType = node.GetType();
-            if (Systems.GetSystems(nodeType, typeof(IFixedUpdateSystem)) != null)
-                fixedUpdateEntitiesQueue.Enqueue(node.InstanceId);
-            if (Systems.GetSystems(nodeType, typeof(IUpdateSystem)) != null)
-                updateEntitiesQueue.Enqueue(node.InstanceId);
-            if (Systems.GetSystems(nodeType, typeof(ILateUpdateSystem)) != null)
-                lateUpdateEntitiesQueue.Enqueue(node.InstanceId);
+            this.entities.Add(entity.InstanceId, entity);
+            var entityType = entity.GetType();
+            if (Systems.GetSystems(entityType, typeof(IFixedUpdateSystem)) != null)
+                fixedUpdateEntitiesQueue.Enqueue(entity.InstanceId);
+            if (Systems.GetSystems(entityType, typeof(IUpdateSystem)) != null)
+                updateEntitiesQueue.Enqueue(entity.InstanceId);
+            if (Systems.GetSystems(entityType, typeof(ILateUpdateSystem)) != null)
+                lateUpdateEntitiesQueue.Enqueue(entity.InstanceId);
         }
 
         public void Remove(int instanceId)
@@ -55,7 +55,7 @@ namespace CZToolKit
             this.entities.Remove(instanceId);
         }
 
-        public Node Get(int instanceId)
+        public Entity Get(int instanceId)
         {
             this.entities.TryGetValue(instanceId, out var component);
             return component;

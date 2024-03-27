@@ -27,7 +27,7 @@ namespace CZToolKit
             }
 
             var systemTypes = Util_TypeCache.GetTypesDerivedFrom<ISystem>();
-            var nodeTypes = Util_TypeCache.GetTypesDerivedFrom<Node>();
+            var nodeTypes = Util_TypeCache.GetTypesDerivedFrom<Entity>();
 
             if (s_Systems == null)
             {
@@ -113,107 +113,107 @@ namespace CZToolKit
             return lst;
         }
 
-        public static void Awake(Node node)
+        public static void Awake(Entity entity)
         {
-            var type = node.GetType();
+            var type = entity.GetType();
             var systems = GetSystems(type, typeof(IAwakeSystem));
             if (systems == null)
                 return;
 
             for (int i = 0; i < systems.Count; i++)
             {
-                ((IAwakeSystem)systems[i]).Execute(node);
+                ((IAwakeSystem)systems[i]).Execute(entity);
             }
         }
 
-        public static void Awake<A>(Node node, A a)
+        public static void Awake<A>(Entity entity, A a)
         {
-            var type = node.GetType();
+            var type = entity.GetType();
             var systems = GetSystems(type, typeof(IAwakeSystem<A>));
             if (systems == null)
                 return;
 
             for (int i = 0; i < systems.Count; i++)
             {
-                ((IAwakeSystem<A>)systems[i]).Execute(node, a);
+                ((IAwakeSystem<A>)systems[i]).Execute(entity, a);
             }
         }
 
-        public static void Awake<A, B>(Node node, A a, B b)
+        public static void Awake<A, B>(Entity entity, A a, B b)
         {
-            var type = node.GetType();
+            var type = entity.GetType();
             var systems = GetSystems(type, typeof(IAwakeSystem<A, B>));
             if (systems == null)
                 return;
 
             for (int i = 0; i < systems.Count; i++)
             {
-                ((IAwakeSystem<A, B>)systems[i]).Execute(node, a, b);
+                ((IAwakeSystem<A, B>)systems[i]).Execute(entity, a, b);
             }
         }
 
-        public static void Awake<A, B, C>(Node node, A a, B b, C c)
+        public static void Awake<A, B, C>(Entity entity, A a, B b, C c)
         {
-            var type = node.GetType();
+            var type = entity.GetType();
             var systems = GetSystems(type, typeof(IAwakeSystem<A, B, C>));
             if (systems == null)
                 return;
 
             for (int i = 0; i < systems.Count; i++)
             {
-                ((IAwakeSystem<A, B, C>)systems[i]).Execute(node, a, b, c);
+                ((IAwakeSystem<A, B, C>)systems[i]).Execute(entity, a, b, c);
             }
         }
 
-        public static void Awake<A, B, C, D>(Node node, A a, B b, C c, D d)
+        public static void Awake<A, B, C, D>(Entity entity, A a, B b, C c, D d)
         {
-            var type = node.GetType();
+            var type = entity.GetType();
             var systems = GetSystems(type, typeof(IAwakeSystem<A, B, C, D>));
             if (systems == null)
                 return;
 
             for (int i = 0; i < systems.Count; i++)
             {
-                ((IAwakeSystem<A, B, C, D>)systems[i]).Execute(node, a, b, c, d);
+                ((IAwakeSystem<A, B, C, D>)systems[i]).Execute(entity, a, b, c, d);
             }
         }
 
-        public static void AddComponent(Node node, Node component)
+        public static void AddComponent(Entity entity, Entity component)
         {
-            var type = node.GetType();
+            var type = entity.GetType();
             var systems = GetSystems(type, typeof(IAddComponentSystem));
             if (systems == null)
                 return;
 
             for (int i = 0; i < systems.Count; i++)
             {
-                ((IAddComponentSystem)systems[i]).Execute(node, component);
+                ((IAddComponentSystem)systems[i]).Execute(entity, component);
             }
         }
 
-        public static void OnCreate(Node node)
+        public static void OnCreate(Entity entity)
         {
-            var type = node.GetType();
+            var type = entity.GetType();
             var systems = GetSystems(type, typeof(IOnCreateSystem));
             if (systems == null)
                 return;
 
             for (int i = 0; i < systems.Count; i++)
             {
-                ((IOnCreateSystem)systems[i]).Execute(node);
+                ((IOnCreateSystem)systems[i]).Execute(entity);
             }
         }
 
-        public static void Destroy(Node node)
+        public static void Destroy(Entity entity)
         {
-            var type = node.GetType();
+            var type = entity.GetType();
             var systems = GetSystems(type, typeof(IDestroySystem));
             if (systems == null)
                 return;
 
             for (int i = systems.Count - 1; i >= 0; i--)
             {
-                ((IDestroySystem)systems[i]).Execute(node);
+                ((IDestroySystem)systems[i]).Execute(entity);
             }
         }
 

@@ -4,10 +4,10 @@ namespace CZToolKit
 {
     public interface ILateUpdateSystem : ISystem
     {
-        void Execute(Node o);
+        void Execute(Entity o);
     }
 
-    public abstract class LateUpdateSystem<T> : ILateUpdateSystem where T : Node
+    public abstract class LateUpdateSystem<T> : ILateUpdateSystem where T : Entity
     {
         public Type NodeType()
         {
@@ -19,7 +19,7 @@ namespace CZToolKit
             return typeof(ILateUpdateSystem);
         }
 
-        public void Execute(Node o)
+        public void Execute(Entity o)
         {
             LateUpdate((T)o);
         }

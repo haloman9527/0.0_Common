@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace CZToolKit
 {
-    public class NodePreviewRoot : MonoBehaviour
+    public class EntityPreviewRoot : MonoBehaviour
     {
-        private static NodePreviewRoot s_Instance;
+        private static EntityPreviewRoot s_Instance;
 
-        public static NodePreviewRoot Instance
+        public static EntityPreviewRoot Instance
         {
             get { return s_Instance; }
         }

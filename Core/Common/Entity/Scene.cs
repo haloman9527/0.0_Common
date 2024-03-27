@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 namespace CZToolKit
 {
-    public sealed class Scene : Node
+    public sealed class Scene : Entity
     {
         private Dictionary<string, Scene> childScenes;
 
         public string Name { get; private set; }
 
-        public new Node Parent
+        public new Entity Parent
         {
             get { return base.Parent; }
             private set { throw new Exception("domain cannot change parent"); }
         }
 
-        public new Node Domain
+        public new Entity Domain
         {
             get { return base.Domain; }
             private set
@@ -29,12 +29,12 @@ namespace CZToolKit
             }
         }
 
-        public Scene(string name, Node parent)
+        public Scene(string name, Entity parent)
         {
             Init(name, parent);
         }
 
-        private void Init(string name, Node parent)
+        private void Init(string name, Entity parent)
         {
             this.InstanceId = Root.Instance.GenerateInstanceId();
             this.Name = name;
@@ -53,7 +53,7 @@ namespace CZToolKit
                 domain.As<Scene>().childScenes.Add(name, this);
             }
 
-#if UNITY_EDITOR && NODE_PREVIEW
+#if UNITY_EDITOR && ENTITY_PREVIEW
             viewGO.name = name;
 #endif
         }
@@ -87,7 +87,7 @@ namespace CZToolKit
 
     public static class SceneSystems
     {
-        public static Scene AddScene(this Node self, string name)
+        public static Scene AddScene(this Entity self, string name)
         {
             return new Scene(name, self);
         }

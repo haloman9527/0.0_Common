@@ -4,20 +4,20 @@ using System.Collections.Generic;
 namespace CZToolKit
 {
     [Serializable]
-    public class Node : IDisposable
+    public class Entity : IDisposable
     {
-#if UNITY_EDITOR && NODE_PREVIEW
+#if UNITY_EDITOR && ENTITY_PREVIEW
         protected UnityEngine.GameObject viewGO;
 #endif
 
         [NonSerialized] private int m_instanceId;
-        [NonSerialized] protected Node domain;
-        [NonSerialized] protected Node parent;
-        [NonSerialized] protected Dictionary<int, Node> children;
-        [NonSerialized] protected Dictionary<Type, Node> components;
+        [NonSerialized] protected Entity domain;
+        [NonSerialized] protected Entity parent;
+        [NonSerialized] protected Dictionary<int, Entity> children;
+        [NonSerialized] protected Dictionary<Type, Entity> components;
 
-        private HashSet<Node> childrenDB;
-        private HashSet<Node> componentsDB;
+        private HashSet<Entity> childrenDB;
+        private HashSet<Entity> componentsDB;
 
         public int InstanceId
         {
@@ -40,12 +40,12 @@ namespace CZToolKit
                     Root.Instance.Add(this);
                 }
 
-#if UNITY_EDITOR && NODE_PREVIEW
+#if UNITY_EDITOR && ENTITY_PREVIEW
                 if (m_instanceId != 0)
                 {
                     this.viewGO = new UnityEngine.GameObject(this.GetType().Name);
-                    this.viewGO.AddComponent<NodePreview>().component = this;
-                    this.viewGO.transform.SetParent(NodePreviewRoot.Instance.transform);
+                    this.viewGO.AddComponent<EntityPreview>().component = this;
+                    this.viewGO.transform.SetParent(EntityPreviewRoot.Instance.transform);
                 }
                 else if (parent == null || !parent.IsDisposed)
                 {
@@ -63,7 +63,7 @@ namespace CZToolKit
         /// <summary>
         /// 其实就是Scene啦，只是为了规避和<see cref="Scene"/>的命名冲突
         /// </summary>
-        public Node Domain
+        public Entity Domain
         {
             get { return domain; }
             protected set
@@ -82,23 +82,23 @@ namespace CZToolKit
 
                 if (this.children != null)
                 {
-                    foreach (Node node in this.children.Values)
+                    foreach (var o in this.children.Values)
                     {
-                        node.Domain = this.domain;
+                        o.Domain = this.domain;
                     }
                 }
 
                 if (this.components != null)
                 {
-                    foreach (Node component in this.components.Values)
+                    foreach (var o in this.components.Values)
                     {
-                        component.Domain = this.domain;
+                        o.Domain = this.domain;
                     }
                 }
             }
         }
 
-        public Node Parent
+        public Entity Parent
         {
             get { return parent; }
             set
@@ -137,7 +137,7 @@ namespace CZToolKit
                 else
                     this.domain = this.parent.domain;
 
-#if UNITY_EDITOR && NODE_PREVIEW
+#if UNITY_EDITOR && ENTITY_PREVIEW
                 if (parent.viewGO.transform.Find("---------------") == null)
                 {
                     new UnityEngine.GameObject("---------------").transform.SetParent(parent.viewGO.transform, false);
@@ -153,7 +153,7 @@ namespace CZToolKit
             }
         }
 
-        private Node ComponentParent
+        private Entity ComponentParent
         {
             set
             {
@@ -193,7 +193,7 @@ namespace CZToolKit
                 else
                     this.domain = this.parent.domain;
 
-#if UNITY_EDITOR && NODE_PREVIEW
+#if UNITY_EDITOR && ENTITY_PREVIEW
                 if (parent.viewGO.transform.Find("---------------") == null)
                 {
                     new UnityEngine.GameObject("---------------").transform.SetParent(parent.viewGO.transform, false);
@@ -205,26 +205,26 @@ namespace CZToolKit
             }
         }
 
-        public Dictionary<int, Node> Children
+        public Dictionary<int, Entity> Children
         {
             get
             {
                 if (children == null)
                 {
-                    children = new Dictionary<int, Node>();
+                    children = new Dictionary<int, Entity>();
                 }
 
                 return this.children;
             }
         }
 
-        public Dictionary<Type, Node> Components
+        public Dictionary<Type, Entity> Components
         {
             get
             {
                 if (components == null)
                 {
-                    components = new Dictionary<Type, Node>();
+                    components = new Dictionary<Type, Entity>();
                 }
 
                 return this.components;
@@ -236,92 +236,92 @@ namespace CZToolKit
             return this as T;
         }
 
-        public Node AddChild(Node node)
+        public Entity AddChild(Entity entity)
         {
-            if (!node.IsDisposed)
+            if (!entity.IsDisposed)
             {
-                throw new Exception($"node has not disposed!");
+                throw new Exception($"has not disposed!");
             }
 
-            node.InstanceId = Root.Instance.GenerateInstanceId();
-            node.Parent = this;
+            entity.InstanceId = Root.Instance.GenerateInstanceId();
+            entity.Parent = this;
 
-            Systems.Awake(node);
-            Systems.OnCreate(node);
+            Systems.Awake(entity);
+            Systems.OnCreate(entity);
 
-            return node;
+            return entity;
         }
 
-        public T AddChild<T>() where T : Node, new()
+        public T AddChild<T>() where T : Entity, new()
         {
-            var node = new T();
-            node.InstanceId = Root.Instance.GenerateInstanceId();
-            node.Parent = this;
+            var o = new T();
+            o.InstanceId = Root.Instance.GenerateInstanceId();
+            o.Parent = this;
 
-            Systems.Awake(node);
-            Systems.OnCreate(node);
+            Systems.Awake(o);
+            Systems.OnCreate(o);
 
-            return node;
+            return o;
         }
 
-        public T AddChild<T, A>(A a) where T : Node, new()
+        public T AddChild<T, A>(A a) where T : Entity, new()
         {
-            var node = new T();
-            node.InstanceId = Root.Instance.GenerateInstanceId();
-            node.Parent = this;
+            var o = new T();
+            o.InstanceId = Root.Instance.GenerateInstanceId();
+            o.Parent = this;
 
-            Systems.Awake(node, a);
-            Systems.OnCreate(node);
+            Systems.Awake(o, a);
+            Systems.OnCreate(o);
 
-            return node;
+            return o;
         }
 
-        public T AddChild<T, A, B>(A a, B b) where T : Node, new()
+        public T AddChild<T, A, B>(A a, B b) where T : Entity, new()
         {
-            var node = new T();
-            node.InstanceId = Root.Instance.GenerateInstanceId();
-            node.Parent = this;
+            var o = new T();
+            o.InstanceId = Root.Instance.GenerateInstanceId();
+            o.Parent = this;
 
-            Systems.Awake(node, a, b);
-            Systems.OnCreate(node);
+            Systems.Awake(o, a, b);
+            Systems.OnCreate(o);
 
-            return node;
+            return o;
         }
 
-        public T AddChild<T, A, B, C>(A a, B b, C c) where T : Node, new()
+        public T AddChild<T, A, B, C>(A a, B b, C c) where T : Entity, new()
         {
-            var node = new T();
-            node.InstanceId = Root.Instance.GenerateInstanceId();
-            node.Parent = this;
+            var o = new T();
+            o.InstanceId = Root.Instance.GenerateInstanceId();
+            o.Parent = this;
 
-            Systems.Awake(node, a, b, c);
-            Systems.OnCreate(node);
+            Systems.Awake(o, a, b, c);
+            Systems.OnCreate(o);
 
-            return node;
+            return o;
         }
 
-        public T AddChild<T, A, B, C, D>(A a, B b, C c, D d) where T : Node, new()
+        public T AddChild<T, A, B, C, D>(A a, B b, C c, D d) where T : Entity, new()
         {
-            var node = new T();
-            node.InstanceId = Root.Instance.GenerateInstanceId();
-            node.Parent = this;
+            var o = new T();
+            o.InstanceId = Root.Instance.GenerateInstanceId();
+            o.Parent = this;
 
-            Systems.Awake(node, a, b, c, d);
-            Systems.OnCreate(node);
+            Systems.Awake(o, a, b, c, d);
+            Systems.OnCreate(o);
 
-            return node;
+            return o;
         }
 
-        public Node GetChild(int instanceId)
+        public Entity GetChild(int instanceId)
         {
             if (children == null)
             {
                 return null;
             }
 
-            if (this.children.TryGetValue(instanceId, out var node))
+            if (this.children.TryGetValue(instanceId, out var o))
             {
-                return node;
+                return o;
             }
 
             return null;
@@ -343,7 +343,7 @@ namespace CZToolKit
             child.Dispose();
         }
 
-        public void RemoveChild(Node child)
+        public void RemoveChild(Entity child)
         {
             if (this.IsDisposed)
             {
@@ -368,19 +368,19 @@ namespace CZToolKit
             child.Dispose();
         }
 
-        private void AddToChildren(Node node)
+        private void AddToChildren(Entity entity)
         {
-            this.Children.Add(node.m_instanceId, node);
+            this.Children.Add(entity.m_instanceId, entity);
 
             if (childrenDB == null)
             {
-                childrenDB = new HashSet<Node>();
+                childrenDB = new HashSet<Entity>();
             }
 
-            childrenDB.Add(node);
+            childrenDB.Add(entity);
         }
 
-        private void RemoveFromChildren(Node node, int instanceId)
+        private void RemoveFromChildren(Entity entity, int instanceId)
         {
             if (children == null)
             {
@@ -394,10 +394,10 @@ namespace CZToolKit
                 return;
             }
 
-            childrenDB.Remove(node);
+            childrenDB.Remove(entity);
         }
 
-        public void AddComponent(Node component)
+        public void AddComponent(Entity component)
         {
             if (!component.IsDisposed)
             {
@@ -407,7 +407,7 @@ namespace CZToolKit
             var type = component.GetType();
             if (this.components != null && this.components.ContainsKey(type))
             {
-                throw new Exception($"node already has component: {type.FullName}");
+                throw new Exception($"already has component: {type.FullName}");
             }
 
             component.InstanceId = Root.Instance.GenerateInstanceId();
@@ -418,14 +418,14 @@ namespace CZToolKit
             Systems.AddComponent(this, component);
         }
 
-        public Node AddComponent(Type type)
+        public Entity AddComponent(Type type)
         {
             if (this.components != null && this.components.ContainsKey(type))
             {
-                throw new Exception($"node already has component: {type.FullName}");
+                throw new Exception($"already has component: {type.FullName}");
             }
 
-            var component = Activator.CreateInstance(type) as Node;
+            var component = Activator.CreateInstance(type) as Entity;
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -436,14 +436,14 @@ namespace CZToolKit
             return component;
         }
 
-        public Node AddComponent<A>(Type type, A a)
+        public Entity AddComponent<A>(Type type, A a)
         {
             if (this.components != null && this.components.ContainsKey(type))
             {
-                throw new Exception($"node already has component: {type.FullName}");
+                throw new Exception($"already has component: {type.FullName}");
             }
 
-            var component = Activator.CreateInstance(type) as Node;
+            var component = Activator.CreateInstance(type) as Entity;
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -454,14 +454,14 @@ namespace CZToolKit
             return component;
         }
 
-        public Node AddComponent<A, B>(Type type, A a, B b)
+        public Entity AddComponent<A, B>(Type type, A a, B b)
         {
             if (this.components != null && this.components.ContainsKey(type))
             {
-                throw new Exception($"node already has component: {type.FullName}");
+                throw new Exception($"already has component: {type.FullName}");
             }
 
-            var component = Activator.CreateInstance(type) as Node;
+            var component = Activator.CreateInstance(type) as Entity;
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -472,14 +472,14 @@ namespace CZToolKit
             return component;
         }
 
-        public Node AddComponent<A, B, C>(Type type, A a, B b, C c)
+        public Entity AddComponent<A, B, C>(Type type, A a, B b, C c)
         {
             if (this.components != null && this.components.ContainsKey(type))
             {
-                throw new Exception($"node already has component: {type.FullName}");
+                throw new Exception($"already has component: {type.FullName}");
             }
 
-            var component = Activator.CreateInstance(type) as Node;
+            var component = Activator.CreateInstance(type) as Entity;
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -490,14 +490,14 @@ namespace CZToolKit
             return component;
         }
 
-        public Node AddComponent<A, B, C, D>(Type type, A a, B b, C c, D d)
+        public Entity AddComponent<A, B, C, D>(Type type, A a, B b, C c, D d)
         {
             if (this.components != null && this.components.ContainsKey(type))
             {
-                throw new Exception($"node already has component: {type.FullName}");
+                throw new Exception($"already has component: {type.FullName}");
             }
 
-            var component = Activator.CreateInstance(type) as Node;
+            var component = Activator.CreateInstance(type) as Entity;
             component.InstanceId = Root.Instance.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -508,27 +508,27 @@ namespace CZToolKit
             return component;
         }
 
-        public T AddComponent<T>() where T : Node, new()
+        public T AddComponent<T>() where T : Entity, new()
         {
             return (T)AddComponent(typeof(T));
         }
 
-        public T AddComponent<T, A>(A a) where T : Node, new()
+        public T AddComponent<T, A>(A a) where T : Entity, new()
         {
             return (T)AddComponent(typeof(T), a);
         }
 
-        public T AddComponent<T, A, B>(A a, B b) where T : Node, new()
+        public T AddComponent<T, A, B>(A a, B b) where T : Entity, new()
         {
             return (T)AddComponent(typeof(T), a, b);
         }
 
-        public T AddComponent<T, A, B, C>(A a, B b, C c) where T : Node, new()
+        public T AddComponent<T, A, B, C>(A a, B b, C c) where T : Entity, new()
         {
             return (T)AddComponent(typeof(T), a, b, c);
         }
 
-        public T AddComponent<T, A, B, C, D>(A a, B b, C c, D d) where T : Node, new()
+        public T AddComponent<T, A, B, C, D>(A a, B b, C c, D d) where T : Entity, new()
         {
             return (T)AddComponent(typeof(T), a, b, c, d);
         }
@@ -538,7 +538,7 @@ namespace CZToolKit
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetComponent<T>() where T : Node, new()
+        public T GetComponent<T>() where T : Entity, new()
         {
             return (T)(GetComponent(typeof(T)));
         }
@@ -559,7 +559,7 @@ namespace CZToolKit
         /// <param name="type"></param>
         /// <param name="deriveMatch"> 是否匹配派生类 </param>
         /// <returns></returns>
-        public Node GetComponent(Type type, bool deriveMatch = false)
+        public Entity GetComponent(Type type, bool deriveMatch = false)
         {
             if (components == null)
             {
@@ -597,12 +597,12 @@ namespace CZToolKit
             component.Dispose();
         }
 
-        public void RemoveComponent<T>() where T : Node
+        public void RemoveComponent<T>() where T : Entity
         {
             RemoveComponent(typeof(T));
         }
 
-        public void RemoveComponent(Node component)
+        public void RemoveComponent(Entity component)
         {
             if (component == null)
             {
@@ -627,19 +627,19 @@ namespace CZToolKit
             component.Dispose();
         }
 
-        private void AddToComponents(Node component)
+        private void AddToComponents(Entity component)
         {
             this.Components.Add(component.GetType(), component);
 
             if (componentsDB == null)
             {
-                componentsDB = new HashSet<Node>();
+                componentsDB = new HashSet<Entity>();
             }
 
             componentsDB.Add(component);
         }
 
-        private void RemoveFromComponents(Node component)
+        private void RemoveFromComponents(Entity component)
         {
             if (components == null)
             {
@@ -670,7 +670,7 @@ namespace CZToolKit
 
             if (this.children != null)
             {
-                foreach (Node child in this.children.Values)
+                foreach (Entity child in this.children.Values)
                 {
                     child.Dispose();
                 }
@@ -680,7 +680,7 @@ namespace CZToolKit
 
             if (this.components != null)
             {
-                foreach (Node component in this.components.Values)
+                foreach (Entity component in this.components.Values)
                 {
                     component.Dispose();
                 }

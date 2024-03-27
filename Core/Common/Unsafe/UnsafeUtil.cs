@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -85,10 +86,17 @@ namespace CZToolKit.UnsafeEx
             return *(T*)ptr;
         }
 
-        public static object Read(IntPtr ptr)
+        public static T Read<T>(IntPtr ptr) where T : unmanaged
         {
-            return GCHandle.FromIntPtr(ptr).Target;
+            return *(T*)ptr;
         }
+
+        public static int ReadInt32(IntPtr ptr, int offset)
+        {
+            return Marshal.ReadInt32(ptr, offset);
+        }
+        
+        
 
         public static ref T AsRef<T>(void* ptr) where T : unmanaged
         {
@@ -106,6 +114,11 @@ namespace CZToolKit.UnsafeEx
             {
                 return ref *(TTo*)ptr;
             }
+        }
+
+        public static int GetFieldOffset(FieldInfo field)
+        {
+            return UnsafeUtility.GetFieldOffset(field);
         }
 
         public static T ReadArrayElement<T>(void* destination, int index) where T : unmanaged
