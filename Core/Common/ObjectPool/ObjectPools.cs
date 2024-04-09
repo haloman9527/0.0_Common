@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace CZToolKit
 {
@@ -31,13 +32,42 @@ namespace CZToolKit
         }
     }
 
-    public class ObjectPool : AutoSingleton<ObjectPool>, ISingletonAwake
+    public class ObjectPools : AutoSingleton<ObjectPools>, ISingletonAwake
     {
+        private static Dictionary<Type, IObjectPool> s_CustomPools;
+
+        static ObjectPools()
+        {
+            var baseType = typeof(IObjectPool);
+            s_CustomPools = new Dictionary<Type, IObjectPool>();
+            foreach (var type in Util_TypeCache.AllTypes)
+            {
+                if (!baseType.IsAssignableFrom(type))
+                {
+                    continue;
+                }
+
+                var attribute = type.GetCustomAttribute<CustomPoolAttribute>();
+                if (attribute == null)
+                {
+                    continue;
+                }
+
+                var pool = Activator.CreateInstance(type);
+                s_CustomPools.Add(attribute.unitType, pool as IObjectPool);
+            }
+        }
+        
+        
         private Dictionary<Type, IObjectPool> pools;
 
         public void Awake()
         {
             pools = new Dictionary<Type, IObjectPool>();
+            foreach (var pair in s_CustomPools)
+            {
+                pools.Add(pair.Key, pair.Value);
+            }
         }
 
         private IObjectPool GetOrCreatePool(Type unitType)
