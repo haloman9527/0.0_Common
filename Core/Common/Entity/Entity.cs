@@ -132,8 +132,8 @@ namespace CZToolKit
                 this.parent = value;
                 this.parent.AddToChildren(this);
 
-                if (this.parent is Scene)
-                    this.domain = this.parent;
+                if (this is Scene scene)
+                    scene.Domain = this.parent.domain;
                 else
                     this.domain = this.parent.domain;
 

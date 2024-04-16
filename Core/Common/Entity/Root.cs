@@ -5,8 +5,6 @@ namespace CZToolKit
 {
     public class Root : Singleton<Root>, ISingletonAwake, ISingletonDestory, ISingletonFixedUpdate, ISingletonUpdate, ISingletonLateUpdate
     {
-        private static Dictionary<Type, HashSet<Type>> s_CustomMarkTypes = new Dictionary<Type, HashSet<Type>>();
-
         private Queue<int> fixedUpdateEntitiesQueue;
         private Queue<int> updateEntitiesQueue;
         private Queue<int> lateUpdateEntitiesQueue;

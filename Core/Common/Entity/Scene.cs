@@ -9,23 +9,38 @@ namespace CZToolKit
 
         public string Name { get; private set; }
 
-        public new Entity Parent
-        {
-            get { return base.Parent; }
-            private set { throw new Exception("domain cannot change parent"); }
-        }
-
         public new Entity Domain
         {
             get { return base.Domain; }
-            private set
+            set
             {
                 if (value == null)
                 {
                     throw new Exception($"domain cant set null: {this.GetType().Name}");
                 }
+                
+                var domainScene = value.As<Scene>();
+                if (domainScene.childScenes != null && domainScene.childScenes.ContainsKey(this.Name))
+                {
+                    throw new Exception($"domain already exists {this.Name}");
+                }
 
-                this.domain = value;
+                if (this.Domain != null)
+                {
+                    var oldDomainScene = this.Domain.As<Scene>();
+                    if (oldDomainScene != null && oldDomainScene != domainScene && oldDomainScene.childScenes.ContainsKey(this.Name))
+                    {
+                        oldDomainScene.childScenes.Remove(this.Name);
+                    }
+                }
+                
+                if (domainScene.childScenes == null)
+                {
+                    domainScene.childScenes = new Dictionary<string, Scene>();
+                }
+
+                base.Domain = value;
+                domainScene.childScenes.Add(this.Name, this);
             }
         }
 
@@ -41,16 +56,13 @@ namespace CZToolKit
             if (parent == null)
                 this.Domain = this;
             else
-                base.Parent = parent;
-
-            if (this.domain != this)
             {
-                if (domain.As<Scene>().childScenes == null)
+                var domainScene = parent.Domain.As<Scene>();
+                if (domainScene.childScenes != null && domainScene.childScenes.ContainsKey(this.Name))
                 {
-                    domain.As<Scene>().childScenes = new Dictionary<string, Scene>();
+                    throw new Exception($"domain already exists {this.Name}");
                 }
-
-                domain.As<Scene>().childScenes.Add(name, this);
+                this.Parent = parent;
             }
 
 #if UNITY_EDITOR && ENTITY_PREVIEW
