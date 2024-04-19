@@ -131,7 +131,12 @@ namespace CZToolKit.UnsafeEx
             Wirte(((byte*)destination + (SizeOf<T>() * index)), value);
         }
 
-        public static void CopyBlock(void* destination, void* source, uint byteCount)
+        public static void CopyBlock(void* destination, void* source, int byteCount)
+        {
+            Buffer.MemoryCopy(source, destination, byteCount, byteCount);
+        }
+
+        public static void CopyBlock(void* destination, void* source, long byteCount)
         {
             Buffer.MemoryCopy(source, destination, byteCount, byteCount);
         }
