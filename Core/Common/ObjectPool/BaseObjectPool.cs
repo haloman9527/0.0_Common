@@ -29,7 +29,7 @@ namespace CZToolKit
                 unit = unusedObjects.Dequeue();
             else
                 unit = Create();
-            OnAcquire(unit);
+            OnSpawn(unit);
             return unit;
         }
 
@@ -42,28 +42,28 @@ namespace CZToolKit
         public void Recycle(T unit)
         {
             unusedObjects.Enqueue(unit);
-            OnRelease(unit);
+            OnRecycle(unit);
         }
 
         public void Dispose()
         {
             while (unusedObjects.Count > 0)
             {
-                Destroy(unusedObjects.Dequeue());
+                OnDestroy(unusedObjects.Dequeue());
             }
         }
 
         protected abstract T Create();
 
-        protected virtual void Destroy(T unit)
+        protected virtual void OnDestroy(T unit)
         {
         }
 
-        protected virtual void OnAcquire(T unit)
+        protected virtual void OnSpawn(T unit)
         {
         }
 
-        protected virtual void OnRelease(T unit)
+        protected virtual void OnRecycle(T unit)
         {
         }
     }
