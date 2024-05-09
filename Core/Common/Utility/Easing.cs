@@ -14,7 +14,6 @@
  */
 #endregion
 using System;
-using UnityEngine;
 
 namespace CZToolKit
 {
@@ -113,7 +112,7 @@ namespace CZToolKit
         {
             float min = 0.0f;
             float max = 360.0f;
-            float half = Mathf.Abs((max - min) * 0.5f);
+            float half = Math.Abs((max - min) * 0.5f);
             float retval = 0.0f;
             float diff = 0.0f;
             if ((end - start) < -half)
@@ -132,8 +131,8 @@ namespace CZToolKit
 
         public static float Spring(float start, float end, float t)
         {
-            t = Mathf.Clamp01(t);
-            t = (Mathf.Sin(t * Mathf.PI * (0.2f + 2.5f * t * t * t)) * Mathf.Pow(1f - t, 2.2f) + t) * (1f + (1.2f * (1f - t)));
+            t = Math.Clamp(t, 0, 1);
+            t = (float)(Math.Sin(t * Math.PI * (0.2f + 2.5f * t * t * t)) * Math.Pow(1f - t, 2.2f) + t) * (1f + (1.2f * (1f - t)));
             return start + (end - start) * t;
         }
 
@@ -227,62 +226,62 @@ namespace CZToolKit
         public static float EaseInSine(float start, float end, float t)
         {
             end -= start;
-            return -end * Mathf.Cos(t * (Mathf.PI * 0.5f)) + end + start;
+            return (float)(-end * Math.Cos(t * (Math.PI * 0.5f)) + end + start);
         }
 
         public static float EaseOutSine(float start, float end, float t)
         {
             end -= start;
-            return end * Mathf.Sin(t * (Mathf.PI * 0.5f)) + start;
+            return (float)(end * Math.Sin(t * (Math.PI * 0.5f)) + start);
         }
 
         public static float EaseInOutSine(float start, float end, float t)
         {
             end -= start;
-            return -end * 0.5f * (Mathf.Cos(Mathf.PI * t) - 1) + start;
+            return (float)(-end * 0.5f * (Math.Cos(Math.PI * t) - 1) + start);
         }
 
         public static float EaseInExpo(float start, float end, float t)
         {
             end -= start;
-            return end * Mathf.Pow(2, 10 * (t - 1)) + start;
+            return (float)(end * Math.Pow(2, 10 * (t - 1)) + start);
         }
 
         public static float EaseOutExpo(float start, float end, float t)
         {
             end -= start;
-            return end * (-Mathf.Pow(2, -10 * t) + 1) + start;
+            return (float)(end * (-Math.Pow(2, -10 * t) + 1) + start);
         }
 
         public static float EaseInOutExpo(float start, float end, float t)
         {
             t /= .5f;
             end -= start;
-            if (t < 1) return end * 0.5f * Mathf.Pow(2, 10 * (t - 1)) + start;
+            if (t < 1) return (float)(end * 0.5f * Math.Pow(2, 10 * (t - 1)) + start);
             t--;
-            return end * 0.5f * (-Mathf.Pow(2, -10 * t) + 2) + start;
+            return (float)(end * 0.5f * (-Math.Pow(2, -10 * t) + 2) + start);
         }
 
         public static float EaseInCirc(float start, float end, float t)
         {
             end -= start;
-            return -end * (Mathf.Sqrt(1 - t * t) - 1) + start;
+            return (float)(-end * (Math.Sqrt(1 - t * t) - 1) + start);
         }
 
         public static float EaseOutCirc(float start, float end, float t)
         {
             t--;
             end -= start;
-            return end * Mathf.Sqrt(1 - t * t) + start;
+            return (float)(end * Math.Sqrt(1 - t * t) + start);
         }
 
         public static float EaseInOutCirc(float start, float end, float t)
         {
             t /= .5f;
             end -= start;
-            if (t < 1) return -end * 0.5f * (Mathf.Sqrt(1 - t * t) - 1) + start;
+            if (t < 1) return (float)(-end * 0.5f * (Math.Sqrt(1 - t * t) - 1) + start);
             t -= 2;
-            return end * 0.5f * (Mathf.Sqrt(1 - t * t) + 1) + start;
+            return (float)(end * 0.5f * (Math.Sqrt(1 - t * t) + 1) + start);
         }
 
         /* GFX47 MOD START */
@@ -377,17 +376,17 @@ namespace CZToolKit
 
             if ((t /= d) == 1) return start + end;
 
-            if (a == 0f || a < Mathf.Abs(end))
+            if (a == 0f || a < Math.Abs(end))
             {
                 a = end;
                 s = p / 4;
             }
             else
             {
-                s = p / (2 * Mathf.PI) * Mathf.Asin(end / a);
+                s = (float)(p / (2 * Math.PI) * Math.Asin(end / a));
             }
 
-            return -(a * Mathf.Pow(2, 10 * (t -= 1)) * Mathf.Sin((t * d - s) * (2 * Mathf.PI) / p)) + start;
+            return (float)(-(a * Math.Pow(2, 10 * (t -= 1)) * Math.Sin((t * d - s) * (2 * Math.PI) / p)) + start);
         }
         /* GFX47 MOD END */
 
@@ -407,17 +406,17 @@ namespace CZToolKit
 
             if ((t /= d) == 1) return start + end;
 
-            if (a == 0f || a < Mathf.Abs(end))
+            if (a == 0f || a < Math.Abs(end))
             {
                 a = end;
                 s = p * 0.25f;
             }
             else
             {
-                s = p / (2 * Mathf.PI) * Mathf.Asin(end / a);
+                s = (float)(p / (2 * Math.PI) * Math.Asin(end / a));
             }
 
-            return (a * Mathf.Pow(2, -10 * t) * Mathf.Sin((t * d - s) * (2 * Mathf.PI) / p) + end + start);
+            return (float)(a * Math.Pow(2, -10 * t) * Math.Sin((t * d - s) * (2 * Math.PI) / p) + end + start);
         }
 
         /* GFX47 MOD START */
@@ -434,18 +433,18 @@ namespace CZToolKit
 
             if ((t /= d * 0.5f) == 2) return start + end;
 
-            if (a == 0f || a < Mathf.Abs(end))
+            if (a == 0f || a < Math.Abs(end))
             {
                 a = end;
                 s = p / 4;
             }
             else
             {
-                s = p / (2 * Mathf.PI) * Mathf.Asin(end / a);
+                s = (float)(p / (2 * Math.PI) * Math.Asin(end / a));
             }
 
-            if (t < 1) return -0.5f * (a * Mathf.Pow(2, 10 * (t -= 1)) * Mathf.Sin((t * d - s) * (2 * Mathf.PI) / p)) + start;
-            return a * Mathf.Pow(2, -10 * (t -= 1)) * Mathf.Sin((t * d - s) * (2 * Mathf.PI) / p) * 0.5f + end + start;
+            if (t < 1) return (float)(-0.5f * (a * Math.Pow(2, 10 * (t -= 1)) * Math.Sin((t * d - s) * (2 * Math.PI) / p)) + start);
+            return (float)(a * Math.Pow(2, -10 * (t -= 1)) * Math.Sin((t * d - s) * (2 * Math.PI) / p) * 0.5f + end + start);
         }
         /* GFX47 MOD END */
 
@@ -461,8 +460,8 @@ namespace CZToolKit
                 return 0;
             }
             float period = 1 * 0.3f;
-            s = period / (2 * Mathf.PI) * Mathf.Asin(0);
-            return (amplitude * Mathf.Pow(2, -10 * t) * Mathf.Sin((t * 1 - s) * (2 * Mathf.PI) / period));
+            s = (float)(period / (2 * Math.PI) * Math.Asin(0));
+            return (float)(amplitude * Math.Pow(2, -10 * t) * Math.Sin((t * 1 - s) * (2 * Math.PI) / period));
         }
     }
 }

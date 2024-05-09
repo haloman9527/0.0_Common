@@ -106,7 +106,7 @@ namespace CZToolKit
             pools.Remove(unitType);
         }
 
-        public T Spawn<T>() where T : class, new()
+        public T Spawn<T>() where T : class
         {
             return (T)GetOrCreatePool(typeof(T)).Spawn();
         }
@@ -136,10 +136,15 @@ namespace CZToolKit
             }
         }
 
-        public void Recycle(object reference)
+        public void Recycle(object unit)
         {
-            var unitType = reference.GetType();
-            GetOrCreatePool(unitType).Recycle(reference);
+            var unitType = unit.GetType();
+            Recycle(unitType, unit);
+        }
+
+        public void Recycle(Type unitType, object unit)
+        {
+            GetOrCreatePool(unitType).Recycle(unit);
         }
     }
 }
