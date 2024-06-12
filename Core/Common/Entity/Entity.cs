@@ -247,7 +247,6 @@ namespace CZToolKit
             entity.Parent = this;
 
             Systems.Awake(entity);
-            Systems.OnCreate(entity);
 
             return entity;
         }
@@ -259,7 +258,6 @@ namespace CZToolKit
             o.Parent = this;
 
             Systems.Awake(o);
-            Systems.OnCreate(o);
 
             return o;
         }
@@ -271,7 +269,6 @@ namespace CZToolKit
             o.Parent = this;
 
             Systems.Awake(o, a);
-            Systems.OnCreate(o);
 
             return o;
         }
@@ -283,7 +280,6 @@ namespace CZToolKit
             o.Parent = this;
 
             Systems.Awake(o, a, b);
-            Systems.OnCreate(o);
 
             return o;
         }
@@ -295,7 +291,6 @@ namespace CZToolKit
             o.Parent = this;
 
             Systems.Awake(o, a, b, c);
-            Systems.OnCreate(o);
 
             return o;
         }
@@ -307,7 +302,6 @@ namespace CZToolKit
             o.Parent = this;
 
             Systems.Awake(o, a, b, c, d);
-            Systems.OnCreate(o);
 
             return o;
         }
@@ -414,7 +408,6 @@ namespace CZToolKit
             component.ComponentParent = this;
 
             Systems.Awake(component);
-            Systems.OnCreate(component);
             Systems.AddComponent(this, component);
         }
 
@@ -430,7 +423,6 @@ namespace CZToolKit
             component.ComponentParent = this;
 
             Systems.Awake(component);
-            Systems.OnCreate(component);
             Systems.AddComponent(this, component);
 
             return component;
@@ -448,7 +440,6 @@ namespace CZToolKit
             component.ComponentParent = this;
 
             Systems.Awake(component, a);
-            Systems.OnCreate(component);
             Systems.AddComponent(this, component);
 
             return component;
@@ -466,7 +457,6 @@ namespace CZToolKit
             component.ComponentParent = this;
 
             Systems.Awake(component, a, b);
-            Systems.OnCreate(component);
             Systems.AddComponent(this, component);
 
             return component;
@@ -484,7 +474,6 @@ namespace CZToolKit
             component.ComponentParent = this;
 
             Systems.Awake(component, a, b, c);
-            Systems.OnCreate(component);
             Systems.AddComponent(this, component);
 
             return component;
@@ -502,7 +491,6 @@ namespace CZToolKit
             component.ComponentParent = this;
 
             Systems.Awake(component, a, b, c, d);
-            Systems.OnCreate(component);
             Systems.AddComponent(this, component);
 
             return component;

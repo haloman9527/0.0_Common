@@ -21,7 +21,7 @@ using System;
 namespace CZToolKit
 {
     [Serializable]
-    public class BindableProperty<T> : IBindableProperty<T>
+    public class BindableProperty<T> : IBindableProperty<T>, IBindableProperty
     {
         private event Func<T> Getter;
         private event Action<T> Setter;

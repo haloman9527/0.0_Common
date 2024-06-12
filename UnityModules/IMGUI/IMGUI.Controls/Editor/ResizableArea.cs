@@ -20,240 +20,283 @@
 using UnityEngine;
 using UnityEditor;
 using System;
+using System.Collections.Generic;
 
 namespace CZToolKitEditor.IMGUI.Controls
 {
     [Serializable]
     public class ResizableArea
     {
-        [Flags]
-        public enum Direction
+        public enum UIDirection
         {
             None = 0,
-            Left = 1 << 0,
-            Right = 1 << 1,
-            Top = 1 << 2,
-            Bottom = 1 << 3,
-            TopLeft = 1 << 4,
-            TopRight = 1 << 5,
-            MiddleCenter = 1 << 6,
-            BottomLeft = 1 << 7,
-            BottomRight = 1 << 8
+            Left = 1,
+            Right = 2,
+            Top = 4,
+            Bottom = 8,
+            TopLeft = 16,
+            TopRight = 32,
+            MiddleCenter = 64,
+            BottomLeft = 128,
+            BottomRight = 256
         }
 
-        public const float DefaultSideWidth = 10;
+        public const float DefaultSide = 10;
 
-        private Direction activeSides;
-        private Direction draggingSide;
-        private float sideWidth = DefaultSideWidth;
+        bool isDragging;
+
+        UIDirection[] directions;
+        UIDirection sideDirection;
+        UIDirection enabledSides;
+        Dictionary<UIDirection, Rect> sides;
+        Dictionary<UIDirection, float> sideOffset;
 
         public Vector2 minSize = Vector2.zero;
         public Vector2 maxSize = Vector2.zero;
+        public float side = DefaultSide;
 
-        private Rect GetSide(Rect rect, Direction direction, float offset = 0)
+        Dictionary<UIDirection, Rect> Sides
+        {
+            get
+            {
+                if (sides == null)
+                    sides = new Dictionary<UIDirection, Rect>();
+                return sides;
+            }
+        }
+
+        public Dictionary<UIDirection, float> SideOffset
+        {
+            get
+            {
+                if (sideOffset == null)
+                    sideOffset = new Dictionary<UIDirection, float>();
+                return sideOffset;
+            }
+        }
+
+        UIDirection[] Directions
+        {
+            get
+            {
+                if (directions == null)
+                {
+                    Array array = Enum.GetValues(typeof(UIDirection));
+                    directions = new UIDirection[array.Length];
+                    for (int i = 0; i < directions.Length; i++)
+                    {
+                        UIDirection direction = (UIDirection)(array.GetValue(i));
+                        directions[i] = direction;
+                    }
+                }
+
+                return directions;
+            }
+        }
+
+        public ResizableArea()
+        {
+            directions = Directions;
+        }
+
+        public void EnableSide(UIDirection direction)
+        {
+            enabledSides |= direction;
+        }
+
+        public void DisableSide(UIDirection direction)
+        {
+            enabledSides &= ~direction;
+            if (Sides.ContainsKey(direction))
+                Sides.Remove(direction);
+        }
+
+        public bool IsEnabled(UIDirection direction)
+        {
+            return enabledSides.HasFlag(direction);
+        }
+
+        void Reload(Rect rect)
+        {
+            foreach (var direction in Directions)
+            {
+                if (enabledSides.HasFlag(direction))
+                {
+                    float offset;
+                    SideOffset.TryGetValue(direction, out offset);
+                    Sides[direction] = GetSide(rect, direction, side, offset);
+                }
+            }
+        }
+
+        public Rect GetSide(Rect self, UIDirection direction, float width, float offset = 0)
         {
             switch (direction)
             {
-                case Direction.MiddleCenter:
-                    return new Rect(rect.x + sideWidth / 2, rect.y + sideWidth / 2, rect.width - sideWidth,
-                        rect.height - sideWidth);
-                case Direction.Top:
-                    return new Rect(rect.x + sideWidth / 2, rect.y - sideWidth / 2 + offset, rect.width - sideWidth,
-                        sideWidth);
-                case Direction.Bottom:
-                    return new Rect(rect.x + sideWidth / 2, rect.y + rect.height - sideWidth / 2 + offset,
-                        rect.width - sideWidth, sideWidth);
-                case Direction.Left:
-                    return new Rect(rect.x - sideWidth / 2 + offset, rect.y + sideWidth / 2, sideWidth,
-                        rect.height - sideWidth);
-                case Direction.Right:
-                    return new Rect(rect.x + rect.width - sideWidth / 2 + offset, rect.y + sideWidth / 2, sideWidth,
-                        rect.height - sideWidth);
-                case Direction.TopLeft:
-                    return new Rect(rect.x - sideWidth / 2 + offset, rect.y - sideWidth / 2 + offset, sideWidth,
-                        sideWidth);
-                case Direction.TopRight:
-                    return new Rect(rect.x + rect.width - sideWidth / 2 + offset, rect.y - sideWidth / 2 + offset,
-                        sideWidth, sideWidth);
-                case Direction.BottomLeft:
-                    return new Rect(rect.x - sideWidth / 2 + offset, rect.y + rect.height - sideWidth / 2 + offset,
-                        sideWidth, sideWidth);
-                case Direction.BottomRight:
-                    return new Rect(rect.x + rect.width - sideWidth / 2 + offset,
-                        rect.y + rect.height - sideWidth / 2 + offset, sideWidth, sideWidth);
+                case UIDirection.MiddleCenter:
+                    return new Rect(self.x + width / 2, self.y + width / 2, self.width - width, self.height - width);
+                case UIDirection.Top:
+                    return new Rect(self.x + width / 2, self.y - width / 2 + offset, self.width - width, width);
+                case UIDirection.Bottom:
+                    return new Rect(self.x + width / 2, self.y + self.height - width / 2 + offset, self.width - width, width);
+                case UIDirection.Left:
+                    return new Rect(self.x - width / 2 + offset, self.y + width / 2, width, self.height - width);
+                case UIDirection.Right:
+                    return new Rect(self.x + self.width - width / 2 + offset, self.y + width / 2, width, self.height - width);
+                case UIDirection.TopLeft:
+                    return new Rect(self.x - width / 2 + offset, self.y - width / 2 + offset, width, width);
+                case UIDirection.TopRight:
+                    return new Rect(self.x + self.width - width / 2 + offset, self.y - width / 2 + offset, width, width);
+                case UIDirection.BottomLeft:
+                    return new Rect(self.x - width / 2 + offset, self.y + self.height - width / 2 + offset, width, width);
+                case UIDirection.BottomRight:
+                    return new Rect(self.x + self.width - width / 2 + offset, self.y + self.height - width / 2 + offset, width, width);
             }
 
             return new Rect();
         }
 
-        public void EnableSide(Direction direction)
+        public virtual Rect OnGUI(Rect rect)
         {
-            activeSides |= direction;
-        }
-
-        public void DisableSide(Direction direction)
-        {
-            activeSides &= ~direction;
-        }
-
-        public bool IsEnabled(Direction direction)
-        {
-            return (activeSides & direction) == direction;
-        }
-        
-        public Rect OnGUI(Rect position)
-        {
+            Reload(rect);
             Event evt = Event.current;
             switch (evt.type)
             {
                 case EventType.Repaint:
-                {
-                    for (int i = 0; i <= 9; i++)
-                    {
-                        var direction = (Direction)(1 << i);
-                        if (!IsEnabled(direction))
-                            continue;
+                    if (IsEnabled(UIDirection.Top))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Top], MouseCursor.ResizeVertical);
+                    if (IsEnabled(UIDirection.Bottom))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Bottom], MouseCursor.ResizeVertical);
 
-                        var side = GetSide(position, direction, 10);
-                        var mouseCursor = MouseCursor.MoveArrow;
-                        switch (direction)
-                        {
-                            case Direction.Top:
-                            case Direction.Bottom:
-                                mouseCursor = MouseCursor.ResizeVertical;
-                                break;
-                            case Direction.Left:
-                            case Direction.Right:
-                                mouseCursor = MouseCursor.ResizeHorizontal;
-                                break;
-                            case Direction.TopLeft:
-                                mouseCursor = MouseCursor.ResizeUpLeft;
-                                break;
-                            case Direction.TopRight:
-                                mouseCursor = MouseCursor.ResizeUpRight;
-                                break;
-                            case Direction.BottomLeft:
-                                mouseCursor = MouseCursor.ResizeUpRight;
-                                break;
-                            case Direction.BottomRight:
-                                mouseCursor = MouseCursor.ResizeUpLeft;
-                                break;
-                            case Direction.MiddleCenter:
-                                if (draggingSide != Direction.MiddleCenter)
-                                    continue;
-                                mouseCursor = MouseCursor.MoveArrow;
-                                break;
-                        }
+                    if (IsEnabled(UIDirection.Left))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Left], MouseCursor.ResizeHorizontal);
+                    if (IsEnabled(UIDirection.Right))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Right], MouseCursor.ResizeHorizontal);
 
-                        EditorGUIUtility.AddCursorRect(side, mouseCursor);
-                    }
+                    if (IsEnabled(UIDirection.TopLeft))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.TopLeft], MouseCursor.ResizeUpLeft);
+                    if (IsEnabled(UIDirection.TopRight))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.TopRight], MouseCursor.ResizeUpRight);
 
+                    if (IsEnabled(UIDirection.BottomLeft))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.BottomLeft], MouseCursor.ResizeUpRight);
+                    if (IsEnabled(UIDirection.BottomRight))
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.BottomRight], MouseCursor.ResizeUpLeft);
+
+                    if (IsEnabled(UIDirection.MiddleCenter) && isDragging && sideDirection == UIDirection.MiddleCenter)
+                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.MiddleCenter], MouseCursor.MoveArrow);
                     break;
-                }
                 case EventType.MouseDown:
-                {
-                    for (int i = 0; i <= 9; i++)
+                    foreach (var direction in Directions)
                     {
-                        var direction = (Direction)(1 << i);
-                        if (!IsEnabled(direction))
-                            continue;
-
-                        var side = GetSide(position, direction, 10);
-                        if (IsEnabled(direction) && side.Contains(evt.mousePosition))
+                        if (IsEnabled(direction) && Sides[direction].Contains(evt.mousePosition))
                         {
-                            draggingSide = direction;
+                            sideDirection = direction;
+                            isDragging = true;
                             Event.current.Use();
                             break;
                         }
                     }
 
                     break;
-                }
                 case EventType.MouseUp:
-                {
-                    draggingSide = Direction.None;
+                    isDragging = false;
+                    sideDirection = UIDirection.None;
                     break;
-                }
                 case EventType.MouseDrag:
-                {
-                    if (draggingSide == Direction.None)
-                        break;
-                    switch (draggingSide)
+                    if (isDragging)
                     {
-                        case Direction.Top:
-                            if (IsEnabled(draggingSide))
-                                position.yMin = evt.mousePosition.y;
+                        switch (sideDirection)
+                        {
+                            case UIDirection.Top:
+                                if (IsEnabled(sideDirection))
+                                {
+                                    rect.yMin = evt.mousePosition.y;
+                                }
 
-                            break;
-                        case Direction.Bottom:
-                            if (IsEnabled(draggingSide))
-                                position.yMax = evt.mousePosition.y;
+                                break;
+                            case UIDirection.Bottom:
+                                if (IsEnabled(sideDirection))
+                                {
+                                    rect.yMax = evt.mousePosition.y;
+                                }
 
-                            break;
-                        case Direction.Left:
-                            if (IsEnabled(draggingSide))
-                                position.xMin += evt.mousePosition.x;
+                                break;
+                            case UIDirection.Left:
+                                if (IsEnabled(sideDirection))
+                                {
+                                    rect.xMin += evt.mousePosition.x;
+                                }
 
-                            break;
-                        case Direction.Right:
-                            if (IsEnabled(draggingSide))
-                                position.xMax = evt.mousePosition.x;
+                                break;
+                            case UIDirection.Right:
+                                if (IsEnabled(sideDirection))
+                                {
+                                    rect.xMax = evt.mousePosition.x;
+                                }
 
-                            break;
-                        case Direction.TopLeft:
-                            if (IsEnabled(draggingSide))
-                            {
-                                position.yMin = evt.mousePosition.y;
-                                position.xMin += evt.mousePosition.x;
-                            }
+                                break;
+                            case UIDirection.TopLeft:
+                                if (IsEnabled(sideDirection))
+                                {
+                                    rect.yMin = evt.mousePosition.y;
 
-                            break;
-                        case Direction.TopRight:
-                            if (IsEnabled(draggingSide))
-                            {
-                                position.yMin = evt.mousePosition.y;
-                                position.xMax = evt.mousePosition.x;
-                            }
+                                    rect.xMin += evt.mousePosition.x;
+                                }
 
-                            break;
-                        case Direction.BottomLeft:
-                            if (IsEnabled(draggingSide))
-                            {
-                                position.yMax = evt.mousePosition.y;
-                                position.xMin = evt.mousePosition.x;
-                            }
+                                break;
+                            case UIDirection.TopRight:
+                                if (IsEnabled(sideDirection))
+                                {
+                                    rect.yMin = evt.mousePosition.y;
 
-                            break;
-                        case Direction.BottomRight:
-                            if (IsEnabled(draggingSide))
-                            {
-                                position.yMax = evt.mousePosition.y;
-                                position.xMax = evt.mousePosition.x;
-                            }
+                                    rect.xMax = evt.mousePosition.x;
+                                }
 
-                            break;
-                        case Direction.MiddleCenter:
-                            if (IsEnabled(draggingSide))
-                                position.position += evt.delta;
-                            
-                            break;
+                                break;
+                            case UIDirection.BottomLeft:
+                                if (IsEnabled(sideDirection))
+                                {
+                                    rect.yMax = evt.mousePosition.y;
+
+                                    rect.xMin = evt.mousePosition.x;
+                                }
+
+                                break;
+                            case UIDirection.BottomRight:
+                                if (IsEnabled(sideDirection))
+                                {
+                                    rect.yMax = evt.mousePosition.y;
+
+                                    rect.xMax = evt.mousePosition.x;
+                                }
+
+                                break;
+                            case UIDirection.MiddleCenter:
+                                if (IsEnabled(sideDirection))
+                                    rect.position += evt.delta;
+                                break;
+
+                        }
+
+                        evt.Use();
                     }
 
-                    evt.Use();
                     break;
-                }
+                default:
+                    break;
             }
 
-            position.width = Mathf.Max(position.width, minSize.x);
-            position.height = Mathf.Max(position.height, minSize.y);
+            rect.width = Mathf.Max(rect.width, minSize.x);
+            rect.height = Mathf.Max(rect.height, minSize.y);
 
             if (maxSize != Vector2.zero)
             {
-                position.width = Mathf.Min(position.width, maxSize.x);
-                position.height = Mathf.Min(position.height, maxSize.y);
+                rect.width = Mathf.Min(rect.width, maxSize.x);
+                rect.height = Mathf.Min(rect.height, maxSize.y);
             }
 
-            return position;
+            return rect;
         }
     }
 }

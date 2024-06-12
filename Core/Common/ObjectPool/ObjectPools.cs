@@ -32,10 +32,10 @@ namespace CZToolKit
         }
     }
 
-    public class ObjectPools : AutoSingleton<ObjectPools>, ISingletonAwake
+    public class ObjectPools : Singleton<ObjectPools>, ISingletonAwake
     {
         private static Dictionary<Type, IObjectPool> s_CustomPools;
-
+        
         static ObjectPools()
         {
             var baseType = typeof(IObjectPool);
@@ -57,7 +57,6 @@ namespace CZToolKit
                 s_CustomPools.Add(attribute.unitType, pool as IObjectPool);
             }
         }
-        
         
         private Dictionary<Type, IObjectPool> pools;
 

@@ -44,7 +44,7 @@ namespace CZToolKit
     }
 
     [Serializable]
-    public class BindableSharedVariable<T> : IBindableProperty<T>, ISharedVariable, ISharedVariable<T>
+    public class BindableSharedVariable<T> : IBindableProperty<T>, IBindableProperty, ISharedVariable, ISharedVariable<T>
     {
         private IValueProvider valueProvider;
 

@@ -16,10 +16,9 @@
 
 #endregion
 
-using System;
 using UnityEngine;
 
-namespace CZToolKit
+namespace CZToolKit.Unity
 {
     public class AutoMonoSingleton<T> : MonoBehaviour, ISingleton where T : AutoMonoSingleton<T>
     {

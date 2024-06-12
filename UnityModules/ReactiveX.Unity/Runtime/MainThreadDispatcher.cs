@@ -14,7 +14,7 @@
  */
 #endregion
 
-using CZToolKit;
+using CZToolKit.Unity;
 
 namespace CZToolKit.RX
 {

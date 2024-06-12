@@ -78,7 +78,7 @@ namespace CZToolKitEditor
         protected virtual void OnEnable()
         {
             leftArea.minSize = new Vector2(LeftMinWidth, 50);
-            leftArea.EnableSide(ResizableArea.Direction.Right);
+            leftArea.EnableSide(ResizableArea.UIDirection.Right);
 
             searchField = new SearchField();
             RefreshTreeView();

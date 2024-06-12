@@ -107,7 +107,7 @@ namespace CZToolKit
 
             foreach (var evt in evts)
             {
-                (evt as GlobalEvent<A>).Handle(arg);
+                (evt as GlobalEvent<A>)?.Handle(arg);
             }
         }
     }

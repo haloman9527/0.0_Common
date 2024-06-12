@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CZToolKit
@@ -8,13 +9,34 @@ namespace CZToolKit
     {
         private StringBuilder codeBuilder = new StringBuilder();
         private StringBuilder tempBuilder = new StringBuilder();
+        private Dictionary<string, int> marks = new Dictionary<string, int>();
         public int indentLevel = 0;
+
+        public int Lenght
+        {
+            get { return codeBuilder.Length; }
+        }
 
         public void Clear()
         {
             codeBuilder.Clear();
             tempBuilder.Clear();
             indentLevel = 0;
+        }
+
+        public void Mark(string key)
+        {
+            marks[key] = codeBuilder.Length;
+        }
+
+        public void RemoveMark(string key)
+        {
+            marks.Remove(key);
+        }
+
+        public int GetMark(string key)
+        {
+            return marks[key];
         }
 
         public void WriteLine()
@@ -24,22 +46,13 @@ namespace CZToolKit
 
         public void WriteLine(string code)
         {
-            codeBuilder.AppendLine($"{new string(' ', indentLevel * 4)}{code}");
+            var text = $"{new string(' ', indentLevel * 4)}{code}";
+            codeBuilder.AppendLine(text);
         }
 
         public void WriteLineWithoutIndent(string code)
         {
             codeBuilder.AppendLine(code);
-        }
-
-        public void WriteUsingNamespace(string name)
-        {
-            WriteLine($"using {name};");
-        }
-
-        public void WriteRenameType(string newTypeName, string sourceTypeName)
-        {
-            WriteLine($"using {newTypeName} = {sourceTypeName};");
         }
 
         public void BeginRegion(string region)
@@ -70,6 +83,42 @@ namespace CZToolKit
             WriteLine("};");
         }
 
+        public void InsertLine(int index, string code)
+        {
+            var text = $"{new string(' ', indentLevel * 4)}{code}\n";
+            codeBuilder.Insert(index, text);
+            foreach (var key in marks.Keys.ToArray())
+            {
+                if (marks[key] >= index)
+                {
+                    marks[key] += text.Length;
+                }
+            }
+        }
+
+        public void InsertLineWithoutIndent(int index, string code)
+        {
+            var text = code + '\n';
+            codeBuilder.Insert(index, text);
+            foreach (var key in marks.Keys.ToArray())
+            {
+                if (marks[key] >= index)
+                {
+                    marks[key] += text.Length;
+                }
+            }
+        }
+
+        public void WriteUsingNamespace(string name)
+        {
+            WriteLine($"using {name};");
+        }
+
+        public void WriteRenameType(string newTypeName, string sourceTypeName)
+        {
+            WriteLine($"using {newTypeName} = {sourceTypeName};");
+        }
+        
         public void BeginNamespace(string name)
         {
             WriteLine($"namespace {name}");
@@ -176,5 +225,12 @@ namespace CZToolKit
         {
             return codeBuilder.ToString();
         }
+    }
+
+    public struct Line
+    {
+        public string text;
+        public int startIndex;
+        public int indent;
     }
 }

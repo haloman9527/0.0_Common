@@ -3,7 +3,7 @@
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
  *      反射操作及缓存
  *  Date:
@@ -29,15 +29,14 @@ namespace CZToolKit
 
         public static IReadOnlyList<Type> AllTypes
         {
-            get { return s_AllTypes; }
+            get
+            {
+                Init();
+                return s_AllTypes;
+            }
         }
 
-        static Util_TypeCache()
-        {
-            Init(true);
-        }
-
-        public static void Init(bool force)
+        public static void Init(bool force = false)
         {
             if (!force && s_Initialized)
                 return;
@@ -57,8 +56,52 @@ namespace CZToolKit
             s_Initialized = true;
         }
 
+#if UNITY_EDITOR
+        public static IEnumerable<Type> GetTypesWithAttribute(Type attributeType)
+        {
+            var types = UnityEditor.TypeCache.GetTypesWithAttribute(attributeType);
+            foreach (var type in types)
+            {
+                yield return type;
+            }
+        }
+
+        public static IEnumerable<Type> GetTypesWithAttribute<T>() where T : Attribute
+        {
+            return GetTypesWithAttribute(typeof(T));
+        }
+
+        public static IEnumerable<Type> GetTypesDerivedFrom(Type parentType)
+        {
+            var types = UnityEditor.TypeCache.GetTypesDerivedFrom(parentType);
+            foreach (var type in types)
+            {
+                yield return type;
+            }
+        }
+
+        public static IEnumerable<Type> GetTypesDerivedFrom<T>()
+        {
+            return GetTypesDerivedFrom(typeof(T));
+        }
+
+        public static IEnumerable<MethodInfo> GetMethodsWithAttribute(Type attributeType)
+        {
+            var methods = UnityEditor.TypeCache.GetMethodsWithAttribute(attributeType);
+            foreach (var method in methods)
+            {
+                yield return method;
+            }
+        }
+
+        public static IEnumerable<MethodInfo> GetMethodsWithAttribute<T>() where T : Attribute
+        {
+            return GetMethodsWithAttribute(typeof(T));
+        }
+#else
         public static IEnumerable<Type> GetTypesWithAttribute(Type attributeType, bool inherit = true)
         {
+            Init();
             foreach (var type in AllTypes)
             {
                 if (!type.IsDefined(attributeType, inherit))
@@ -74,6 +117,7 @@ namespace CZToolKit
 
         public static IEnumerable<Type> GetTypesDerivedFrom(Type parentType)
         {
+            Init();
             foreach (var type in AllTypes)
             {
                 if (type == parentType)
@@ -91,6 +135,7 @@ namespace CZToolKit
 
         public static IEnumerable<MethodInfo> GetMethodsWithAttribute(Type attributeType, bool inherit = true)
         {
+            Init();
             foreach (var type in AllTypes)
             {
                 foreach (var method in type.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
@@ -106,5 +151,6 @@ namespace CZToolKit
         {
             return GetMethodsWithAttribute(typeof(T), inherit);
         }
+#endif
     }
 }

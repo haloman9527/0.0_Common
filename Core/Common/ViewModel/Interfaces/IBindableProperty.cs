@@ -30,7 +30,7 @@ namespace CZToolKit
         void ClearValueChangedEvent();
     }
 
-    public interface IBindableProperty<T> : IBindableProperty
+    public interface IBindableProperty<T>
     {
         event ValueChangedEvent<T> onValueChanged;
 

@@ -18,12 +18,14 @@
 
 #if UNITY_EDITOR
 
+using System;
 using UnityEngine;
 using UnityEditor;
 
 namespace CZToolKitEditor.IMGUI.Controls
 {
-    public class EditorGUISplitView
+    [Serializable]
+    public class SplitView
     {
         public enum Direction
         {
@@ -31,14 +33,14 @@ namespace CZToolKitEditor.IMGUI.Controls
             Vertical
         }
 
-        Direction splitDirection;
-        float splitNormalizedPosition;
-        bool resize;
+        private Direction splitDirection;
+        private float splitNormalizedPosition;
+        private bool resize;
+        public Rect availableRect;
         public Vector2 scrollPosition;
-        Rect availableRect;
 
 
-        public EditorGUISplitView(Direction splitDirection)
+        public SplitView(Direction splitDirection)
         {
             splitNormalizedPosition = 0.5f;
             this.splitDirection = splitDirection;
@@ -55,6 +57,7 @@ namespace CZToolKitEditor.IMGUI.Controls
 
             if (tempRect.width > 0.0f)
             {
+                tempRect.width = Mathf.Max(tempRect.width, 10);
                 availableRect = tempRect;
             }
 
@@ -69,6 +72,7 @@ namespace CZToolKitEditor.IMGUI.Controls
         public void Split()
         {
             GUILayout.EndScrollView();
+            GUILayout.Space(5);
             ResizeSplitFirstView();
         }
 
@@ -85,13 +89,16 @@ namespace CZToolKitEditor.IMGUI.Controls
             Rect resizeHandleRect;
 
             if (splitDirection == Direction.Horizontal)
-                resizeHandleRect = new Rect(availableRect.width * splitNormalizedPosition, availableRect.y, 2f,
+                resizeHandleRect = new Rect(availableRect.width * splitNormalizedPosition, availableRect.y, 5f,
                     availableRect.height);
             else
                 resizeHandleRect = new Rect(availableRect.x, availableRect.height * splitNormalizedPosition,
-                    availableRect.width, 2f);
+                    availableRect.width, 5f);
 
-            GUI.DrawTexture(resizeHandleRect, EditorGUIUtility.whiteTexture);
+            var resizeHandleRect2 = resizeHandleRect;
+            resizeHandleRect2.width = 2;
+            resizeHandleRect2.x += 1;
+            GUI.DrawTexture(resizeHandleRect2, EditorGUIUtility.whiteTexture);
 
             if (splitDirection == Direction.Horizontal)
                 EditorGUIUtility.AddCursorRect(resizeHandleRect, MouseCursor.ResizeHorizontal);

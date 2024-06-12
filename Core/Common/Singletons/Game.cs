@@ -6,10 +6,7 @@ namespace CZToolKit
     public static class Game
     {
         private static readonly Dictionary<Type, ISingleton> singletonTypes = new Dictionary<Type, ISingleton>();
-        private static readonly Stack<ISingleton> singletons = new Stack<ISingleton>();
-        private static readonly Queue<ISingleton> fixedUpdates = new Queue<ISingleton>();
-        private static readonly Queue<ISingleton> updates = new Queue<ISingleton>();
-        private static readonly Queue<ISingleton> lateUpdates = new Queue<ISingleton>();
+        private static readonly Queue<ISingleton> singletons = new Queue<ISingleton>();
 
         public static IReadOnlyDictionary<Type, ISingleton> SingleTypes => singletonTypes;
 
@@ -33,29 +30,20 @@ namespace CZToolKit
         private static void AddSingleton_Internal(ISingleton singleton, Type singletonType)
         {
             singletonTypes.Add(singletonType, singleton);
-            singletons.Push(singleton);
+            singletons.Enqueue(singleton);
 
             singleton.Register();
 
             if (singleton is ISingletonAwake awake)
                 awake.Awake();
-
-            if (singleton is ISingletonFixedUpdate)
-                fixedUpdates.Enqueue(singleton);
-
-            if (singleton is ISingletonUpdate)
-                updates.Enqueue(singleton);
-
-            if (singleton is ISingletonLateUpdate)
-                lateUpdates.Enqueue(singleton);
         }
 
         public static void FixedUpdate()
         {
-            int count = fixedUpdates.Count;
+            int count = singletons.Count;
             while (count-- > 0)
             {
-                var singleton = fixedUpdates.Dequeue();
+                var singleton = singletons.Dequeue();
 
                 if (singleton.IsDisposed)
                     continue;
@@ -63,17 +51,17 @@ namespace CZToolKit
                 if (!(singleton is ISingletonFixedUpdate fixedUpdate))
                     continue;
 
-                fixedUpdates.Enqueue(singleton);
+                singletons.Enqueue(singleton);
                 fixedUpdate.FixedUpdate();
             }
         }
 
         public static void Update()
         {
-            int count = updates.Count;
+            int count = singletons.Count;
             while (count-- > 0)
             {
-                var singleton = updates.Dequeue();
+                var singleton = singletons.Dequeue();
 
                 if (singleton.IsDisposed)
                     continue;
@@ -81,17 +69,17 @@ namespace CZToolKit
                 if (!(singleton is ISingletonUpdate update))
                     continue;
 
-                updates.Enqueue(singleton);
+                singletons.Enqueue(singleton);
                 update.Update();
             }
         }
 
         public static void LateUpdate()
         {
-            int count = lateUpdates.Count;
+            int count = singletons.Count;
             while (count-- > 0)
             {
-                var singleton = lateUpdates.Dequeue();
+                var singleton = singletons.Dequeue();
 
                 if (singleton.IsDisposed)
                     continue;
@@ -99,7 +87,7 @@ namespace CZToolKit
                 if (!(singleton is ISingletonLateUpdate lateUpdate))
                     continue;
 
-                lateUpdates.Enqueue(singleton);
+                singletons.Enqueue(singleton);
                 lateUpdate.LateUpdate();
             }
         }
@@ -107,9 +95,15 @@ namespace CZToolKit
         public static void Close()
         {
             // 顺序反过来清理
+            var singletonStack = new Stack<ISingleton>();
             while (singletons.Count > 0)
             {
-                var singleton = singletons.Pop();
+                singletonStack.Push(singletons.Dequeue());
+            }
+            
+            while (singletonStack.Count > 0)
+            {
+                var singleton = singletonStack.Pop();
                 if (singleton.IsDisposed)
                     continue;
                 singleton.Dispose();

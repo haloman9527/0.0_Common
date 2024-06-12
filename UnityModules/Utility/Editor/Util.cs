@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit
+namespace CZToolKit.Unity
 {
     public static class Util_UnityEditor
     {

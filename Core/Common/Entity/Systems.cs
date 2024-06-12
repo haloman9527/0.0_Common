@@ -191,19 +191,6 @@ namespace CZToolKit
             }
         }
 
-        public static void OnCreate(Entity entity)
-        {
-            var type = entity.GetType();
-            var systems = GetSystems(type, typeof(IOnCreateSystem));
-            if (systems == null)
-                return;
-
-            for (int i = 0; i < systems.Count; i++)
-            {
-                ((IOnCreateSystem)systems[i]).Execute(entity);
-            }
-        }
-
         public static void Destroy(Entity entity)
         {
             var type = entity.GetType();
