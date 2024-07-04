@@ -18,17 +18,13 @@ namespace CZToolKit
     public interface IEvtTask<K>
     {
         public K EvtName { get; }
-        public Type ArgType { get; }
-        public object Arg { get; }
     }
-
+    
     public class EvtTask<K> : IEvtTask<K>
     {
         public K evtName;
 
         public K EvtName => evtName;
-        public Type ArgType => null;
-        public object Arg => null;
     }
 
     public class EvtTask<K, A> : IEvtTask<K>
@@ -38,7 +34,7 @@ namespace CZToolKit
 
         public K EvtName => evtName;
         public Type ArgType => typeof(A);
-        public object Arg => arg;
+        public A Arg => arg;
     }
 
     public partial class GlobalEvents
@@ -112,7 +108,7 @@ namespace CZToolKit
         }
     }
 
-    public partial class GlobalEvents : ISingleton, ISingletonFixedUpdate
+    public partial class GlobalEvents : ISingleton
     {
         private static GlobalEvents s_Instance;
 
@@ -122,7 +118,6 @@ namespace CZToolKit
         }
 
         private Events<string> events;
-        private Queue<IEvtTask<string>> eventTasks;
 
         public bool IsDisposed { get; private set; }
 
@@ -133,7 +128,6 @@ namespace CZToolKit
 
             s_Instance = this;
             events = new Events<string>();
-            eventTasks = new Queue<IEvtTask<string>>();
         }
 
         public void Dispose()
@@ -143,24 +137,6 @@ namespace CZToolKit
 
             this.IsDisposed = true;
             s_Instance = null;
-            eventTasks.Clear();
-            eventTasks = null;
-        }
-
-        public void FixedUpdate()
-        {
-            while (eventTasks.Count > 0)
-            {
-                var task = eventTasks.Dequeue();
-                if (task.ArgType == null)
-                {
-                    events.Publish(task.EvtName);
-                }
-                else
-                {
-                    events.Publish(task.EvtName, task.Arg);
-                }
-            }
         }
         
         public void Subscribe<T>(string key, Action<T> handler)
@@ -193,9 +169,9 @@ namespace CZToolKit
             events.Publish(key);
         }
 
-        public bool HasEvent(string key)
+        public bool ExistsEvent(string key)
         {
-            return events.HasEvent(key);
+            return events.ExistsEvent(key);
         }
 
         public void Clear()

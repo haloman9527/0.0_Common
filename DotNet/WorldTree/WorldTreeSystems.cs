@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CZToolKit
 {
-    public static class Systems
+    public static class WorldTreeSystems
     {
         private class OneTypeSystems
         {
@@ -14,7 +14,7 @@ namespace CZToolKit
         private static bool s_Initialized;
         private static Dictionary<Type, OneTypeSystems> s_Systems;
 
-        static Systems()
+        static WorldTreeSystems()
         {
             Init(true);
         }

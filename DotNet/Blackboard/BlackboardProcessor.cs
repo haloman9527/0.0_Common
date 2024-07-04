@@ -115,7 +115,7 @@ namespace CZToolKit.Blackboard
 
         private void NotifyObservers(TKey key, object value, NotifyType notifyType)
         {
-            if (!events.HasEvent(key))
+            if (!events.ExistsEvent(key))
                 return;
 
             addObservers.Clear();

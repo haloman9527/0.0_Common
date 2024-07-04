@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace CZToolKit
 {
+    public interface IEvent
+    {
+        bool IsNull { get; }
+    }
+
     public class Events<TKey>
     {
-        public interface IEvent
-        {
-            bool IsNull { get; }
-        }
-
         private class Event : IEvent
         {
             public event Action handler;
@@ -96,7 +96,7 @@ namespace CZToolKit
             ((Event)evts).Handle();
         }
 
-        public bool HasEvent(TKey key)
+        public bool ExistsEvent(TKey key)
         {
             return events.TryGetValue(key, out var evts) && !evts.IsNull;
         }

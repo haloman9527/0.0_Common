@@ -3,9 +3,9 @@
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
- *  
+ *
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
@@ -22,7 +22,42 @@ using System.Collections.Generic;
 
 namespace CZToolKit
 {
-    public class ViewModel : IDictionary<string, IBindableProperty>, IReadOnlyDictionary<string, IBindableProperty>
+    public interface IViewModel
+    {
+        int Count { get; }
+
+        IBindableProperty this[string propertyName] { get; set; }
+
+        IEnumerable<string> Keys { get; }
+
+        IEnumerable<IBindableProperty> Values { get; }
+
+        IEnumerator<KeyValuePair<string, IBindableProperty>> GetEnumerator();
+
+        bool Contains(string key);
+
+        void Clear();
+
+        IBindableProperty GetProperty(string propertyName);
+
+        IBindableProperty<T> GetProperty<T>(string propertyName);
+
+        bool TryGetProperty(string propertyName, out IBindableProperty property);
+
+        bool TrygetProperty<T>(string propertyName, out IBindableProperty<T> property);
+
+        void RegisterProperty(string propertyName, IBindableProperty property);
+
+        void UnregisterProperty(string propertyName);
+
+        T GetPropertyValue<T>(string propertyName);
+
+        void SetPropertyValue<T>(string propertyName, T value);
+
+        void ClearValueChangedEvent(string propertyName);
+    }
+
+    public class ViewModel : IViewModel
     {
         private Dictionary<string, IBindableProperty> internalBindableProperties;
 
@@ -38,15 +73,9 @@ namespace CZToolKit
 
         public int Count => InternalBindableProperties.Count;
 
-        public bool IsReadOnly => (InternalBindableProperties as IDictionary).IsReadOnly;
-
         public IEnumerable<string> Keys => InternalBindableProperties.Keys;
 
         public IEnumerable<IBindableProperty> Values => InternalBindableProperties.Values;
-
-        ICollection<IBindableProperty> IDictionary<string, IBindableProperty>.Values => InternalBindableProperties.Values;
-
-        ICollection<string> IDictionary<string, IBindableProperty>.Keys => InternalBindableProperties.Keys;
 
         public IBindableProperty this[string propertyName]
         {
@@ -69,19 +98,68 @@ namespace CZToolKit
             return (InternalBindableProperties as IDictionary<string, IBindableProperty>).Remove(item);
         }
 
-        public void Add(string key, IBindableProperty value)
+        public bool Contains(string propertyName)
         {
-            InternalBindableProperties.Add(key, value);
+            return InternalBindableProperties.ContainsKey(propertyName);
         }
 
-        public bool ContainsKey(string key)
+        public IBindableProperty GetProperty(string propertyName)
         {
-            return InternalBindableProperties.ContainsKey(key);
+            if (internalBindableProperties == null)
+            {
+                return null;
+            }
+
+            if (!internalBindableProperties.TryGetValue(propertyName, out var property))
+            {
+                return null;
+            }
+
+            return property;
         }
 
-        public bool TryGetValue(string key, out IBindableProperty value)
+        public IBindableProperty<T> GetProperty<T>(string propertyName)
         {
-            return InternalBindableProperties.TryGetValue(key, out value);
+            if (internalBindableProperties == null)
+            {
+                return null;
+            }
+
+            if (!internalBindableProperties.TryGetValue(propertyName, out var property))
+            {
+                return null;
+            }
+
+            return property as IBindableProperty<T>;
+        }
+
+        public bool TryGetProperty(string propertyName, out IBindableProperty property)
+        {
+            if (internalBindableProperties == null)
+            {
+                property = null;
+                return false;
+            }
+
+            return internalBindableProperties.TryGetValue(propertyName, out property);
+        }
+
+        public bool TrygetProperty<T>(string propertyName, out IBindableProperty<T> property)
+        {
+            if (internalBindableProperties == null)
+            {
+                property = null;
+                return false;
+            }
+
+            if (!internalBindableProperties.TryGetValue(propertyName, out var tempProperty))
+            {
+                property = null;
+                return false;
+            }
+
+            property = tempProperty as IBindableProperty<T>;
+            return property != null;
         }
 
         public bool Remove(string key)
@@ -94,29 +172,14 @@ namespace CZToolKit
             InternalBindableProperties.Clear();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return InternalBindableProperties.GetEnumerator();
-        }
-
-        void ICollection<KeyValuePair<string, IBindableProperty>>.Add(KeyValuePair<string, IBindableProperty> item)
-        {
-            (InternalBindableProperties as ICollection<KeyValuePair<string, IBindableProperty>>).Add(item);
-        }
-
-        void ICollection<KeyValuePair<string, IBindableProperty>>.CopyTo(KeyValuePair<string, IBindableProperty>[] array, int arrayIndex)
-        {
-            (InternalBindableProperties as ICollection<KeyValuePair<string, IBindableProperty>>).CopyTo(array, arrayIndex);
-        }
-
         public void RegisterProperty(string propertyName, IBindableProperty property)
         {
-            this.Add(propertyName, property);
+            InternalBindableProperties.Add(propertyName, property);
         }
 
         public void UnregisterProperty(string propertyName)
         {
-            this.Remove(propertyName);
+            InternalBindableProperties.Remove(propertyName);
         }
 
         public T GetPropertyValue<T>(string propertyName)

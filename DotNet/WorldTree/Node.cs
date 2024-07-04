@@ -254,7 +254,7 @@ namespace CZToolKit
             o.InstanceId = Domain.WorldTree.GenerateInstanceId();
             o.Parent = this;
 
-            Systems.Awake(o);
+            WorldTreeSystems.Awake(o);
 
             return o;
         }
@@ -266,7 +266,7 @@ namespace CZToolKit
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
-            Systems.Awake(o);
+            WorldTreeSystems.Awake(o);
 
             return o;
         }
@@ -278,7 +278,7 @@ namespace CZToolKit
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
-            Systems.Awake(o, a);
+            WorldTreeSystems.Awake(o, a);
 
             return o;
         }
@@ -290,7 +290,7 @@ namespace CZToolKit
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
-            Systems.Awake(o, a, b);
+            WorldTreeSystems.Awake(o, a, b);
 
             return o;
         }
@@ -302,7 +302,7 @@ namespace CZToolKit
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
-            Systems.Awake(o, a, b, c);
+            WorldTreeSystems.Awake(o, a, b, c);
 
             return o;
         }
@@ -314,7 +314,7 @@ namespace CZToolKit
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
-            Systems.Awake(o, a, b, c, d);
+            WorldTreeSystems.Awake(o, a, b, c, d);
 
             return o;
         }
@@ -421,8 +421,8 @@ namespace CZToolKit
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
-            Systems.Awake(component);
-            Systems.AddComponent(this, component);
+            WorldTreeSystems.Awake(component);
+            WorldTreeSystems.AddComponent(this, component);
         }
 
         public Node AddComponent(Type type)
@@ -437,8 +437,8 @@ namespace CZToolKit
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
-            Systems.Awake(component);
-            Systems.AddComponent(this, component);
+            WorldTreeSystems.Awake(component);
+            WorldTreeSystems.AddComponent(this, component);
 
             return component;
         }
@@ -455,8 +455,8 @@ namespace CZToolKit
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
-            Systems.Awake(component, a);
-            Systems.AddComponent(this, component);
+            WorldTreeSystems.Awake(component, a);
+            WorldTreeSystems.AddComponent(this, component);
 
             return component;
         }
@@ -473,8 +473,8 @@ namespace CZToolKit
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
-            Systems.Awake(component, a, b);
-            Systems.AddComponent(this, component);
+            WorldTreeSystems.Awake(component, a, b);
+            WorldTreeSystems.AddComponent(this, component);
 
             return component;
         }
@@ -491,8 +491,8 @@ namespace CZToolKit
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
-            Systems.Awake(component, a, b, c);
-            Systems.AddComponent(this, component);
+            WorldTreeSystems.Awake(component, a, b, c);
+            WorldTreeSystems.AddComponent(this, component);
 
             return component;
         }
@@ -509,8 +509,8 @@ namespace CZToolKit
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
-            Systems.Awake(component, a, b, c, d);
-            Systems.AddComponent(this, component);
+            WorldTreeSystems.Awake(component, a, b, c, d);
+            WorldTreeSystems.AddComponent(this, component);
 
             return component;
         }
@@ -670,7 +670,7 @@ namespace CZToolKit
                 return;
             }
 
-            Systems.Destroy(this);
+            WorldTreeSystems.Destroy(this);
 
             var instanceId = this.m_instanceId;
             this.InstanceId = 0;

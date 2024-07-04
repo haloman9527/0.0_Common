@@ -44,11 +44,11 @@ namespace CZToolKit
         {
             this.entities.Add(entity.InstanceId, entity);
             var entityType = entity.GetType();
-            if (Systems.GetSystems(entityType, typeof(IFixedUpdateSystem)) != null)
+            if (WorldTreeSystems.GetSystems(entityType, typeof(IFixedUpdateSystem)) != null)
                 fixedUpdateEntitiesQueue.Enqueue(entity.InstanceId);
-            if (Systems.GetSystems(entityType, typeof(IUpdateSystem)) != null)
+            if (WorldTreeSystems.GetSystems(entityType, typeof(IUpdateSystem)) != null)
                 updateEntitiesQueue.Enqueue(entity.InstanceId);
-            if (Systems.GetSystems(entityType, typeof(ILateUpdateSystem)) != null)
+            if (WorldTreeSystems.GetSystems(entityType, typeof(ILateUpdateSystem)) != null)
                 lateUpdateEntitiesQueue.Enqueue(entity.InstanceId);
         }
 
@@ -65,17 +65,17 @@ namespace CZToolKit
 
         public void FixedUpdate()
         {
-            Systems.FixedUpdate(this, fixedUpdateEntitiesQueue);
+            WorldTreeSystems.FixedUpdate(this, fixedUpdateEntitiesQueue);
         }
 
         public void Update()
         {
-            Systems.Update(this, updateEntitiesQueue);
+            WorldTreeSystems.Update(this, updateEntitiesQueue);
         }
 
         public void LateUpdate()
         {
-            Systems.LateUpdate(this, lateUpdateEntitiesQueue);
+            WorldTreeSystems.LateUpdate(this, lateUpdateEntitiesQueue);
         }
     }
 }
