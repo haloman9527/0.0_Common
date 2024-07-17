@@ -143,7 +143,11 @@ namespace CZToolKit
 
         public void Recycle(Type unitType, object unit)
         {
-            GetOrCreatePool(unitType).Recycle(unit);
+            var pool = GetPool(unitType);
+            if (pool == null)
+                return;
+            
+            pool.Recycle(unit);
         }
     }
 }
