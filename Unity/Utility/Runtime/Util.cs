@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace CZToolKit.Unity
 {
-    public static class Util_Unity
+    public static class Util
     {
 #if UNITY_EDITOR
         /// <summary>
@@ -45,6 +45,23 @@ namespace CZToolKit.Unity
             var texture = new Texture2D(100, 100);
             texture.LoadImage(bytes);
             return texture;
+        }
+
+        public static string GetTransformPath(this Transform transform)
+        {
+            var path = transform.name;
+            while (true)
+            {
+                transform = transform.parent;
+                if (transform == null)
+                {
+                    break;
+                }
+
+                path = $"{transform}/{path}";
+            }
+
+            return path;
         }
     }
 }

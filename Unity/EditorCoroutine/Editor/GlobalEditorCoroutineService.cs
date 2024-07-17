@@ -50,7 +50,7 @@ namespace CZToolKit.EditorCoroutine
         public const string NAME = nameof(GlobalEditorCoroutineService);
         public const string KEY = "GlobalEditorCoroutine.Settings";
 
-#if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER && HALOMAN
         [SettingsProvider]
         public static SettingsProvider CreateSettingsProvider()
         {
@@ -62,7 +62,7 @@ namespace CZToolKit.EditorCoroutine
         }
 #endif
 
-#if !UNITY_2019_1_OR_NEWER
+#if !UNITY_2019_1_OR_NEWER && HALOMAN
         [PreferenceItem(Name)]
 #endif
         private static void PreferencesGUI()

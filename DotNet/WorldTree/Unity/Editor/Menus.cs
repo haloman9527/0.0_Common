@@ -8,7 +8,9 @@ namespace CZToolKit.Editors
     {
         public const string WORLD_TREE_PREVIEW_DEFINE = "WORLD_TREE_PREVIEW";
 
-        [MenuItem("Tools/CZToolKit/ET/Enable World Tree Preview")]
+#if HALOMAN
+        [MenuItem("Tools/CZToolKit/World Tree/Enable World Tree Preview")]
+#endif
         public static void SwitchPreview()
         {
             var targetGroup = BuildTargetGroup.Standalone; // 选择目标平台
@@ -20,12 +22,14 @@ namespace CZToolKit.Editors
             PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, defines.ToArray());
         }
 
-        [MenuItem("Tools/CZToolKit/ET/Enable World Tree Preview", validate = true)]
+#if HALOMAN
+        [MenuItem("Tools/CZToolKit/World Tree/Enable World Tree Preview", validate = true)]
+#endif
         public static bool EnablePreviewValid()
         {
             var targetGroup = BuildTargetGroup.Standalone; // 选择目标平台
             var defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup).Split(';').ToList();
-            Menu.SetChecked("Tools/CZToolKit/ET/Enable World Tree Preview", defines.Contains(WORLD_TREE_PREVIEW_DEFINE));
+            Menu.SetChecked("Tools/CZToolKit/World Tree/Enable World Tree Preview", defines.Contains(WORLD_TREE_PREVIEW_DEFINE));
             return true;
         }
     }
