@@ -28,7 +28,7 @@ namespace CZToolKitEditor
         /// <summary>  </summary>
         /// <param name="key"> 用于存取上下文数据 </param>
         /// <returns> visible or not </returns>
-        public static bool BeginFadeGroup(string key, bool visible, float speed = 1)
+        public static bool BeginFadeGroup(string key, bool visible, out bool animating, float speed = 1)
         {
             if (!GUIHelper.TryGetContextData<AnimFloat>(key, out var contextData))
                 contextData.value = new AnimFloat(visible ? 1 : 0);
@@ -46,6 +46,7 @@ namespace CZToolKitEditor
             }
 
             EditorGUIExtension.BeginAlpha(t);
+            animating = visible ? !Mathf.Approximately(t, 1) : t != 0;
             return EditorGUILayout.BeginFadeGroup(t);
         }
 
@@ -115,13 +116,11 @@ namespace CZToolKitEditor
             }
 
             EditorGUI.BeginDisabledGroup(!enable);
-            EditorGUI.indentLevel++;
             return (foldout, enable);
         }
 
         public static void EndToggleGroup()
         {
-            EditorGUI.indentLevel--;
             EditorGUI.EndDisabledGroup();
             EndVerticalBoxGroup();
         }
@@ -137,13 +136,11 @@ namespace CZToolKitEditor
         {
             BeginVerticalBoxGroup();
             foldout = Foldout(label, foldout);
-            EditorGUI.indentLevel++;
             return foldout;
         }
 
         public static void EndFoldoutGroup()
         {
-            EditorGUI.indentLevel--;
             EndVerticalBoxGroup();
         }
 

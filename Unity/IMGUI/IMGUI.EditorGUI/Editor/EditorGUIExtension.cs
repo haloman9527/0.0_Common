@@ -143,6 +143,13 @@ namespace CZToolKitEditor
                 case EventType.Repaint:
                     GUI.Box(rect, string.Empty, GUI.skin.button);
                     Rect t = rect;
+                    
+                    if (EditorGUIUtility.hierarchyMode)
+                    {
+                        int num = EditorStyles.foldout.padding.left - EditorStyles.label.padding.left;
+                        t.xMin += (float) num;
+                    }
+                    
                     t.xMin += 5;
                     t.xMax -= 5;
                     EditorGUI.Foldout(t, foldout, label);

@@ -3,9 +3,9 @@
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
- *  
+ *
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
@@ -32,10 +32,10 @@ namespace CZToolKit
     {
         public static class Styles
         {
-            public static readonly GUIContent ClearSameLabel = new GUIContent(EditorGUIUtility.FindTexture("Refresh"), "Clear Same");
-            public static readonly GUIContent ClearEmptyLabel = new GUIContent(EditorGUIUtility.FindTexture("Refresh"), "Clear Empty");
-            public static readonly GUIContent ClearAllLabel = new GUIContent(EditorGUIUtility.FindTexture("Refresh"), "Clear All");
-            public static readonly GUIContent SortLabel = new GUIContent(EditorGUIUtility.FindTexture("AlphabeticalSorting"), "Sort");
+            public static readonly GUIContent ClearSameLabel = new GUIContent("S", "相同值只留第一个");
+            public static readonly GUIContent ClearEmptyLabel = new GUIContent("E", "清理所有空值");
+            public static readonly GUIContent ClearAllLabel = new GUIContent("C", "清空所有");
+            public static readonly GUIContent SortLabel = new GUIContent(EditorGUIUtility.FindTexture("AlphabeticalSorting"), "排序");
             public static readonly GUIContent ComponentsLabel = new GUIContent(EditorGUIUtility.FindTexture("UnityEditor.HierarchyWindow"), "Components");
         }
 
@@ -110,7 +110,7 @@ namespace CZToolKit
                 EditorGUI.BeginChangeCheck();
                 var sourceK = key.stringValue;
                 var k = EditorGUI.DelayedTextField(keyFieldRect, sourceK);
-                if (!string.IsNullOrEmpty(k) && k != sourceK && !referenceCollector.ReferencesMap.ContainsKey(k))
+                if (!string.IsNullOrEmpty(k) && k != sourceK && !referenceCollector.Contains(k))
                     key.stringValue = k;
 
                 EditorGUI.PropertyField(objFieldRect, value, GUIContent.none);
@@ -169,16 +169,17 @@ namespace CZToolKit
                 do
                 {
                     key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
-                } while (referenceCollector.ReferencesMap.ContainsKey(key));
+                } while (referenceCollector.Contains(key));
 
-                referenceCollector.references.Add(new ReferenceCollector.ReferencePair() { key = key, value = null });
+                referenceCollector.Set(key, null);
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.UpdateIfRequiredOrScript();
             };
             referencesList.onRemoveCallback += (a) =>
             {
                 Undo.RecordObject(referenceCollector, "Remove ReferenceData");
-                referenceCollector.references.RemoveAt(referencesList.index);
+                var serializedProperty = serializedObject.FindProperty("references");
+                serializedProperty.DeleteArrayElementAtIndex(referencesList.index);
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.UpdateIfRequiredOrScript();
                 referencesList.index = Mathf.Clamp(referencesList.index, 0, referencesList.count - 1);
@@ -198,13 +199,13 @@ namespace CZToolKit
                 foreach (var obj in results)
                 {
                     string key = obj.name;
-                    while (referenceCollector.ReferencesMap.ContainsKey(key))
+                    while (referenceCollector.Contains(key))
                     {
                         key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
                     }
 
                     Undo.RecordObjects(targets, "Add ReferenceData");
-                    referenceCollector.references.Add(new ReferenceCollector.ReferencePair() { key = key, value = obj });
+                    referenceCollector.Set(key, obj);
                     serializedObject.ApplyModifiedProperties();
                     serializedObject.UpdateIfRequiredOrScript();
                 }
