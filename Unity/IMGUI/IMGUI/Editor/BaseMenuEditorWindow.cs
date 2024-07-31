@@ -25,6 +25,8 @@ using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityObject = UnityEngine.Object;
+using TreeView = CZToolKitEditor.IMGUI.Controls.TreeView;
+using TreeViewItem = CZToolKitEditor.IMGUI.Controls.TreeViewItem;
 
 namespace CZToolKitEditor
 {
@@ -44,7 +46,7 @@ namespace CZToolKitEditor
         Rect rightRect;
         Vector2 rightScroll;
 
-        public CZTreeView MenuTreeView { get; private set; }
+        public TreeView MenuTreeView { get; private set; }
 
         protected VisualElement RightRoot
         {
@@ -79,7 +81,7 @@ namespace CZToolKitEditor
             RefreshTreeView();
         }
 
-        protected abstract CZTreeView BuildMenuTree(TreeViewState treeViewState);
+        protected abstract TreeView BuildMenuTree(TreeViewState treeViewState);
 
         public void RefreshTreeView()
         {
@@ -197,7 +199,7 @@ namespace CZToolKitEditor
         {
             if (selection.Count == 0)
                 return;
-            CZTreeViewItem first = MenuTreeView.FindItem(selection[0]);
+            TreeViewItem first = MenuTreeView.FindItem(selection[0]);
             if (first == null) return;
 
             switch (first.userData)

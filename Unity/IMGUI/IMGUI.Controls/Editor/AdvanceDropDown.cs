@@ -1,10 +1,11 @@
 #region 注 释
+
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
- *  
+ *
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
@@ -12,7 +13,9 @@
  *  Blog: https://www.haloman.net/
  *
  */
+
 #endregion
+
 #if UNITY_EDITOR
 using System;
 using System.Linq;
@@ -20,107 +23,120 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
+using UnityAdvancedDropdown = UnityEditor.IMGUI.Controls.AdvancedDropdown;
+using UnityAdvancedDropDownItem = UnityEditor.IMGUI.Controls.AdvancedDropdownItem;
+
 namespace CZToolKitEditor.IMGUI.Controls
 {
-    public class CZAdvancedDropDownItem : AdvancedDropdownItem
+    public class AdvancedDropdownItem : UnityAdvancedDropDownItem
     {
         public object userData;
-        public event Action<CZAdvancedDropDownItem> onSelected;
-
-        public CZAdvancedDropDownItem(string name) : base(name) { }
-
-        public void Selected()
+        
+        public AdvancedDropdownItem(string name) : base(name)
         {
-            onSelected?.Invoke(this);
         }
     }
 
-    public class CZAdvancedDropDown : AdvancedDropdown
+    public class AdvancedDropdown : UnityAdvancedDropdown
     {
         const string DEFAULT_ROOT_NAME = "Root";
-        private static void SplitMenuPath(string menuPath, out string path, out string name)
-        {
-            menuPath = menuPath.Trim('/');
-            int num = menuPath.LastIndexOf('/');
-            if (num == -1)
-            {
-                path = "";
-                name = menuPath;
-                return;
-            }
-            path = menuPath.Substring(0, num);
-            name = menuPath.Substring(num + 1);
 
+        private string rootName;
+        private AdvancedDropdownItem root;
+        private bool split = true;
+        
+        public event Action<AdvancedDropdownItem> onItemSelected;
+
+        public Vector2 MinimumSize
+        {
+            get { return minimumSize; }
+            set { minimumSize = value; }
+        }
+        
+        public bool Split
+        {
+            get => split;
+            set => split = value;
         }
 
-        string rootName;
-        CZAdvancedDropDownItem root;
-        public event Action<CZAdvancedDropDownItem> onItemSelected;
-        public Vector2 MinimumSize { get { return minimumSize; } set { minimumSize = value; } }
-        CZAdvancedDropDownItem Root
+        AdvancedDropdownItem Root
         {
             get
             {
-                if (root == null) root = new CZAdvancedDropDownItem(rootName) { id = GenerateID() };
+                if (root == null) root = new AdvancedDropdownItem(rootName) { id = GenerateID() };
                 return root;
             }
         }
 
-        public CZAdvancedDropDown() : this(new AdvancedDropdownState())
+        public AdvancedDropdown() : this(DEFAULT_ROOT_NAME, new AdvancedDropdownState())
         {
-            this.rootName = DEFAULT_ROOT_NAME;
+            
         }
-        public CZAdvancedDropDown(string rootName) : this(new AdvancedDropdownState())
+
+        public AdvancedDropdown(string rootName) : this(rootName, new AdvancedDropdownState())
+        {
+            
+        }
+
+        public AdvancedDropdown(AdvancedDropdownState state) : this(DEFAULT_ROOT_NAME, state)
+        {
+        }
+
+        public AdvancedDropdown(string rootName, AdvancedDropdownState state) : base(state)
         {
             this.rootName = rootName;
         }
-        public CZAdvancedDropDown(string rootName, AdvancedDropdownState state) : this(state)
-        {
-            this.rootName = rootName;
-        }
-        public CZAdvancedDropDown(AdvancedDropdownState state) : base(state) { }
 
         // 添加一个选项
-        public CZAdvancedDropDownItem Add(string path, Texture2D icon = null)
+        public AdvancedDropdownItem Add(string path, Texture2D icon = null, char sperator = '/')
         {
-            SplitMenuPath(path, out path, out string name);
-            AdvancedDropdownItem parent = Root;
-            if (!string.IsNullOrEmpty(path))
+            var name = path;
+            var parent = Root;
+            if (split)
             {
-                string[] tmpPath = path.Split('/');
-                for (int i = 0; i < tmpPath.Length; i++)
+                var p = path.Split(sperator);
+                name = p[p.Length - 1];
+                if (p.Length > 1)
                 {
-                    CZAdvancedDropDownItem tempItem = parent.children.FirstOrDefault(_item => _item.name == tmpPath[i]) as CZAdvancedDropDownItem;
-                    if (tempItem != null)
-                        parent = tempItem;
-                    else
+                    for (int i = 0; i < p.Length - 1; i++)
                     {
-                        tempItem = new CZAdvancedDropDownItem(tmpPath[i]) { id = GenerateID() };
-                        parent.AddChild(tempItem);
-                        parent = tempItem;
+                        var tempItem = parent.children.FirstOrDefault(_item => _item.name == p[i]) as AdvancedDropdownItem;
+                        if (tempItem != null)
+                            parent = tempItem;
+                        else
+                        {
+                            tempItem = new AdvancedDropdownItem(p[i]) { id = GenerateID() };
+                            parent.AddChild(tempItem);
+                            parent = tempItem;
+                        }
                     }
                 }
             }
-            CZAdvancedDropDownItem item = new CZAdvancedDropDownItem(name);
+
+            var item = new AdvancedDropdownItem(name);
             item.id = GenerateID();
             item.icon = icon;
             parent.AddChild(item);
             return item;
         }
-        protected override void ItemSelected(AdvancedDropdownItem item)
+
+        protected override void ItemSelected(UnityAdvancedDropDownItem item)
         {
             base.ItemSelected(item);
-            onItemSelected?.Invoke(item as CZAdvancedDropDownItem);
-            (item as CZAdvancedDropDownItem).Selected();
+            onItemSelected?.Invoke(item as AdvancedDropdownItem);
         }
-        protected override AdvancedDropdownItem BuildRoot() { return Root; }
 
-        public void Show(Rect buttonRect, float maxHeight)
+        protected override UnityAdvancedDropDownItem BuildRoot()
+        {
+            return Root;
+        }
+
+        public void Show(Rect rect, float maxHeight)
         {
             if (MinimumSize == Vector2.zero)
                 MinimumSize = new Vector2(200, 200);
 
-            base.Show(buttonRect);
+            base.Show(rect);
 
             var window = EditorWindow.focusedWindow;
 
@@ -130,7 +146,7 @@ namespace CZToolKitEditor.IMGUI.Controls
                 return;
             }
 
-            if (!string.Equals(window.GetType().Namespace, typeof(AdvancedDropdown).Namespace))
+            if (!string.Equals(window.GetType().Namespace, typeof(UnityAdvancedDropdown).Namespace))
             {
                 Debug.LogWarning("EditorWindow.focusedWindow " + EditorWindow.focusedWindow.GetType().FullName + " was not in expected namespace.");
                 return;
@@ -142,12 +158,16 @@ namespace CZToolKitEditor.IMGUI.Controls
             Vector2 size = window.position.size;
             size.x = Mathf.Clamp(size.x, window.minSize.x, window.maxSize.x);
             size.y = Mathf.Clamp(size.y, window.minSize.y, window.maxSize.y);
-
-            window.ShowAsDropDown(GUIUtility.GUIToScreenRect(buttonRect), size);
+            
+            window.ShowAsDropDown(GUIUtility.GUIToScreenRect(rect), size);
         }
 
         int id;
-        int GenerateID() { return id++; }
+
+        int GenerateID()
+        {
+            return id++;
+        }
     }
 }
 #endif

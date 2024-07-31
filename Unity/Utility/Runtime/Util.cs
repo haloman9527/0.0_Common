@@ -14,6 +14,7 @@
  */
 #endregion
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CZToolKit.Unity
@@ -32,7 +33,7 @@ namespace CZToolKit.Unity
         }
 #endif
 
-        public static string TextureToBase64(Texture2D texture)
+        public static string ToBase64(this Texture2D texture)
         {
             var bytes = texture.EncodeToJPG();
             var baser64 = Convert.ToBase64String(bytes);
@@ -42,18 +43,19 @@ namespace CZToolKit.Unity
         public static Texture2D Base64ToTexture(string base64)
         {
             var bytes = Convert.FromBase64String(base64);
+            // 长宽任意，LoadImage会覆盖
             var texture = new Texture2D(100, 100);
             texture.LoadImage(bytes);
             return texture;
         }
 
-        public static string GetTransformPath(this Transform transform)
+        public static string GetPath(this Transform transform, Transform root = null)
         {
             var path = transform.name;
             while (true)
             {
                 transform = transform.parent;
-                if (transform == null)
+                if (transform == root)
                 {
                     break;
                 }
@@ -62,6 +64,40 @@ namespace CZToolKit.Unity
             }
 
             return path;
+        }
+        
+        public static void FindComponents<T>(this UnityEngine.SceneManagement.Scene scene, List<T> components, bool includeInactive = false) where T : Component
+        {
+            var rootGameObjects = scene.GetRootGameObjects();
+            foreach (var rootGameObject in rootGameObjects)
+            {
+                components.AddRange(rootGameObject.transform.GetComponentsInChildren<T>(includeInactive));
+            }
+        }
+
+        public static List<T> FindComponents<T>(this UnityEngine.SceneManagement.Scene scene, bool includeInactive = false) where T : Component
+        {
+            var components = new List<T>();
+            var rootGameObjects = scene.GetRootGameObjects();
+            foreach (var rootGameObject in rootGameObjects)
+            {
+                components.AddRange(rootGameObject.transform.GetComponentsInChildren<T>(includeInactive));
+            }
+
+            return components;
+        }
+
+        public static T FindComponent<T>(this UnityEngine.SceneManagement.Scene scene, bool includeInactive = false) where T : Component
+        {
+            var rootGameObjects = scene.GetRootGameObjects();
+            foreach (var rootGameObject in rootGameObjects)
+            {
+                var component = rootGameObject.transform.GetComponentInChildren<T>();
+                if (component != null)
+                    return component;
+            }
+
+            return null;
         }
     }
 }
