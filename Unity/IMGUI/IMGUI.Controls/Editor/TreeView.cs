@@ -53,17 +53,6 @@ namespace CZToolKitEditor.IMGUI.Controls
 
     public class TreeView : UnityTreeView
     {
-        public class Styles
-        {
-            public GUIStyle leftLabelStyle;
-
-            public Styles()
-            {
-                leftLabelStyle = new GUIStyle(EditorStyles.label);
-                leftLabelStyle.alignment = TextAnchor.MiddleLeft;
-            }
-        }
-
         private static void SplitMenuPath(string menuPath, char separator, out string path, out string name)
         {
             menuPath = menuPath.Trim(separator);
@@ -80,8 +69,7 @@ namespace CZToolKitEditor.IMGUI.Controls
         }
 
         private UnityTreeViewItem root;
-        private Styles styles;
-        private TreeViewItemPool itemPool = new TreeViewItemPool();
+        private TreeViewItemPool itemPool;
 
         public Action<IList<int>> onSelectionChanged;
         public Action onKeyEvent;
@@ -157,11 +145,25 @@ namespace CZToolKitEditor.IMGUI.Controls
 
         public TreeView(TreeViewState state) : base(state)
         {
+            this.itemPool = new TreeViewItemPool();
             onItemRowGUI += DefaultRowGUI;
         }
 
         public TreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
         {
+            this.itemPool = new TreeViewItemPool();
+            onItemRowGUI += DefaultRowGUI;
+        }
+
+        public TreeView(TreeViewState state, TreeViewItemPool itemPool) : base(state)
+        {
+            this.itemPool = itemPool;
+            onItemRowGUI += DefaultRowGUI;
+        }
+
+        public TreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, TreeViewItemPool itemPool) : base(state, multiColumnHeader)
+        {
+            this.itemPool = itemPool;
             onItemRowGUI += DefaultRowGUI;
         }
 

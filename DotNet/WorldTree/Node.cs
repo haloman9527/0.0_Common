@@ -11,7 +11,7 @@ namespace CZToolKit
 #endif
 
         [NonSerialized] private int m_instanceId;
-        [NonSerialized] private WorldTree worldTree;
+        [NonSerialized] internal WorldTree worldTree;
         [NonSerialized] protected Scene domain;
         [NonSerialized] protected Node parent;
         [NonSerialized] protected Dictionary<int, Node> children;
@@ -64,7 +64,6 @@ namespace CZToolKit
         public WorldTree WorldTree
         {
             get { return worldTree; }
-            protected set { this.worldTree = value; }
         }
 
         /// <summary>
@@ -87,7 +86,7 @@ namespace CZToolKit
 
                 this.domain = value;
 
-                if (this.children != null)
+                if (this.CheckChildren())
                 {
                     foreach (var o in this.children.Values)
                     {
@@ -95,7 +94,7 @@ namespace CZToolKit
                     }
                 }
 
-                if (this.components != null)
+                if (this.CheckComponents())
                 {
                     foreach (var o in this.components.Values)
                     {
@@ -130,7 +129,7 @@ namespace CZToolKit
                     this.parent.RemoveFromChildren(this, this.m_instanceId);
                 }
 
-                if (parent != null && parent.componentsDB != null && parent.componentsDB.Contains(this))
+                if (parent != null && CheckComponents() && parent.componentsDB.Contains(this))
                 {
                     ComponentParent = value;
                     return;
@@ -212,32 +211,6 @@ namespace CZToolKit
             }
         }
 
-        public Dictionary<int, Node> Children
-        {
-            get
-            {
-                if (children == null)
-                {
-                    children = new Dictionary<int, Node>();
-                }
-
-                return this.children;
-            }
-        }
-
-        public Dictionary<Type, Node> Components
-        {
-            get
-            {
-                if (components == null)
-                {
-                    components = new Dictionary<Type, Node>();
-                }
-
-                return this.components;
-            }
-        }
-
         public T As<T>() where T : class
         {
             return this as T;
@@ -250,8 +223,8 @@ namespace CZToolKit
                 throw new Exception($"has not disposed!");
             }
 
-            o.WorldTree = this.worldTree;
-            o.InstanceId = Domain.WorldTree.GenerateInstanceId();
+            o.worldTree = this.worldTree;
+            o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
             WorldTreeSystems.Awake(o);
@@ -262,7 +235,8 @@ namespace CZToolKit
         public T AddChild<T>() where T : Node, new()
         {
             var o = new T();
-            o.WorldTree = this.worldTree;
+
+            o.worldTree = this.worldTree;
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
@@ -274,7 +248,7 @@ namespace CZToolKit
         public T AddChild<T, A>(A a) where T : Node, new()
         {
             var o = new T();
-            o.WorldTree = this.worldTree;
+            o.worldTree = this.worldTree;
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
@@ -286,7 +260,7 @@ namespace CZToolKit
         public T AddChild<T, A, B>(A a, B b) where T : Node, new()
         {
             var o = new T();
-            o.WorldTree = this.worldTree;
+            o.worldTree = this.worldTree;
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
@@ -298,7 +272,7 @@ namespace CZToolKit
         public T AddChild<T, A, B, C>(A a, B b, C c) where T : Node, new()
         {
             var o = new T();
-            o.WorldTree = this.worldTree;
+            o.worldTree = this.worldTree;
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
@@ -310,7 +284,7 @@ namespace CZToolKit
         public T AddChild<T, A, B, C, D>(A a, B b, C c, D d) where T : Node, new()
         {
             var o = new T();
-            o.WorldTree = this.worldTree;
+            o.worldTree = this.worldTree;
             o.InstanceId = WorldTree.GenerateInstanceId();
             o.Parent = this;
 
@@ -341,8 +315,12 @@ namespace CZToolKit
                 return;
             }
 
-            var child = this.GetChild(instanceId);
-            if (child == null)
+            if (!this.CheckChildren())
+            {
+                return;
+            }
+
+            if (!this.children.TryGetValue(instanceId, out var child))
             {
                 return;
             }
@@ -353,11 +331,6 @@ namespace CZToolKit
         public void RemoveChild(Node child)
         {
             if (this.IsDisposed)
-            {
-                return;
-            }
-
-            if (child == null)
             {
                 return;
             }
@@ -375,33 +348,39 @@ namespace CZToolKit
             child.Dispose();
         }
 
-        private void AddToChildren(Node o)
+        private bool CheckChildren(bool autoInit = false)
         {
-            this.Children.Add(o.m_instanceId, o);
-
-            if (childrenDB == null)
+            if (children != null)
             {
-                childrenDB = new HashSet<Node>();
+                return true;
             }
 
-            childrenDB.Add(o);
+            if (autoInit)
+            {
+                this.children = new Dictionary<int, Node>();
+                this.childrenDB = new HashSet<Node>();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void AddToChildren(Node o)
+        {
+            this.CheckChildren(true);
+            this.children.Add(o.m_instanceId, o);
+            this.childrenDB.Add(o);
         }
 
         private void RemoveFromChildren(Node o, int instanceId)
         {
-            if (children == null)
+            if (!CheckChildren())
             {
                 return;
             }
 
-            children.Remove(instanceId);
-
-            if (childrenDB == null)
-            {
-                return;
-            }
-
-            childrenDB.Remove(o);
+            this.children.Remove(instanceId);
+            this.childrenDB.Remove(o);
         }
 
         public void AddComponent(Node component)
@@ -412,12 +391,12 @@ namespace CZToolKit
             }
 
             var type = component.GetType();
-            if (this.components != null && this.components.ContainsKey(type))
+            if (this.CheckComponents() && this.components.ContainsKey(type))
             {
                 throw new Exception($"already has component: {type.FullName}");
             }
 
-            component.WorldTree = this.worldTree;
+            component.worldTree = this.worldTree;
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -427,13 +406,13 @@ namespace CZToolKit
 
         public Node AddComponent(Type type)
         {
-            if (this.components != null && this.components.ContainsKey(type))
+            if (this.CheckComponents() && this.components.ContainsKey(type))
             {
                 throw new Exception($"already has component: {type.FullName}");
             }
 
             var component = Activator.CreateInstance(type) as Node;
-            component.WorldTree = this.worldTree;
+            component.worldTree = this.worldTree;
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -445,13 +424,13 @@ namespace CZToolKit
 
         public Node AddComponent<A>(Type type, A a)
         {
-            if (this.components != null && this.components.ContainsKey(type))
+            if (this.CheckComponents() && this.components.ContainsKey(type))
             {
                 throw new Exception($"already has component: {type.FullName}");
             }
 
             var component = Activator.CreateInstance(type) as Node;
-            component.WorldTree = this.worldTree;
+            component.worldTree = this.worldTree;
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -463,13 +442,13 @@ namespace CZToolKit
 
         public Node AddComponent<A, B>(Type type, A a, B b)
         {
-            if (this.components != null && this.components.ContainsKey(type))
+            if (this.CheckComponents() && this.components.ContainsKey(type))
             {
                 throw new Exception($"already has component: {type.FullName}");
             }
 
             var component = Activator.CreateInstance(type) as Node;
-            component.WorldTree = this.worldTree;
+            component.worldTree = this.worldTree;
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -481,13 +460,13 @@ namespace CZToolKit
 
         public Node AddComponent<A, B, C>(Type type, A a, B b, C c)
         {
-            if (this.components != null && this.components.ContainsKey(type))
+            if (this.CheckComponents() && this.components.ContainsKey(type))
             {
                 throw new Exception($"already has component: {type.FullName}");
             }
 
             var component = Activator.CreateInstance(type) as Node;
-            component.WorldTree = this.worldTree;
+            component.worldTree = this.worldTree;
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -499,13 +478,13 @@ namespace CZToolKit
 
         public Node AddComponent<A, B, C, D>(Type type, A a, B b, C c, D d)
         {
-            if (this.components != null && this.components.ContainsKey(type))
+            if (this.CheckComponents() && this.components.ContainsKey(type))
             {
                 throw new Exception($"already has component: {type.FullName}");
             }
 
             var component = Activator.CreateInstance(type) as Node;
-            component.WorldTree = this.worldTree;
+            component.worldTree = this.worldTree;
             component.InstanceId = WorldTree.GenerateInstanceId();
             component.ComponentParent = this;
 
@@ -568,12 +547,17 @@ namespace CZToolKit
         /// <returns></returns>
         public Node GetComponent(Type type, bool deriveMatch = false)
         {
-            if (components == null)
+            if (!CheckComponents())
             {
                 return null;
             }
 
-            if (!this.components.TryGetValue(type, out var component) && deriveMatch)
+            if (this.components.TryGetValue(type, out var component))
+            {
+                return component;
+            }
+
+            if (deriveMatch)
             {
                 foreach (var pair in components)
                 {
@@ -595,8 +579,12 @@ namespace CZToolKit
                 return;
             }
 
-            var component = this.GetComponent(type);
-            if (component == null)
+            if (!CheckComponents())
+            {
+                return;
+            }
+
+            if (!components.TryGetValue(type, out var component))
             {
                 return;
             }
@@ -611,7 +599,7 @@ namespace CZToolKit
 
         public void RemoveComponent(Node component)
         {
-            if (component == null)
+            if (component.IsDisposed)
             {
                 return;
             }
@@ -621,7 +609,7 @@ namespace CZToolKit
                 return;
             }
 
-            if (component.IsDisposed)
+            if (!CheckComponents())
             {
                 return;
             }
@@ -634,33 +622,39 @@ namespace CZToolKit
             component.Dispose();
         }
 
-        private void AddToComponents(Node component)
+        private bool CheckComponents(bool autoInit = false)
         {
-            this.Components.Add(component.GetType(), component);
-
-            if (componentsDB == null)
+            if (components != null)
             {
-                componentsDB = new HashSet<Node>();
+                return true;
             }
 
-            componentsDB.Add(component);
+            if (autoInit)
+            {
+                this.components = new Dictionary<Type, Node>();
+                this.componentsDB = new HashSet<Node>();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void AddToComponents(Node component)
+        {
+            this.CheckComponents(true);
+            this.components.Add(component.GetType(), component);
+            this.componentsDB.Add(component);
         }
 
         private void RemoveFromComponents(Node component)
         {
-            if (components == null)
+            if (!CheckComponents())
             {
                 return;
             }
 
             this.components.Remove(component.GetType());
-
-            if (componentsDB == null)
-            {
-                return;
-            }
-
-            componentsDB.Remove(component);
+            this.componentsDB.Remove(component);
         }
 
         public virtual void Dispose()
@@ -675,7 +669,7 @@ namespace CZToolKit
             var instanceId = this.m_instanceId;
             this.InstanceId = 0;
 
-            if (this.children != null)
+            if (this.CheckChildren())
             {
                 foreach (Node child in this.children.Values)
                 {
@@ -683,9 +677,10 @@ namespace CZToolKit
                 }
 
                 this.children.Clear();
+                this.childrenDB.Clear();
             }
 
-            if (this.components != null)
+            if (this.CheckComponents())
             {
                 foreach (Node component in this.components.Values)
                 {
@@ -693,6 +688,7 @@ namespace CZToolKit
                 }
 
                 this.components.Clear();
+                this.componentsDB.Clear();
             }
 
             if (this.parent != null && !this.parent.IsDisposed)
@@ -707,15 +703,25 @@ namespace CZToolKit
         }
     }
 
-    public struct EntityId
+    public struct NodeId
     {
         public readonly WorldTree world;
         public readonly int instanceId;
 
-        public EntityId(WorldTree world, int instanceId)
+        public NodeId(WorldTree world, int instanceId)
         {
             this.world = world;
             this.instanceId = instanceId;
+        }
+
+        public bool IsValid()
+        {
+            return world != null && instanceId != 0 && world.Get(instanceId) != null;
+        }
+
+        public override int GetHashCode()
+        {
+            return instanceId;
         }
     }
 }

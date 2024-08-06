@@ -55,7 +55,7 @@ namespace CZToolKit
 
         private void Init(string n, Node p, WorldTree r)
         {
-            this.WorldTree = r;
+            this.worldTree = r;
             this.InstanceId = r.GenerateInstanceId();
             this.Name = n;
             if (p == null)
