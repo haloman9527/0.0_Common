@@ -44,9 +44,7 @@ namespace CZToolKit
             // 2.循环将堆首位（最大值）与末位交换，然后在重新调整最大堆
             while (endIndex > startIndex)
             {
-                var temp = original[endIndex];
-                original[endIndex] = original[startIndex];
-                original[startIndex] = temp;
+                (original[endIndex], original[startIndex]) = (original[startIndex], original[endIndex]);
 
                 endIndex--;
                 AdjustHeap(original, startIndex, endIndex, 0, -1, comparer);
@@ -76,9 +74,7 @@ namespace CZToolKit
                     break;
                 }
 
-                var temp = original[startIndex + maxIndex];
-                original[startIndex + maxIndex] = original[startIndex + i];
-                original[startIndex + i] = temp;
+                (original[startIndex + maxIndex], original[startIndex + i]) = (original[startIndex + i], original[startIndex + maxIndex]);
                 i = maxIndex;
             }
         }
@@ -123,9 +119,7 @@ namespace CZToolKit
             // 2.循环将堆首位（最大值）与末位交换，然后在重新调整最大堆
             while (endIndex > startIndex)
             {
-                var temp = original[endIndex];
-                original[endIndex] = original[startIndex];
-                original[startIndex] = temp;
+                (original[endIndex], original[startIndex]) = (original[startIndex], original[endIndex]);
 
                 endIndex--;
                 AdjustHeap(original, startIndex, endIndex, 0, -1, comparer);
@@ -165,9 +159,7 @@ namespace CZToolKit
                     break;
                 }
 
-                var temp = original[startIndex + maxIndex];
-                original[startIndex + maxIndex] = original[startIndex + i];
-                original[startIndex + i] = temp;
+                (original[startIndex + maxIndex], original[startIndex + i]) = (original[startIndex + i], original[startIndex + maxIndex]);
                 i = maxIndex;
             }
         }
@@ -189,9 +181,7 @@ namespace CZToolKit
             // 2.循环将堆首位（最大值）与末位交换，然后在重新调整最大堆
             while (endIndex > startIndex)
             {
-                var temp = original[endIndex];
-                original[endIndex] = original[startIndex];
-                original[startIndex] = temp;
+                (original[endIndex], original[startIndex]) = (original[startIndex], original[endIndex]);
 
                 endIndex--;
                 AdjustHeap(original, startIndex, endIndex, 0, -1, comparer);
@@ -231,9 +221,7 @@ namespace CZToolKit
                     break;
                 }
 
-                var temp = original[startIndex + maxIndex];
-                original[startIndex + maxIndex] = original[startIndex + i];
-                original[startIndex + i] = temp;
+                (original[startIndex + maxIndex], original[startIndex + i]) = (original[startIndex + i], original[startIndex + maxIndex]);
                 i = maxIndex;
             }
         }
@@ -255,9 +243,7 @@ namespace CZToolKit
             // 2.循环将堆首位（最大值）与末位交换，然后在重新调整最大堆
             while (endIndex > startIndex)
             {
-                var temp = original[endIndex];
-                original[endIndex] = original[startIndex];
-                original[startIndex] = temp;
+                (original[endIndex], original[startIndex]) = (original[startIndex], original[endIndex]);
 
                 endIndex--;
                 AdjustHeap(original, startIndex, endIndex, 0, -1, comparer);
@@ -297,9 +283,7 @@ namespace CZToolKit
                     break;
                 }
 
-                var temp = original[startIndex + maxIndex];
-                original[startIndex + maxIndex] = original[startIndex + i];
-                original[startIndex + i] = temp;
+                (original[startIndex + maxIndex], original[startIndex + i]) = (original[startIndex + i], original[startIndex + maxIndex]);
                 i = maxIndex;
             }
         }

@@ -4,7 +4,7 @@ namespace CZToolKit
 {
     public abstract class BaseObjectPool<T> : IObjectPool, IObjectPool<T> where T : class
     {
-        protected Queue<T> unusedObjects;
+        protected Stack<T> unusedObjects;
 
         public int UnusedCount
         {
@@ -13,7 +13,7 @@ namespace CZToolKit
 
         public BaseObjectPool()
         {
-            this.unusedObjects = new Queue<T>();
+            this.unusedObjects = new Stack<T>();
         }
 
         object IObjectPool.Spawn()
@@ -26,7 +26,7 @@ namespace CZToolKit
         {
             T unit = null;
             if (unusedObjects.Count > 0)
-                unit = unusedObjects.Dequeue();
+                unit = unusedObjects.Pop();
             else
                 unit = Create();
             OnSpawn(unit);
@@ -41,7 +41,7 @@ namespace CZToolKit
         /// <summary> 回收 </summary>
         public void Recycle(T unit)
         {
-            unusedObjects.Enqueue(unit);
+            unusedObjects.Push(unit);
             OnRecycle(unit);
         }
 
@@ -49,7 +49,7 @@ namespace CZToolKit
         {
             while (unusedObjects.Count > 0)
             {
-                OnDestroy(unusedObjects.Dequeue());
+                OnDestroy(unusedObjects.Pop());
             }
         }
 

@@ -27,6 +27,37 @@ namespace CZToolKit.UnsafeEx
 {
     public unsafe static class UnsafeUtil
     {
+        /// <summary>
+        /// 获取值类型的地址
+        /// </summary>
+        /// <param name="tf"></param>
+        /// <returns></returns>
+        public unsafe static IntPtr GetValueAddr(TypedReference tf)
+        {
+            return *(IntPtr*)&tf;
+        }
+
+        /// <summary>
+        /// 获取值类型的地址
+        /// </summary>
+        /// <param name="tf"></param>
+        /// <returns></returns>
+        public static void* GetValueAddrVoidPtr(TypedReference tf)
+        {
+            return *(void**)&tf;
+        }
+        /// <summary>
+        /// 获取引用类型的地址
+        /// </summary>
+        /// <param name="tf"></param>
+        /// <returns></returns>
+
+        public unsafe static IntPtr GetObjectAddr(TypedReference tf)
+        {
+            return *(IntPtr*)*(IntPtr*)&tf;
+        }
+        
+        
         public static int AlignOf<T>() where T : struct
         {
             return UnsafeUtility.AlignOf<T>();

@@ -19,10 +19,10 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using CZToolKit;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using CZToolKit;
 using UnityTreeView = UnityEditor.IMGUI.Controls.TreeView;
 using UnityTreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem;
 
@@ -32,7 +32,13 @@ namespace CZToolKitEditor.IMGUI.Controls
     {
         public object userData;
 
-        public new List<UnityTreeViewItem> children
+        public new TreeViewItem parent
+        {
+            get => base.parent as TreeViewItem;
+            set => base.parent = value;
+        }
+
+        public override List<UnityTreeViewItem> children
         {
             get
             {
@@ -44,7 +50,7 @@ namespace CZToolKitEditor.IMGUI.Controls
 
         public void ClearChildren()
         {
-            if (base.children != null)
+            if (base.hasChildren)
             {
                 base.children.Clear();
             }
@@ -53,23 +59,10 @@ namespace CZToolKitEditor.IMGUI.Controls
 
     public class TreeView : UnityTreeView
     {
-        private static void SplitMenuPath(string menuPath, char separator, out string path, out string name)
-        {
-            menuPath = menuPath.Trim(separator);
-            int num = menuPath.LastIndexOf(separator);
-            if (num == -1)
-            {
-                path = "";
-                name = menuPath;
-                return;
-            }
-
-            path = menuPath.Substring(0, num);
-            name = menuPath.Substring(num + 1);
-        }
-
         private UnityTreeViewItem root;
         private TreeViewItemPool itemPool;
+        private bool sharedItemPool;
+        private Dictionary<int, TreeViewItem> itemMap = new Dictionary<int, TreeViewItem>();
 
         public Action<IList<int>> onSelectionChanged;
         public Action onKeyEvent;
@@ -78,29 +71,10 @@ namespace CZToolKitEditor.IMGUI.Controls
         public Action<TreeViewItem> onItemSingleClicked;
         public Action<TreeViewItem> onItemDoubleClicked;
         public Action<TreeViewItem, string, string> renameEnded;
-
-        public Action<RowGUIArgsBridge> onItemRowGUI;
+        
         public Func<TreeViewItem, bool> canRename;
         public Func<TreeViewItem, bool> canMultiSelect;
         public Func<TreeViewItem, bool> canBeParent;
-
-        public class TreeViewItemPool : ObjectPool<TreeViewItem>
-        {
-            protected override TreeViewItem Create()
-            {
-                return new TreeViewItem();
-            }
-
-            protected override void OnRecycle(TreeViewItem unit)
-            {
-                unit.userData = null;
-                unit.displayName = string.Empty;
-                unit.icon = null;
-                unit.parent = null;
-                unit.ClearChildren();
-                base.OnRecycle(unit);
-            }
-        }
 
         public float RowHeight
         {
@@ -145,39 +119,42 @@ namespace CZToolKitEditor.IMGUI.Controls
 
         public TreeView(TreeViewState state) : base(state)
         {
+            this.sharedItemPool = false;
             this.itemPool = new TreeViewItemPool();
-            onItemRowGUI += DefaultRowGUI;
         }
 
         public TreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
         {
+            this.sharedItemPool = false;
             this.itemPool = new TreeViewItemPool();
-            onItemRowGUI += DefaultRowGUI;
         }
 
         public TreeView(TreeViewState state, TreeViewItemPool itemPool) : base(state)
         {
+            this.sharedItemPool = true;
             this.itemPool = itemPool;
-            onItemRowGUI += DefaultRowGUI;
         }
 
         public TreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, TreeViewItemPool itemPool) : base(state, multiColumnHeader)
         {
+            this.sharedItemPool = true;
             this.itemPool = itemPool;
-            onItemRowGUI += DefaultRowGUI;
         }
 
         public void Sort(Func<UnityTreeViewItem, UnityTreeViewItem, int> comparer)
         {
-            Sort(RootItem as TreeViewItem);
+            SortRecursive(RootItem as TreeViewItem);
             Reload();
 
-            void Sort(TreeViewItem item)
+            void SortRecursive(TreeViewItem item)
             {
+                if (!item.hasChildren)
+                    return;
+
                 item.children.QuickSort(comparer);
                 foreach (var child in item.children)
                 {
-                    Sort(child as TreeViewItem);
+                    SortRecursive(child as TreeViewItem);
                 }
             }
         }
@@ -216,28 +193,58 @@ namespace CZToolKitEditor.IMGUI.Controls
             renameEnded?.Invoke(item, args.originalName, args.newName);
         }
 
-        protected override void RowGUI(RowGUIArgs args)
+        protected override void SelectionChanged(IList<int> selectedIds)
         {
-            var argsBridge = new RowGUIArgsBridge()
-            {
-                item = args.item,
-                label = args.label,
-                rowRect = args.rowRect,
-                row = args.row,
-                selected = args.selected,
-                focused = args.focused,
-                isRenaming = args.isRenaming
-            };
-            onItemRowGUI?.Invoke(argsBridge);
+            onSelectionChanged?.Invoke(selectedIds);
         }
 
-        protected void DefaultRowGUI(RowGUIArgsBridge args)
+        protected override void KeyEvent()
         {
-            var item = args.item as TreeViewItem;
+            onKeyEvent?.Invoke();
+        }
 
+        protected override void SingleClickedItem(int id)
+        {
+            var item = FindItem(id);
+            onItemSingleClicked?.Invoke(item);
+        }
+
+        protected override void DoubleClickedItem(int id)
+        {
+            var item = FindItem(id);
+            onItemDoubleClicked?.Invoke(item);
+        }
+
+        protected override void ContextClicked()
+        {
+            onContextClicked?.Invoke();
+        }
+
+        protected override void ContextClickedItem(int id)
+        {
+            var item = FindItem(id);
+            if (item == null)
+                return;
+
+            onItemContextClicked?.Invoke(item);
+        }
+
+        protected sealed override void RowGUI(RowGUIArgs args)
+        {
+            ItemRowGUI(args.item as TreeViewItem, args);
+        }
+
+        protected virtual void ItemRowGUI(TreeViewItem item, RowGUIArgs args)
+        {
+            DefaultRowGUI(args);
+        }
+
+        protected void DefaultRowGUI(RowGUIArgs args)
+        {
             if (!args.isRenaming)
             {
-                Rect labelRect = args.rowRect;
+                var item = args.item;
+                var labelRect = args.rowRect;
                 if (hasSearch)
                     labelRect.xMin += depthIndentWidth;
                 else
@@ -248,42 +255,59 @@ namespace CZToolKitEditor.IMGUI.Controls
             }
         }
 
-        public TreeViewItem AddMenuItem(string path, char separator = '/')
+        public TreeViewItem AddMenuItem(string path, char separator = '/', bool split = true)
         {
-            return AddMenuItem(path, (Texture2D)null, separator);
+            return AddMenuItemTo(RootItem as TreeViewItem, path, null, separator, split);
         }
 
-        public TreeViewItem AddMenuItem(string path, Texture2D icon, char separator = '/')
+        public TreeViewItem AddMenuItem(string path, Texture2D icon, char separator = '/', bool split = true)
+        {
+            return AddMenuItemTo(RootItem as TreeViewItem, path, icon, separator, split);
+        }
+
+        public TreeViewItem AddMenuItemTo(TreeViewItem parent, string path, char separator = '/', bool split = true)
+        {
+            return AddMenuItemTo(parent, path, null, separator, split);
+        }
+
+        public TreeViewItem AddMenuItemTo(TreeViewItem parent, string path, Texture2D icon, char separator = '/', bool split = true)
         {
             if (string.IsNullOrEmpty(path))
                 return null;
 
-            var parent = RootItem as TreeViewItem;
-            var p = path.Split(separator);
-            if (p.Length > 1)
-            {
-                for (int i = 0; i < p.Length - 1; i++)
-                {
-                    var tempParent = parent.children.Find(item => item.displayName == p[i]) as TreeViewItem;
-                    if (tempParent == null)
-                    {
-                        tempParent = itemPool.Spawn();
-                        tempParent.id = GenerateID();
-                        tempParent.displayName = p[i];
-                        tempParent.parent = parent;
-                        parent.children.Add(tempParent);
-                    }
+            var name = path;
 
-                    parent = tempParent;
+            if (split && path.IndexOf(separator) != -1)
+            {
+                var p = path.Split(separator);
+                if (p.Length > 1)
+                {
+                    name = p[p.Length - 1];
+                    for (int i = 0; i < p.Length - 1; i++)
+                    {
+                        var tempParent = parent.children.Find(item => item.displayName == p[i]) as TreeViewItem;
+                        if (tempParent == null)
+                        {
+                            tempParent = itemPool.Spawn();
+                            tempParent.id = GenerateID();
+                            tempParent.displayName = p[i];
+                            tempParent.parent = parent;
+                            parent.children.Add(tempParent);
+                            itemMap[tempParent.id] = tempParent;
+                        }
+
+                        parent = tempParent;
+                    }
                 }
             }
 
             var item = itemPool.Spawn();
             item.icon = icon;
             item.id = GenerateID();
-            item.displayName = p[p.Length - 1];
+            item.displayName = name;
             item.parent = parent;
             parent.children.Add(item);
+            itemMap[item.id] = item;
             return item;
         }
 
@@ -291,18 +315,19 @@ namespace CZToolKitEditor.IMGUI.Controls
         {
             if (treeViewItem == null || treeViewItem.parent == null)
                 return;
+
+            itemMap.Remove(treeViewItem.id);
             treeViewItem.parent.children.Remove(treeViewItem);
         }
 
         public TreeViewItem FindItem(int id)
         {
-            return FindItem(id, rootItem) as TreeViewItem;
-        }
+            if (itemMap.TryGetValue(id, out var item))
+            {
+                return item;
+            }
 
-        protected override void SelectionChanged(IList<int> selectedIds)
-        {
-            base.SelectionChanged(selectedIds);
-            onSelectionChanged?.Invoke(selectedIds);
+            return FindItem(id, rootItem) as TreeViewItem;
         }
 
         public IEnumerable<TreeViewItem> Items()
@@ -322,39 +347,6 @@ namespace CZToolKitEditor.IMGUI.Controls
             }
         }
 
-        protected override void KeyEvent()
-        {
-            base.KeyEvent();
-            onKeyEvent?.Invoke();
-        }
-
-        protected override void SingleClickedItem(int id)
-        {
-            base.SingleClickedItem(id);
-            var item = FindItem(id);
-            onItemSingleClicked?.Invoke(item);
-        }
-
-        protected override void DoubleClickedItem(int id)
-        {
-            base.DoubleClickedItem(id);
-            var item = FindItem(id);
-            onItemDoubleClicked?.Invoke(item);
-        }
-
-        protected override void ContextClicked()
-        {
-            base.ContextClicked();
-            onContextClicked?.Invoke();
-        }
-
-        protected override void ContextClickedItem(int id)
-        {
-            base.ContextClickedItem(id);
-            var item = FindItem(id);
-            onItemContextClicked?.Invoke(item);
-        }
-
         public void Clear()
         {
             foreach (var item in Items())
@@ -362,59 +354,49 @@ namespace CZToolKitEditor.IMGUI.Controls
                 itemPool.Recycle(item);
             }
 
+            itemMap.Clear();
             RootItem.children.Clear();
-            id = 0;
+            lastItemId = 0;
         }
 
         public void Dispose()
         {
+            if (sharedItemPool)
+            {
+                foreach (var item in Items())
+                {
+                    itemPool.Recycle(item);
+                }
+            }
+
+            itemMap.Clear();
             RootItem.children.Clear();
-            id = 0;
+            lastItemId = 0;
         }
 
-        private int id = 0;
+        private int lastItemId = 0;
 
         private int GenerateID()
         {
-            return id++;
+            return lastItemId++;
         }
 
-        public struct RowGUIArgsBridge
+        public class TreeViewItemPool : BaseObjectPool<TreeViewItem>
         {
-            /// <summary>
-            ///   <para>Item for the current row being handled in TreeView.RowGUI.</para>
-            /// </summary>
-            public UnityTreeViewItem item;
+            protected override TreeViewItem Create()
+            {
+                return new TreeViewItem();
+            }
 
-            /// <summary>
-            ///   <para>Label used for text rendering of the item displayName. Note this is an empty string when isRenaming == true.</para>
-            /// </summary>
-            public string label;
-
-            /// <summary>
-            ///   <para>Row rect for the current row being handled.</para>
-            /// </summary>
-            public Rect rowRect;
-
-            /// <summary>
-            ///   <para>Row index into the list of current rows.</para>
-            /// </summary>
-            public int row;
-
-            /// <summary>
-            ///   <para>This value is true when the current row's item is part of the current selection.</para>
-            /// </summary>
-            public bool selected;
-
-            /// <summary>
-            ///   <para>This value is true only when the TreeView has keyboard focus and the TreeView's window has focus.</para>
-            /// </summary>
-            public bool focused;
-
-            /// <summary>
-            ///   <para>This value is true when the ::item is currently being renamed.</para>
-            /// </summary>
-            public bool isRenaming;
+            protected override void OnRecycle(TreeViewItem unit)
+            {
+                unit.userData = null;
+                unit.displayName = string.Empty;
+                unit.icon = null;
+                unit.parent = null;
+                unit.ClearChildren();
+                base.OnRecycle(unit);
+            }
         }
     }
 }

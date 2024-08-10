@@ -29,9 +29,7 @@ namespace CZToolKit
                 var index = Util.DefaultRandom.Next(startIndex, endIndex + 1);
                 if (index != endIndex)
                 {
-                    var last = original[endIndex];
-                    original[endIndex] = original[index];
-                    original[index] = last;
+                    (original[endIndex], original[index]) = (original[index], original[endIndex]);
                 }
 
                 endIndex--;
@@ -45,9 +43,7 @@ namespace CZToolKit
                 var index = Util.DefaultRandom.Next(startIndex, endIndex + 1);
                 if (index != endIndex)
                 {
-                    var last = original[endIndex];
-                    original[endIndex] = original[index];
-                    original[index] = last;
+                    (original[endIndex], original[index]) = (original[index], original[endIndex]);
                 }
 
                 endIndex--;

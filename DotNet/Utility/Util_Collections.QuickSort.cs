@@ -57,9 +57,7 @@ namespace CZToolKit
                     continue;
                 }
 
-                T temp = original[less];
-                original[less] = original[greater];
-                original[greater] = temp;
+                (original[less], original[greater]) = (original[greater], original[less]);
                 changed = true;
             }
 
@@ -120,9 +118,7 @@ namespace CZToolKit
                     continue;
                 }
 
-                T temp = original[less];
-                original[less] = original[greater];
-                original[greater] = temp;
+                (original[less], original[greater]) = (original[greater], original[less]);
                 changed = true;
             }
 
@@ -160,9 +156,7 @@ namespace CZToolKit
                     continue;
                 }
 
-                T temp = original[less];
-                original[less] = original[greater];
-                original[greater] = temp;
+                (original[less], original[greater]) = (original[greater], original[less]);
                 changed = true;
             }
 
@@ -200,9 +194,7 @@ namespace CZToolKit
                     continue;
                 }
 
-                T temp = original[less];
-                original[less] = original[greater];
-                original[greater] = temp;
+                (original[less], original[greater]) = (original[greater], original[less]);
                 changed = true;
             }
 
