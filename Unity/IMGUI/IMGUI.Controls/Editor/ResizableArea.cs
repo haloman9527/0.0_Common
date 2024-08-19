@@ -3,9 +3,9 @@
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
- *  
+ *
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
@@ -28,6 +28,7 @@ namespace CZToolKitEditor.IMGUI.Controls
     [Serializable]
     public class ResizableArea
     {
+        [Flags]
         public enum UIDirection
         {
             None = 0,
@@ -42,40 +43,34 @@ namespace CZToolKitEditor.IMGUI.Controls
             BottomRight = 256
         }
 
-        public const float DefaultSide = 10;
+        public const float DefaultSideWdith = 10;
 
-        bool isDragging;
+        public static readonly Dictionary<UIDirection, int> DirectionIndexMap = new Dictionary<UIDirection, int>
+        {
+            { UIDirection.None, -1 },
+            { UIDirection.Left, 0 },
+            { UIDirection.Right, 1 },
+            { UIDirection.Top, 1 },
+            { UIDirection.Bottom, 1 },
+            { UIDirection.TopLeft, 1 },
+            { UIDirection.TopRight, 1 },
+            { UIDirection.MiddleCenter, 1 },
+            { UIDirection.BottomLeft, 1 },
+            { UIDirection.BottomRight, 1 },
+        };
 
-        UIDirection[] directions;
-        UIDirection sideDirection;
-        UIDirection enabledSides;
-        Dictionary<UIDirection, Rect> sides;
-        Dictionary<UIDirection, float> sideOffset;
+        [NonSerialized] private bool isDragging;
+        [NonSerialized] private UIDirection[] directions;
+
+        public UIDirection sideDirection;
+        public UIDirection enabledSides;
+        public Rect[] sides = new Rect[9];
+        public float[] sideOffset = new float[9];
 
         public Rect rect = default;
         public Vector2 minSize = Vector2.zero;
         public Vector2 maxSize = Vector2.zero;
-        public float side = DefaultSide;
-
-        Dictionary<UIDirection, Rect> Sides
-        {
-            get
-            {
-                if (sides == null)
-                    sides = new Dictionary<UIDirection, Rect>();
-                return sides;
-            }
-        }
-
-        public Dictionary<UIDirection, float> SideOffset
-        {
-            get
-            {
-                if (sideOffset == null)
-                    sideOffset = new Dictionary<UIDirection, float>();
-                return sideOffset;
-            }
-        }
+        public float side = DefaultSideWdith;
 
         UIDirection[] Directions
         {
@@ -109,25 +104,23 @@ namespace CZToolKitEditor.IMGUI.Controls
         public void DisableSide(UIDirection direction)
         {
             enabledSides &= ~direction;
-            if (Sides.ContainsKey(direction))
-                Sides.Remove(direction);
         }
 
         public bool IsEnabled(UIDirection direction)
         {
-            return enabledSides.HasFlag(direction);
+            return (enabledSides & direction) != UIDirection.None;
         }
 
         void Reload()
         {
             foreach (var direction in Directions)
             {
-                if (enabledSides.HasFlag(direction))
+                if ((enabledSides & direction) == UIDirection.None)
                 {
-                    float offset;
-                    SideOffset.TryGetValue(direction, out offset);
-                    Sides[direction] = GetSide(direction, side, offset);
+                    continue;
                 }
+
+                sides[DirectionIndexMap[direction]] = GetSide(direction, side, sideOffset[DirectionIndexMap[direction]]);
             }
         }
 
@@ -166,38 +159,40 @@ namespace CZToolKitEditor.IMGUI.Controls
             {
                 case EventType.Repaint:
                     if (IsEnabled(UIDirection.Top))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Top], MouseCursor.ResizeVertical);
+                        EditorGUIUtility.AddCursorRect(sides[DirectionIndexMap[UIDirection.Top]], MouseCursor.ResizeVertical);
                     if (IsEnabled(UIDirection.Bottom))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Bottom], MouseCursor.ResizeVertical);
+                        EditorGUIUtility.AddCursorRect(sides[DirectionIndexMap[UIDirection.Bottom]], MouseCursor.ResizeVertical);
 
                     if (IsEnabled(UIDirection.Left))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Left], MouseCursor.ResizeHorizontal);
+                        EditorGUIUtility.AddCursorRect(sides[DirectionIndexMap[UIDirection.Left]], MouseCursor.ResizeHorizontal);
                     if (IsEnabled(UIDirection.Right))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.Right], MouseCursor.ResizeHorizontal);
+                        EditorGUIUtility.AddCursorRect(sides[DirectionIndexMap[UIDirection.Right]], MouseCursor.ResizeHorizontal);
 
                     if (IsEnabled(UIDirection.TopLeft))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.TopLeft], MouseCursor.ResizeUpLeft);
+                        EditorGUIUtility.AddCursorRect(sides[DirectionIndexMap[UIDirection.TopLeft]], MouseCursor.ResizeUpLeft);
                     if (IsEnabled(UIDirection.TopRight))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.TopRight], MouseCursor.ResizeUpRight);
+                        EditorGUIUtility.AddCursorRect(sides[DirectionIndexMap[UIDirection.TopRight]], MouseCursor.ResizeUpRight);
 
                     if (IsEnabled(UIDirection.BottomLeft))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.BottomLeft], MouseCursor.ResizeUpRight);
+                        EditorGUIUtility.AddCursorRect(sides[DirectionIndexMap[UIDirection.BottomLeft]], MouseCursor.ResizeUpRight);
                     if (IsEnabled(UIDirection.BottomRight))
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.BottomRight], MouseCursor.ResizeUpLeft);
+                        EditorGUIUtility.AddCursorRect(sides[DirectionIndexMap[UIDirection.BottomRight]], MouseCursor.ResizeUpLeft);
 
                     if (IsEnabled(UIDirection.MiddleCenter) && isDragging && sideDirection == UIDirection.MiddleCenter)
-                        EditorGUIUtility.AddCursorRect(Sides[UIDirection.MiddleCenter], MouseCursor.MoveArrow);
+                        EditorGUIUtility.AddCursorRect(sides[DirectionIndexMap[UIDirection.MiddleCenter]], MouseCursor.MoveArrow);
                     break;
                 case EventType.MouseDown:
                     foreach (var direction in Directions)
                     {
-                        if (IsEnabled(direction) && Sides[direction].Contains(evt.mousePosition))
+                        if (!IsEnabled(direction) || !sides[DirectionIndexMap[direction]].Contains(evt.mousePosition))
                         {
-                            sideDirection = direction;
-                            isDragging = true;
-                            Event.current.Use();
-                            break;
+                            continue;
                         }
+
+                        sideDirection = direction;
+                        isDragging = true;
+                        Event.current.Use();
+                        break;
                     }
 
                     break;
@@ -206,83 +201,84 @@ namespace CZToolKitEditor.IMGUI.Controls
                     sideDirection = UIDirection.None;
                     break;
                 case EventType.MouseDrag:
-                    if (isDragging)
+                    if (!isDragging)
                     {
-                        switch (sideDirection)
-                        {
-                            case UIDirection.Top:
-                                if (IsEnabled(sideDirection))
-                                {
-                                    rect.yMin = evt.mousePosition.y;
-                                }
-
-                                break;
-                            case UIDirection.Bottom:
-                                if (IsEnabled(sideDirection))
-                                {
-                                    rect.yMax = evt.mousePosition.y;
-                                }
-
-                                break;
-                            case UIDirection.Left:
-                                if (IsEnabled(sideDirection))
-                                {
-                                    rect.xMin += evt.mousePosition.x;
-                                }
-
-                                break;
-                            case UIDirection.Right:
-                                if (IsEnabled(sideDirection))
-                                {
-                                    rect.xMax = evt.mousePosition.x;
-                                }
-
-                                break;
-                            case UIDirection.TopLeft:
-                                if (IsEnabled(sideDirection))
-                                {
-                                    rect.yMin = evt.mousePosition.y;
-
-                                    rect.xMin += evt.mousePosition.x;
-                                }
-
-                                break;
-                            case UIDirection.TopRight:
-                                if (IsEnabled(sideDirection))
-                                {
-                                    rect.yMin = evt.mousePosition.y;
-
-                                    rect.xMax = evt.mousePosition.x;
-                                }
-
-                                break;
-                            case UIDirection.BottomLeft:
-                                if (IsEnabled(sideDirection))
-                                {
-                                    rect.yMax = evt.mousePosition.y;
-
-                                    rect.xMin = evt.mousePosition.x;
-                                }
-
-                                break;
-                            case UIDirection.BottomRight:
-                                if (IsEnabled(sideDirection))
-                                {
-                                    rect.yMax = evt.mousePosition.y;
-
-                                    rect.xMax = evt.mousePosition.x;
-                                }
-
-                                break;
-                            case UIDirection.MiddleCenter:
-                                if (IsEnabled(sideDirection))
-                                    rect.position += evt.delta;
-                                break;
-
-                        }
-
-                        evt.Use();
+                        break;
                     }
+
+                    switch (sideDirection)
+                    {
+                        case UIDirection.Top:
+                            if (IsEnabled(sideDirection))
+                            {
+                                rect.yMin = evt.mousePosition.y;
+                            }
+
+                            break;
+                        case UIDirection.Bottom:
+                            if (IsEnabled(sideDirection))
+                            {
+                                rect.yMax = evt.mousePosition.y;
+                            }
+
+                            break;
+                        case UIDirection.Left:
+                            if (IsEnabled(sideDirection))
+                            {
+                                rect.xMin += evt.mousePosition.x;
+                            }
+
+                            break;
+                        case UIDirection.Right:
+                            if (IsEnabled(sideDirection))
+                            {
+                                rect.xMax = evt.mousePosition.x;
+                            }
+
+                            break;
+                        case UIDirection.TopLeft:
+                            if (IsEnabled(sideDirection))
+                            {
+                                rect.yMin = evt.mousePosition.y;
+
+                                rect.xMin += evt.mousePosition.x;
+                            }
+
+                            break;
+                        case UIDirection.TopRight:
+                            if (IsEnabled(sideDirection))
+                            {
+                                rect.yMin = evt.mousePosition.y;
+
+                                rect.xMax = evt.mousePosition.x;
+                            }
+
+                            break;
+                        case UIDirection.BottomLeft:
+                            if (IsEnabled(sideDirection))
+                            {
+                                rect.yMax = evt.mousePosition.y;
+
+                                rect.xMin = evt.mousePosition.x;
+                            }
+
+                            break;
+                        case UIDirection.BottomRight:
+                            if (IsEnabled(sideDirection))
+                            {
+                                rect.yMax = evt.mousePosition.y;
+
+                                rect.xMax = evt.mousePosition.x;
+                            }
+
+                            break;
+                        case UIDirection.MiddleCenter:
+                            if (IsEnabled(sideDirection))
+                                rect.position += evt.delta;
+                            break;
+                    }
+
+                    evt.Use();
 
                     break;
                 default:
