@@ -16,15 +16,13 @@
 
 #endregion
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace CZToolKit
 {
-    public class ViewModel
+    public partial class ViewModel
     {
         private Dictionary<string, IBindableProperty> internalBindableProperties;
 
@@ -165,11 +163,45 @@ namespace CZToolKit
         }
     }
 
-    public class ViewModel0 : INotifyPropertyChanged
+    public partial class ViewModel
     {
+        public abstract class RefProperty
+        {
+        }
+
+        public class RefProperty<V> : RefProperty
+        {
+            public delegate ref V RefFunc();
+
+            private RefFunc getter;
+
+            public ref V Value
+            {
+                get { return ref getter(); }
+            }
+
+            public RefProperty(RefFunc getter)
+            {
+                this.getter = getter;
+            }
+        }
+    }
+
+    public partial class ViewModel : INotifyPropertyChanging, INotifyPropertyChanged
+    {
+        public event PropertyChangingEventHandler PropertyChanging;
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private readonly Dictionary<string, RefProperty> properties = new Dictionary<string, RefProperty>();
+
+        public Dictionary<string, RefProperty> Properties => properties;
+        
+        protected virtual void OnPropertyChanging(string propertyName = null)
+        {
+            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
+        }
+
+        protected virtual void OnPropertyChanged(string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -180,6 +212,37 @@ namespace CZToolKit
             field = value;
             OnPropertyChanged(propertyName);
             return true;
+        }
+
+        protected bool SetField<T>(string propertyName, T value)
+        {
+            if (!properties.TryGetValue(propertyName, out var p) || !(p is RefProperty<T> property))
+            {
+                return false;
+            }
+
+            if (EqualityComparer<T>.Default.Equals(property.Value, value)) return false;
+            
+            OnPropertyChanging(propertyName);
+            property.Value = value;
+            OnPropertyChanged(propertyName);
+            
+            return true;
+        }
+
+        protected T GetField<T>(string propertyName)
+        {
+            if (properties.TryGetValue(propertyName, out var p) && p is RefProperty<T> property)
+            {
+                return property.Value;
+            }
+
+            return default;
+        }
+
+        public void NotifyChanged(string propertyName)
+        {
+            OnPropertyChanged(propertyName);
         }
     }
 }
