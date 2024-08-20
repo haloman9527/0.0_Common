@@ -98,7 +98,7 @@ namespace CZToolKit.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/CZToolKit/Path Print/ComsoleLogPath")]'
+        [MenuItem("Tools/CZToolKit/Path Print/ComsoleLogPath")]
 #endif
         public static void PrintComsoleLogPath()
         {

@@ -82,12 +82,7 @@ namespace CZToolKit
 
         public IObjectPool GetPool(Type unitType)
         {
-            if (!pools.TryGetValue(unitType, out var pool))
-            {
-                return null;
-            }
-
-            return pool;
+            return pools.GetValueOrDefault(unitType);
         }
 
         public void RegisterPool(Type unitType, IObjectPool pool)

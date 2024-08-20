@@ -19,45 +19,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace CZToolKit
 {
-    public interface IViewModel
-    {
-        int Count { get; }
-
-        IBindableProperty this[string propertyName] { get; set; }
-
-        IEnumerable<string> Keys { get; }
-
-        IEnumerable<IBindableProperty> Values { get; }
-
-        IEnumerator<KeyValuePair<string, IBindableProperty>> GetEnumerator();
-
-        bool Contains(string key);
-
-        void Clear();
-
-        IBindableProperty GetProperty(string propertyName);
-
-        IBindableProperty<T> GetProperty<T>(string propertyName);
-
-        bool TryGetProperty(string propertyName, out IBindableProperty property);
-
-        bool TrygetProperty<T>(string propertyName, out IBindableProperty<T> property);
-
-        void RegisterProperty(string propertyName, IBindableProperty property);
-
-        void UnregisterProperty(string propertyName);
-
-        T GetPropertyValue<T>(string propertyName);
-
-        void SetPropertyValue<T>(string propertyName, T value);
-
-        void ClearValueChangedEvent(string propertyName);
-    }
-
-    public class ViewModel : IViewModel
+    public class ViewModel
     {
         private Dictionary<string, IBindableProperty> internalBindableProperties;
 
@@ -86,16 +53,6 @@ namespace CZToolKit
         public IEnumerator<KeyValuePair<string, IBindableProperty>> GetEnumerator()
         {
             return InternalBindableProperties.GetEnumerator();
-        }
-
-        public bool Contains(KeyValuePair<string, IBindableProperty> item)
-        {
-            return (InternalBindableProperties as ICollection<KeyValuePair<string, IBindableProperty>>).Contains(item);
-        }
-
-        public bool Remove(KeyValuePair<string, IBindableProperty> item)
-        {
-            return (InternalBindableProperties as IDictionary<string, IBindableProperty>).Remove(item);
         }
 
         public bool Contains(string propertyName)
@@ -144,7 +101,7 @@ namespace CZToolKit
             return internalBindableProperties.TryGetValue(propertyName, out property);
         }
 
-        public bool TrygetProperty<T>(string propertyName, out IBindableProperty<T> property)
+        public bool TryGetProperty<T>(string propertyName, out IBindableProperty<T> property)
         {
             if (internalBindableProperties == null)
             {
@@ -205,6 +162,24 @@ namespace CZToolKit
         public void ClearValueChangedEvent(string propertyName)
         {
             this[propertyName].ClearValueChangedEvent();
+        }
+    }
+
+    public class ViewModel0 : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }

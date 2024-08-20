@@ -18,7 +18,7 @@
 
 #if UNITY_EDITOR
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -31,9 +31,25 @@ namespace CZToolKitEditor.IMGUI.Controls
     public class AdvancedDropdownItem : UnityAdvancedDropDownItem
     {
         public object userData;
+
+        private Dictionary<string, AdvancedDropdownItem> childrenMap;
+
+        public Dictionary<string, AdvancedDropdownItem> ChildrenMap
+        {
+            get
+            {
+                if (childrenMap == null)
+                {
+                    childrenMap = new Dictionary<string, AdvancedDropdownItem>();
+                }
+
+                return childrenMap;
+            }
+        }
         
         public AdvancedDropdownItem(string name) : base(name)
         {
+            
         }
     }
 
@@ -43,7 +59,6 @@ namespace CZToolKitEditor.IMGUI.Controls
 
         private string rootName;
         private AdvancedDropdownItem root;
-        private bool split = true;
         
         public event Action<AdvancedDropdownItem> onItemSelected;
 
@@ -51,12 +66,6 @@ namespace CZToolKitEditor.IMGUI.Controls
         {
             get { return minimumSize; }
             set { minimumSize = value; }
-        }
-        
-        public bool Split
-        {
-            get => split;
-            set => split = value;
         }
 
         AdvancedDropdownItem Root
@@ -88,27 +97,26 @@ namespace CZToolKitEditor.IMGUI.Controls
         }
 
         // 添加一个选项
-        public AdvancedDropdownItem Add(string path, Texture2D icon = null, char sperator = '/')
+        public AdvancedDropdownItem Add(string path, Texture2D icon = null, char seperator = '/', bool split = true)
         {
-            var name = path;
             var parent = Root;
-            if (split)
+            var name = path;
+            
+            if (split && path.IndexOf(seperator) != -1)
             {
-                var p = path.Split(sperator);
-                name = p[p.Length - 1];
+                var p = path.Split(seperator);
                 if (p.Length > 1)
                 {
+                    name = p[^1];
                     for (int i = 0; i < p.Length - 1; i++)
                     {
-                        var tempItem = parent.children.FirstOrDefault(_item => _item.name == p[i]) as AdvancedDropdownItem;
-                        if (tempItem != null)
-                            parent = tempItem;
-                        else
+                        if (!parent.ChildrenMap.TryGetValue(p[i], out var tmpParent))
                         {
-                            tempItem = new AdvancedDropdownItem(p[i]) { id = GenerateID() };
-                            parent.AddChild(tempItem);
-                            parent = tempItem;
+                            tmpParent = new AdvancedDropdownItem(p[i]) { id = GenerateID() };
+                            parent.AddChild(tmpParent);
                         }
+
+                        parent = tmpParent;
                     }
                 }
             }
@@ -162,11 +170,11 @@ namespace CZToolKitEditor.IMGUI.Controls
             window.ShowAsDropDown(GUIUtility.GUIToScreenRect(rect), size);
         }
 
-        int id;
+        private int lastId;
 
-        int GenerateID()
+        private int GenerateID()
         {
-            return id++;
+            return lastId++;
         }
     }
 }
