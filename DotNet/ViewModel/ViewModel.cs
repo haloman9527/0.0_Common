@@ -58,35 +58,35 @@ namespace CZToolKit
             return InternalBindableProperties.ContainsKey(propertyName);
         }
 
-        public IBindableProperty GetProperty(string propertyName)
-        {
-            if (internalBindableProperties == null)
-            {
-                return null;
-            }
-
-            if (!internalBindableProperties.TryGetValue(propertyName, out var property))
-            {
-                return null;
-            }
-
-            return property;
-        }
-
-        public IBindableProperty<T> GetProperty<T>(string propertyName)
-        {
-            if (internalBindableProperties == null)
-            {
-                return null;
-            }
-
-            if (!internalBindableProperties.TryGetValue(propertyName, out var property))
-            {
-                return null;
-            }
-
-            return property as IBindableProperty<T>;
-        }
+        // public IBindableProperty GetProperty(string propertyName)
+        // {
+        //     if (internalBindableProperties == null)
+        //     {
+        //         return null;
+        //     }
+        //
+        //     if (!internalBindableProperties.TryGetValue(propertyName, out var property))
+        //     {
+        //         return null;
+        //     }
+        //
+        //     return property;
+        // }
+        //
+        // public IBindableProperty<T> GetProperty<T>(string propertyName)
+        // {
+        //     if (internalBindableProperties == null)
+        //     {
+        //         return null;
+        //     }
+        //
+        //     if (!internalBindableProperties.TryGetValue(propertyName, out var property))
+        //     {
+        //         return null;
+        //     }
+        //
+        //     return property as IBindableProperty<T>;
+        // }
 
         public bool TryGetProperty(string propertyName, out IBindableProperty property)
         {
@@ -165,22 +165,22 @@ namespace CZToolKit
 
     public partial class ViewModel
     {
+        public delegate ref V RefFunc<V>();
+        
         public abstract class RefProperty
         {
         }
 
         public class RefProperty<V> : RefProperty
         {
-            public delegate ref V RefFunc();
-
-            private RefFunc getter;
+            private RefFunc<V> getter;
 
             public ref V Value
             {
                 get { return ref getter(); }
             }
 
-            public RefProperty(RefFunc getter)
+            public RefProperty(RefFunc<V> getter)
             {
                 this.getter = getter;
             }
@@ -206,7 +206,7 @@ namespace CZToolKit
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetField<T>(ref T field, T value, string propertyName)
         {
             if (EqualityComparer<T>.Default.Equals(field, value)) return false;
             field = value;
@@ -214,13 +214,23 @@ namespace CZToolKit
             return true;
         }
 
-        protected bool SetField<T>(string propertyName, T value)
+        protected T GetField<T>(string propertyName)
+        {
+            if (!string.IsNullOrEmpty(propertyName) && properties.TryGetValue(propertyName, out var p) && p is RefProperty<T> property)
+            {
+                return property.Value;
+            }
+
+            return default;
+        }
+
+        protected bool SetProperty<T>(string propertyName, T value)
         {
             if (!properties.TryGetValue(propertyName, out var p) || !(p is RefProperty<T> property))
             {
                 return false;
             }
-
+        
             if (EqualityComparer<T>.Default.Equals(property.Value, value)) return false;
             
             OnPropertyChanging(propertyName);
@@ -229,18 +239,23 @@ namespace CZToolKit
             
             return true;
         }
-
-        protected T GetField<T>(string propertyName)
+        
+        protected T GetProperty<T>(string propertyName)
         {
             if (properties.TryGetValue(propertyName, out var p) && p is RefProperty<T> property)
             {
                 return property.Value;
             }
-
+        
             return default;
         }
 
-        public void NotifyChanged(string propertyName)
+        protected void RegisterProperty<V>(string propertyName, RefFunc<V> getter)
+        {
+            properties.Add(propertyName, new RefProperty<V>(getter));
+        }
+
+        public void NotifyPropertyChanged(string propertyName)
         {
             OnPropertyChanged(propertyName);
         }
