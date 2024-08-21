@@ -3,7 +3,7 @@
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
  *  普通对象的绘制媒介
  *  Date:
@@ -17,164 +17,121 @@
 #endregion
 
 #if UNITY_EDITOR
+using System;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
-using System;
-using UnityObject = UnityEngine.Object;
 
 namespace CZToolKitEditor
 {
     public class ObjectInspector : ScriptableObject
     {
-        [SerializeField] object target;
+        [SerializeField]
+        [SerializeReference]
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.HideReferenceObjectPicker]
+#endif
+        public object target;
 
-        public object Target
+        private void OnDisable()
         {
-            get { return target; }
-            private set { target = value; }
-        }
-
-        public UnityObject UnityContext { get; private set; }
-
-        public void Initialize(object target, UnityObject unityContext)
-        {
-            UnityContext = unityContext;
-            Target = target;
+            target = null;
         }
     }
 
     [CustomEditor(typeof(ObjectInspector))]
-#if ODIN_INSPECTOR && DRAW_WITH_ODIN
+#if ODIN_INSPECTOR
     public class ObjectInspectorEditor : Sirenix.OdinInspector.Editor.OdinEditor
 #else
     public class ObjectInspectorEditor : Editor
 #endif
     {
-        public ObjectEditor ObjectEditor { get; set; }
-        public ObjectInspector InspectorObject
+        public static ObjectInspectorEditor CreateEditor(object target)
         {
-            get { return target as ObjectInspector; }
+            var inspector = ScriptableObject.CreateInstance<ObjectInspector>();
+            inspector.target = target;
+            return Editor.CreateEditor(inspector, typeof(ObjectInspectorEditor)) as ObjectInspectorEditor;
         }
-#if ODIN_INSPECTOR && DRAW_WITH_ODIN
+
+        private ObjectEditor ObjectEditor { get; set; }
+
+#if ODIN_INSPECTOR
         protected override void OnEnable()
         {
             base.OnEnable();
+            OnEnable(target as ObjectInspector);
+        }
 #else
-        void OnEnable()
+        private void OnEnable()
         {
-#endif
             OnEnable(InspectorObject);
-
-            void OnEnable(ObjectInspector ispectorObject)
+        }
+#endif
+        
+        private void OnEnable(ObjectInspector ispectorObject)
+        {
+            if (ispectorObject.target == null)
             {
-                if (ispectorObject == null)
-                    return;
-                if (ispectorObject.Target == null)
-                    return;
-                ObjectEditor = ObjectEditor.CreateEditor(ispectorObject.Target, ispectorObject.UnityContext, this);
-                if (ObjectEditor == null)
-                    return;
-                string title = ObjectEditor.GetTitle();
-                if (!string.IsNullOrEmpty(title))
-                    ispectorObject.name = title;
-                ObjectEditor.OnEnable();
+                return;
             }
+            
+            ObjectEditor = ObjectEditor.CreateEditor(ispectorObject.target, this);
+            string title = ObjectEditor?.GetTitle();
+            if (!string.IsNullOrEmpty(title))
+                ispectorObject.name = title;
+            ObjectEditor?.OnEnable();
         }
 
-        protected override void OnHeaderGUI()
+#if ODIN_INSPECTOR
+        protected override void OnDisable()
         {
-            base.OnHeaderGUI();
-            if (ObjectEditor != null)
-                ObjectEditor.OnHeaderGUI();
+            ObjectEditor?.OnDisable();
+            ObjectEditor = null;
+            base.OnDisable();
         }
+#else
+        private void OnDisable()
+        {
+            ObjectEditor?.OnDisable();
+            ObjectEditor = null;
+        }
+#endif
 
-        public override VisualElement CreateInspectorGUI()
-        {
-            VisualElement v = null;
-            if (ObjectEditor != null)
-                v = ObjectEditor.CreateInspectorGUI();
-            if (v == null)
-                v = base.CreateInspectorGUI();
-            return v;
-        }
+        protected override void OnHeaderGUI() => ObjectEditor?.OnHeaderGUI();
+        public void BaseOnHeaderGUI() => base.OnHeaderGUI();
 
-        public override void OnInspectorGUI()
-        {
-            if (ObjectEditor == null)
-                return;
-            if (ObjectEditor.Target == null)
-                return;
-            ObjectEditor.OnInspectorGUI();
-        }
+        public override VisualElement CreateInspectorGUI() => ObjectEditor?.CreateInspectorGUI();
+        public VisualElement BaseCreateInspectorGUI() => base.CreateInspectorGUI();
 
-        public void DrawBaseInspecotrGUI()
-        {
-            base.OnInspectorGUI();
-        }
+        public override void OnInspectorGUI() => ObjectEditor?.OnInspectorGUI();
+        public void BaseOnInspecotrGUI() => base.OnInspectorGUI();
 
-        public override void DrawPreview(Rect previewArea)
-        {
-            base.DrawPreview(previewArea);
-            if (ObjectEditor != null)
-                ObjectEditor.DrawPreview(previewArea);
-        }
+        public override void DrawPreview(Rect previewArea) => ObjectEditor?.DrawPreview(previewArea);
+        public void BaseDrawPreview(Rect previewArea) => base.DrawPreview(previewArea);
 
-        public override bool HasPreviewGUI()
-        {
-            if (ObjectEditor != null)
-                return ObjectEditor.HasPreviewGUI();
-            return base.HasPreviewGUI();
-        }
+        public override bool HasPreviewGUI() => ObjectEditor == null ? BaseHasPreviewGUI() : ObjectEditor.HasPreviewGUI();
+        public bool BaseHasPreviewGUI() => base.HasPreviewGUI();
 
-        public override void OnPreviewSettings()
-        {
-            base.OnPreviewSettings();
-            if (ObjectEditor != null)
-                ObjectEditor.OnPreviewSettings();
-        }
+        public override void OnPreviewSettings() => ObjectEditor?.OnPreviewSettings();
+        public void BasePreviewSettings() => base.OnPreviewSettings();
 
-        public override GUIContent GetPreviewTitle()
-        {
-            GUIContent title = null;
-            if (ObjectEditor != null)
-                title = ObjectEditor.GetPreviewTitle();
-            if (title == null)
-                title = base.GetPreviewTitle();
-            return title;
-        }
+        public override GUIContent GetPreviewTitle() => ObjectEditor?.GetPreviewTitle();
+        public GUIContent BaseGetPreviewTitle() => base.GetPreviewTitle();
 
-        public override void OnPreviewGUI(Rect rect, GUIStyle background)
-        {
-            base.OnPreviewGUI(rect, background);
-            if (ObjectEditor != null)
-                ObjectEditor.OnPreviewGUI(rect, background);
-        }
+        public override void OnPreviewGUI(Rect rect, GUIStyle background) => ObjectEditor?.OnPreviewGUI(rect, background);
+        public void BaseOnPreviewGUI(Rect rect, GUIStyle background) => base.OnPreviewGUI(rect, background);
 
-        public override void OnInteractivePreviewGUI(Rect rect, GUIStyle background)
-        {
-            base.OnInteractivePreviewGUI(rect, background);
-            if (ObjectEditor != null)
-                ObjectEditor.OnInteractivePreviewGUI(rect, background);
-        }
+        public override void OnInteractivePreviewGUI(Rect rect, GUIStyle background) => ObjectEditor?.OnInteractivePreviewGUI(rect, background);
+        public void BaseOnInteractivePreviewGUI(Rect rect, GUIStyle background) => base.OnInteractivePreviewGUI(rect, background);
 
         private void OnSceneGUI()
         {
-            if (ObjectEditor != null)
-                ObjectEditor.OnSceneGUI();
+            ObjectEditor?.OnSceneGUI();
         }
-
+        
         private void OnValidate()
         {
-            if (ObjectEditor != null)
-                ObjectEditor.OnValidate();
-        }
-
-        private void OnDisable()
-        {
-            if (ObjectEditor != null)
-                ObjectEditor.OnDisable();
-            ObjectEditor = null;
+            ObjectEditor?.OnValidate();
         }
     }
 }

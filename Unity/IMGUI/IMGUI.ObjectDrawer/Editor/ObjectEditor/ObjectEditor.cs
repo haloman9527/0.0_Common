@@ -1,4 +1,5 @@
 #region 注 释
+
 /***
  *
  *  Title:
@@ -12,7 +13,9 @@
  *  Blog: https://www.haloman.net/
  *
  */
+
 #endregion
+
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
@@ -21,62 +24,27 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using CZToolKit;
 
-using UnityObject = UnityEngine.Object;
-
 namespace CZToolKitEditor
 {
     public class ObjectEditor
     {
-        public object Target
-        {
-            get;
-            private set;
-        }
-        public UnityObject Owner
-        {
-            get;
-            private set;
-        }
-        public Editor Editor
-        {
-            get;
-            private set;
-        }
-        public MonoScript Script
-        {
-            get;
-            private set;
-        }
-        public SerializedPropertyS SerializedObject
-        {
-            get;
-            private set;
-        }
+        public object Target { get; private set; }
 
-        protected ObjectEditor() { }
+        public ObjectInspectorEditor SourceEditor { get; private set; }
+
+        public MonoScript Script { get; private set; }
 
         void Initialize(object target)
         {
             Target = target;
             Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
-            SerializedObject = new SerializedPropertyS(Target);
         }
 
-        void Initialize(object target, UnityObject context)
+        void Initialize(object target, ObjectInspectorEditor sourceEditor)
         {
             Target = target;
-            Owner = context;
+            SourceEditor = sourceEditor;
             Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
-            SerializedObject = new SerializedPropertyS(Target);
-        }
-
-        void Initialize(object target, UnityObject context, Editor editor)
-        {
-            Target = target;
-            Owner = context;
-            Editor = editor;
-            Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
-            SerializedObject = new SerializedPropertyS(Target);
         }
 
         public virtual string GetTitle()
@@ -84,45 +52,69 @@ namespace CZToolKitEditor
             return string.Empty;
         }
 
-        public virtual void OnEnable() { }
+        public virtual void OnEnable()
+        {
+        }
 
-        public virtual void OnHeaderGUI() { }
+        public virtual void OnDisable()
+        {
+        }
+
+        public virtual void OnValidate()
+        {
+        }
+
+        public virtual void OnSceneGUI()
+        {
+        }
+
+        public virtual VisualElement CreateInspectorGUI()
+        {
+            return SourceEditor.BaseCreateInspectorGUI();
+        }
+
+        public virtual void OnHeaderGUI()
+        {
+            SourceEditor.BaseOnHeaderGUI();
+        }
 
         public virtual void OnInspectorGUI()
         {
-            EditorGUILayoutExtension.PropertyField(SerializedObject);
+            SourceEditor.BaseOnInspecotrGUI();
         }
 
         public virtual bool HasPreviewGUI()
         {
-            return false;
+            return SourceEditor.BaseHasPreviewGUI();
         }
 
         public virtual GUIContent GetPreviewTitle()
         {
-            return null;
+            return SourceEditor.BaseGetPreviewTitle();
         }
 
-        public virtual void OnPreviewSettings() { }
-
-        public virtual void DrawPreview(Rect previewArea) { }
-
-        public virtual void OnPreviewGUI(Rect rect, GUIStyle background) { }
-
-        public virtual void OnInteractivePreviewGUI(Rect rect, GUIStyle background) { }
-
-        public virtual void OnValidate() { }
-
-        public virtual void OnSceneGUI() { }
-
-        public virtual void OnDisable() { }
-
-        public virtual VisualElement CreateInspectorGUI()
+        public virtual void OnPreviewSettings()
         {
-            return null;
+            SourceEditor.BasePreviewSettings();
+        }
+
+        public virtual void DrawPreview(Rect previewArea)
+        {
+            SourceEditor.BaseDrawPreview(previewArea);
+        }
+
+        public virtual void OnPreviewGUI(Rect rect, GUIStyle background)
+        {
+            SourceEditor.BaseOnPreviewGUI(rect, background);
+        }
+
+        public virtual void OnInteractivePreviewGUI(Rect rect, GUIStyle background)
+        {
+            SourceEditor.BaseOnInteractivePreviewGUI(rect, background);
         }
 
         #region Static
+
         static Dictionary<Type, Type> ObjectEditorTypeCache;
 
         static ObjectEditor()
@@ -143,81 +135,13 @@ namespace CZToolKitEditor
             }
         }
 
-        public static Type GetEditorType(Type objectType)
+        private static Type GetEditorType(Type objectType)
         {
             if (ObjectEditorTypeCache.TryGetValue(objectType, out Type editorType))
                 return editorType;
             if (objectType.BaseType != null)
                 return GetEditorType(objectType.BaseType);
             return null;
-        }
-
-        public static ObjectEditor CreateEditor(object target)
-        {
-            var editorType = GetEditorType(target.GetType());
-            if (editorType  == null)
-                editorType = typeof(ObjectEditor);
-            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
-            if (objectEditor == null)
-                return null;
-            objectEditor.Initialize(target);
-            return objectEditor;
-        }
-
-        public static ObjectEditor CreateEditor(object target, UnityObject context)
-        {
-            var editorType = GetEditorType(target.GetType());
-            if (editorType == null)
-                editorType = typeof(ObjectEditor);
-            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
-            if (objectEditor == null)
-                return null;
-            objectEditor.Initialize(target, context);
-            return objectEditor;
-        }
-
-        public static ObjectEditor CreateEditor(object target, UnityObject context, Editor editor)
-        {
-            var editorType = GetEditorType(target.GetType());
-            if (editorType == null)
-                editorType = typeof(ObjectEditor);
-            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
-            if (objectEditor == null)
-                return null;
-            objectEditor.Initialize(target, context, editor);
-            return objectEditor;
-        }
-
-        public static ObjectEditor CreateEditor(object target, Type editorType)
-        {
-            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
-            if (objectEditor == null)
-                return null;
-            objectEditor.Initialize(target);
-            return objectEditor;
-        }
-
-        public static ObjectEditor CreateEditor(object target, UnityObject context, Type editorType)
-        {
-            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
-            if (objectEditor == null)
-                return null;
-            objectEditor.Initialize(target, context);
-            return objectEditor;
-        }
-
-        public static ObjectEditor CreateEditor(object target, UnityObject context, Editor editor, Type editorType)
-        {
-            ObjectEditor objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
-            if (objectEditor == null)
-                return null;
-            objectEditor.Initialize(target, context, editor);
-            return objectEditor;
-        }
-
-        public static bool HasEditor(object target)
-        {
-            return HasEditor(target.GetType());
         }
 
         public static bool HasEditor(Type targetType)
@@ -227,24 +151,20 @@ namespace CZToolKitEditor
             if (targetType.BaseType != null)
                 return HasEditor(targetType.BaseType);
             return false;
-
         }
 
-        public static void DrawObjectInInspector(object target, UnityObject context = null)
+        public static ObjectEditor CreateEditor(object target, ObjectInspectorEditor sourceEditor)
         {
-            if (target is UnityObject)
-                Selection.activeObject = target as UnityObject;
-            else
-                DrawObjectInInspector("Inspector", target, context);
+            var editorType = GetEditorType(target.GetType());
+            if (editorType == null)
+                editorType = typeof(ObjectEditor);
+            var objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
+            if (objectEditor == null)
+                return null;
+            objectEditor.Initialize(target, sourceEditor);
+            return objectEditor;
         }
 
-        public static void DrawObjectInInspector(string title, object target, UnityObject context = null)
-        {
-            var instance = ScriptableObject.CreateInstance<ObjectInspector>();
-            instance.name = title;
-            instance.Initialize(target, context);
-            Selection.activeObject = instance;
-        }
         #endregion
     }
 
