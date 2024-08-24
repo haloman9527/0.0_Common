@@ -34,7 +34,7 @@ namespace CZToolKit
             }
         }
 
-        private Dictionary<TKey, IEvent> events = new Dictionary<TKey, IEvent>();
+        private readonly Dictionary<TKey, IEvent> events = new Dictionary<TKey, IEvent>();
 
         public void Subscribe<T>(TKey key, Action<T> handler)
         {

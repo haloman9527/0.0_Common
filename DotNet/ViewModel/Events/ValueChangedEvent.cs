@@ -17,5 +17,5 @@
 
 namespace CZToolKit
 {
-    public delegate void ValueChangedEvent<T>(T oldValue, T newValue);
+    public delegate void ValueChangedEvent<in T>(T oldValue, T newValue);
 }

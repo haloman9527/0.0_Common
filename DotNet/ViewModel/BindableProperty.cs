@@ -17,14 +17,15 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 namespace CZToolKit
 {
     [Serializable]
     public class BindableProperty<T> : IBindableProperty<T>, IBindableProperty
     {
-        private event Func<T> Getter;
-        private event Action<T> Setter;
+        private event Func<T> getter;
+        private event Action<T> setter;
         
         public event ValueChangedEvent<T> onValueChanged;
         public event ValueChangedEvent<object> onBoxedValueChanged;
@@ -33,42 +34,34 @@ namespace CZToolKit
         {
             get
             {
-                if (Getter == null)
+                if (getter == null)
                     throw new NotImplementedException("haven't get method");
-                return Getter();
+                return getter();
             }
             set
             {
-                if (Setter == null)
+                if (setter == null)
                     throw new NotImplementedException("haven't set method");
                 if (ValidEquals(Value, value))
                     return;
                 var oldValue = Value;
-                Setter(value);
+                setter(value);
                 NotifyValueChanged_Internal(oldValue, value);
             }
         }
 
-        public object ValueBoxed
+        public object BoxedValue
         {
-            get { return Value; }
-            set { Value = (T)value; }
+            get => Value;
+            set => Value = (T)value;
         }
 
-        public Type ValueType
-        {
-            get { return typeof(T); }
-        }
-        
+        public Type ValueType => typeof(T);
+
         public BindableProperty(Func<T> getter, Action<T> setter)
         {
-            InitValue_Insternal(getter, setter);
-        }
-        
-        private void InitValue_Insternal(Func<T> getter, Action<T> setter)
-        {
-            this.Getter = getter;
-            this.Setter = setter;
+            this.getter = getter;
+            this.setter = setter;
         }
 
         private void NotifyValueChanged_Internal(T oldValue, T newValue)
@@ -92,37 +85,38 @@ namespace CZToolKit
             this.onValueChanged -= onValueChanged;
         }
 
-        public void SetValueWithNotify(T value)
-        {
-            Setter?.Invoke(value);
-            NotifyValueChanged();
-        }
-
         public void SetValueWithoutNotify(T value)
         {
-            Setter?.Invoke(value);
-        }
-
-        public void SetValueWithNotify(object value)
-        {
-            SetValueWithoutNotify((T)value);
-            NotifyValueChanged();
+            setter?.Invoke(value);
         }
 
         public void SetValueWithoutNotify(object value)
         {
-            SetValueWithoutNotify((T)value);
+            setter?.Invoke((T)value);
         }
 
         public void ClearValueChangedEvent()
         {
             while (this.onValueChanged != null)
+            {
                 this.onValueChanged -= this.onValueChanged;
+            }
+            while (this.onBoxedValueChanged != null)
+            {
+                this.onBoxedValueChanged -= this.onBoxedValueChanged;
+            }
         }
 
         public void NotifyValueChanged()
         {
             NotifyValueChanged_Internal(Value, Value);
+        }
+
+        public virtual void Dispose()
+        {
+            getter = null;
+            setter = null;
+            ClearValueChangedEvent();
         }
 
         public override string ToString()
@@ -132,7 +126,7 @@ namespace CZToolKit
 
         protected virtual bool ValidEquals(T oldValue, T newValue)
         {
-            return Equals(oldValue, newValue);
+            return EqualityComparer<T>.Default.Equals(oldValue, newValue);
         }
     }
 }

@@ -17,26 +17,24 @@ using System;
 
 namespace CZToolKit
 {
-    public interface IBindableProperty
+    public interface IBindableProperty : IDisposable
     {
         event ValueChangedEvent<object> onBoxedValueChanged;
 
-        object ValueBoxed { get; set; }
+        object BoxedValue { get; set; }
         Type ValueType { get; }
 
-        void SetValueWithNotify(object value);
         void SetValueWithoutNotify(object value);
         void NotifyValueChanged();
         void ClearValueChangedEvent();
     }
 
-    public interface IBindableProperty<T>
+    public interface IBindableProperty<T> : IDisposable
     {
         event ValueChangedEvent<T> onValueChanged;
 
         T Value { get; set; }
 
-        void SetValueWithNotify(T value);
         void SetValueWithoutNotify(T value);
         void RegisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);
         void UnregisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);
