@@ -68,7 +68,7 @@ namespace CZToolKitEditor.IMGUI.Controls
 
     public class TreeView : UnityTreeView
     {
-        private UnityTreeViewItem root;
+        private TreeViewItem root;
         private TreeViewItemPool itemPool;
         private bool sharedItemPool;
         private Dictionary<int, TreeViewItem> itemMap = new Dictionary<int, TreeViewItem>();
@@ -399,7 +399,12 @@ namespace CZToolKitEditor.IMGUI.Controls
             }
 
             itemMap.Clear();
-            RootItem.children.Clear();
+            root.userData = null;
+            if (root.hasChildren)
+            {
+                root.children.Clear();
+                root.ChildrenMap.Clear();
+            }
             lastItemId = 0;
         }
 
@@ -414,7 +419,12 @@ namespace CZToolKitEditor.IMGUI.Controls
             }
 
             itemMap.Clear();
-            RootItem.children.Clear();
+            root.userData = null;
+            if (root.hasChildren)
+            {
+                root.children.Clear();
+                root.ChildrenMap.Clear();
+            }
             lastItemId = 0;
         }
 
