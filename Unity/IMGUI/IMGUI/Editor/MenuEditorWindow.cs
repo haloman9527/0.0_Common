@@ -10,10 +10,16 @@ namespace CZToolKitEditor
 {
     public abstract class MenuEditorWindow : EditorWindow
     {
-        private ResizableArea resizableArea = new ResizableArea();
+        public ResizableArea resizableArea;
         private VisualElement rightContentVisualElement;
         private Vector2 leftScroll;
+        private Rect rightRect;
+        private Rect sideRect;
+        private Rect contentRect;
+
         private SearchField menuTreeViewSearchField;
+        private TreeView menuTreeView;
+        private TreeViewState menuTreeViewState;
 
         public abstract TreeView MenuTreeView { get; }
 
@@ -22,11 +28,17 @@ namespace CZToolKitEditor
         protected virtual void OnEnable()
         {
             menuTreeViewSearchField = new SearchField();
-            resizableArea.rect = new Rect(0, 0, 150, 150);
-            resizableArea.minSize = new Vector2(50, 50);
-            resizableArea.side = 10;
-            resizableArea.EnableSide(ResizableArea.UIDirection.Right);
-
+            if (resizableArea == null)
+            {
+                resizableArea = new ResizableArea
+                {
+                    rect = new Rect(0, 0, 150, 150),
+                    minSize = new Vector2(50, 50),
+                    side = 10
+                };
+                resizableArea.EnableSide(ResizableArea.UIDirection.Right);
+            }
+            
             rightContentVisualElement = new VisualElement();
             rightContentVisualElement.pickingMode = PickingMode.Ignore;
             rootVisualElement.Add(rightContentVisualElement);
