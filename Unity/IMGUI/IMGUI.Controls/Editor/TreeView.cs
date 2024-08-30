@@ -73,6 +73,7 @@ namespace CZToolKitEditor.IMGUI.Controls
         private bool sharedItemPool;
         private Dictionary<int, TreeViewItem> itemMap = new Dictionary<int, TreeViewItem>();
 
+        public object userData;
         public Action<IList<int>> onSelectionChanged;
         public Action onKeyEvent;
         public Action onContextClicked;
