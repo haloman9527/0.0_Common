@@ -28,6 +28,15 @@ namespace CZToolKitEditor
 {
     public static partial class EditorGUILayoutExtension
     {
+        public static object CreateInstance(Type type)
+        {
+            if (type == typeof(string))
+                return "";
+            if (type.IsArray)
+                return Array.CreateInstance(type.GetElementType(), 0);
+            return Activator.CreateInstance(type, true);
+        }
+        
         /// <summary> 不是<see cref="private"/>、或者标记了<see cref="SerializeField"/>特性，并且没有标记<see cref="NonSerializedAttribute"/>特性，并且没有标记<see cref="HideInInspector"/>特性。 </summary>
         /// <returns> 满足以上条件返回<see cref="true"/> </returns>
         public static bool CanDraw(FieldInfo fieldInfo)
@@ -108,7 +117,7 @@ namespace CZToolKitEditor
             }
 
             float height = EditorGUIExtension.GetHeight(type, label);
-            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, height), value, label);
+            return EditorGUIExtension.DrawValue(EditorGUILayout.GetControlRect(true, height), value, label);
 
             //if (_fieldType.Equals(typeof(Matrix4x4)))
             //{
@@ -142,14 +151,14 @@ namespace CZToolKitEditor
             return DrawField(value, GUIHelper.TextContent(label));
         }
 
-        public static object DrawField(Type type, object value, GUIContent label)
+        public static object DrawValue(Type type, object value, GUIContent label)
         {
-            return EditorGUIExtension.DrawField(EditorGUILayout.GetControlRect(true, EditorGUIExtension.GetHeight(type, label)), type, value, label);
+            return EditorGUIExtension.DrawValue(EditorGUILayout.GetControlRect(true, EditorGUIExtension.GetHeight(type, label)), type, value, label);
         }
 
-        public static object DrawField(Type type, object value, string label)
+        public static object DrawValue(Type type, object value, string label)
         {
-            return DrawField(type, value, GUIHelper.TextContent(label));
+            return DrawValue(type, value, GUIHelper.TextContent(label));
         }
 
         static object DrawArrayField(Type fieldType, object value, GUIContent label)

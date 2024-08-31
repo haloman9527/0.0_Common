@@ -78,7 +78,7 @@ namespace CZToolKitEditor
                     property.expanded = EditorGUI.Foldout(rect, property.expanded, property.niceName);
 
                     if (property.Value == null)
-                        property.Value = EditorGUIExtension.CreateInstance(property.propertyType);
+                        property.Value = EditorGUILayoutExtension.CreateInstance(property.propertyType);
                     IList list = (IList)property.Value;
                     if (property.expanded)
                     {
@@ -105,7 +105,7 @@ namespace CZToolKitEditor
 
                             if (!property.propertyType.IsGenericType && !property.propertyType.IsArray)
                             {
-                                var newList = (EditorGUIExtension.CreateInstance(property.propertyType) as IList);
+                                var newList = (EditorGUILayoutExtension.CreateInstance(property.propertyType) as IList);
                                 list = newList;
                             }
 
@@ -118,7 +118,7 @@ namespace CZToolKitEditor
                                     if (!typeof(UnityObject).IsAssignableFrom(type))
                                     {
                                         for (int i = currentCount; i < size; i++)
-                                            list.Add(EditorGUIExtension.CreateInstance(type));
+                                            list.Add(EditorGUILayoutExtension.CreateInstance(type));
                                     }
                                     else
                                     {
@@ -185,7 +185,7 @@ namespace CZToolKitEditor
             else
             {
                 EditorGUI.BeginChangeCheck();
-                var value = DrawField(rect, property.propertyType, property.Value, property.niceName);
+                var value = DrawValue(rect, property.propertyType, property.Value, property.niceName);
                 if (EditorGUI.EndChangeCheck())
                 {
                     property.Value = value;

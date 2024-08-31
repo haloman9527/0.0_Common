@@ -40,15 +40,6 @@ namespace CZToolKitEditor
             }
         }
 
-        public static object CreateInstance(Type type)
-        {
-            if (type == typeof(string))
-                return "";
-            if (type.IsArray)
-                return Array.CreateInstance(type.GetElementType(), 0);
-            return Activator.CreateInstance(type, true);
-        }
-
         /// <summary> 是否是基元类型 </summary>
         public static bool IsBasicType(Type type)
         {
@@ -208,13 +199,8 @@ namespace CZToolKitEditor
             return 0;
         }
 
-        public static object DrawField(Rect rect, Type type, object value, GUIContent label)
+        public static object DrawValue(Rect rect, Type type, object value, GUIContent label)
         {
-            if (value == null)
-            {
-                if (!typeof(UnityObject).IsAssignableFrom(type))
-                    value = CreateInstance(type);
-            }
             if (!IsSupport(type))
             {
                 return null;
@@ -299,19 +285,19 @@ namespace CZToolKitEditor
             return null;
         }
 
-        public static object DrawField(Rect rect, Type type, object value, string label)
+        public static object DrawValue(Rect rect, Type type, object value, string label)
         {
-            return DrawField(rect, type, value, GUIHelper.TextContent(label));
+            return DrawValue(rect, type, value, GUIHelper.TextContent(label));
         }
 
-        public static object DrawField(Rect rect, object value, GUIContent label)
+        public static object DrawValue(Rect rect, object value, GUIContent label)
         {
-            return DrawField(rect, value.GetType(), value, label);
+            return DrawValue(rect, value.GetType(), value, label);
         }
 
-        public static object DrawField(Rect rect, object value, string label)
+        public static object DrawValue(Rect rect, object value, string label)
         {
-            return DrawField(rect, value.GetType(), value, label);
+            return DrawValue(rect, value.GetType(), value, label);
         }
     }
 }

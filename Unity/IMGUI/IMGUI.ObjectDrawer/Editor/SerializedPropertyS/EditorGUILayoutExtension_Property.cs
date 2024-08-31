@@ -43,7 +43,7 @@ namespace CZToolKitEditor
                     property.expanded = EditorGUI.Foldout(rect, property.expanded, property.niceName);
 
                     if (property.Value == null)
-                        property.Value = EditorGUIExtension.CreateInstance(property.propertyType);
+                        property.Value = EditorGUILayoutExtension.CreateInstance(property.propertyType);
                     IList list = (IList)property.Value;
                     if (property.expanded)
                     {
@@ -135,7 +135,7 @@ namespace CZToolKitEditor
             else
             {
                 EditorGUI.BeginChangeCheck();
-                var value = EditorGUILayoutExtension.DrawField(property.propertyType, property.Value, property.niceName);
+                var value = EditorGUILayoutExtension.DrawValue(property.propertyType, property.Value, property.niceName);
                 if (EditorGUI.EndChangeCheck())
                 {
                     property.Value = value;

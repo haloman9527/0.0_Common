@@ -141,7 +141,7 @@ namespace CZToolKitEditor
         {
             if (value == null)
             {
-                value = EditorGUIExtension.CreateInstance(propertyType);
+                value = EditorGUILayoutExtension.CreateInstance(propertyType);
                 if (fieldInfo != null && parent != null)
                     fieldInfo.SetValue(parent.Value, value);
             }
