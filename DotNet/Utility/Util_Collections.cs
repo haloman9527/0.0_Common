@@ -24,29 +24,21 @@ namespace CZToolKit
         /// <typeparam name="T"></typeparam>
         public static void Shuffle<T>(this IList<T> original, int startIndex, int endIndex)
         {
-            while (endIndex - startIndex > 0)
+            while (endIndex-- - startIndex > 0)
             {
                 var index = Util.DefaultRandom.Next(startIndex, endIndex + 1);
                 if (index != endIndex)
-                {
                     (original[endIndex], original[index]) = (original[index], original[endIndex]);
-                }
-
-                endIndex--;
             }
         }
 
         public static unsafe void Shuffle<T>(T* original, int startIndex, int endIndex) where T : unmanaged
         {
-            while (endIndex - startIndex > 0)
+            while (endIndex-- - startIndex > 0)
             {
                 var index = Util.DefaultRandom.Next(startIndex, endIndex + 1);
                 if (index != endIndex)
-                {
                     (original[endIndex], original[index]) = (original[index], original[endIndex]);
-                }
-
-                endIndex--;
             }
         }
     }

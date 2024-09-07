@@ -25,16 +25,13 @@ namespace CZToolKit
     {
         #region Static
 
-        private static T instance;
+        private static T s_Instance;
 
-        public static T Instance
-        {
-            get { return instance; }
-        }
+        public static T Instance => s_Instance;
 
         public static bool IsInitialized()
         {
-            return instance != null;
+            return s_Instance != null;
         }
 
         #endregion
@@ -45,10 +42,10 @@ namespace CZToolKit
 
         public void Register()
         {
-            if (instance != null)
+            if (s_Instance != null)
                 throw new Exception($"singleton register twice! {typeof(T).Name}");
 
-            instance = (T)this;
+            s_Instance = (T)this;
         }
 
         public void Dispose()
@@ -57,9 +54,9 @@ namespace CZToolKit
                 return;
 
             this.isDisposed = true;
-            if (instance is ISingletonDestory iSingletonDestory)
+            if (s_Instance is ISingletonDestory iSingletonDestory)
                 iSingletonDestory.Destroy();
-            instance = null;
+            s_Instance = null;
         }
     }
 }

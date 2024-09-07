@@ -37,6 +37,14 @@ namespace CZToolKitEditor
         {
             target = null;
         }
+
+        public static ObjectInspector Show(object v)
+        {
+            var graphInspector = ScriptableObject.CreateInstance<ObjectInspector>();
+            graphInspector.target = v;
+            Selection.activeObject = graphInspector;
+            return graphInspector;
+        }
     }
 
     [CustomEditor(typeof(ObjectInspector))]

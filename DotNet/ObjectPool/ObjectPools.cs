@@ -132,8 +132,7 @@ namespace CZToolKit
 
         public void Recycle(object unit)
         {
-            var unitType = unit.GetType();
-            Recycle(unitType, unit);
+            Recycle(unit.GetType(), unit);
         }
 
         public void Recycle(Type unitType, object unit)

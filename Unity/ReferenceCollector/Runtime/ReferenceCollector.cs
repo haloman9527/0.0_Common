@@ -61,10 +61,7 @@ namespace CZToolKit
             }
         }
 
-        public IReadOnlyList<ReferencePair> References
-        {
-            get { return references; }
-        }
+        public IReadOnlyList<ReferencePair> References => references;
 
         public bool Contains(string key)
         {

@@ -8,7 +8,7 @@ namespace CZToolKit
 
         public static ILogger Logger
         {
-            set { logger = value; }
+            set => logger = value;
         }
 
         public static void Debug(object msg)

@@ -206,9 +206,13 @@ namespace CZToolKit
 
                     Undo.RecordObjects(targets, "Add ReferenceData");
                     referenceCollector.Set(key, obj);
-                    serializedObject.ApplyModifiedProperties();
-                    serializedObject.UpdateIfRequiredOrScript();
                 }
+            }
+
+            if (serializedObject.hasModifiedProperties)
+            {
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.UpdateIfRequiredOrScript();
             }
         }
     }

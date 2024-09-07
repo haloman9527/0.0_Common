@@ -28,7 +28,7 @@ namespace CZToolKit
     {
         int Count { get; }
 
-        IEnumerator<KeyValuePair<string, IBindableProperty>> GetEnumerator();
+        IReadOnlyDictionary<string, IBindableProperty> Properties { get; }
 
         bool Contains(string propertyName);
 
@@ -39,22 +39,28 @@ namespace CZToolKit
         bool TryGetProperty(string propertyName, out IBindableProperty property);
 
         bool TryGetProperty<T>(string propertyName, out IBindableProperty<T> property);
-
+        
         void RegisterProperty(string propertyName, IBindableProperty property);
 
+        void RegisterProperty<T>(string propertyName, Func<T> getter = null, Action<T> setter = null);
+        
+        void RegisterProperty<T>(string propertyName, RefFunc<T> getter);
+        
         void UnregisterProperty(string propertyName);
 
         T GetPropertyValue<T>(string propertyName);
 
         void SetPropertyValue<T>(string propertyName, T value);
+
+        void NotifyPropertyChanged(string propertyName);
     }
 
-    public class ViewModel : INotifyPropertyChanged
+    public class ViewModel : IViewModel, INotifyPropertyChanged
     {
         private readonly Dictionary<string, IBindableProperty> bindableProperties = new Dictionary<string, IBindableProperty>();
 
         public event PropertyChangedEventHandler PropertyChanged;
-        
+
         public int Count => bindableProperties.Count;
 
         public IReadOnlyDictionary<string, IBindableProperty> Properties => bindableProperties;
@@ -64,7 +70,7 @@ namespace CZToolKit
             GetProperty(propertyName)?.NotifyValueChanged();
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        
+
         public bool Contains(string propertyName)
         {
             return bindableProperties.ContainsKey(propertyName);
@@ -130,11 +136,11 @@ namespace CZToolKit
 
         public void UnregisterProperty(string propertyName)
         {
-            if (!bindableProperties.TryGetValue(propertyName,out var property))
+            if (!bindableProperties.TryGetValue(propertyName, out var property))
             {
                 return;
             }
-            
+
             property.Dispose();
             bindableProperties.Remove(propertyName);
         }
