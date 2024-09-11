@@ -4,8 +4,8 @@
  *
  *  Title: ""
  *      主题: 对象池基类，只有最基本的功能
- *  Description: 
- *      功能: 
+ *  Description:
+ *      功能:
  *      	1.生成一个对象
  *      	2.回收一个对象
  *  Date:
@@ -32,10 +32,17 @@ namespace CZToolKit
         }
     }
 
+    public interface IPoolableObject
+    {
+        void OnSpawn();
+        
+        void OnRecycle();
+    }
+
     public class ObjectPools : Singleton<ObjectPools>, ISingletonAwake
     {
         private static Dictionary<Type, IObjectPool> s_CustomPools;
-        
+
         static ObjectPools()
         {
             var baseType = typeof(IObjectPool);
@@ -57,7 +64,7 @@ namespace CZToolKit
                 s_CustomPools.Add(attribute.unitType, pool as IObjectPool);
             }
         }
-        
+
         private Dictionary<Type, IObjectPool> pools;
 
         public void Awake()
@@ -80,6 +87,17 @@ namespace CZToolKit
             return pool;
         }
 
+        private IObjectPool<T> GetOrCreatePool<T>() where T : class, new()
+        {
+            var unitType = typeof(T);
+            if (!pools.TryGetValue(unitType, out var pool))
+            {
+                pools[unitType] = pool = new ObjectPool<T>();
+            }
+
+            return (IObjectPool<T>)pool;
+        }
+
         public IObjectPool GetPool(Type unitType)
         {
             return pools.GetValueOrDefault(unitType);
@@ -100,48 +118,52 @@ namespace CZToolKit
             pools.Remove(unitType);
         }
 
-        public T Spawn<T>() where T : class
+        public T Spawn<T>() where T : class, new()
         {
-            return (T)GetOrCreatePool(typeof(T)).Spawn();
+            var unit = GetOrCreatePool<T>().Spawn();
+            if (unit is IPoolableObject poolableObject)
+            {
+                poolableObject.OnSpawn();
+            }
+            return unit;
         }
 
         public object Spawn(Type unitType)
         {
-            if (unitType.IsValueType)
+            if (!unitType.IsClass)
             {
-                throw new Exception("Can't spawn value type");
+                throw new TypeAccessException($"{unitType}不是引用类型");
+            }
+
+            var unit = GetOrCreatePool(unitType).Spawn();
+            if (unit is IPoolableObject poolableObject)
+            {
+                poolableObject.OnSpawn();
+            }
+            return unit;
+        }
+
+        public void Recycle(Type unitType, object unit)
+        {
+            if (!unitType.IsClass)
+            {
+                throw new TypeAccessException($"{unitType}不是引用类型");
             }
             
             var pool = GetPool(unitType);
             if (pool == null)
-            {
-                var constructor = unitType.GetConstructor(Type.EmptyTypes);
-                if (constructor != null)
-                    pool = GetOrCreatePool(unitType);
-            }
+                return;
 
-            if (pool == null)
+            if (unit is IPoolableObject poolableObject)
             {
-                throw new Exception($"Can't spawn {unitType.Name}, please register the pool first");
+                poolableObject.OnRecycle();
             }
-            else
-            {
-                return GetOrCreatePool(unitType).Spawn();
-            }
+            pool.Recycle(unit);
         }
 
         public void Recycle(object unit)
         {
             Recycle(unit.GetType(), unit);
-        }
-
-        public void Recycle(Type unitType, object unit)
-        {
-            var pool = GetPool(unitType);
-            if (pool == null)
-                return;
-            
-            pool.Recycle(unit);
         }
     }
 }
