@@ -40,13 +40,7 @@ namespace CZToolKit
             }
             set
             {
-                if (setter == null)
-                    throw new NotImplementedException("haven't set method");
-                if (ValidEquals(Value, value))
-                    return;
-                var oldValue = Value;
-                setter(value);
-                NotifyValueChanged_Internal(oldValue, value);
+                SetValue(value);
             }
         }
 
@@ -85,9 +79,26 @@ namespace CZToolKit
             this.onValueChanged -= onValueChanged;
         }
 
+        public bool SetValue(T value)
+        {
+            if (setter == null)
+                throw new NotImplementedException("haven't set method");
+            if (ValidEquals(Value, value))
+                return false;
+            var oldValue = Value;
+            setter(value);
+            NotifyValueChanged_Internal(oldValue, value);
+            return true;
+        }
+
         public void SetValueWithoutNotify(T value)
         {
             setter?.Invoke(value);
+        }
+
+        public bool SetValue(object value)
+        {
+            return SetValue((T)value);
         }
 
         public void SetValueWithoutNotify(object value)

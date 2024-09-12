@@ -23,7 +23,8 @@ namespace CZToolKit
 
         object BoxedValue { get; set; }
         Type ValueType { get; }
-
+        
+        bool SetValue(object value);
         void SetValueWithoutNotify(object value);
         void NotifyValueChanged();
         void ClearValueChangedEvent();
@@ -35,6 +36,7 @@ namespace CZToolKit
 
         T Value { get; set; }
 
+        bool SetValue(T value);
         void SetValueWithoutNotify(T value);
         void RegisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);
         void UnregisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);

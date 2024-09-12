@@ -24,7 +24,7 @@ namespace CZToolKit
 {
     public delegate ref V RefFunc<V>();
 
-    public interface IViewModel
+    public interface IViewModel : INotifyPropertyChanged
     {
         int Count { get; }
 
@@ -55,7 +55,7 @@ namespace CZToolKit
         void NotifyPropertyChanged(string propertyName);
     }
 
-    public class ViewModel : IViewModel, INotifyPropertyChanged
+    public class ViewModel : IViewModel
     {
         private readonly Dictionary<string, IBindableProperty> bindableProperties = new Dictionary<string, IBindableProperty>();
 
@@ -64,12 +64,6 @@ namespace CZToolKit
         public int Count => bindableProperties.Count;
 
         public IReadOnlyDictionary<string, IBindableProperty> Properties => bindableProperties;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            GetProperty(propertyName)?.NotifyValueChanged();
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         public bool Contains(string propertyName)
         {
@@ -152,13 +146,25 @@ namespace CZToolKit
 
         public void SetPropertyValue<T>(string propertyName, T value)
         {
-            GetProperty<T>(propertyName).Value = value;
+            var property = GetProperty<T>(propertyName);
+            if (!property.SetValue(value))
+            {
+                return;
+            }
+            
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            OnPropertyChanged(propertyName);
         }
 
         public void NotifyPropertyChanged(string propertyName)
         {
             GetProperty(propertyName)?.NotifyValueChanged();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             OnPropertyChanged(propertyName);
+        }
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
         }
     }
 }
