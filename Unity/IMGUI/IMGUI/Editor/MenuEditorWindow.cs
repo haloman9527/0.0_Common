@@ -33,7 +33,7 @@ namespace CZToolKitEditor
                 resizableArea = new ResizableArea
                 {
                     rect = new Rect(0, 0, 150, 150),
-                    minSize = new Vector2(50, 50),
+                    minSize = this.minSize,
                     side = 10
                 };
                 resizableArea.EnableSide(ResizableArea.UIDirection.Right);
@@ -46,7 +46,7 @@ namespace CZToolKitEditor
 
         protected virtual void OnGUI()
         {
-            var r = EditorGUILayout.GetControlRect(false, GUILayout.ExpandHeight(true), GUILayout.ExpandHeight(true));
+            var r = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandHeight(true), GUILayout.ExpandHeight(true));
             if (Event.current.type == EventType.Repaint)
             {
                 resizableArea.rect.position = r.position;
