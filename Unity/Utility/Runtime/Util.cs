@@ -33,7 +33,7 @@ namespace CZToolKit.Unity
         }
 #endif
 
-        public static string ToBase64(this Texture2D texture)
+        public static string TextureToBase64(this Texture2D texture)
         {
             var bytes = texture.EncodeToJPG();
             var baser64 = Convert.ToBase64String(bytes);
@@ -49,7 +49,7 @@ namespace CZToolKit.Unity
             return texture;
         }
 
-        public static string GetPath(this Transform transform, Transform root = null)
+        public static string GetTransformPath(this Transform transform, Transform root = null)
         {
             var path = transform.name;
             while (true)
@@ -60,7 +60,7 @@ namespace CZToolKit.Unity
                     break;
                 }
 
-                path = $"{transform}/{path}";
+                path = $"{transform.name}/{path}";
             }
 
             return path;
