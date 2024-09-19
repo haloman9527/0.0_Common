@@ -47,10 +47,17 @@ namespace CZToolKitEditor
 
         private void ShowButton(Rect rect)
         {
+#if UNITY_6000_0_OR_NEWER
             rect.x = 0;
-            rect.y = 4;
+            rect.y = 5;
             rect.height = 20;
             rect.width = position.width - 25;
+#else
+            rect.x = 0;
+            rect.y = 1;
+            rect.height = 20;
+            rect.width = position.width - 60; 
+#endif
             GUILayout.BeginArea(rect);
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
