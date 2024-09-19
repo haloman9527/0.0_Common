@@ -72,12 +72,26 @@ namespace CZToolKitEditor
                 return coroutineMachine;
             }
         }
-
-        protected virtual void ShowButton(Rect rect)
+        
+        private void ShowButton(Rect rect)
         {
-            rect.x -= 8;
-            rect.width = 20;
-            if (GUI.Button(rect, CSIcon, CSIconStyle))
+            rect.x = 0;
+            rect.y = 5;
+            rect.height = 20;
+            rect.width = position.width - 25;
+            GUILayout.BeginArea(rect);
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            OnShowButton(rect);
+            
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+
+        protected virtual void OnShowButton(Rect rect)
+        {
+            if (GUILayout.Button(CSIcon, (GUIStyle)"IconButton", GUILayout.Width(20)))
                 AssetDatabase.OpenAsset(MonoScript);
         }
 

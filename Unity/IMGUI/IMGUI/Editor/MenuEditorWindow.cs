@@ -10,6 +10,7 @@ namespace CZToolKitEditor
 {
     public abstract class MenuEditorWindow : EditorWindow
     {
+        public bool showMenu = true;
         public ResizableArea resizableArea;
         private VisualElement rightContentVisualElement;
         private Vector2 leftScroll;
@@ -38,48 +39,78 @@ namespace CZToolKitEditor
                 };
                 resizableArea.EnableSide(ResizableArea.UIDirection.Right);
             }
-            
+
             rightContentVisualElement = new VisualElement();
             rightContentVisualElement.pickingMode = PickingMode.Ignore;
             rootVisualElement.Add(rightContentVisualElement);
         }
 
+        private void ShowButton(Rect rect)
+        {
+            rect.x = 0;
+            rect.y = 4;
+            rect.height = 20;
+            rect.width = position.width - 25;
+            GUILayout.BeginArea(rect);
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            OnShowButton(rect);
+
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+
+        protected virtual void OnShowButton(Rect rect)
+        {
+            showMenu = GUILayout.Toggle(showMenu, "Menu", GUI.skin.button);
+        }
+
         protected virtual void OnGUI()
         {
-            var r = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandHeight(true), GUILayout.ExpandHeight(true));
-            if (Event.current.type == EventType.Repaint)
+            if (showMenu)
             {
-                resizableArea.rect.position = r.position;
-                resizableArea.maxSize = r.size;
-                resizableArea.rect.height = r.height;
+                var r = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandHeight(true), GUILayout.ExpandHeight(true));
+                if (Event.current.type == EventType.Repaint)
+                {
+                    resizableArea.rect.position = r.position;
+                    resizableArea.maxSize = r.size;
+                    resizableArea.rect.height = r.height;
+                }
+
+                resizableArea.OnGUI();
+
+                sideRect = resizableArea.rect;
+                sideRect.x += sideRect.width;
+                sideRect.width = 1;
+
+                rightRect = sideRect;
+                rightRect.x += rightRect.width + 1;
+                rightRect.width = position.width - resizableArea.rect.width - sideRect.width - 2;
+                rightRect.width = Mathf.Max(rightRect.width, 100);
+                rightRect.xMin += 10;
+                rightRect.xMax -= 10;
+
+                using (new GUILayout.AreaScope(resizableArea.rect))
+                {
+                    OnLeftGUI(new Rect(Vector2.zero, resizableArea.rect.size));
+                }
+
+                EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
             }
-
-            resizableArea.OnGUI();
-
-            var sideRect = resizableArea.rect;
-            sideRect.x += sideRect.width;
-            sideRect.width = 1;
-
-            var rightRect = sideRect;
-            rightRect.x += rightRect.width + 1;
-            rightRect.width = position.width - resizableArea.rect.width - sideRect.width - 2;
-            rightRect.width = Mathf.Max(rightRect.width, 100);
-            rightRect.xMin += 10;
-            rightRect.xMax -= 10;
+            else
+            {
+                rightRect = new Rect(Vector2.zero, position.size);
+                rightRect.xMin += 11;
+                rightRect.xMax -= 11;
+            }
 
             rightContentVisualElement.style.position = Position.Relative;
             rightContentVisualElement.style.left = rightRect.x;
             rightContentVisualElement.style.top = rightRect.y;
             rightContentVisualElement.style.width = rightRect.width;
             rightContentVisualElement.style.height = rightRect.height;
-
-            using (new GUILayout.AreaScope(resizableArea.rect))
-            {
-                OnLeftGUI(new Rect(Vector2.zero, resizableArea.rect.size));
-            }
-
-            EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
-
+            
             using (new GUILayout.AreaScope(rightRect))
             {
                 OnRightGUI(new Rect(Vector2.zero, rightRect.size));
