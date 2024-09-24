@@ -40,7 +40,7 @@ namespace CZToolKit
             return ++lastInstanceId;
         }
 
-        public void Add(Node entity)
+        public void Register(Node entity)
         {
             this.entities.Add(entity.InstanceId, entity);
             var entityType = entity.GetType();
@@ -52,7 +52,7 @@ namespace CZToolKit
                 lateUpdateEntitiesQueue.Enqueue(entity.InstanceId);
         }
 
-        public void Remove(int instanceId)
+        public void Unregister(int instanceId)
         {
             this.entities.Remove(instanceId);
         }

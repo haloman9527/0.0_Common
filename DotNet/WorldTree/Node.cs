@@ -17,8 +17,8 @@ namespace CZToolKit
         [NonSerialized] protected Dictionary<int, Node> children;
         [NonSerialized] protected Dictionary<Type, Node> components;
 
-        private HashSet<Node> childrenDB;
-        private HashSet<Node> componentsDB;
+        [NonSerialized] private HashSet<Node> childrenDB;
+        [NonSerialized] private HashSet<Node> componentsDB;
 
         public int InstanceId
         {
@@ -32,13 +32,13 @@ namespace CZToolKit
 
                 if (value == 0)
                 {
-                    WorldTree.Remove(this.m_instanceId);
+                    WorldTree.Unregister(this.m_instanceId);
                     m_instanceId = value;
                 }
                 else
                 {
                     m_instanceId = value;
-                    WorldTree.Add(this);
+                    WorldTree.Register(this);
                 }
 
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW

@@ -25,14 +25,14 @@ namespace CZToolKit
             return root.GenerateInstanceId();
         }
 
-        public void Add(Node entity)
+        public void Add(Node n)
         {
-            root.Add(entity);
+            root.Register(n);
         }
 
         public void Remove(int instanceId)
         {
-            root.Remove(instanceId);
+            root.Unregister(instanceId);
         }
 
         public Node Get(int instanceId)
