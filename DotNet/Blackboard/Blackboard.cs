@@ -11,9 +11,13 @@ namespace CZToolKit.Blackboard
 
             bool TryGet(TKey key, out object value);
 
-            void Remove(TKey key);
+            bool Set(TKey key, object value);
+
+            bool Remove(TKey key);
 
             void Clear();
+
+            IEnumerable<KeyValuePair<TKey, object>> Values();
         }
 
         private interface IDataContainer<T>
@@ -22,22 +26,18 @@ namespace CZToolKit.Blackboard
 
             bool TryGet(TKey key, out T value);
 
-            void Set(TKey key, T value);
+            bool Set(TKey key, T value);
 
-            void Remove(TKey key);
+            bool Remove(TKey key);
 
             void Clear();
+
+            IEnumerable<KeyValuePair<TKey, T>> Values();
         }
 
         private class DataContainer<T> : IDataContainer, IDataContainer<T>
         {
             private Dictionary<TKey, T> data = new Dictionary<TKey, T>();
-
-            public T this[TKey key]
-            {
-                get { return Get(key); }
-                set { Set(key, value); }
-            }
 
             object IDataContainer.Get(TKey key)
             {
@@ -58,6 +58,26 @@ namespace CZToolKit.Blackboard
                 return false;
             }
 
+            bool IDataContainer.Set(TKey key, object value)
+            {
+                var tmpValue = (T)value;
+                if (this.data.TryGetValue(key, out var v) && v.GetHashCode() == tmpValue.GetHashCode())
+                {
+                    return false;
+                }
+
+                this.data[key] = tmpValue;
+                return true;
+            }
+
+            IEnumerable<KeyValuePair<TKey, object>> IDataContainer.Values()
+            {
+                foreach (var pair in data)
+                {
+                    yield return new KeyValuePair<TKey, object>(pair.Key, pair.Value);
+                }
+            }
+
             public T Get(TKey key)
             {
                 if (this.data.TryGetValue(key, out var value))
@@ -73,14 +93,28 @@ namespace CZToolKit.Blackboard
                 return this.data.TryGetValue(key, out value);
             }
 
-            public void Set(TKey key, T value)
+            public bool Set(TKey key, T value)
             {
+                if (this.data.TryGetValue(key, out var v) && v.GetHashCode() == value.GetHashCode())
+                {
+                    return false;
+                }
+
                 this.data[key] = value;
+                return true;
             }
 
-            public void Remove(TKey key)
+            public IEnumerable<KeyValuePair<TKey, T>> Values()
             {
-                data.Remove(key);
+                foreach (var pair in data)
+                {
+                    yield return new KeyValuePair<TKey, T>(pair.Key, pair.Value);
+                }
+            }
+
+            public bool Remove(TKey key)
+            {
+                return data.Remove(key);
             }
 
             public void Clear()
@@ -89,8 +123,7 @@ namespace CZToolKit.Blackboard
             }
         }
 
-        private DataContainer<object> objectContainer = new DataContainer<object>();
-        private Dictionary<Type, IDataContainer> structContainers = new Dictionary<Type, IDataContainer>();
+        private Dictionary<Type, IDataContainer> containers = new Dictionary<Type, IDataContainer>();
         private Dictionary<TKey, IDataContainer> containerMap = new Dictionary<TKey, IDataContainer>();
 
         public object Get(TKey key)
@@ -156,7 +189,7 @@ namespace CZToolKit.Blackboard
             return result;
         }
 
-        public void Set<T>(TKey key, T value)
+        public bool Set<T>(TKey key, T value)
         {
             var type = typeof(T);
             var isValueType = type.IsValueType;
@@ -164,37 +197,58 @@ namespace CZToolKit.Blackboard
             {
                 if (isValueType)
                 {
-                    if (!structContainers.TryGetValue(type, out dataContainer))
+                    if (!containers.TryGetValue(type, out dataContainer))
                     {
-                        structContainers[type] = dataContainer = new DataContainer<T>();
+                        containers[type] = dataContainer = new DataContainer<T>();
                     }
-
-                    containerMap[key] = dataContainer;
                 }
                 else
-                    containerMap[key] = dataContainer = objectContainer;
+                {
+                    if (!containers.TryGetValue(typeof(object), out dataContainer))
+                    {
+                        containers[type] = dataContainer = new DataContainer<object>();
+                    }
+                }
+
+                containerMap[key] = dataContainer;
             }
 
             if (isValueType)
-                ((DataContainer<T>)dataContainer).Set(key, value);
+                return ((IDataContainer<T>)dataContainer).Set(key, value);
             else
-                ((DataContainer<object>)dataContainer).Set(key, value);
+                return ((IDataContainer<object>)dataContainer).Set(key, value);
         }
 
-        public void Remove(TKey key)
+        public bool Remove(TKey key)
         {
             if (!containerMap.TryGetValue(key, out var dataContainer))
-                return;
+                return false;
 
             containerMap.Remove(key);
             dataContainer.Remove(key);
+            return true;
         }
 
         public void Clear()
         {
-            objectContainer.Clear();
-            structContainers.Clear();
+            foreach (var pair in containers)
+            {
+                pair.Value.Clear();
+            }
+
+            containers.Clear();
             containerMap.Clear();
+        }
+
+        public IEnumerable<KeyValuePair<TKey, object>> EnumerateValues()
+        {
+            foreach (var container in containers.Values)
+            {
+                foreach (var pair in container.Values())
+                {
+                    yield return pair;
+                }
+            }
         }
     }
 }

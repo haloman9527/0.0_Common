@@ -12,9 +12,9 @@
         
         bool TryGet(TKey key, out object value);
 
-        void Set<T>(TKey key, T value);
+        bool Set<T>(TKey key, T value);
 
-        void Remove(TKey key);
+        bool Remove(TKey key);
 
         void Clear();
     }

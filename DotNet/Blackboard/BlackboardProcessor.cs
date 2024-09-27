@@ -3,9 +3,9 @@
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
- *  
+ *
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
@@ -32,7 +32,7 @@ namespace CZToolKit.Blackboard
     {
         public object value;
         public NotifyType notifyType;
-        
+
         public BBEventArg(object value, NotifyType notifyType)
         {
             this.value = value;
@@ -86,23 +86,33 @@ namespace CZToolKit.Blackboard
             return blackboard.TryGet(key, out value);
         }
 
-        public void Set<T>(TKey key, T value)
+        public bool Set<T>(TKey key, T value)
         {
             var notifyType = NotifyType.Changed;
             if (!blackboard.Contains(key))
+            {
                 notifyType = NotifyType.Added;
-            blackboard.Set(key, value);
-            NotifyObservers(key, value, notifyType);
+            }
+
+            if (blackboard.Set(key, value))
+            {
+                NotifyObservers(key, value, notifyType);
+                return true;
+            }
+
+            return false;
         }
 
-        public void Remove(TKey key)
+        public bool Remove(TKey key)
         {
-            if (blackboard.TryGet(key, out var value))
+            if (!blackboard.TryGet(key, out var value))
             {
-                NotifyObservers(key, value, NotifyType.Remove);
+                return false;
             }
 
             blackboard.Remove(key);
+            NotifyObservers(key, value, NotifyType.Remove);
+            return true;
         }
 
         public void Clear()

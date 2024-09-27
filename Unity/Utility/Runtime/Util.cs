@@ -68,20 +68,24 @@ namespace CZToolKit.Unity
         
         public static void FindComponents<T>(this UnityEngine.SceneManagement.Scene scene, List<T> components, bool includeInactive = false) where T : Component
         {
+            var buffer = new List<T>();
             var rootGameObjects = scene.GetRootGameObjects();
             foreach (var rootGameObject in rootGameObjects)
             {
-                components.AddRange(rootGameObject.transform.GetComponentsInChildren<T>(includeInactive));
+                rootGameObject.transform.GetComponentsInChildren(includeInactive, buffer);
+                components.AddRange(buffer);
             }
         }
 
         public static List<T> FindComponents<T>(this UnityEngine.SceneManagement.Scene scene, bool includeInactive = false) where T : Component
         {
             var components = new List<T>();
+            var buffer = new List<T>();
             var rootGameObjects = scene.GetRootGameObjects();
             foreach (var rootGameObject in rootGameObjects)
             {
-                components.AddRange(rootGameObject.transform.GetComponentsInChildren<T>(includeInactive));
+                rootGameObject.transform.GetComponentsInChildren(includeInactive, buffer);
+                components.AddRange(buffer);
             }
 
             return components;
