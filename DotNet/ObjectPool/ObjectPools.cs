@@ -39,14 +39,14 @@ namespace CZToolKit
         void OnRecycle();
     }
 
-    public class ObjectPools : Singleton<ObjectPools>, ISingletonAwake
+    public static class ObjectPools
     {
-        private static Dictionary<Type, IObjectPool> s_CustomPools;
+        private static Dictionary<Type, IObjectPool> s_Pools;
 
         static ObjectPools()
         {
             var baseType = typeof(IObjectPool);
-            s_CustomPools = new Dictionary<Type, IObjectPool>();
+            s_Pools = new Dictionary<Type, IObjectPool>();
             foreach (var type in Util_TypeCache.AllTypes)
             {
                 if (!baseType.IsAssignableFrom(type))
@@ -61,64 +61,53 @@ namespace CZToolKit
                 }
 
                 var pool = Activator.CreateInstance(type);
-                s_CustomPools.Add(attribute.unitType, pool as IObjectPool);
+                s_Pools.Add(attribute.unitType, pool as IObjectPool);
             }
         }
 
-        private Dictionary<Type, IObjectPool> pools;
-
-        public void Awake()
+        private static IObjectPool GetOrCreatePool(Type unitType)
         {
-            pools = new Dictionary<Type, IObjectPool>();
-            foreach (var pair in s_CustomPools)
-            {
-                pools.Add(pair.Key, pair.Value);
-            }
-        }
-
-        private IObjectPool GetOrCreatePool(Type unitType)
-        {
-            if (!pools.TryGetValue(unitType, out var pool))
+            if (!s_Pools.TryGetValue(unitType, out var pool))
             {
                 var poolType = typeof(ObjectPool<>).MakeGenericType(unitType);
-                pools[unitType] = pool = (IObjectPool)Activator.CreateInstance(poolType);
+                s_Pools[unitType] = pool = (IObjectPool)Activator.CreateInstance(poolType);
             }
 
             return pool;
         }
 
-        private IObjectPool<T> GetOrCreatePool<T>() where T : class, new()
+        private static IObjectPool<T> GetOrCreatePool<T>() where T : class, new()
         {
             var unitType = typeof(T);
-            if (!pools.TryGetValue(unitType, out var pool))
+            if (!s_Pools.TryGetValue(unitType, out var pool))
             {
-                pools[unitType] = pool = new ObjectPool<T>();
+                s_Pools[unitType] = pool = new ObjectPool<T>();
             }
 
             return (IObjectPool<T>)pool;
         }
 
-        public IObjectPool GetPool(Type unitType)
+        public static IObjectPool GetPool(Type unitType)
         {
-            return pools.GetValueOrDefault(unitType);
+            return s_Pools.GetValueOrDefault(unitType);
         }
 
-        public void RegisterPool(Type unitType, IObjectPool pool)
+        public static void RegisterPool(Type unitType, IObjectPool pool)
         {
-            pools.Add(unitType, pool);
+            s_Pools.Add(unitType, pool);
         }
 
-        public void ReleasePool(Type unitType)
+        public static void ReleasePool(Type unitType)
         {
             var pool = GetPool(unitType);
             if (pool == null)
                 return;
 
             pool.Dispose();
-            pools.Remove(unitType);
+            s_Pools.Remove(unitType);
         }
 
-        public T Spawn<T>() where T : class, new()
+        public static T Spawn<T>() where T : class, new()
         {
             var unit = GetOrCreatePool<T>().Spawn();
             if (unit is IPoolableObject poolableObject)
@@ -128,7 +117,7 @@ namespace CZToolKit
             return unit;
         }
 
-        public object Spawn(Type unitType)
+        public static object Spawn(Type unitType)
         {
             if (!unitType.IsClass)
             {
@@ -143,7 +132,7 @@ namespace CZToolKit
             return unit;
         }
 
-        public void Recycle(Type unitType, object unit)
+        public static void Recycle(Type unitType, object unit)
         {
             if (!unitType.IsClass)
             {
@@ -161,7 +150,7 @@ namespace CZToolKit
             pool.Recycle(unit);
         }
 
-        public void Recycle(object unit)
+        public static void Recycle(object unit)
         {
             Recycle(unit.GetType(), unit);
         }

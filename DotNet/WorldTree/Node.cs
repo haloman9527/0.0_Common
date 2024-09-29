@@ -702,26 +702,4 @@ namespace CZToolKit
             this.worldTree = null;
         }
     }
-
-    public struct NodeId
-    {
-        public readonly WorldTree world;
-        public readonly int instanceId;
-
-        public NodeId(WorldTree world, int instanceId)
-        {
-            this.world = world;
-            this.instanceId = instanceId;
-        }
-
-        public bool IsValid()
-        {
-            return world != null && instanceId != 0 && world.Get(instanceId) != null;
-        }
-
-        public override int GetHashCode()
-        {
-            return instanceId;
-        }
-    }
 }
