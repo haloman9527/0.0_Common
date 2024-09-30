@@ -4,6 +4,8 @@ namespace CZToolKit
 {
     public interface IObjectPool : IDisposable
     {
+        Type UnitType { get; }
+        
         int UnusedCount { get; }
 
         object Spawn();
@@ -13,6 +15,8 @@ namespace CZToolKit
     
     public interface IObjectPool<T> : IDisposable where T : class
     {
+        Type UnitType { get; }
+        
         int UnusedCount { get; }
 
         T Spawn();

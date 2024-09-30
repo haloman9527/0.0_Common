@@ -24,22 +24,25 @@ using System.Reflection;
 
 namespace CZToolKit
 {
-    public class ObjectPool<T> : BaseObjectPool<T> where T : class, new()
-    {
-        protected override T Create()
-        {
-            return new T();
-        }
-    }
-
     public interface IPoolableObject
     {
         void OnSpawn();
-        
+
         void OnRecycle();
     }
 
-    public static class ObjectPools
+    public static partial class ObjectPools
+    {
+        private class ObjectPool<T> : BaseObjectPool<T> where T : class, new()
+        {
+            protected override T Create()
+            {
+                return new T();
+            }
+        }
+    }
+
+    public static partial class ObjectPools
     {
         private static Dictionary<Type, IObjectPool> s_Pools;
 
@@ -92,9 +95,9 @@ namespace CZToolKit
             return s_Pools.GetValueOrDefault(unitType);
         }
 
-        public static void RegisterPool(Type unitType, IObjectPool pool)
+        public static void RegisterPool(IObjectPool pool)
         {
-            s_Pools.Add(unitType, pool);
+            s_Pools.Add(pool.UnitType, pool);
         }
 
         public static void ReleasePool(Type unitType)
@@ -114,6 +117,7 @@ namespace CZToolKit
             {
                 poolableObject.OnSpawn();
             }
+
             return unit;
         }
 
@@ -129,6 +133,7 @@ namespace CZToolKit
             {
                 poolableObject.OnSpawn();
             }
+
             return unit;
         }
 
@@ -138,7 +143,7 @@ namespace CZToolKit
             {
                 throw new TypeAccessException($"{unitType}不是引用类型");
             }
-            
+
             var pool = GetPool(unitType);
             if (pool == null)
                 return;
@@ -147,6 +152,7 @@ namespace CZToolKit
             {
                 poolableObject.OnRecycle();
             }
+
             pool.Recycle(unit);
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CZToolKit
 {
@@ -6,10 +7,9 @@ namespace CZToolKit
     {
         protected Stack<T> unusedObjects;
 
-        public int UnusedCount
-        {
-            get { return unusedObjects.Count; }
-        }
+        public Type UnitType => typeof(T);
+
+        public int UnusedCount => unusedObjects.Count;
 
         public BaseObjectPool()
         {

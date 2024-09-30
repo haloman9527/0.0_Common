@@ -20,26 +20,6 @@ namespace CZToolKit
             root.Dispose();
         }
 
-        public int GenerateInstanceId()
-        {
-            return root.GenerateInstanceId();
-        }
-
-        public void Add(Node n)
-        {
-            root.Register(n);
-        }
-
-        public void Remove(int instanceId)
-        {
-            root.Unregister(instanceId);
-        }
-
-        public Node Get(int instanceId)
-        {
-            return root.Get(instanceId);
-        }
-
         public void FixedUpdate()
         {
             root.FixedUpdate();
