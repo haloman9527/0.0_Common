@@ -12,12 +12,12 @@ namespace CZToolKit
         /// <summary>
         /// 机器Id位数
         /// </summary>
-        private const int WORKER_Id_BITS = 5;
+        private const int WORKER_ID_BITS = 5;
 
         /// <summary>
         /// 数据中心Id位数
         /// </summary>
-        private const int DATACENTER_Id_BITS = 5;
+        private const int DATACENTER_ID_BITS = 5;
 
         /// <summary>
         /// 计数器位数
@@ -27,17 +27,17 @@ namespace CZToolKit
         /// <summary>
         /// 机器码数据左移位数, 就是后面计数器占用的位数
         /// </summary>
-        private const int WORKER_Id_SHIFT = SEQUENCE_BITS;
+        private const int WORKER_ID_SHIFT = SEQUENCE_BITS;
 
         /// <summary>
         /// 数据Id左移位数
         /// </summary>
-        private const int DATACENTER_Id_SHIFT = SEQUENCE_BITS + WORKER_Id_BITS;
+        private const int DATACENTER_ID_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS;
 
         /// <summary>
         /// 时间戳左移动位数就是机器码+计数器总位数+数据位数
         /// </summary>
-        private const int TIMESTAMP_LEFT_SHIFT = SEQUENCE_BITS + WORKER_Id_BITS + DATACENTER_Id_BITS;
+        private const int TIMESTAMP_LEFT_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS + DATACENTER_ID_BITS;
 
         /// <summary>
         /// 一单位时间内可以产生计数, 如果达到该值(4096)则等到下一单位时间在进行生成. 
@@ -47,12 +47,12 @@ namespace CZToolKit
         /// <summary>
         /// 最大机器Id(5位:0-31). 
         /// </summary>
-        private const long MAX_WORKER_Id = -1L ^ (-1L << WORKER_Id_BITS);
+        private const long MAX_WORKER_ID = -1L ^ (-1L << WORKER_ID_BITS);
 
         /// <summary>
         /// 最大数据Id(5位:0-31). 
         /// </summary>
-        private const long MAX_DATACENTER_Id = -1L ^ (-1L << DATACENTER_Id_BITS);
+        private const long MAX_DATACENTER_ID = -1L ^ (-1L << DATACENTER_ID_BITS);
 
         #endregion
 
@@ -120,11 +120,11 @@ namespace CZToolKit
             this.DatacenterId = datacenterId;
             this.TimeProvider = timeProvider;
 
-            if (WorkerId > MAX_WORKER_Id)
-                throw new ArgumentException($"worker Id can't be greater than {MAX_WORKER_Id} or less than 0");
+            if (WorkerId > MAX_WORKER_ID)
+                throw new ArgumentException($"worker Id can't be greater than {MAX_WORKER_ID} or less than 0");
 
-            if (DatacenterId > MAX_DATACENTER_Id)
-                throw new ArgumentException($"datacenter Id can't be greater than {MAX_DATACENTER_Id} or less than 0");
+            if (DatacenterId > MAX_DATACENTER_ID)
+                throw new ArgumentException($"datacenter Id can't be greater than {MAX_DATACENTER_ID} or less than 0");
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace CZToolKit
             lock (this)
             {
                 var timestamp = TimeProvider.GetCurrentTime();
-                ;
+                
                 if (timestamp < lastTimestamp)
                 {
                     throw new Exception(
@@ -173,7 +173,7 @@ namespace CZToolKit
 
                 // 把当前时间戳保存为最后生成Id的时间戳
                 lastTimestamp = timestamp;
-                return ((timestamp) << TIMESTAMP_LEFT_SHIFT) | (DatacenterId << DATACENTER_Id_SHIFT) | (WorkerId << WORKER_Id_SHIFT) | sequence;
+                return ((timestamp) << TIMESTAMP_LEFT_SHIFT) | (DatacenterId << DATACENTER_ID_SHIFT) | (WorkerId << WORKER_ID_SHIFT) | sequence;
             }
         }
     }

@@ -31,7 +31,6 @@ namespace CZToolKitEditor.IMGUI.Controls
     public class TreeViewItem : UnityTreeViewItem
     {
         public object userData;
-
         private Dictionary<string, TreeViewItem> childrenMap;
 
         public new TreeViewItem parent
@@ -50,7 +49,7 @@ namespace CZToolKitEditor.IMGUI.Controls
             }
         }
 
-        public Dictionary<string, TreeViewItem> ChildrenMap
+        public IReadOnlyDictionary<string, TreeViewItem> ChildrenMap
         {
             get
             {
@@ -63,27 +62,104 @@ namespace CZToolKitEditor.IMGUI.Controls
             }
         }
 
-        public override string displayName { get; set; }
+        public void Clear()
+        {
+            this.userData = null;
+
+            if (this.hasChildren)
+            {
+                this.children.Clear();
+            }
+
+            if (this.childrenMap != null)
+            {
+                this.childrenMap.Clear();
+            }
+        }
+
+        public void Reset()
+        {
+            this.userData = null;
+            this.displayName = string.Empty;
+            this.icon = null;
+            this.parent = null;
+
+            if (this.hasChildren)
+            {
+                this.children.Clear();
+            }
+
+            if (this.childrenMap != null)
+            {
+                this.childrenMap.Clear();
+            }
+        }
+
+        public new void AddChild(UnityTreeViewItem item)
+        {
+            throw new Exception("禁用此行为");
+        }
+
+        public void AddChild(TreeViewItem item)
+        {
+            this.children.Add(item);
+            if (childrenMap == null)
+            {
+                childrenMap = new Dictionary<string, TreeViewItem>();
+            }
+
+            childrenMap[displayName] = item;
+            item.parent = this;
+            item.depth = this.depth + 1;
+        }
+
+        public void InsertChild(int index, TreeViewItem item)
+        {
+            this.children.Insert(index, item);
+            if (childrenMap == null)
+            {
+                childrenMap = new Dictionary<string, TreeViewItem>();
+            }
+
+            childrenMap[item.displayName] = item;
+            item.parent = this;
+            item.depth = this.depth + 1;
+        }
+
+        public void RemoveChild(TreeViewItem item)
+        {
+            if (!children.Remove(item))
+            {
+                return;
+            }
+
+            if (childrenMap != null && childrenMap.TryGetValue(item.displayName, out var child) && child == item)
+            {
+                childrenMap.Remove(item.displayName);
+            }
+
+            item.parent = null;
+        }
     }
 
-    public class TreeView : UnityTreeView
+    public class TreeView<T> : UnityTreeView where T : TreeViewItem, new()
     {
-        private TreeViewItem root;
+        private T root;
         private TreeViewItemPool itemPool;
         private bool sharedItemPool;
-        private Dictionary<int, TreeViewItem> itemMap = new Dictionary<int, TreeViewItem>();
+        private Dictionary<int, T> itemMap = new Dictionary<int, T>();
 
         public Action<IList<int>> onSelectionChanged;
         public Action onKeyEvent;
         public Action onContextClicked;
-        public Action<TreeViewItem> onItemContextClicked;
-        public Action<TreeViewItem> onItemSingleClicked;
-        public Action<TreeViewItem> onItemDoubleClicked;
-        public Action<TreeViewItem, string, string> renameEnded;
+        public Action<T> onItemContextClicked;
+        public Action<T> onItemSingleClicked;
+        public Action<T> onItemDoubleClicked;
+        public Action<T, string, string> renameEnded;
 
-        public Func<TreeViewItem, bool> canRename;
-        public Func<TreeViewItem, bool> canMultiSelect;
-        public Func<TreeViewItem, bool> canBeParent;
+        public Func<T, bool> canRename;
+        public Func<T, bool> canMultiSelect;
+        public Func<T, bool> canBeParent;
 
         public float RowHeight
         {
@@ -121,7 +197,7 @@ namespace CZToolKitEditor.IMGUI.Controls
             {
                 if (root == null)
                 {
-                    root = new TreeViewItem() { id = -1, depth = -1, displayName = "Root" };
+                    root = new T() { id = -1, depth = -1, displayName = "Root" };
                 }
 
                 if (root.children == null)
@@ -132,6 +208,8 @@ namespace CZToolKitEditor.IMGUI.Controls
                 return root;
             }
         }
+
+        public T Root => (T)RootItem;
 
         public TreeView(TreeViewState state) : base(state)
         {
@@ -159,10 +237,10 @@ namespace CZToolKitEditor.IMGUI.Controls
 
         public void Sort(Func<UnityTreeViewItem, UnityTreeViewItem, int> comparer)
         {
-            SortRecursive(RootItem as TreeViewItem);
+            SortRecursive(RootItem as T);
             Reload();
 
-            void SortRecursive(TreeViewItem item)
+            void SortRecursive(T item)
             {
                 if (!item.hasChildren)
                     return;
@@ -170,7 +248,7 @@ namespace CZToolKitEditor.IMGUI.Controls
                 item.children.QuickSort(comparer);
                 foreach (var child in item.children)
                 {
-                    SortRecursive(child as TreeViewItem);
+                    SortRecursive(child as T);
                 }
             }
         }
@@ -181,12 +259,12 @@ namespace CZToolKitEditor.IMGUI.Controls
             return RootItem;
         }
 
-        protected override sealed bool DoesItemMatchSearch(UnityTreeViewItem item, string search)
+        protected sealed override bool DoesItemMatchSearch(UnityTreeViewItem item, string search)
         {
-            return DoesItemMatchSearch(item as TreeViewItem, search);
+            return DoesItemMatchSearch(item as T, search);
         }
 
-        protected virtual bool DoesItemMatchSearch(TreeViewItem item, string search)
+        protected virtual bool DoesItemMatchSearch(T item, string search)
         {
             return base.DoesItemMatchSearch(item, search);
         }
@@ -195,21 +273,21 @@ namespace CZToolKitEditor.IMGUI.Controls
         {
             if (canMultiSelect == null)
                 return false;
-            return canMultiSelect(item as TreeViewItem);
+            return canMultiSelect(item as T);
         }
 
         protected override bool CanRename(UnityTreeViewItem item)
         {
             if (canRename == null)
                 return false;
-            return canRename(item as TreeViewItem);
+            return canRename(item as T);
         }
 
         protected override bool CanBeParent(UnityTreeViewItem item)
         {
             if (canBeParent == null)
                 return base.CanBeParent(item);
-            return canBeParent(item as TreeViewItem);
+            return canBeParent(item as T);
         }
 
         protected override void RenameEnded(RenameEndedArgs args)
@@ -257,10 +335,10 @@ namespace CZToolKitEditor.IMGUI.Controls
 
         protected sealed override void RowGUI(RowGUIArgs args)
         {
-            ItemRowGUI(args.item as TreeViewItem, args);
+            ItemRowGUI(args.item as T, args);
         }
 
-        protected virtual void ItemRowGUI(TreeViewItem item, RowGUIArgs args)
+        protected virtual void ItemRowGUI(T item, RowGUIArgs args)
         {
             DefaultRowGUI(args);
         }
@@ -275,28 +353,26 @@ namespace CZToolKitEditor.IMGUI.Controls
                     labelRect.xMin += depthIndentWidth;
                 else
                     labelRect.xMin += item.depth * depthIndentWidth + depthIndentWidth;
-                var label = EditorGUIUtility.TrTextContent(args.label);
-                label.image = item.icon;
-                GUI.Label(labelRect, label);
+                GUI.Label(labelRect, EditorGUIUtility.TrTextContent(args.label, item.icon));
             }
         }
 
-        public TreeViewItem AddMenuItem(string path, char separator = '/', bool split = true)
+        public T AddMenuItem(string path, char separator = '/', bool split = true)
         {
-            return AddMenuItemTo(RootItem as TreeViewItem, path, null, separator, split);
+            return AddMenuItemTo(RootItem as T, path, null, separator, split);
         }
 
-        public TreeViewItem AddMenuItem(string path, Texture2D icon, char separator = '/', bool split = true)
+        public T AddMenuItem(string path, Texture2D icon, char separator = '/', bool split = true)
         {
-            return AddMenuItemTo(RootItem as TreeViewItem, path, icon, separator, split);
+            return AddMenuItemTo(RootItem as T, path, icon, separator, split);
         }
 
-        public TreeViewItem GetOrAddMenuItem(string path, Texture2D icon = null, char separator = '/', bool split = true)
+        public T GetOrAddMenuItem(string path, Texture2D icon = null, char separator = '/', bool split = true)
         {
             return GetOrAddMenuItemTo(root, path, icon, separator, split);
         }
 
-        public TreeViewItem AddMenuItemTo(TreeViewItem parent, string path, Texture2D icon = null, char separator = '/', bool split = true)
+        public T AddMenuItemTo(T parent, string path, Texture2D icon = null, char separator = '/', bool split = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -314,14 +390,11 @@ namespace CZToolKitEditor.IMGUI.Controls
                         tmpParent = itemPool.Spawn();
                         tmpParent.id = GenerateID();
                         tmpParent.displayName = p[i];
-                        tmpParent.parent = parent;
-                        tmpParent.depth = parent.depth + 1;
-                        parent.children.Add(tmpParent);
-                        parent.ChildrenMap[p[i]] = tmpParent;
-                        itemMap[tmpParent.id] = tmpParent;
+                        parent.AddChild(tmpParent);
+                        itemMap[tmpParent.id] = (T)tmpParent;
                     }
 
-                    parent = tmpParent;
+                    parent = (T)tmpParent;
                 }
             }
 
@@ -329,15 +402,12 @@ namespace CZToolKitEditor.IMGUI.Controls
             item.icon = icon;
             item.id = GenerateID();
             item.displayName = name;
-            item.parent = parent;
-            item.depth = parent.depth + 1;
-            parent.children.Add(item);
-            parent.ChildrenMap[name] = item;
+            parent.AddChild(item);
             itemMap[item.id] = item;
             return item;
         }
 
-        public TreeViewItem GetOrAddMenuItemTo(TreeViewItem parent, string path, Texture2D icon = null, char separator = '/', bool split = true)
+        public T GetOrAddMenuItemTo(T parent, string path, Texture2D icon = null, char separator = '/', bool split = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -355,14 +425,11 @@ namespace CZToolKitEditor.IMGUI.Controls
                         tmpParent = itemPool.Spawn();
                         tmpParent.id = GenerateID();
                         tmpParent.displayName = p[i];
-                        tmpParent.parent = parent;
-                        tmpParent.depth = parent.depth + 1;
-                        parent.children.Add(tmpParent);
-                        parent.ChildrenMap[p[i]] = tmpParent;
-                        itemMap[tmpParent.id] = tmpParent;
+                        parent.AddChild(tmpParent);
+                        itemMap[tmpParent.id] = (T)tmpParent;
                     }
 
-                    parent = tmpParent;
+                    parent = (T)tmpParent;
                 }
             }
 
@@ -372,41 +439,37 @@ namespace CZToolKitEditor.IMGUI.Controls
                 child.icon = icon;
                 child.id = GenerateID();
                 child.displayName = name;
-                child.parent = parent;
-                child.depth = parent.depth + 1;
-                parent.children.Add(child);
-                parent.ChildrenMap[name] = child;
-                itemMap[child.id] = child;
+                parent.AddChild(child);
+                itemMap[child.id] = (T)child;
             }
 
-            return child;
+            return (T)child;
         }
 
-        public void Remove(TreeViewItem treeViewItem)
+        public void Remove(T treeViewItem)
         {
             if (treeViewItem == null || treeViewItem.parent == null)
                 return;
 
-            itemMap.Remove(treeViewItem.id);
-            treeViewItem.parent.children.Remove(treeViewItem);
+            treeViewItem.parent.RemoveChild(treeViewItem);
         }
 
-        public TreeViewItem FindItem(int id)
+        public T FindItem(int id)
         {
             if (itemMap.TryGetValue(id, out var item))
             {
                 return item;
             }
 
-            return FindItem(id, rootItem) as TreeViewItem;
+            return FindItem(id, rootItem) as T;
         }
 
-        public TreeViewItem FindItem(string path, char separator = '/', bool split = true)
+        public T FindItem(string path, char separator = '/', bool split = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
 
-            var parent = RootItem as TreeViewItem;
+            var parent = (T)RootItem;
             var result = (TreeViewItem)null;
             if (split && path.IndexOf(separator) != -1)
             {
@@ -418,7 +481,7 @@ namespace CZToolKitEditor.IMGUI.Controls
                         break;
                     }
 
-                    parent = result;
+                    parent = (T)result;
                 }
             }
             else
@@ -426,19 +489,19 @@ namespace CZToolKitEditor.IMGUI.Controls
                 parent.ChildrenMap.TryGetValue(path, out result);
             }
 
-            return result;
+            return (T)result;
         }
 
-        public IEnumerable<TreeViewItem> Items()
+        public IEnumerable<T> Items()
         {
-            return Foreach(RootItem as TreeViewItem);
+            return Foreach(RootItem as T);
 
-            IEnumerable<TreeViewItem> Foreach(TreeViewItem parent)
+            IEnumerable<T> Foreach(T parent)
             {
                 foreach (var item in parent.children)
                 {
-                    yield return item as TreeViewItem;
-                    foreach (var child in Foreach(item as TreeViewItem))
+                    yield return item as T;
+                    foreach (var child in Foreach(item as T))
                     {
                         yield return child;
                     }
@@ -454,11 +517,9 @@ namespace CZToolKitEditor.IMGUI.Controls
             }
 
             itemMap.Clear();
-            root.userData = null;
-            if (root.hasChildren)
+            if (Root.hasChildren)
             {
-                root.children.Clear();
-                root.ChildrenMap.Clear();
+                Root.Clear();
             }
 
             lastItemId = 0;
@@ -475,11 +536,9 @@ namespace CZToolKitEditor.IMGUI.Controls
             }
 
             itemMap.Clear();
-            root.userData = null;
             if (root.hasChildren)
             {
-                root.children.Clear();
-                root.ChildrenMap.Clear();
+                Root.Clear();
             }
 
             lastItemId = 0;
@@ -492,27 +551,38 @@ namespace CZToolKitEditor.IMGUI.Controls
             return lastItemId++;
         }
 
-        public class TreeViewItemPool : BaseObjectPool<TreeViewItem>
+        public class TreeViewItemPool : BaseObjectPool<T>
         {
-            protected override TreeViewItem Create()
+            protected override T Create()
             {
-                return new TreeViewItem();
+                return new T();
             }
 
-            protected override void OnRecycle(TreeViewItem unit)
+            protected override void OnRecycle(T unit)
             {
-                unit.userData = null;
-                unit.displayName = string.Empty;
-                unit.icon = null;
-                unit.parent = null;
-                if (unit.hasChildren)
-                {
-                    unit.children.Clear();
-                    unit.ChildrenMap.Clear();
-                }
-
+                unit.Reset();
                 base.OnRecycle(unit);
             }
+        }
+    }
+
+
+    public class TreeView : TreeView<TreeViewItem>
+    {
+        public TreeView(TreeViewState state) : base(state)
+        {
+        }
+
+        public TreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
+        {
+        }
+
+        public TreeView(TreeViewState state, TreeViewItemPool itemPool) : base(state, itemPool)
+        {
+        }
+
+        public TreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, TreeViewItemPool itemPool) : base(state, multiColumnHeader, itemPool)
+        {
         }
     }
 }

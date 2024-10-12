@@ -32,7 +32,7 @@ namespace CZToolKit
         {
             if (startIndex >= endIndex)
                 return false;
-            T middle = original[startIndex];
+            T middle = original[startIndex + (endIndex - startIndex) / 2];
             int less = startIndex;
             int greater = endIndex;
             bool changed = false;
@@ -53,6 +53,7 @@ namespace CZToolKit
                 var lr = comparer.Compare(original[less], original[greater]);
                 if (lr == 0)
                 {
+                    less++;
                     greater--;
                     continue;
                 }
@@ -93,7 +94,7 @@ namespace CZToolKit
         {
             if (startIndex >= endIndex)
                 return false;
-            T middle = original[startIndex];
+            T middle = original[startIndex + (endIndex - startIndex) / 2];
             int less = startIndex;
             int greater = endIndex;
             bool changed = false;
@@ -114,6 +115,7 @@ namespace CZToolKit
                 var lr = comparer(original[less], original[greater]);
                 if (lr == 0)
                 {
+                    less++;
                     greater--;
                     continue;
                 }
@@ -122,7 +124,7 @@ namespace CZToolKit
                 changed = true;
             }
 
-            changed |= QuickSort(original, startIndex, less, comparer);
+            changed |= QuickSort(original, startIndex, less - 1, comparer);
             changed |= QuickSort(original, less + 1, endIndex, comparer);
             return changed;
         }
@@ -131,7 +133,7 @@ namespace CZToolKit
         {
             if (startIndex >= endIndex)
                 return false;
-            T middle = original[startIndex];
+            T middle = original[startIndex + (endIndex - startIndex) / 2];
             int less = startIndex;
             int greater = endIndex;
             bool changed = false;
@@ -152,6 +154,7 @@ namespace CZToolKit
                 var lr = comparer.Compare(original[less], original[greater]);
                 if (lr == 0)
                 {
+                    less++;
                     greater--;
                     continue;
                 }
@@ -169,7 +172,7 @@ namespace CZToolKit
         {
             if (startIndex >= endIndex)
                 return false;
-            T middle = original[startIndex];
+            T middle = original[startIndex + (endIndex - startIndex) / 2];
             int less = startIndex;
             int greater = endIndex;
             bool changed = false;

@@ -21,12 +21,11 @@ namespace CZToolKit
         public static int BinaryMatch<T>(this IList<T> original, int startIndex, int endIndex, T item, Func<T, T, int> comparer)
         {
             if (original.Count == 0)
-                return 0;
+                return -1;
 
-            var mid = -1;
             while (startIndex <= endIndex)
             {
-                mid = (startIndex + endIndex) / 2;
+                var mid = startIndex + (endIndex - startIndex) / 2;
                 var dir = comparer(item, original[mid]);
                 if (dir == 0)
                     return mid;
@@ -47,7 +46,7 @@ namespace CZToolKit
                 }
             }
 
-            return mid;
+            return -1;
         }
 
         public static int BinaryMatch<T>(this IList<T> original, T item, IComparer<T> comparer)
@@ -58,12 +57,11 @@ namespace CZToolKit
         public static int BinaryMatch<T>(this IList<T> original, int startIndex, int endIndex, T item, IComparer<T> comparer)
         {
             if (original.Count == 0)
-                return 0;
+                return -1;
 
-            var mid = -1;
             while (startIndex <= endIndex)
             {
-                mid = (startIndex + endIndex) / 2;
+                var mid = startIndex + (endIndex - startIndex) / 2;
                 var dir = comparer.Compare(item, original[mid]);
                 if (dir == 0)
                     return mid;
@@ -84,7 +82,7 @@ namespace CZToolKit
                 }
             }
 
-            return mid;
+            return -1;
         }
 
         /// <summary>
@@ -105,7 +103,7 @@ namespace CZToolKit
         {
             while (startIndex <= endIndex)
             {
-                var mid = (startIndex + endIndex) / 2;
+                var mid = startIndex + (endIndex - startIndex) / 2;
                 var dir = comparer(item, original[mid]);
 
                 if (dir == 0)
@@ -133,7 +131,7 @@ namespace CZToolKit
         {
             while (startIndex <= endIndex)
             {
-                var mid = (startIndex + endIndex) / 2;
+                var mid = startIndex + (endIndex - startIndex) / 2;
                 var dir = comparer.Compare(item, original[mid]);
 
                 if (dir == 0)
@@ -156,7 +154,7 @@ namespace CZToolKit
         {
             while (startIndex <= endIndex)
             {
-                var mid = (startIndex + endIndex) / 2;
+                var mid = startIndex + (endIndex - startIndex) / 2;
                 var dir = comparer(item, original[mid]);
 
                 if (dir == 0)

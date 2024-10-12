@@ -43,7 +43,7 @@ namespace CZToolKit
 
         protected void OnEnable()
         {
-            var referenceCollector = serializedObject.targetObject as ReferenceCollector;
+            var referenceCollector = (ReferenceCollector)target;
             referencesList = new ReorderableList(serializedObject, serializedObject.FindProperty("references"), true, true, true, true);
             referencesList.elementHeight = 20;
             referencesList.drawHeaderCallback = (a) =>
@@ -55,8 +55,6 @@ namespace CZToolKit
                 {
                     Undo.RecordObject(referenceCollector, "Clear All");
                     referenceCollector.references.Clear();
-                    serializedObject.ApplyModifiedProperties();
-                    serializedObject.UpdateIfRequiredOrScript();
                 }
 
                 var cleanButtonRect = new Rect(a.x + a.width - 60, a.y, 30, a.height);
@@ -64,8 +62,6 @@ namespace CZToolKit
                 {
                     Undo.RecordObject(referenceCollector, "Clear Empty");
                     referenceCollector.references.RemoveAll(pair => string.IsNullOrEmpty(pair.key) || pair.value == null);
-                    serializedObject.ApplyModifiedProperties();
-                    serializedObject.UpdateIfRequiredOrScript();
                 }
 
                 var clearSameButtonRect = new Rect(a.x + a.width - 90, a.y, 30, a.height);
@@ -83,9 +79,6 @@ namespace CZToolKit
                         referenceCollector.references.RemoveAt(i);
                         i--;
                     }
-
-                    serializedObject.ApplyModifiedProperties();
-                    serializedObject.UpdateIfRequiredOrScript();
                 }
 
                 var sortButtonRect = new Rect(a.x + a.width - 120, a.y, 30, a.height);
@@ -93,8 +86,6 @@ namespace CZToolKit
                 {
                     Undo.RecordObject(referenceCollector, "Sort ReferenceData");
                     referenceCollector.references.QuickSort((l, r) => { return String.Compare(l.key, r.key, StringComparison.Ordinal); });
-                    serializedObject.ApplyModifiedProperties();
-                    serializedObject.UpdateIfRequiredOrScript();
                 }
             };
             referencesList.drawElementCallback += (a, b, c, d) =>
@@ -107,24 +98,18 @@ namespace CZToolKit
                 var objFieldRect = new Rect(a.x + a.width * 0.3f + 1, a.y + 1, a.width * 0.7f - 26, a.height - 2);
                 var dropDownButtonRect = new Rect(a.xMax - 25, a.y + 1, 25, a.height + 1);
 
-                EditorGUI.BeginChangeCheck();
                 var sourceK = key.stringValue;
                 var k = EditorGUI.DelayedTextField(keyFieldRect, sourceK);
                 if (!string.IsNullOrEmpty(k) && k != sourceK && !referenceCollector.Contains(k))
                     key.stringValue = k;
 
                 EditorGUI.PropertyField(objFieldRect, value, GUIContent.none);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    serializedObject.UpdateIfRequiredOrScript();
-                }
 
                 EditorGUI.BeginDisabledGroup(!(value.objectReferenceValue is GameObject) && !(value.objectReferenceValue is Component));
                 if (GUI.Button(dropDownButtonRect, Styles.ComponentsLabel, EditorStyles.toolbarButton))
                 {
                     GenericMenu menu = new GenericMenu();
-                    Component[] components = null;
+                    Component[] components = Array.Empty<Component>();
                     GameObject gameObject = null;
                     switch (value.objectReferenceValue)
                     {
@@ -140,17 +125,16 @@ namespace CZToolKit
 
                     menu.AddItem(EditorGUIUtility.TrTextContent($"0:GameObject"), false, () =>
                     {
-                        Undo.RecordObject(referenceCollector, "Change Component");
                         value.objectReferenceValue = gameObject;
                         serializedObject.ApplyModifiedProperties();
                         serializedObject.UpdateIfRequiredOrScript();
                     });
+                    
                     for (int i = 0; i < components.Length; i++)
                     {
                         var component = components[i];
                         menu.AddItem(EditorGUIUtility.TrTextContent($"{i + 1}:{component.GetType().Name}"), false, () =>
                         {
-                            Undo.RecordObject(referenceCollector, "Change Component");
                             value.objectReferenceValue = component;
                             serializedObject.ApplyModifiedProperties();
                             serializedObject.UpdateIfRequiredOrScript();
@@ -172,16 +156,11 @@ namespace CZToolKit
                 } while (referenceCollector.Contains(key));
 
                 referenceCollector.Set(key, null);
-                serializedObject.ApplyModifiedProperties();
-                serializedObject.UpdateIfRequiredOrScript();
             };
             referencesList.onRemoveCallback += (a) =>
             {
-                Undo.RecordObject(referenceCollector, "Remove ReferenceData");
                 var serializedProperty = serializedObject.FindProperty("references");
                 serializedProperty.DeleteArrayElementAtIndex(referencesList.index);
-                serializedObject.ApplyModifiedProperties();
-                serializedObject.UpdateIfRequiredOrScript();
                 referencesList.index = Mathf.Clamp(referencesList.index, 0, referencesList.count - 1);
             };
         }
@@ -195,7 +174,7 @@ namespace CZToolKit
             var results = EditorGUIExtension.DragDropAreaMulti(rect, DragAndDropVisualMode.Generic);
             if (results != null)
             {
-                var referenceCollector = serializedObject.targetObject as ReferenceCollector;
+                var referenceCollector = (ReferenceCollector)target;
                 foreach (var obj in results)
                 {
                     string key = obj.name;

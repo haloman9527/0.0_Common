@@ -75,10 +75,15 @@ namespace CZToolKitEditor
         
         private void ShowButton(Rect rect)
         {
+#if UNITY_6000_0_OR_NEWER
             rect.x = 0;
             rect.y = 5;
             rect.height = 20;
             rect.width = position.width - 25;
+#else
+            rect.x = 0;
+            rect.width = position.width - 60;
+#endif
             GUILayout.BeginArea(rect);
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
@@ -91,7 +96,7 @@ namespace CZToolKitEditor
 
         protected virtual void OnShowButton(Rect rect)
         {
-            if (GUILayout.Button(CSIcon, (GUIStyle)"IconButton", GUILayout.Width(20)))
+            if (GUILayout.Button(CSIcon, (GUIStyle)"IconButton"))
                 AssetDatabase.OpenAsset(MonoScript);
         }
 

@@ -36,7 +36,7 @@ namespace CZToolKit
 
             // 1.建堆
             var length = endIndex - startIndex + 1;
-            for (int i = ((length / 2) - (length % 2)); i >= 0; i--)
+            for (int i = ((length / 2) - 1); i >= 0; i--)
             {
                 AdjustHeap(original, startIndex, endIndex, i, -1, comparer);
             }
@@ -111,7 +111,7 @@ namespace CZToolKit
 
             // 1.建堆
             var length = endIndex - startIndex + 1;
-            for (int i = ((length / 2) - (length % 2)); i >= 0; i--)
+            for (int i = ((length / 2) - 1); i >= 0; i--)
             {
                 AdjustHeap(original, startIndex, endIndex, i, -1, comparer);
             }

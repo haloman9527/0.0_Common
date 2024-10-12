@@ -110,13 +110,14 @@ namespace CZToolKitEditor.IMGUI.Controls
                     name = p[^1];
                     for (int i = 0; i < p.Length - 1; i++)
                     {
-                        if (!parent.ChildrenMap.TryGetValue(p[i], out var tmpParent))
+                        if (!parent.ChildrenMap.TryGetValue(p[i], out var child))
                         {
-                            tmpParent = new AdvancedDropdownItem(p[i]) { id = GenerateID() };
-                            parent.AddChild(tmpParent);
+                            child = new AdvancedDropdownItem(p[i]) { id = GenerateID() };
+                            parent.AddChild(child);
+                            parent.ChildrenMap[p[i]] = child;
                         }
 
-                        parent = tmpParent;
+                        parent = child;
                     }
                 }
             }
@@ -125,6 +126,7 @@ namespace CZToolKitEditor.IMGUI.Controls
             item.id = GenerateID();
             item.icon = icon;
             parent.AddChild(item);
+            parent.ChildrenMap[name] = item;
             return item;
         }
 

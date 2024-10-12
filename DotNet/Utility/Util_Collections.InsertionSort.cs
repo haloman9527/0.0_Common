@@ -44,7 +44,7 @@ namespace CZToolKit
                         original[j] = temp;
                         i = j;
                         temp = original[i];
-                        changed |= true;
+                        changed = true;
                     }
                     else
                     {
@@ -93,9 +93,9 @@ namespace CZToolKit
                     {
                         original[i] = t;
                         original[j] = temp;
+                        temp = original[j];
                         i = j;
-                        temp = original[i];
-                        changed |= true;
+                        changed = true;
                     }
                     else
                     {
@@ -123,7 +123,7 @@ namespace CZToolKit
                         original[j] = temp;
                         i = j;
                         temp = original[i];
-                        changed |= true;
+                        changed = true;
                     }
                     else
                     {
@@ -151,7 +151,7 @@ namespace CZToolKit
                         original[j] = temp;
                         i = j;
                         temp = original[i];
-                        changed |= true;
+                        changed = true;
                     }
                     else
                     {

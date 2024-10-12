@@ -72,7 +72,7 @@ namespace CZToolKitEditor
 #else
         private void OnEnable()
         {
-            OnEnable(InspectorObject);
+            OnEnable(target as ObjectInspector);
         }
 #endif
         

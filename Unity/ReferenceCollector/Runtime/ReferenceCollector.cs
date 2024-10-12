@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
@@ -49,19 +48,26 @@ namespace CZToolKit
             {
                 if (referencesMap == null)
                 {
-                    referencesMap = new Dictionary<string, ReferencePair>();
-                    foreach (var pair in references)
-                    {
-                        if (string.IsNullOrEmpty(pair.key))
-                            continue;
-                        referencesMap[pair.key] = pair;
-                    }
+                    InitReferencesMap();
                 }
                 return referencesMap;
             }
         }
 
         public IReadOnlyList<ReferencePair> References => references;
+
+        private void InitReferencesMap()
+        {
+            var tempReferencesMap = new Dictionary<string, ReferencePair>();
+            foreach (var pair in references)
+            {
+                if (string.IsNullOrEmpty(pair.key))
+                    continue;
+                tempReferencesMap.Add(pair.key, pair);
+            }
+
+            referencesMap = tempReferencesMap;
+        }
 
         public bool Contains(string key)
         {
@@ -87,6 +93,8 @@ namespace CZToolKit
             else
             {
                 pair = new ReferencePair() { key = key, value = uo };
+                if (referencesMap != null)
+                    referencesMap.Add(pair.key, pair);
                 references.Add(pair);
             }
         }
@@ -96,12 +104,17 @@ namespace CZToolKit
             if (referencesMap != null && referencesMap.TryGetValue(key, out var pair))
             {
                 referencesMap.Remove(key);
-                references.Remove(pair);
+                references.RemoveAll(item => item.key == key);
             }
             else
             {
                 references.RemoveAll(item => item.key == key);
             }
+        }
+
+        private void OnValidate()
+        {
+            referencesMap = null;
         }
     }
 }

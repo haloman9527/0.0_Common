@@ -33,18 +33,19 @@ namespace CZToolKit
             var changed = false;
             for (int i = endIndex - 1; i >= startIndex; i--)
             {
-                var index = i;
-                var temp = original[index];
-
-                for (int j = i + 1; j <= endIndex; j++)
-                {
-                    var t = original[j];
-                    if (comparer.Compare(temp, t) > 0)
-                    {
-                        original[index] = t;
-                        original[j] = temp;
-                        changed |= true;
-                    }
+                var minIndex = i;
+                for (int j = i + 1; j <= endIndex; j++)  
+                {  
+                    if (comparer.Compare(original[minIndex], original[j]) > 0)  
+                    {  
+                        minIndex = j;  
+                    }  
+                }  
+                
+                if (minIndex != i)  
+                {  
+                    (original[i], original[minIndex]) = (original[minIndex], original[i]);  
+                    changed = true;  
                 }
             }
 
@@ -79,18 +80,19 @@ namespace CZToolKit
             var changed = false;
             for (int i = endIndex - 1; i >= startIndex; i--)
             {
-                var index = i;
-                var temp = original[index];
-
-                for (int j = i + 1; j <= endIndex; j++)
-                {
-                    var t = original[j];
-                    if (comparer(temp, t) > 0)
-                    {
-                        original[index] = t;
-                        original[j] = temp;
-                        changed |= true;
-                    }
+                var minIndex = i;
+                for (int j = i + 1; j <= endIndex; j++)  
+                {  
+                    if (comparer(original[minIndex], original[j]) > 0)  
+                    {  
+                        minIndex = j;  
+                    }  
+                }  
+                
+                if (minIndex != i)  
+                {  
+                    (original[i], original[minIndex]) = (original[minIndex], original[i]);  
+                    changed = true;  
                 }
             }
 
@@ -102,18 +104,19 @@ namespace CZToolKit
             var changed = false;
             for (int i = endIndex - 1; i >= startIndex; i--)
             {
-                var index = i;
-                var temp = original[index];
-
-                for (int j = i + 1; j <= endIndex; j++)
-                {
-                    var t = original[j];
-                    if (comparer.Compare(temp, t) > 0)
-                    {
-                        original[index] = t;
-                        original[j] = temp;
-                        changed |= true;
-                    }
+                var minIndex = i;
+                for (int j = i + 1; j <= endIndex; j++)  
+                {  
+                    if (comparer.Compare(original[minIndex], original[j]) > 0)  
+                    {  
+                        minIndex = j;  
+                    }  
+                }  
+                
+                if (minIndex != i)  
+                {  
+                    (original[i], original[minIndex]) = (original[minIndex], original[i]);  
+                    changed = true;  
                 }
             }
 
@@ -125,18 +128,19 @@ namespace CZToolKit
             var changed = false;
             for (int i = endIndex - 1; i >= startIndex; i--)
             {
-                var index = i;
-                var temp = original[index];
-
-                for (int j = i + 1; j <= endIndex; j++)
-                {
-                    var t = original[j];
-                    if (comparer(temp, t) > 0)
-                    {
-                        original[index] = t;
-                        original[j] = temp;
-                        changed |= true;
-                    }
+                var minIndex = i;
+                for (int j = i + 1; j <= endIndex; j++)  
+                {  
+                    if (comparer(original[minIndex], original[j]) > 0)  
+                    {  
+                        minIndex = j;  
+                    }  
+                }  
+                
+                if (minIndex != i)  
+                {  
+                    (original[i], original[minIndex]) = (original[minIndex], original[i]);  
+                    changed = true;  
                 }
             }
 
