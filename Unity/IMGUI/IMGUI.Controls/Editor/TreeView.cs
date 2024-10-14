@@ -108,7 +108,7 @@ namespace CZToolKitEditor.IMGUI.Controls
                 childrenMap = new Dictionary<string, TreeViewItem>();
             }
 
-            childrenMap[displayName] = item;
+            childrenMap[item.displayName] = item;
             item.parent = this;
             item.depth = this.depth + 1;
         }
