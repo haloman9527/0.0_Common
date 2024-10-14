@@ -194,7 +194,7 @@ namespace CZToolKit
         private const int MaxRegexMatch = 20;
 
         // 处理asset打开的callback函数
-        [UnityEditor.Callbacks.OnOpenAssetAttribute(0)]
+        // [UnityEditor.Callbacks.OnOpenAssetAttribute(0)]
         static bool OnOpenAsset(int instance, int line)
         {
             // 自定义函数，用来获取stacktrace

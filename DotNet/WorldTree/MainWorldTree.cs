@@ -22,17 +22,17 @@ namespace CZToolKit
 
         public void FixedUpdate()
         {
-            root.FixedUpdate();
+            root.Publish<IFixedUpdateSystem>();
         }
 
         public void Update()
         {
-            root.Update();
+            root.Publish<IUpdateSystem>();
         }
 
         public void LateUpdate()
         {
-            root.LateUpdate();
+            root.Publish<ILateUpdateSystem>();
         }
     }
 }

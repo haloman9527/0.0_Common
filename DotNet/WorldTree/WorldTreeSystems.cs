@@ -5,10 +5,11 @@ namespace CZToolKit
 {
     public static class WorldTreeSystems
     {
-        private class OneTypeSystems
+        public class OneTypeSystems
         {
-            public Dictionary<Type, List<ISystem>> originSystems = new Dictionary<Type, List<ISystem>>();
-            public Dictionary<Type, List<ISystem>> systems = new Dictionary<Type, List<ISystem>>();
+            public Dictionary<Type, List<ISystem>> nodeOriginSystems = new Dictionary<Type, List<ISystem>>();
+            public Dictionary<Type, List<ISystem>> nodeSystems = new Dictionary<Type, List<ISystem>>();
+            public List<Type> systemTypes = new List<Type>();
         }
 
         private static bool s_Initialized;
@@ -61,9 +62,9 @@ namespace CZToolKit
                     s_Systems[system.NodeType()] = systems = new OneTypeSystems();
                 }
 
-                if (!systems.originSystems.TryGetValue(systemType, out var lst))
+                if (!systems.nodeOriginSystems.TryGetValue(systemType, out var lst))
                 {
-                    systems.originSystems[system.SystemType()] = lst = new List<ISystem>();
+                    systems.nodeOriginSystems[system.SystemType()] = lst = new List<ISystem>();
                 }
 
                 lst.Add(system);
@@ -71,12 +72,12 @@ namespace CZToolKit
 
             foreach (var nodeType in nodeTypes)
             {
-                var type = nodeType;
-                while (type != null)
+                var tempNodeType = nodeType;
+                while (tempNodeType != null)
                 {
-                    if (!s_Systems.TryGetValue(type, out var systems))
+                    if (!s_Systems.TryGetValue(tempNodeType, out var systems))
                     {
-                        type = type.BaseType;
+                        tempNodeType = tempNodeType.BaseType;
                         continue;
                     }
 
@@ -85,17 +86,17 @@ namespace CZToolKit
                         s_Systems[nodeType] = nodeSystems = new OneTypeSystems();
                     }
 
-                    foreach (var pair in systems.originSystems)
+                    foreach (var pair in systems.nodeOriginSystems)
                     {
-                        if (!nodeSystems.systems.TryGetValue(pair.Key, out var lst))
+                        if (!nodeSystems.nodeSystems.TryGetValue(pair.Key, out var lst))
                         {
-                            nodeSystems.systems[pair.Key] = lst = new List<ISystem>();
+                            nodeSystems.nodeSystems[pair.Key] = lst = new List<ISystem>();
                         }
 
                         lst.InsertRange(0, pair.Value);
                     }
 
-                    type = type.BaseType;
+                    tempNodeType = tempNodeType.BaseType;
                 }
             }
 
@@ -107,10 +108,17 @@ namespace CZToolKit
             if (!s_Systems.TryGetValue(nodeType, out var systems))
                 return null;
 
-            if (!systems.systems.TryGetValue(systemType, out var lst))
+            if (!systems.nodeSystems.TryGetValue(systemType, out var lst))
                 return null;
 
             return lst;
+        }
+
+        public static OneTypeSystems GetOneTypeSystems(Type nodeType)
+        { 
+            OneTypeSystems systems = null;
+            s_Systems.TryGetValue(nodeType, out systems);
+            return systems;
         }
 
         public static void Awake(Node entity)
@@ -201,122 +209,6 @@ namespace CZToolKit
             for (int i = systems.Count - 1; i >= 0; i--)
             {
                 ((IDestroySystem)systems[i]).Execute(entity);
-            }
-        }
-
-        public static void FixedUpdate(WorldTree root, Queue<int> entitiesQueue)
-        {
-            int count = entitiesQueue.Count;
-            while (count-- > 0)
-            {
-                var instanceId = entitiesQueue.Dequeue();
-                var component = root.Get(instanceId);
-                if (component == null)
-                {
-                    continue;
-                }
-
-                if (component.IsDisposed)
-                {
-                    continue;
-                }
-
-                entitiesQueue.Enqueue(instanceId);
-
-                var systems = GetSystems(component.GetType(), typeof(IFixedUpdateSystem));
-                if (systems == null)
-                {
-                    continue;
-                }
-
-                for (int i = 0; i < systems.Count; i++)
-                {
-                    try
-                    {
-                        ((IFixedUpdateSystem)systems[i]).Execute(component);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error(e);
-                    }
-                }
-            }
-        }
-
-        public static void Update(WorldTree root, Queue<int> entitiesQueue)
-        {
-            int count = entitiesQueue.Count;
-            while (count-- > 0)
-            {
-                var instanceId = entitiesQueue.Dequeue();
-                var component = root.Get(instanceId);
-                if (component == null)
-                {
-                    continue;
-                }
-
-                if (component.IsDisposed)
-                {
-                    continue;
-                }
-
-                entitiesQueue.Enqueue(instanceId);
-
-                var systems = GetSystems(component.GetType(), typeof(IUpdateSystem));
-                if (systems == null)
-                {
-                    continue;
-                }
-
-                for (int i = 0; i < systems.Count; i++)
-                {
-                    try
-                    {
-                        ((IUpdateSystem)systems[i]).Execute(component);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error(e);
-                    }
-                }
-            }
-        }
-
-        public static void LateUpdate(WorldTree root, Queue<int> entitiesQueue)
-        {
-            int count = entitiesQueue.Count;
-            while (count-- > 0)
-            {
-                var instanceId = entitiesQueue.Dequeue();
-                var component = root.Get(instanceId);
-                if (component == null)
-                {
-                    continue;
-                }
-
-                if (component.IsDisposed)
-                {
-                    continue;
-                }
-
-                entitiesQueue.Enqueue(instanceId);
-                var systems = GetSystems(component.GetType(), typeof(ILateUpdateSystem));
-                if (systems == null)
-                {
-                    continue;
-                }
-
-                for (int i = 0; i < systems.Count; i++)
-                {
-                    try
-                    {
-                        ((ILateUpdateSystem)systems[i]).Execute(component);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error(e);
-                    }
-                }
             }
         }
     }

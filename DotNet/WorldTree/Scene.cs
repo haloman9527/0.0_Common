@@ -44,9 +44,14 @@ namespace CZToolKit
             }
         }
 
-        private Scene(string name, Node parent, WorldTree root)
+        public Scene(string name, Node parent, WorldTree root)
         {
             Init(name, parent, root);
+        }
+
+        internal Scene(string name, WorldTree root) : this(name, null, root)
+        {
+            
         }
 
         public Scene(string name, Node parent) : this(name, parent, parent.Domain.WorldTree)
@@ -107,11 +112,6 @@ namespace CZToolKit
             }
 
             return scene;
-        }
-
-        public static Scene NewRootScene(string name, WorldTree root)
-        {
-            return new Scene(name, null, root);
         }
     }
 

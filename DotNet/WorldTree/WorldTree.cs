@@ -5,10 +5,8 @@ namespace CZToolKit
 {
     public class WorldTree : IDisposable
     {
-        private Queue<int> fixedUpdateEntitiesQueue;
-        private Queue<int> updateEntitiesQueue;
-        private Queue<int> lateUpdateEntitiesQueue;
-        private Dictionary<int, Node> entities;
+        private Dictionary<int, Node> nodes;
+        private Dictionary<Type, Queue<NodeRef<Node>>> systemNodes;
         private int lastInstanceId;
         private Scene root;
 
@@ -19,20 +17,15 @@ namespace CZToolKit
 
         public WorldTree()
         {
-            this.fixedUpdateEntitiesQueue = new Queue<int>(256);
-            this.updateEntitiesQueue = new Queue<int>(256);
-            this.lateUpdateEntitiesQueue = new Queue<int>(256);
-            this.entities = new Dictionary<int, Node>(256);
-            this.root = Scene.NewRootScene("Root", this);
+            this.nodes = new Dictionary<int, Node>(256);
+            this.systemNodes = new Dictionary<Type, Queue<NodeRef<Node>>>();
+            this.root = new Scene("Root", this);
         }
 
         public void Dispose()
         {
             root.Dispose();
-            fixedUpdateEntitiesQueue.Clear();
-            updateEntitiesQueue.Clear();
-            lateUpdateEntitiesQueue.Clear();
-            entities.Clear();
+            nodes.Clear();
         }
 
         public int GenerateInstanceId()
@@ -40,42 +33,142 @@ namespace CZToolKit
             return ++lastInstanceId;
         }
 
-        public void Register(Node entity)
+        public Queue<NodeRef<Node>> GetQueue(Type type)
         {
-            this.entities.Add(entity.InstanceId, entity);
-            var entityType = entity.GetType();
-            if (WorldTreeSystems.GetSystems(entityType, typeof(IFixedUpdateSystem)) != null)
-                fixedUpdateEntitiesQueue.Enqueue(entity.InstanceId);
-            if (WorldTreeSystems.GetSystems(entityType, typeof(IUpdateSystem)) != null)
-                updateEntitiesQueue.Enqueue(entity.InstanceId);
-            if (WorldTreeSystems.GetSystems(entityType, typeof(ILateUpdateSystem)) != null)
-                lateUpdateEntitiesQueue.Enqueue(entity.InstanceId);
+            if (!this.systemNodes.TryGetValue(type, out var queue))
+            {
+                queue = new Queue<NodeRef<Node>>();
+                this.systemNodes.Add(type, queue);
+            }
+
+            return queue;
+        }
+
+        public void Register(Node n)
+        {
+            var nodeRef = (NodeRef<Node>)n;
+            this.nodes.Add(n.InstanceId, nodeRef);
+
+            var nodeType = n.GetType();
+            var oneTypeSystems = WorldTreeSystems.GetOneTypeSystems(nodeType);
+            if (oneTypeSystems == null)
+            {
+                return;
+            }
+
+            foreach (Type queueType in oneTypeSystems.nodeOriginSystems.Keys)
+            {
+                var queue = this.GetQueue(queueType);
+                queue.Enqueue(n);
+            }
         }
 
         public void Unregister(int instanceId)
         {
-            this.entities.Remove(instanceId);
+            this.nodes.Remove(instanceId);
         }
 
         public Node Get(int instanceId)
         {
-            this.entities.TryGetValue(instanceId, out var component);
+            this.nodes.TryGetValue(instanceId, out var component);
             return component;
         }
 
-        public void FixedUpdate()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"> SystemType </typeparam>
+        public void Publish<T>() where T : ISystem
         {
-            WorldTreeSystems.FixedUpdate(this, fixedUpdateEntitiesQueue);
+            var queue = GetQueue(typeof(T));
+            if (queue == null)
+            {
+                return;
+            }
+
+            int count = queue.Count;
+            while (count-- > 0)
+            {
+                var component = (Node)queue.Dequeue();
+                if (component == null)
+                {
+                    continue;
+                }
+
+                if (component.IsDisposed)
+                {
+                    continue;
+                }
+
+                var systems = WorldTreeSystems.GetSystems(component.GetType(), typeof(T));
+                if (systems == null)
+                {
+                    continue;
+                }
+
+                queue.Enqueue(component);
+
+                for (int i = 0; i < systems.Count; i++)
+                {
+                    try
+                    {
+                        ((ITriggerSystem)systems[i]).Execute(component);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e);
+                    }
+                }
+            }
+        }
+    }
+
+    public struct NodeRef<T> where T : Node
+    {
+        private readonly long instanceId;
+        private T node;
+
+        private NodeRef(T t)
+        {
+            if (t == null)
+            {
+                this.instanceId = 0;
+                this.node = null;
+            }
+            else
+            {
+                this.instanceId = t.InstanceId;
+                this.node = t;
+            }
         }
 
-        public void Update()
+        private T UnWrap
         {
-            WorldTreeSystems.Update(this, updateEntitiesQueue);
+            get
+            {
+                if (this.node == null)
+                {
+                    return null;
+                }
+
+                if (this.node.InstanceId != this.instanceId)
+                {
+                    // 这里instanceId变化了，设置为null，解除引用，好让runtime去gc
+                    this.node = null;
+                }
+
+                return this.node;
+            }
         }
 
-        public void LateUpdate()
+        public static implicit operator NodeRef<T>(T t)
         {
-            WorldTreeSystems.LateUpdate(this, lateUpdateEntitiesQueue);
+            return new NodeRef<T>(t);
+        }
+
+        public static implicit operator T(NodeRef<T> v)
+        {
+            return v.UnWrap;
         }
     }
 }
