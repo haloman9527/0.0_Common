@@ -32,38 +32,42 @@ namespace CZToolKit
         {
             if (startIndex >= endIndex)
                 return false;
-            T middle = original[startIndex + (endIndex - startIndex) / 2];
-            int less = startIndex;
-            int greater = endIndex;
+            
+            var pivot = original[startIndex + (endIndex - startIndex) / 2];
+            var left = startIndex;
+            var right = endIndex;
             bool changed = false;
-            while (true)
+            while (left <= right)
             {
-                while (less < greater && comparer.Compare(original[less], middle) < 0)
+                while (comparer.Compare(original[left], pivot) < 0)
                 {
-                    less++;
+                    left++;
                 }
 
-                while (greater > less && comparer.Compare(original[greater], middle) > 0)
+                while (comparer.Compare(original[right], pivot) > 0)
                 {
-                    greater--;
+                    right--;
                 }
 
-                if (less >= greater) break;
-
-                var lr = comparer.Compare(original[less], original[greater]);
-                if (lr == 0)
+                if (left <= right)
                 {
-                    less++;
-                    greater--;
-                    continue;
+                    (original[left], original[right]) = (original[right], original[left]);
+                    left++;
+                    right--;
+                    changed = true;
                 }
-
-                (original[less], original[greater]) = (original[greater], original[less]);
-                changed = true;
             }
 
-            changed |= QuickSort(original, startIndex, less, comparer);
-            changed |= QuickSort(original, less + 1, endIndex, comparer);
+            if (startIndex < right)
+            {
+                changed |= QuickSort(original, startIndex, right, comparer);
+            }
+
+            if (left < endIndex)
+            {
+                changed |= QuickSort(original, left, endIndex, comparer);
+            }
+
             return changed;
         }
 
@@ -94,38 +98,42 @@ namespace CZToolKit
         {
             if (startIndex >= endIndex)
                 return false;
-            T middle = original[startIndex + (endIndex - startIndex) / 2];
-            int less = startIndex;
-            int greater = endIndex;
-            bool changed = false;
-            while (true)
+            
+            var pivot = original[startIndex + (endIndex - startIndex) / 2];
+            var left = startIndex;
+            var right = endIndex;
+            var changed = false;
+            while (left <= right)
             {
-                while (less < greater && comparer(original[less], middle) < 0)
+                while (comparer(original[left], pivot) < 0)
                 {
-                    less++;
+                    left++;
                 }
 
-                while (greater > less && comparer(original[greater], middle) > 0)
+                while (comparer(original[right], pivot) > 0)
                 {
-                    greater--;
+                    right--;
                 }
 
-                if (less >= greater) break;
-
-                var lr = comparer(original[less], original[greater]);
-                if (lr == 0)
+                if (left <= right)
                 {
-                    less++;
-                    greater--;
-                    continue;
+                    (original[left], original[right]) = (original[right], original[left]);
+                    left++;
+                    right--;
+                    changed = true;
                 }
-
-                (original[less], original[greater]) = (original[greater], original[less]);
-                changed = true;
             }
 
-            changed |= QuickSort(original, startIndex, less - 1, comparer);
-            changed |= QuickSort(original, less + 1, endIndex, comparer);
+            if (startIndex < right)
+            {
+                changed |= QuickSort(original, startIndex, right, comparer);
+            }
+
+            if (left < endIndex)
+            {
+                changed |= QuickSort(original, left, endIndex, comparer);
+            }
+
             return changed;
         }
 
@@ -133,38 +141,42 @@ namespace CZToolKit
         {
             if (startIndex >= endIndex)
                 return false;
-            T middle = original[startIndex + (endIndex - startIndex) / 2];
-            int less = startIndex;
-            int greater = endIndex;
-            bool changed = false;
-            while (true)
+            
+            var pivot = original[startIndex + (endIndex - startIndex) / 2];
+            int left = startIndex;
+            int right = endIndex;
+            var changed = false;
+            while (left <= right)
             {
-                while (less < greater && comparer.Compare(original[less], middle) < 0)
+                while (comparer.Compare(original[left], pivot) < 0)
                 {
-                    less++;
+                    left++;
                 }
 
-                while (greater > less && comparer.Compare(original[greater], middle) > 0)
+                while (comparer.Compare(original[right], pivot) > 0)
                 {
-                    greater--;
+                    right--;
                 }
 
-                if (less >= greater) break;
-
-                var lr = comparer.Compare(original[less], original[greater]);
-                if (lr == 0)
+                if (left <= right)
                 {
-                    less++;
-                    greater--;
-                    continue;
+                    (original[left], original[right]) = (original[right], original[left]);
+                    left++;
+                    right--;
+                    changed = true;
                 }
-
-                (original[less], original[greater]) = (original[greater], original[less]);
-                changed = true;
             }
 
-            changed |= QuickSort(original, startIndex, less, comparer);
-            changed |= QuickSort(original, less + 1, endIndex, comparer);
+            if (startIndex < right)
+            {
+                changed |= QuickSort(original, startIndex, right, comparer);
+            }
+
+            if (left < endIndex)
+            {
+                changed |= QuickSort(original, left, endIndex, comparer);
+            }
+
             return changed;
         }
 
@@ -172,37 +184,41 @@ namespace CZToolKit
         {
             if (startIndex >= endIndex)
                 return false;
-            T middle = original[startIndex + (endIndex - startIndex) / 2];
-            int less = startIndex;
-            int greater = endIndex;
+            T pivot = original[startIndex + (endIndex - startIndex) / 2];
+            int left = startIndex;
+            int right = endIndex;
             bool changed = false;
-            while (true)
+            while (left <= right)
             {
-                while (less < greater && comparer(original[less], middle) < 0)
+                while (comparer(original[left], pivot) < 0)
                 {
-                    less++;
+                    left++;
                 }
 
-                while (greater > less && comparer(original[greater], middle) > 0)
+                while (comparer(original[right], pivot) > 0)
                 {
-                    greater--;
+                    right--;
                 }
 
-                if (less >= greater) break;
-
-                var lr = comparer(original[less], original[greater]);
-                if (lr == 0)
+                if (left <= right)
                 {
-                    greater--;
-                    continue;
+                    (original[left], original[right]) = (original[right], original[left]);
+                    left++;
+                    right--;
+                    changed = true;
                 }
-
-                (original[less], original[greater]) = (original[greater], original[less]);
-                changed = true;
             }
 
-            changed |= QuickSort(original, startIndex, less, comparer);
-            changed |= QuickSort(original, less + 1, endIndex, comparer);
+            if (startIndex < right)
+            {
+                changed |= QuickSort(original, startIndex, right, comparer);
+            }
+
+            if (left < endIndex)
+            {
+                changed |= QuickSort(original, left, endIndex, comparer);
+            }
+
             return changed;
         }
     }
