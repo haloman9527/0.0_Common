@@ -3,9 +3,9 @@
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
- *  
+ *
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
@@ -25,7 +25,8 @@ namespace CZToolKit
     public static class ViewModelFactory
     {
         private static bool s_Initialized;
-        private static Dictionary<Type, Type> s_ViewModelTypeCache;
+        private static Dictionary<Type, Type> s_ViewModelTypes;
+        private static Dictionary<Type, IViewModelFactory> s_ViewModelFactories;
 
         static ViewModelFactory()
         {
@@ -37,20 +38,49 @@ namespace CZToolKit
             if (!force && s_Initialized)
                 return;
 
-            if (s_ViewModelTypeCache == null)
-                s_ViewModelTypeCache = new Dictionary<Type, Type>();
+            if (s_ViewModelTypes == null)
+            {
+                s_ViewModelTypes = new Dictionary<Type, Type>();
+            }
             else
-                s_ViewModelTypeCache.Clear();
+            {
+                s_ViewModelTypes.Clear();
+            }
 
             foreach (var type in Util_TypeCache.GetTypesWithAttribute<ViewModelAttribute>())
             {
                 if (type.IsAbstract)
+                {
                     continue;
+                }
+
                 if (type.IsGenericType)
+                {
                     continue;
-                
+                }
+
                 var attribute = type.GetCustomAttribute<ViewModelAttribute>(true);
-                s_ViewModelTypeCache[attribute.modelType] = type;
+                s_ViewModelTypes.Add(attribute.modelType, type);
+            }
+
+            if (s_ViewModelFactories == null)
+            {
+                s_ViewModelFactories = new Dictionary<Type, IViewModelFactory>();
+            }
+            else
+            {
+                s_ViewModelFactories.Clear();
+            }
+            
+            foreach (var type in Util_TypeCache.GetTypesWithAttribute<ViewModelAttribute>())
+            {
+                if (type.IsAbstract)
+                {
+                    continue;
+                }
+
+                var attribute = type.GetCustomAttribute<ViewModelAttribute>(true);
+                s_ViewModelFactories[attribute.modelType] = (IViewModelFactory)Activator.CreateInstance(type);
             }
 
             s_Initialized = true;
@@ -58,43 +88,62 @@ namespace CZToolKit
 
         public static Type GetViewModelType(Type modelType)
         {
-            if (modelType == null)
+            var viewModelType = (Type)null;
+            while (modelType != null && !s_ViewModelTypes.TryGetValue(modelType, out viewModelType))
             {
-                return null;
-            }
-
-            if (!s_ViewModelTypeCache.TryGetValue(modelType, out var viewModelType))
-            {
-                var sourceModelType = modelType;
-                do
-                {
-                    modelType = modelType.BaseType;
-                } while (modelType != null && !s_ViewModelTypeCache.TryGetValue(modelType, out viewModelType));
-
-                s_ViewModelTypeCache.Add(sourceModelType, viewModelType);
+                modelType = modelType.BaseType;
             }
 
             return viewModelType;
         }
 
+        public static IViewModelFactory GetViewModelFactory(Type modelType)
+        {
+            var factory = (IViewModelFactory)null;
+            while (modelType != null && !s_ViewModelFactories.TryGetValue(modelType, out factory))
+            {
+                modelType = modelType.BaseType;
+            }
+
+            return factory;
+        }
+
         public static object CreateViewModel(object model)
         {
             var modelType = model.GetType();
-            var viewModelType = GetViewModelType(modelType);
-            if (viewModelType == null)
-                return null;
 
-            return Activator.CreateInstance(viewModelType, model);
+            var factory = GetViewModelFactory(modelType);
+            if (factory != null)
+            {
+                var viewModel = factory.CreateViewModel(model);
+                (viewModel as IViewModel)?.SetUp(model);
+                return viewModel;
+            }
+            
+            var viewModelType = GetViewModelType(modelType);
+            if (viewModelType != null)
+            {
+                var viewModel = Activator.CreateInstance(viewModelType, model);
+                (viewModel as IViewModel)?.SetUp(model);
+                return viewModel;
+            }
+            
+            return null;
         }
 
         public static object CreateViewModel(object model, params object[] parameters)
         {
             var modelType = model.GetType();
+            
             var viewModelType = GetViewModelType(modelType);
-            if (viewModelType == null)
-                return null;
+            if (viewModelType != null)
+            {
+                var viewModel = Activator.CreateInstance(viewModelType, model, parameters);
+                (viewModel as IViewModel)?.SetUp(model);
+                return viewModel;
+            }
 
-            return Activator.CreateInstance(viewModelType, model, parameters);
+            return null;
         }
     }
 }

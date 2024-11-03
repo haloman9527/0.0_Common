@@ -28,21 +28,16 @@ namespace CZToolKitEditor
 {
     public class ObjectEditor
     {
-        public object Target { get; private set; }
-
         public ObjectInspectorEditor SourceEditor { get; private set; }
 
+        public ObjectInspector Source => (ObjectInspector)SourceEditor.target;
+
+        public object Target => Source.target;
+        
         public MonoScript Script { get; private set; }
 
-        void Initialize(object target)
+        void Initialize(ObjectInspectorEditor sourceEditor)
         {
-            Target = target;
-            Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
-        }
-
-        void Initialize(object target, ObjectInspectorEditor sourceEditor)
-        {
-            Target = target;
             SourceEditor = sourceEditor;
             Script = EditorUtilityExtension.FindScriptFromType(Target.GetType());
         }
@@ -153,15 +148,16 @@ namespace CZToolKitEditor
             return false;
         }
 
-        public static ObjectEditor CreateEditor(object target, ObjectInspectorEditor sourceEditor)
+        public static ObjectEditor CreateEditor(ObjectInspectorEditor sourceEditor)
         {
-            var editorType = GetEditorType(target.GetType());
+            var objectInspector = (ObjectInspector)sourceEditor.target;
+            var editorType = GetEditorType(objectInspector.target.GetType());
             if (editorType == null)
                 editorType = typeof(ObjectEditor);
             var objectEditor = Activator.CreateInstance(editorType, true) as ObjectEditor;
             if (objectEditor == null)
                 return null;
-            objectEditor.Initialize(target, sourceEditor);
+            objectEditor.Initialize(sourceEditor);
             return objectEditor;
         }
 

@@ -24,8 +24,12 @@ namespace CZToolKit
 {
     public delegate ref V RefFunc<V>();
 
-    public interface IViewModel : INotifyPropertyChanged
+    public interface IViewModel
     {
+        void SetUp(object model);
+
+        void Reset();
+        
         int Count { get; }
 
         IReadOnlyDictionary<string, IBindableProperty> Properties { get; }
@@ -55,7 +59,7 @@ namespace CZToolKit
         void NotifyPropertyChanged(string propertyName);
     }
 
-    public class ViewModel : IViewModel
+    public class ViewModel : IViewModel, INotifyPropertyChanged
     {
         private readonly Dictionary<string, IBindableProperty> bindableProperties = new Dictionary<string, IBindableProperty>();
 
@@ -64,6 +68,16 @@ namespace CZToolKit
         public int Count => bindableProperties.Count;
 
         public IReadOnlyDictionary<string, IBindableProperty> Properties => bindableProperties;
+
+        public virtual void SetUp(object model)
+        {
+            
+        }
+
+        public virtual void Reset()
+        {
+            
+        }
 
         public bool Contains(string propertyName)
         {

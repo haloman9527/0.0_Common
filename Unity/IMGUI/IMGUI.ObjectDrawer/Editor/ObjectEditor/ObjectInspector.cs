@@ -83,7 +83,7 @@ namespace CZToolKitEditor
                 return;
             }
             
-            ObjectEditor = ObjectEditor.CreateEditor(ispectorObject.target, this);
+            ObjectEditor = ObjectEditor.CreateEditor(this);
             string title = ObjectEditor?.GetTitle();
             if (!string.IsNullOrEmpty(title))
                 ispectorObject.name = title;
