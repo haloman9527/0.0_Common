@@ -95,20 +95,5 @@ namespace CZToolKit
             
             return null;
         }
-
-        public static object CreateViewModel(object model, params object[] parameters)
-        {
-            var modelType = model.GetType();
-            
-            var viewModelType = GetViewModelType(modelType);
-            if (viewModelType != null)
-            {
-                var viewModel = Activator.CreateInstance(viewModelType, model, parameters);
-                (viewModel as ViewModel)?.SetUp(model);
-                return viewModel;
-            }
-
-            return null;
-        }
     }
 }
