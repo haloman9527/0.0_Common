@@ -22,12 +22,6 @@ namespace CZToolKit.SharedVariable
     {
         public SharedInt() : base() { }
 
-        public SharedInt(int _value) : base(_value) { }
-
-        public override object Clone()
-        {
-            SharedInt variable = new SharedInt(Value) { GUID = this.GUID };
-            return variable;
-        }
+        public SharedInt(int v) : base(v) { }
     }
 }

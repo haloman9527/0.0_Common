@@ -23,12 +23,6 @@ namespace CZToolKit.SharedVariable
     {
         public SharedTransform() : base() { }
 
-        public SharedTransform(Transform _value) : base(_value) { }
-
-        public override object Clone()
-        {
-            SharedTransform variable = new SharedTransform(Value) { GUID = this.GUID };
-            return variable;
-        }
+        public SharedTransform(Transform v) : base(v) { }
     }
 }

@@ -1,10 +1,11 @@
 #region 注 释
+
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
- *  
+ *
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
@@ -12,141 +13,65 @@
  *  Blog: https://www.haloman.net/
  *
  */
+
 #endregion
+
 using System;
 using UnityEngine;
 
 namespace CZToolKit.SharedVariable
 {
     [Serializable]
-    [SharedVariable]
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.HideReferenceObjectPicker]
 #endif
-    public abstract class SharedVariable : ICloneable
+    public abstract class SharedVariable
     {
-        [SerializeField, HideInInspector]
-        protected string guid;
+        [SerializeField, HideInInspector] protected long id = Snowflake.BaseUTC2020.NextId();
 
-        [NonSerialized]
-        IVariableOwner variableOwner;
-
-        public string GUID
+        public long Id
         {
-            get { return this.guid; }
-            protected set { this.guid = value; }
+            get => this.id;
+            protected set => this.id = value;
         }
 
-        public IVariableOwner VariableOwner
+        public IVariableOwner Owner { get; protected set; }
+
+        public void SetVariableOwner(IVariableOwner owner)
         {
-            get { return variableOwner; }
-            protected set { variableOwner = value; }
+            this.Owner = owner;
         }
-
-        public SharedVariable() { guid = Guid.NewGuid().ToString(); }
-
-        public SharedVariable(string _guid) { guid = _guid; }
-
-        public virtual void InitializePropertyMapping(IVariableOwner _variableOwner) { }
-
-        public abstract object GetValue();
-
-        public abstract void SetValue(object value);
-
-        public abstract Type GetValueType();
-
-        public abstract object Clone();
     }
 
     [Serializable]
-    public abstract class SharedVariable<T> : SharedVariable
+    public class SharedVariable<T> : SharedVariable
     {
-        [SerializeField]
-        protected T value;
-
-        [NonSerialized]
-        Func<T> getter;
-        [NonSerialized]
-        Action<T> setter;
+        [SerializeField] protected T value;
 
         public T Value
         {
-            get
-            {
-                return this.getter == null ? this.value : this.getter();
-            }
+            get { return (this.Owner != null && this.Owner.VariableSource != null && this.Owner.VariableSource.TryGetValue(this.Id, out T v)) ? v : value; }
             set
             {
-                if (this.setter != null)
-                    this.setter(value);
-                else
-                    this.value = value;
-            }
-        }
-
-        protected SharedVariable() : base() { value = default; }
-
-        public SharedVariable(string _guid) : base(_guid) { value = default; }
-
-        public SharedVariable(T _value) : base() { value = _value; }
-
-        public override void InitializePropertyMapping(IVariableOwner _variableOwner)
-        {
-            VariableOwner = _variableOwner;
-            if (VariableOwner == null)
-            {
-                getter = null;
-                setter = null;
-                return;
-            }
-
-            getter = () =>
-            {
-                SharedVariable<T> variable = _variableOwner.GetVariable(GUID) as SharedVariable<T>;
-                if (variable != null) { return variable.Value; }
-                return value;
-            };
-            setter = _value =>
-            {
-                SharedVariable variable = VariableOwner.GetVariable(GUID);
-                if (variable == null)
+                if (this.Owner != null && this.Owner.VariableSource != null)
                 {
-                    variable = this.Clone() as SharedVariable;
-                    VariableOwner.SetVariable(variable);
+                    this.Owner.VariableSource.SetValue(this.id, value);
                 }
-                variable.SetValue(_value);
-            };
-        }
-
-        public override object GetValue()
-        {
-            if (getter != null)
-                return getter();
-            else
-                return value;
-        }
-
-        public override void SetValue(object _value)
-        {
-            if (setter != null)
-                setter((T)_value);
-            else
-                value = (T)_value;
-        }
-
-        public override Type GetValueType() { return typeof(T); }
-
-        public override string ToString()
-        {
-            string result;
-            if (Value == null)
-                result = "(null)";
-            else
-            {
-                T value = this.Value;
-                result = value.ToString();
+                else
+                {
+                    this.value = value;
+                }
             }
-            return result;
+        }
+
+        public SharedVariable()
+        {
+            
+        }
+
+        public SharedVariable(T v)
+        {
+            this.value = v;
         }
     }
 }

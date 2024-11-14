@@ -34,9 +34,7 @@ namespace CZToolKit.SharedVariable
     {
         protected SharedObjectList() { }
 
-        protected SharedObjectList(string _guid) : base(_guid) { }
-
-        protected SharedObjectList(List<T> _value) : base(_value) { }
+        protected SharedObjectList(List<T> v) : base(v) { }
 
         public Type GetElementType()
         {
@@ -50,13 +48,13 @@ namespace CZToolKit.SharedVariable
 
         public void FillList(List<UnityObject> _other)
         {
-            if (VariableOwner != null && VariableOwner.GetVariable(GUID) == null)
-                VariableOwner.SetVariable(this.Clone() as SharedVariable);
-            Value.Clear();
-            foreach (var item in _other)
-            {
-                Value.Add(item as T);
-            }
+            // if (VariableOwner != null && VariableOwner.GetVariable(GUID) == null)
+            //     VariableOwner.SetVariable(this.Clone() as SharedVariable);
+            // Value.Clear();
+            // foreach (var item in _other)
+            // {
+            //     Value.Add(item as T);
+            // }
         }
     }
 }

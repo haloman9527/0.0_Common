@@ -203,4 +203,9 @@ namespace CZToolKit
             }
         }
     }
+
+    public partial class Snowflake
+    {
+        public static Snowflake BaseUTC2020 = new Snowflake(0, new UtcMSDateTimeProvider(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+    }
 }

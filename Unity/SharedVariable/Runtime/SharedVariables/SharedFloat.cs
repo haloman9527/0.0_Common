@@ -22,12 +22,6 @@ namespace CZToolKit.SharedVariable
     {
         public SharedFloat() : base() { }
 
-        public SharedFloat(float _value) : base(_value) { }
-
-        public override object Clone()
-        {
-            SharedFloat variable = new SharedFloat(Value) { GUID = this.GUID };
-            return variable;
-        }
+        public SharedFloat(float v) : base(v) { }
     }
 }

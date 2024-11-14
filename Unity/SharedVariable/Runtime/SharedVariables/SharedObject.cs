@@ -31,9 +31,7 @@ namespace CZToolKit.SharedVariable
     {
         protected SharedObject() { }
 
-        protected SharedObject(string _guid) : base(_guid) { }
-
-        protected SharedObject(T _value) : base(_value) { }
+        protected SharedObject(T v) : base(v) { }
 
         public UnityObject GetObject()
         {

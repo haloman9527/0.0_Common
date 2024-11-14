@@ -44,12 +44,31 @@ namespace CZToolKit
 
     public static partial class ObjectPools
     {
+        private static bool s_Initialized;
         private static Dictionary<Type, IObjectPool> s_Pools;
 
         static ObjectPools()
         {
+            Init(true);
+        }
+
+        public static void Init(bool force = false)
+        {
+            if (s_Initialized && !force)
+            {
+                return;
+            }
+
+            if (s_Pools == null)
+            {
+                s_Pools = new Dictionary<Type, IObjectPool>();
+            }
+            else
+            {
+                s_Pools.Clear();
+            }
+
             var baseType = typeof(IObjectPool);
-            s_Pools = new Dictionary<Type, IObjectPool>();
             foreach (var type in Util_TypeCache.AllTypes)
             {
                 if (!baseType.IsAssignableFrom(type))

@@ -23,12 +23,6 @@ namespace CZToolKit.SharedVariable
     {
         public SharedVector2() : base() { }
 
-        public SharedVector2(Vector2 _value) : base(_value) { }
-
-        public override object Clone()
-        {
-            SharedVector2 variable = new SharedVector2(Value) { GUID = this.GUID };
-            return variable;
-        }
+        public SharedVector2(Vector2 v) : base(v) { }
     }
 }

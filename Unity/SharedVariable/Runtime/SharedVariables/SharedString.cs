@@ -22,12 +22,6 @@ namespace CZToolKit.SharedVariable
     {
         public SharedString() : base() { }
 
-        public SharedString(string _value) : base(_value) { }
-
-        public override object Clone()
-        {
-            SharedString variable = new SharedString(Value) { GUID = this.GUID };
-            return variable;
-        }
+        public SharedString(string v) : base(v) { }
     }
 }

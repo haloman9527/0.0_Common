@@ -19,166 +19,80 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace CZToolKit
 {
-    public delegate ref V RefFunc<V>();
-
-    public interface IViewModel
+    public class ViewModel : INotifyPropertyChanged
     {
-        void SetUp(object model);
-
-        void Reset();
-        
-        int Count { get; }
-
-        IReadOnlyDictionary<string, IBindableProperty> Properties { get; }
-
-        bool Contains(string propertyName);
-
-        IBindableProperty GetProperty(string propertyName);
-
-        IBindableProperty<T> GetProperty<T>(string propertyName);
-
-        bool TryGetProperty(string propertyName, out IBindableProperty property);
-
-        bool TryGetProperty<T>(string propertyName, out IBindableProperty<T> property);
-        
-        void RegisterProperty(string propertyName, IBindableProperty property);
-
-        void RegisterProperty<T>(string propertyName, Func<T> getter = null, Action<T> setter = null);
-        
-        void RegisterProperty<T>(string propertyName, RefFunc<T> getter);
-        
-        void UnregisterProperty(string propertyName);
-
-        T GetPropertyValue<T>(string propertyName);
-
-        void SetPropertyValue<T>(string propertyName, T value);
-
-        void NotifyPropertyChanged(string propertyName);
-    }
-
-    public class ViewModel : IViewModel, INotifyPropertyChanged
-    {
-        private readonly Dictionary<string, IBindableProperty> bindableProperties = new Dictionary<string, IBindableProperty>();
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public int Count => bindableProperties.Count;
+        private Events<string> Events { get; } = new Events<string>();
 
-        public IReadOnlyDictionary<string, IBindableProperty> Properties => bindableProperties;
+        /// <summary>
+        /// 只在属性中调用
+        /// </summary>
+        /// <param name="field"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected ref T GetFieldValue<T>(ref T field)
+        {
+            return ref field;
+        }
+
+        /// <summary>
+        /// 只在属性中调用
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyName"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        protected bool SetFieldValue<T>(ref T field, T value, string propertyName)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+            {
+                return false;
+            }
+
+            var oldValue = field;
+            field = value;
+            Events.Publish(propertyName, oldValue, value);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            OnPropertyChanged(propertyName);
+            return true;
+        }
 
         public virtual void SetUp(object model)
         {
-            
-        }
-
-        public virtual void Reset()
-        {
-            
-        }
-
-        public bool Contains(string propertyName)
-        {
-            return bindableProperties.ContainsKey(propertyName);
-        }
-
-        public bool TryGetProperty(string propertyName, out IBindableProperty property)
-        {
-            if (bindableProperties == null)
-            {
-                property = null;
-                return false;
-            }
-
-            return bindableProperties.TryGetValue(propertyName, out property);
-        }
-
-        public bool TryGetProperty<T>(string propertyName, out IBindableProperty<T> property)
-        {
-            if (!bindableProperties.TryGetValue(propertyName, out var tempProperty))
-            {
-                property = null;
-                return false;
-            }
-
-            property = tempProperty as IBindableProperty<T>;
-            return property != null;
-        }
-
-        public IBindableProperty GetProperty(string propertyName)
-        {
-            if (!bindableProperties.TryGetValue(propertyName, out var property))
-            {
-                return null;
-            }
-
-            return property;
-        }
-
-        public IBindableProperty<T> GetProperty<T>(string propertyName)
-        {
-            if (!bindableProperties.TryGetValue(propertyName, out var property))
-            {
-                return null;
-            }
-
-            return property as IBindableProperty<T>;
-        }
-
-        public void RegisterProperty(string propertyName, IBindableProperty property)
-        {
-            bindableProperties.Add(propertyName, property);
-        }
-
-        public void RegisterProperty<T>(string propertyName, Func<T> getter = null, Action<T> setter = null)
-        {
-            bindableProperties.Add(propertyName, new BindableProperty<T>(getter, setter));
-        }
-
-        public void RegisterProperty<T>(string propertyName, RefFunc<T> getter)
-        {
-            bindableProperties.Add(propertyName, new BindableProperty<T>(() => getter(), v => getter() = v));
-        }
-
-        public void UnregisterProperty(string propertyName)
-        {
-            if (!bindableProperties.TryGetValue(propertyName, out var property))
-            {
-                return;
-            }
-
-            property.Dispose();
-            bindableProperties.Remove(propertyName);
-        }
-
-        public T GetPropertyValue<T>(string propertyName)
-        {
-            return GetProperty<T>(propertyName).Value;
-        }
-
-        public void SetPropertyValue<T>(string propertyName, T value)
-        {
-            var property = GetProperty<T>(propertyName);
-            if (!property.SetValue(value))
-            {
-                return;
-            }
-            
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            OnPropertyChanged(propertyName);
-        }
-
-        public void NotifyPropertyChanged(string propertyName)
-        {
-            GetProperty(propertyName)?.NotifyValueChanged();
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            OnPropertyChanged(propertyName);
         }
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
+        }
+
+        public void RegisterValueChanged<T>(string name, Action<T, T> valueChangedCallback)
+        {
+            Events.Subscribe(name, valueChangedCallback);
+        }
+
+        public void UnregisterValueChanged<T>(string name, Action<T, T> valueChangedCallback)
+        {
+            Events.Unsubscribe(name, valueChangedCallback);
+        }
+
+        public void UnregisterAllValueChanged(string name)
+        {
+            Events.Remove(name);
+        }
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }
