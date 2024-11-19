@@ -46,12 +46,7 @@ namespace CZToolKit
     {
         private static bool s_Initialized;
         private static Dictionary<Type, IObjectPool> s_Pools;
-
-        static ObjectPools()
-        {
-            Init(true);
-        }
-
+        
         public static void Init(bool force = false)
         {
             if (s_Initialized && !force)
@@ -89,6 +84,8 @@ namespace CZToolKit
 
         private static IObjectPool GetOrCreatePool(Type unitType)
         {
+            Init();
+            
             if (!s_Pools.TryGetValue(unitType, out var pool))
             {
                 var poolType = typeof(ObjectPool<>).MakeGenericType(unitType);
@@ -100,6 +97,8 @@ namespace CZToolKit
 
         private static IObjectPool<T> GetOrCreatePool<T>() where T : class, new()
         {
+            Init();
+
             var unitType = typeof(T);
             if (!s_Pools.TryGetValue(unitType, out var pool))
             {
@@ -111,16 +110,22 @@ namespace CZToolKit
 
         public static IObjectPool GetPool(Type unitType)
         {
+            Init();
+
             return s_Pools.GetValueOrDefault(unitType);
         }
 
         public static void RegisterPool(IObjectPool pool)
         {
+            Init();
+
             s_Pools.Add(pool.UnitType, pool);
         }
 
         public static void ReleasePool(Type unitType)
         {
+            Init();
+
             var pool = GetPool(unitType);
             if (pool == null)
                 return;
@@ -131,6 +136,8 @@ namespace CZToolKit
 
         public static T Spawn<T>() where T : class, new()
         {
+            Init();
+
             var unit = GetOrCreatePool<T>().Spawn();
             if (unit is IPoolableObject poolableObject)
             {
@@ -142,6 +149,8 @@ namespace CZToolKit
 
         public static object Spawn(Type unitType)
         {
+            Init();
+
             if (!unitType.IsClass)
             {
                 throw new TypeAccessException($"{unitType}不是引用类型");
@@ -158,6 +167,8 @@ namespace CZToolKit
 
         public static void Recycle(Type unitType, object unit)
         {
+            Init();
+
             if (!unitType.IsClass)
             {
                 throw new TypeAccessException($"{unitType}不是引用类型");
@@ -177,6 +188,8 @@ namespace CZToolKit
 
         public static void Recycle(object unit)
         {
+            Init();
+
             Recycle(unit.GetType(), unit);
         }
     }
