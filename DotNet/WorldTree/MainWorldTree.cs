@@ -1,5 +1,5 @@
 ﻿
-namespace CZToolKit
+namespace Jiange
 {
     public class MainWorldTree : Singleton<MainWorldTree>, ISingletonAwake, ISingletonDestory, ISingletonFixedUpdate, ISingletonUpdate, ISingletonLateUpdate
     {

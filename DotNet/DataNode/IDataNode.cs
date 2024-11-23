@@ -7,9 +7,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CZToolKit;
+using Jiange;
 
-namespace CZToolKit.GameFramework.DataNode
+namespace Jiange.GameFramework.DataNode
 {
     /// <summary>
     /// 数据结点接口。

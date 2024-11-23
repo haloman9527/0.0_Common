@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CZToolKit
+namespace Jiange
 {
     public class WorldTreePreviewRoot : MonoBehaviour
     {

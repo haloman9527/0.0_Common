@@ -21,7 +21,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public abstract class PropertyDrawer
     {
@@ -103,7 +103,7 @@ namespace CZToolKitEditor
 
             foreach (var type in TypeCache.GetTypesDerivedFrom<PropertyDrawer>())
             {
-                foreach (var attr in CZToolKit.Util_Reflection.GetTypeAttributes<CustomPropertyDrawerAttribute>(type, false))
+                foreach (var attr in Jiange.Util_Reflection.GetTypeAttributes<CustomPropertyDrawerAttribute>(type, false))
                 {
                      ObjectEditorTypeCache[attr.type] = type;
                 }

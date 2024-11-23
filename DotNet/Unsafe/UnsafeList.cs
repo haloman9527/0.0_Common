@@ -1,7 +1,7 @@
 ﻿using System;
 using Unity.Collections;
 
-namespace CZToolKit.UnsafeEx
+namespace Jiange.UnsafeEx
 {
     public unsafe struct UnsafeList<T> : IDisposable where T : unmanaged
     {

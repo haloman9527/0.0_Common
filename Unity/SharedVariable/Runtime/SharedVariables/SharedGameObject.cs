@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace CZToolKit.SharedVariable
+namespace Jiange.SharedVariable
 {
     [Serializable]
     public class SharedGameObject : SharedObject<GameObject>

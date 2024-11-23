@@ -15,11 +15,11 @@
 #endregion
 #if UNITY_EDITOR
 using System.Collections;
-using CZToolKit.EditorCoroutine;
+using Jiange.EditorCoroutine;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public abstract class BaseEditorWindow : EditorWindow
     {

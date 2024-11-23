@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit
+namespace Jiange
 {
     public enum BinaryTreeNodeType
     {

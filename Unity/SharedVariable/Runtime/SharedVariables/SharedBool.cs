@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit.SharedVariable
+namespace Jiange.SharedVariable
 {
     [Serializable]
     public class SharedBool : SharedVariable<bool>

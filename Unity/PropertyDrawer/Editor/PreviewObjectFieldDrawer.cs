@@ -18,7 +18,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Attributes.Editors
+namespace Jiange.Attributes.Editors
 {
     [CustomPropertyDrawer(typeof(PreviewObjectFieldAttribute), true)]
     public class PreviewObjectFieldDrawer : PropertyDrawer

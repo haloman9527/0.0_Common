@@ -18,7 +18,7 @@ using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.EditorCoroutine
+namespace Jiange.EditorCoroutine
 {
     [InitializeOnLoad]
     public class GlobalEditorCoroutineService

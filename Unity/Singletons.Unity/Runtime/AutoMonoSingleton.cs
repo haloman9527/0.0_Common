@@ -18,7 +18,7 @@
 
 using UnityEngine;
 
-namespace CZToolKit.Unity
+namespace Jiange.Unity
 {
     public class AutoMonoSingleton<T> : MonoBehaviour, ISingleton where T : AutoMonoSingleton<T>
     {

@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public static partial class EditorGUIExtension
     {

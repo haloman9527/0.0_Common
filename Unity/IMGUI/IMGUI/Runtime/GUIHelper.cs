@@ -16,7 +16,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CZToolKit
+namespace Jiange
 {
     public static class GUIHelper
     {

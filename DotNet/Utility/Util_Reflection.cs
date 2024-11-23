@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CZToolKit
+namespace Jiange
 {
     public static class Util_Reflection
     {

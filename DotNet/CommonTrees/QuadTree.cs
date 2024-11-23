@@ -18,7 +18,7 @@
 
 using System;
 
-namespace CZToolKit
+namespace Jiange
 {
     public enum QuadTreeNodeType
     {

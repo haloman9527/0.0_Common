@@ -1,13 +1,15 @@
 #if UNITY_EDITOR
-using CZToolKitEditor.IMGUI.Controls;
+using JiangeEditor.IMGUI.Controls;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.UIElements;
-using TreeView = CZToolKitEditor.IMGUI.Controls.TreeView;
+using TreeView = JiangeEditor.IMGUI.Controls.TreeView;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
+    using TreeView = IMGUI.Controls.TreeView;
+
     public abstract class MenuEditorWindow : EditorWindow
     {
         public bool showMenu = true;

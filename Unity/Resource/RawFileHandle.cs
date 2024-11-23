@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CZToolKit
+namespace Jiange
 {
     public abstract class RawFileHandle : HandleBase
     {

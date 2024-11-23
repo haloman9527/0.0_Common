@@ -18,8 +18,9 @@
 
 using System;
 using System.Collections.Generic;
+using Jiange;
 
-namespace CZToolKit.Blackboard
+namespace Jiange.Blackboard
 {
     public enum NotifyType
     {

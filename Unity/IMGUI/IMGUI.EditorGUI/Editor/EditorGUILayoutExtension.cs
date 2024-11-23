@@ -17,11 +17,11 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.AnimatedValues;
-using CZToolKit;
+using Jiange;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public static partial class EditorGUILayoutExtension
     {

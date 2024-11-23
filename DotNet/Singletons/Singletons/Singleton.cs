@@ -18,7 +18,7 @@
 
 using System;
 
-namespace CZToolKit
+namespace Jiange
 {
     [Serializable]
     public abstract class Singleton<T> : ISingleton where T : Singleton<T>

@@ -20,7 +20,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public static partial class EditorGUIExtension
     {

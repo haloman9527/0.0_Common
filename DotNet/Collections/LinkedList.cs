@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace CZToolKit.Collections
+namespace Jiange.Collections
 {
     /// <summary>游戏框架链表类。</summary>
     /// <typeparam name="T">指定链表的元素类型。</typeparam>

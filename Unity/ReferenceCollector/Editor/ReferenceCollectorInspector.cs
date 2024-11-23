@@ -19,13 +19,13 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using CZToolKitEditor;
+using JiangeEditor;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit
+namespace Jiange
 {
     [CustomEditor(typeof(ReferenceCollector))]
     public class UIPanelDataInspector : Editor

@@ -7,8 +7,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Jiange;
 
-namespace CZToolKit.GameFramework.DataNode
+namespace Jiange.GameFramework.DataNode
 {
     public class DataNode : IDataNode
     {

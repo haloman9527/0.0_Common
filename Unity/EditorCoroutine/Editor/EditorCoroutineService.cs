@@ -16,7 +16,7 @@
 #if UNITY_EDITOR
 using System.Collections;
 
-namespace CZToolKit.EditorCoroutine
+namespace Jiange.EditorCoroutine
 {
     public partial class EditorCoroutineService : CoroutineService<EditorCoroutine>
     {

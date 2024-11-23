@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKit.Unity
+namespace Jiange.Unity
 {
     public static class Util_Editor
     {
@@ -66,7 +66,7 @@ namespace CZToolKit.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/CZToolKit/Path Print/DataPath")]
+        [MenuItem("Tools/Jiange/Path Print/DataPath")]
 #endif
         public static void PrintDataPath()
         {
@@ -74,7 +74,7 @@ namespace CZToolKit.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/CZToolKit/Path Print/StreamingAssetsPath")]
+        [MenuItem("Tools/Jiange/Path Print/StreamingAssetsPath")]
 #endif
         public static void PrintStreamingAssetsPath()
         {
@@ -82,7 +82,7 @@ namespace CZToolKit.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/CZToolKit/Path Print/PersistentDataPath")]
+        [MenuItem("Tools/Jiange/Path Print/PersistentDataPath")]
 #endif
         public static void PrintPersistentDataPath()
         {
@@ -90,7 +90,7 @@ namespace CZToolKit.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/CZToolKit/Path Print/TemporaryCachePath")]
+        [MenuItem("Tools/Jiange/Path Print/TemporaryCachePath")]
 #endif
         public static void PrintTemporaryCachePath()
         {
@@ -98,7 +98,7 @@ namespace CZToolKit.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/CZToolKit/Path Print/ComsoleLogPath")]
+        [MenuItem("Tools/Jiange/Path Print/ComsoleLogPath")]
 #endif
         public static void PrintComsoleLogPath()
         {

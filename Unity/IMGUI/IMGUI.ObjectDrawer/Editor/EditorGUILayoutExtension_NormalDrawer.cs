@@ -18,13 +18,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using CZToolKit;
+using Jiange;
 using UnityEditor;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public static partial class EditorGUILayoutExtension
     {
@@ -285,7 +285,7 @@ namespace CZToolKitEditor
             return list;
         }
 
-        const string c_EditorPrefsFoldoutKey = "CZToolKit.Core.Editors.Foldout.";
+        const string c_EditorPrefsFoldoutKey = "Jiange.Core.Editors.Foldout.";
 
         static int currentKeyboardControl = -1;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit
+namespace Jiange
 {
     public abstract class AssetHandle : HandleBase
     {

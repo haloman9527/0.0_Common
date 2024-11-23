@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public static class EditorUtilityExtension
     {

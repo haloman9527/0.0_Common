@@ -19,12 +19,12 @@ using System.Linq;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using CZToolKit;
+using Jiange;
 using UnityEngine;
 using UnityEditor;
 using PropertyAttribute = UnityEngine.PropertyAttribute;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public class SerializedPropertyS
     {

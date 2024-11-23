@@ -22,7 +22,7 @@ using System;
 using UnityEngine;
 using UnityEditor;
 
-namespace CZToolKitEditor.IMGUI.Controls
+namespace JiangeEditor.IMGUI.Controls
 {
     [Serializable]
     public class SplitView

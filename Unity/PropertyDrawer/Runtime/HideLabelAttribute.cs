@@ -15,7 +15,7 @@
 #endregion
 using UnityEngine;
 
-namespace CZToolKit.Attributes
+namespace Jiange.Attributes
 {
     public class HideLabelAttribute : UnityEngine.PropertyAttribute { }
 }

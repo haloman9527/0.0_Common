@@ -19,14 +19,14 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using CZToolKit;
+using Jiange;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityTreeView = UnityEditor.IMGUI.Controls.TreeView;
 using UnityTreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem;
 
-namespace CZToolKitEditor.IMGUI.Controls
+namespace JiangeEditor.IMGUI.Controls
 {
     public class TreeViewItem : UnityTreeViewItem
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace CZToolKit
+namespace Jiange
 {
     /// <summary>
     /// Snowflake 雪花算法

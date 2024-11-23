@@ -17,7 +17,7 @@
 using System;
 using UnityEditor;
 
-namespace CZToolKit.EditorCoroutine
+namespace Jiange.EditorCoroutine
 {
     public class EditorWaitForSeconds : IYield
     {

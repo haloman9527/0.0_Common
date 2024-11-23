@@ -16,13 +16,13 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections;
-using CZToolKit;
+using Jiange;
 using UnityEditor;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public static partial class EditorGUIExtension
     {

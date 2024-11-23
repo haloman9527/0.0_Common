@@ -1,5 +1,5 @@
 
-namespace CZToolKit
+namespace Jiange
 {
     public class AudioManager : Singleton<AudioManager>, IAudioManager
     {

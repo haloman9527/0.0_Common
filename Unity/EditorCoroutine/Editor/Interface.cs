@@ -14,7 +14,7 @@
  */
 #endregion
 
-namespace CZToolKit.EditorCoroutine
+namespace Jiange.EditorCoroutine
 {
     public interface IYield
     {

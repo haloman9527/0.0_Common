@@ -17,7 +17,7 @@
 
 #endregion
 
-namespace CZToolKit
+namespace Jiange
 {
     public interface ICommand
     {

@@ -1,6 +1,6 @@
 ﻿using UnityObject = UnityEngine.Object;
 
-namespace CZToolKit
+namespace Jiange
 {
     public interface IResourceComponent
     {

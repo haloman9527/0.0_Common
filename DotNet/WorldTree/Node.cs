@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CZToolKit
+namespace Jiange
 {
     [Serializable]
     public class Node : IDisposable

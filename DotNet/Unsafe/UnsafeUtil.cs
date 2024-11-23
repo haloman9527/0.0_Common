@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
-namespace CZToolKit.UnsafeEx
+namespace Jiange.UnsafeEx
 {
     public unsafe static class UnsafeUtil
     {

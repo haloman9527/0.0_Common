@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CZToolKit.Blackboard
+namespace Jiange.Blackboard
 {
     public class Blackboard<TKey> : IBlackboard<TKey>
     {

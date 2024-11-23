@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit
+namespace Jiange
 {
     public enum EasingType
     {

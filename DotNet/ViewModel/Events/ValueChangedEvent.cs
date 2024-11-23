@@ -15,7 +15,7 @@
 
 #endregion
 
-namespace CZToolKit
+namespace Jiange
 {
     public delegate void ValueChangedEvent<in T>(T oldValue, T newValue);
 }

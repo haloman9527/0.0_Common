@@ -19,7 +19,7 @@
 using System;
 using UnityEngine;
 
-namespace CZToolKit.SharedVariable
+namespace Jiange.SharedVariable
 {
     [Serializable]
 #if ODIN_INSPECTOR

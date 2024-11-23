@@ -16,7 +16,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public abstract class BaseEditor : Editor
     {

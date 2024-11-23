@@ -26,7 +26,7 @@ using UnityEngine;
 using UnityAdvancedDropdown = UnityEditor.IMGUI.Controls.AdvancedDropdown;
 using UnityAdvancedDropDownItem = UnityEditor.IMGUI.Controls.AdvancedDropdownItem;
 
-namespace CZToolKitEditor.IMGUI.Controls
+namespace JiangeEditor.IMGUI.Controls
 {
     public class AdvancedDropdownItem : UnityAdvancedDropDownItem
     {

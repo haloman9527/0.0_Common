@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace CZToolKit
+namespace Jiange
 {
     public interface IBindableProperty : IDisposable
     {

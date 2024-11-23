@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Threading.Tasks;
 
-namespace CZToolKit
+namespace Jiange
 {
     public abstract class HandleBase
     {

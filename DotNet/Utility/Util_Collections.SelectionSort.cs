@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CZToolKit
+namespace Jiange
 {
     public static partial class Util_Collections
     {

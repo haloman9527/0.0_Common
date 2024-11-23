@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CZToolKit
+namespace Jiange
 {
     public interface IPoolableObject
     {

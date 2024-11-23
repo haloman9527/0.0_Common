@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 using UnityEditor;
 #endif
 
-namespace CZToolKit
+namespace Jiange
 {
     public class WorldTreeNodePreview : MonoBehaviour
     {

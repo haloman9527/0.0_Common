@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace CZToolKit.SharedVariable
+namespace Jiange.SharedVariable
 {
     [Serializable]
     public class SharedVector3 : SharedVariable<Vector3>

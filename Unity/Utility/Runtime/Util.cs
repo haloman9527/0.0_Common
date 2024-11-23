@@ -17,7 +17,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CZToolKit.Unity
+namespace Jiange.Unity
 {
     public static class Util
     {

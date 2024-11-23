@@ -1,4 +1,4 @@
-﻿namespace CZToolKit.Blackboard
+﻿namespace Jiange.Blackboard
 {
     public interface IBlackboard<TKey>
     {

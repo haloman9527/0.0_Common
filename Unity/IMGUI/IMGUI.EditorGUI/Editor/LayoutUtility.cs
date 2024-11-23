@@ -20,7 +20,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public class LayoutUtility
     {

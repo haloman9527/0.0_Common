@@ -22,9 +22,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using CZToolKit;
+using Jiange;
 
-namespace CZToolKitEditor
+namespace JiangeEditor
 {
     public class ObjectEditor
     {

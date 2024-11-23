@@ -18,7 +18,7 @@
 
 using System;
 
-namespace CZToolKit
+namespace Jiange
 {
     public abstract class AutoSingleton<T> : ISingleton where T : AutoSingleton<T>, new()
     {

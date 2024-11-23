@@ -16,7 +16,7 @@
 using UnityEngine;
 using System;
 
-namespace CZToolKit.Attributes
+namespace Jiange.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class ObjectPreviewButtonAttribute : UnityEngine.PropertyAttribute { }

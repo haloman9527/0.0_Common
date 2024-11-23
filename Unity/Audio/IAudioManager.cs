@@ -1,4 +1,4 @@
-﻿namespace CZToolKit
+﻿namespace Jiange
 {
     public interface IAudioManager
     {
