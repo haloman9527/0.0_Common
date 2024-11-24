@@ -165,7 +165,20 @@ namespace JiangeEditor.IMGUI.Controls
 
     public class IdGenerator : IIdGenerator
     {
+        private int startId;
         private int lastItemId;
+
+        public IdGenerator()
+        {
+            this.lastItemId = 0;
+            this.startId = 0;
+        }
+
+        public IdGenerator(int startId)
+        {
+            this.lastItemId = startId;
+            this.startId = startId;
+        }
 
         public int NextId(object userData)
         {
@@ -174,7 +187,7 @@ namespace JiangeEditor.IMGUI.Controls
 
         public void Reset()
         {
-            lastItemId = 0;
+            this.lastItemId = startId;
         }
     }
 
@@ -694,7 +707,7 @@ namespace JiangeEditor.IMGUI.Controls
 
     public class TreeView : TreeView<TreeViewItem>
     {
-        public override IIdGenerator IdGenerator { get; } = new IdGenerator();
+        public override IIdGenerator IdGenerator { get; } = new IdGenerator(20000);
         
         public TreeView(TreeViewState state) : base(state)
         {
