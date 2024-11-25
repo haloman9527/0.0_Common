@@ -258,6 +258,8 @@ namespace JiangeEditor.IMGUI.Controls
             }
         }
 
+        public int Count => itemMap.Count;
+
         public abstract IIdGenerator IdGenerator { get; }
 
         public TreeView(TreeViewState state) : base(state)
