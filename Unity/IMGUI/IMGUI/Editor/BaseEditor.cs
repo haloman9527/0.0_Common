@@ -16,7 +16,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public abstract class BaseEditor : Editor
     {

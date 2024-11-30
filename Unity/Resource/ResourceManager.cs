@@ -1,6 +1,6 @@
 ﻿using UnityObject = UnityEngine.Object;
 
-namespace Jiange
+namespace Moyo
 {
     public class ResourceManager : Singleton<ResourceManager>, IResourceComponent
     {

@@ -17,7 +17,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Jiange.SharedVariable
+namespace Moyo.SharedVariable
 {
     [Serializable]
     public class SharedGameObjectList : SharedObjectList<GameObject>

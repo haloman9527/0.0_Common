@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Jiange
+namespace Moyo
 {
     public class BindableList<T> : BindableProperty<List<T>>, IList<T>
     {

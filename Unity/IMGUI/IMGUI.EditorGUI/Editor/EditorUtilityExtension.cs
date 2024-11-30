@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public static class EditorUtilityExtension
     {

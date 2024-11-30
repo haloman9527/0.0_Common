@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Jiange
+namespace Moyo
 {
     public interface IPoolableObject
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityObject = UnityEngine.Object;
 
-namespace Jiange
+namespace Moyo
 {
     public abstract class AssetHandle : HandleBase
     {

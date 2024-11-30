@@ -1,7 +1,7 @@
 
 using System;
 
-namespace Jiange
+namespace Moyo
 {
     public enum OctreeNodeType
     {

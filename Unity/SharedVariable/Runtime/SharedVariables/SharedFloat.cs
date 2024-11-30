@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace Jiange.SharedVariable
+namespace Moyo.SharedVariable
 {
     [Serializable]
     public class SharedFloat : SharedVariable<float>

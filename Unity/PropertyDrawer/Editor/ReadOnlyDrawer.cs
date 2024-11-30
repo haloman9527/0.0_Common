@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Jiange.Attributes.Editors
+namespace Moyo.Attributes.Editors
 {
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute), true)]
     public class ReadOnlyDrawer : PropertyDrawer

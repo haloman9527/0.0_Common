@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public static partial class EditorGUIExtension
     {

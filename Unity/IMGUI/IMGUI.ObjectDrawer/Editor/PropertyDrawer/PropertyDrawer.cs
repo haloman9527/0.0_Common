@@ -21,7 +21,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public abstract class PropertyDrawer
     {
@@ -103,7 +103,7 @@ namespace JiangeEditor
 
             foreach (var type in TypeCache.GetTypesDerivedFrom<PropertyDrawer>())
             {
-                foreach (var attr in Jiange.Util_Reflection.GetTypeAttributes<CustomPropertyDrawerAttribute>(type, false))
+                foreach (var attr in Moyo.Util_Reflection.GetTypeAttributes<CustomPropertyDrawerAttribute>(type, false))
                 {
                      ObjectEditorTypeCache[attr.type] = type;
                 }

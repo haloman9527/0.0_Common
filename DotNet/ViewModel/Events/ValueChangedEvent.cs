@@ -15,7 +15,7 @@
 
 #endregion
 
-namespace Jiange
+namespace Moyo
 {
     public delegate void ValueChangedEvent<in T>(T oldValue, T newValue);
 }

@@ -1,4 +1,4 @@
-﻿namespace Jiange.Blackboard
+﻿namespace Moyo.Blackboard
 {
     public interface IBlackboard<TKey>
     {

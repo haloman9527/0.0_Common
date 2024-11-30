@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace Jiange
+namespace Moyo
 {
     public enum EasingType
     {

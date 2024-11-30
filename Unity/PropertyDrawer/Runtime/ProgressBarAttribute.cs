@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace Jiange.Attributes
+namespace Moyo.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
     public class ProgressBarAttribute : UnityEngine.PropertyAttribute

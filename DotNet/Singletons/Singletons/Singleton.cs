@@ -18,7 +18,7 @@
 
 using System;
 
-namespace Jiange
+namespace Moyo
 {
     [Serializable]
     public abstract class Singleton<T> : ISingleton where T : Singleton<T>

@@ -19,7 +19,7 @@ using System.Collections.Generic;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Jiange.SharedVariable
+namespace Moyo.SharedVariable
 {
     public interface ISharedObjectList
     {

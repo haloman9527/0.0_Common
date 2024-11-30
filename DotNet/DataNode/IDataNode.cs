@@ -7,9 +7,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Jiange;
+using Moyo;
 
-namespace Jiange.GameFramework.DataNode
+namespace Moyo.GameFramework.DataNode
 {
     /// <summary>
     /// 数据结点接口。

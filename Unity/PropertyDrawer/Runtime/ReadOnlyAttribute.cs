@@ -16,7 +16,7 @@
 using UnityEngine;
 using System;
 
-namespace Jiange.Attributes
+namespace Moyo.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class ReadOnlyAttribute : UnityEngine.PropertyAttribute { }

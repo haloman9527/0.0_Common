@@ -2,14 +2,14 @@
 using System.Linq;
 using UnityEditor;
 
-namespace Jiange.Editors
+namespace Moyo.Editors
 {
     public class Menus
     {
         public const string WORLD_TREE_PREVIEW_DEFINE = "WORLD_TREE_PREVIEW";
 
 #if HALOMAN
-        [MenuItem("Tools/Jiange/World Tree/Enable World Tree Preview")]
+        [MenuItem("Tools/Moyo/World Tree/Enable World Tree Preview")]
 #endif
         public static void SwitchPreview()
         {
@@ -23,13 +23,13 @@ namespace Jiange.Editors
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Jiange/World Tree/Enable World Tree Preview", validate = true)]
+        [MenuItem("Tools/Moyo/World Tree/Enable World Tree Preview", validate = true)]
 #endif
         public static bool EnablePreviewValid()
         {
             var targetGroup = BuildTargetGroup.Standalone; // 选择目标平台
             var defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup).Split(';').ToList();
-            Menu.SetChecked("Tools/Jiange/World Tree/Enable World Tree Preview", defines.Contains(WORLD_TREE_PREVIEW_DEFINE));
+            Menu.SetChecked("Tools/Moyo/World Tree/Enable World Tree Preview", defines.Contains(WORLD_TREE_PREVIEW_DEFINE));
             return true;
         }
     }

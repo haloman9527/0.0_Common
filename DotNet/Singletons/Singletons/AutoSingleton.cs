@@ -18,7 +18,7 @@
 
 using System;
 
-namespace Jiange
+namespace Moyo
 {
     public abstract class AutoSingleton<T> : ISingleton where T : AutoSingleton<T>, new()
     {

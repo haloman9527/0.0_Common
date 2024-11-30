@@ -16,13 +16,13 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using Jiange;
+using Moyo;
 using UnityEditor;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public static partial class EditorGUIExtension
     {

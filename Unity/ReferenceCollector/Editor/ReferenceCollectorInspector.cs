@@ -19,13 +19,13 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using JiangeEditor;
+using MoyoEditor;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace Jiange
+namespace Moyo
 {
     [CustomEditor(typeof(ReferenceCollector))]
     public class UIPanelDataInspector : Editor

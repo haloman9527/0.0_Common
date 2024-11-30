@@ -22,7 +22,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public class ObjectInspector : ScriptableObject
     {

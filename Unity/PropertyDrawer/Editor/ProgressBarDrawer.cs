@@ -14,11 +14,11 @@
  */
 #endregion
 #if UNITY_EDITOR
-using JiangeEditor;
+using MoyoEditor;
 using UnityEditor;
 using UnityEngine;
 
-namespace Jiange.Attributes.Editors
+namespace Moyo.Attributes.Editors
 {
     [@CustomPropertyDrawer(typeof(ProgressBarAttribute))]
     public class ProgressBarDrawer : UnityEditor.PropertyDrawer

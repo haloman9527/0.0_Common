@@ -19,7 +19,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Jiange.SharedVariable
+namespace Moyo.SharedVariable
 {
     public interface ISharedObject
     {

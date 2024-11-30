@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Jiange
+namespace Moyo
 {
     public class FullBinaryTreeNode
     {

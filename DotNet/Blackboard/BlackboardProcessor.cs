@@ -18,9 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using Jiange;
+using Moyo;
 
-namespace Jiange.Blackboard
+namespace Moyo.Blackboard
 {
     public enum NotifyType
     {

@@ -17,11 +17,11 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.AnimatedValues;
-using Jiange;
+using Moyo;
 
 using UnityObject = UnityEngine.Object;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public static partial class EditorGUILayoutExtension
     {

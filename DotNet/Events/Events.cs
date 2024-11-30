@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Jiange
+namespace Moyo
 {
     public interface IEvent
     {

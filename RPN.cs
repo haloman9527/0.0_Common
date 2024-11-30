@@ -23,7 +23,7 @@ using System.Globalization;
 using System.Text;
 using UnityEngine;
 
-namespace Jiange.RPN
+namespace Moyo.RPN
 {
     public class TextUtil
     {

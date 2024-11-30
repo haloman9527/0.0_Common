@@ -1,6 +1,6 @@
 using System;
 
-namespace Jiange
+namespace Moyo
 {
     /// <summary>
     /// Snowflake 雪花算法

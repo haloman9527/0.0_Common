@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace Jiange.SharedVariable
+namespace Moyo.SharedVariable
 {
     [Serializable]
     public class SharedTransform : SharedObject<Transform>

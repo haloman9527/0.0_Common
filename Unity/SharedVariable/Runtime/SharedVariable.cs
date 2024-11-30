@@ -19,7 +19,7 @@
 using System;
 using UnityEngine;
 
-namespace Jiange.SharedVariable
+namespace Moyo.SharedVariable
 {
     [Serializable]
 #if ODIN_INSPECTOR

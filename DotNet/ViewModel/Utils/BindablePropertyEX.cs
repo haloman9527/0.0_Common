@@ -1,4 +1,4 @@
-﻿namespace Jiange
+﻿namespace Moyo
 {
     public static class BindablePropertyEX
     {

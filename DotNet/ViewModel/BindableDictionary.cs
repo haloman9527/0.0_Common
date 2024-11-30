@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Jiange
+namespace Moyo
 {
     public class BindableDictionary<TKey, TValue> : BindableProperty<Dictionary<TKey, TValue>>
     {

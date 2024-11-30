@@ -22,7 +22,7 @@ using System;
 using UnityEngine;
 using UnityEditor;
 
-namespace JiangeEditor.IMGUI.Controls
+namespace MoyoEditor.IMGUI.Controls
 {
     [Serializable]
     public class SplitView

@@ -1,12 +1,12 @@
 #if UNITY_EDITOR
-using JiangeEditor.IMGUI.Controls;
+using MoyoEditor.IMGUI.Controls;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.UIElements;
-using TreeView = JiangeEditor.IMGUI.Controls.TreeView;
+using TreeView = MoyoEditor.IMGUI.Controls.TreeView;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     using TreeView = IMGUI.Controls.TreeView;
 

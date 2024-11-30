@@ -16,7 +16,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Jiange.EditorCoroutine
+namespace Moyo.EditorCoroutine
 {
     public abstract class CoroutineService<T> where T : class, ICoroutine
     {

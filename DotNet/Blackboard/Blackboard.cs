@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Jiange.Blackboard
+namespace Moyo.Blackboard
 {
     public class Blackboard<TKey> : IBlackboard<TKey>
     {

@@ -19,7 +19,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public static partial class EditorGUILayoutExtension
     {

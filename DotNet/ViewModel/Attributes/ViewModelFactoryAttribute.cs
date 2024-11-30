@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Jiange
+namespace Moyo
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class ViewModelFactoryAttribute : Attribute

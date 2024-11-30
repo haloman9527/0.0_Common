@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace Jiange
+namespace Moyo
 {
     public partial class ULogger : ILogger, UnityEngine.ILogger
     {

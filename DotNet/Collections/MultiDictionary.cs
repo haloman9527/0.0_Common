@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Jiange.Collections
+namespace Moyo.Collections
 {
     /// <summary>游戏框架多值字典类。</summary>
     /// <typeparam name="TKey">指定多值字典的主键类型。</typeparam>

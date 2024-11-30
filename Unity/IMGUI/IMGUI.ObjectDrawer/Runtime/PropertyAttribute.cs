@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace Jiange
+namespace Moyo
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Interface, Inherited = true)]
     public abstract class PropertyAttribute : Attribute { }

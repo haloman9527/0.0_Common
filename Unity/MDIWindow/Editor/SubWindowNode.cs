@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     [Serializable]
     public abstract class SubWindowNode

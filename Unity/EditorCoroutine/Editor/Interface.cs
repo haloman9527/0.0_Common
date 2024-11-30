@@ -14,7 +14,7 @@
  */
 #endregion
 
-namespace Jiange.EditorCoroutine
+namespace Moyo.EditorCoroutine
 {
     public interface IYield
     {

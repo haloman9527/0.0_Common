@@ -17,7 +17,7 @@
 
 #endregion
 
-namespace Jiange
+namespace Moyo
 {
     public interface ICommand
     {

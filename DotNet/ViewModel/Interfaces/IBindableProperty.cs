@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace Jiange
+namespace Moyo
 {
     public interface IBindableProperty : IDisposable
     {

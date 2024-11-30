@@ -1,5 +1,5 @@
 
-namespace Jiange
+namespace Moyo
 {
     public class AudioManager : Singleton<AudioManager>, IAudioManager
     {

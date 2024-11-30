@@ -1,5 +1,5 @@
 ﻿
-namespace Jiange
+namespace Moyo
 {
     public class MainWorldTree : Singleton<MainWorldTree>, ISingletonAwake, ISingletonDestory, ISingletonFixedUpdate, ISingletonUpdate, ISingletonLateUpdate
     {

@@ -17,7 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Jiange.SharedVariable
+namespace Moyo.SharedVariable
 {
     public static class SharedVariableUtility
     {

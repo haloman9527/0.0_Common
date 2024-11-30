@@ -20,7 +20,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public class LayoutUtility
     {

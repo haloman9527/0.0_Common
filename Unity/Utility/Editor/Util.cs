@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Jiange.Unity
+namespace Moyo.Unity
 {
     public static class Util_Editor
     {
@@ -66,7 +66,7 @@ namespace Jiange.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Jiange/Path Print/DataPath")]
+        [MenuItem("Tools/Moyo/Path Print/DataPath")]
 #endif
         public static void PrintDataPath()
         {
@@ -74,7 +74,7 @@ namespace Jiange.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Jiange/Path Print/StreamingAssetsPath")]
+        [MenuItem("Tools/Moyo/Path Print/StreamingAssetsPath")]
 #endif
         public static void PrintStreamingAssetsPath()
         {
@@ -82,7 +82,7 @@ namespace Jiange.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Jiange/Path Print/PersistentDataPath")]
+        [MenuItem("Tools/Moyo/Path Print/PersistentDataPath")]
 #endif
         public static void PrintPersistentDataPath()
         {
@@ -90,7 +90,7 @@ namespace Jiange.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Jiange/Path Print/TemporaryCachePath")]
+        [MenuItem("Tools/Moyo/Path Print/TemporaryCachePath")]
 #endif
         public static void PrintTemporaryCachePath()
         {
@@ -98,7 +98,7 @@ namespace Jiange.Unity
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Jiange/Path Print/ComsoleLogPath")]
+        [MenuItem("Tools/Moyo/Path Print/ComsoleLogPath")]
 #endif
         public static void PrintComsoleLogPath()
         {

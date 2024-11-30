@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Jiange.SharedVariable.Editors
+namespace Moyo.SharedVariable.Editors
 {
     [CustomPropertyDrawer(typeof(SharedVariable), true)]
     public class SharedVariablePropertyDrawer : PropertyDrawer

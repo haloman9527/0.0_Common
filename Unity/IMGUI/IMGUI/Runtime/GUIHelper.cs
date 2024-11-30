@@ -16,7 +16,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Jiange
+namespace Moyo
 {
     public static class GUIHelper
     {

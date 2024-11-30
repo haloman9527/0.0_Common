@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Jiange
+namespace Moyo
 {
     public abstract class RawFileHandle : HandleBase
     {

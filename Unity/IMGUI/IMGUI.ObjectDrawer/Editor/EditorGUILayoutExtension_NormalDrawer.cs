@@ -18,13 +18,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using Jiange;
+using Moyo;
 using UnityEditor;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public static partial class EditorGUILayoutExtension
     {
@@ -285,7 +285,7 @@ namespace JiangeEditor
             return list;
         }
 
-        const string c_EditorPrefsFoldoutKey = "Jiange.Core.Editors.Foldout.";
+        const string c_EditorPrefsFoldoutKey = "Moyo.Core.Editors.Foldout.";
 
         static int currentKeyboardControl = -1;
 

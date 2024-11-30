@@ -18,7 +18,7 @@
 
 using System;
 
-namespace Jiange
+namespace Moyo
 {
     public interface ISingleton : IDisposable
     {

@@ -15,7 +15,7 @@
 #endregion
 using System.Collections.Generic;
 
-namespace Jiange.SharedVariable
+namespace Moyo.SharedVariable
 {
     public interface IVariableOwner
     {

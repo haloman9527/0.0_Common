@@ -18,7 +18,7 @@
 
 using UnityEngine;
 
-namespace Jiange.Unity
+namespace Moyo.Unity
 {
     public class AutoMonoSingleton<T> : MonoBehaviour, ISingleton where T : AutoMonoSingleton<T>
     {

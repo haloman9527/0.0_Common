@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Jiange
+namespace Moyo
 {
     public class WorldTreePreviewRoot : MonoBehaviour
     {

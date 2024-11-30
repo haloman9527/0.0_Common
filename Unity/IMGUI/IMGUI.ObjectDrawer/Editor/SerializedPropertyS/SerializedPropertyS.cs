@@ -19,12 +19,12 @@ using System.Linq;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using Jiange;
+using Moyo;
 using UnityEngine;
 using UnityEditor;
 using PropertyAttribute = UnityEngine.PropertyAttribute;
 
-namespace JiangeEditor
+namespace MoyoEditor
 {
     public class SerializedPropertyS
     {

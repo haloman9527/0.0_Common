@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Jiange
+namespace Moyo
 {
     public static class Util_TypeCache
     {
