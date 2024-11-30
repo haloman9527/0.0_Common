@@ -1,2 +1,2 @@
-# CZToolKit_Common
-CZToolKit的通用依赖库
+# Moyo_Common
+Moyo的通用依赖库
