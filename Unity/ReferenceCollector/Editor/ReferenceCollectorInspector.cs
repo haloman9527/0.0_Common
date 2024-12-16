@@ -177,10 +177,11 @@ namespace Moyo
                 var referenceCollector = (ReferenceCollector)target;
                 foreach (var obj in results)
                 {
-                    string key = obj.name;
+                    var key = obj.name;
+                    var index = 0;
                     while (referenceCollector.Contains(key))
                     {
-                        key = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
+                        key = $"{obj.name}_{index++}";
                     }
 
                     Undo.RecordObjects(targets, "Add ReferenceData");
