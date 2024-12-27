@@ -89,7 +89,18 @@ namespace Moyo
             if (viewModelType != null)
             {
                 var viewModel = Activator.CreateInstance(viewModelType, model);
-                (viewModel as ViewModel)?.SetUp(model);
+                return viewModel;
+            }
+            
+            return null;
+        }
+
+        public static object CreateViewModel(Type modelType)
+        {
+            var viewModelType = GetViewModelType(modelType);
+            if (viewModelType != null)
+            {
+                var viewModel = Activator.CreateInstance(viewModelType);
                 return viewModel;
             }
             

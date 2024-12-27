@@ -64,10 +64,6 @@ namespace Moyo
             return true;
         }
 
-        public virtual void SetUp(object model)
-        {
-        }
-
         protected virtual void OnPropertyChanged(string propertyName)
         {
         }
@@ -85,14 +81,6 @@ namespace Moyo
         public void UnregisterAllValueChanged(string name)
         {
             Events.Remove(name);
-        }
-
-        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
         }
     }
 }

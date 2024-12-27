@@ -12,7 +12,7 @@ namespace Moyo
     {
         public Type EventType => typeof(A);
 
-        public abstract void Handle(A arg);
+        public abstract void Invoke(A arg);
     }
 
     public interface IEvtTask<K>
@@ -103,7 +103,7 @@ namespace Moyo
 
             foreach (var evt in evts)
             {
-                (evt as GlobalEvent<A>)?.Handle(arg);
+                (evt as GlobalEvent<A>)?.Invoke(arg);
             }
         }
     }
