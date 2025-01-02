@@ -27,8 +27,8 @@ namespace Moyo
         private event Func<T> getter;
         private event Action<T> setter;
         
-        public event ValueChangedEvent<T> onValueChanged;
-        public event ValueChangedEvent<object> onBoxedValueChanged;
+        public event Action<T, T> onValueChanged;
+        public event Action<object, object> onBoxedValueChanged;
 
         public T Value
         {
@@ -50,7 +50,7 @@ namespace Moyo
             set => Value = (T)value;
         }
 
-        public Type ValueType => typeof(T);
+        public Type ValueType => TypeCache<T>.TYPE;
 
         public BindableProperty(Func<T> getter, Action<T> setter)
         {
@@ -69,12 +69,12 @@ namespace Moyo
             return this as BindableProperty<TOut>;
         }
 
-        public void RegisterValueChangedEvent(ValueChangedEvent<T> onValueChanged)
+        public void RegisterValueChangedEvent(Action<T, T> onValueChanged)
         {
             this.onValueChanged += onValueChanged;
         }
 
-        public void UnregisterValueChangedEvent(ValueChangedEvent<T> onValueChanged)
+        public void UnregisterValueChangedEvent(Action<T, T> onValueChanged)
         {
             this.onValueChanged -= onValueChanged;
         }

@@ -15,28 +15,6 @@ namespace Moyo
         public abstract void Invoke(A arg);
     }
 
-    public interface IEvtTask<K>
-    {
-        public K EvtName { get; }
-    }
-    
-    public class EvtTask<K> : IEvtTask<K>
-    {
-        public K evtName;
-
-        public K EvtName => evtName;
-    }
-
-    public class EvtTask<K, A> : IEvtTask<K>
-    {
-        public K evtName;
-        public A arg;
-
-        public K EvtName => evtName;
-        public Type ArgType => typeof(A);
-        public A Arg => arg;
-    }
-
     public partial class GlobalEvents
     {
         private static bool s_Initialized;
@@ -63,7 +41,7 @@ namespace Moyo
                 s_AllGlobalEvents.Clear();
             }
 
-            foreach (var type in Util_TypeCache.GetTypesDerivedFrom<IGlobalEvent>())
+            foreach (var type in TypesCache.GetTypesDerivedFrom<IGlobalEvent>())
             {
                 if (type.IsAbstract)
                 {
@@ -108,7 +86,7 @@ namespace Moyo
         }
     }
 
-    public partial class GlobalEvents : ISingleton
+    public partial class GlobalEvents : ISingleton, ISingletonUpdate
     {
         private static GlobalEvents s_Instance;
 
@@ -124,7 +102,7 @@ namespace Moyo
         public void Register()
         {
             if (s_Instance != null)
-                throw new Exception($"singleton register twice! {typeof(Events<string>).Name}");
+                throw new Exception($"singleton register twice!");
 
             s_Instance = this;
             events = new Events<string>();
@@ -139,39 +117,29 @@ namespace Moyo
             s_Instance = null;
         }
         
-        public void Subscribe<T>(string key, Action<T> handler)
+        public void Update()
         {
-            events.Subscribe(key, handler);
+            
+        }
+        
+        public void Subscribe<TArg>(string id, Action<TArg> handler) where TArg : BaseEventArg
+        {
+            events.Subscribe(id, handler);
         }
 
-        public void Unsubscribe<T>(string key, Action<T> handler)
+        public void Unsubscribe<TArg>(string id, Action<TArg> handler) where TArg : BaseEventArg
         {
-            events.Unsubscribe(key, handler);
+            events.Unsubscribe(id, handler);
         }
 
-        public void Publish<T>(string key, T arg)
+        public void Publish<TArg>(string id, TArg e) where TArg : BaseEventArg
         {
-            events.Publish(key, arg);
+            events.Publish(id, e);
         }
 
-        public void Subscribe(string key, Action handler)
+        public bool Check(string id)
         {
-            events.Subscribe(key, handler);
-        }
-
-        public void Unsubscribe(string key, Action handler)
-        {
-            events.Unsubscribe(key, handler);
-        }
-
-        public void Publish(string key)
-        {
-            events.Publish(key);
-        }
-
-        public bool ExistsEvent(string key)
-        {
-            return events.ExistsEvent(key);
+            return events.Check(id);
         }
 
         public void Clear()

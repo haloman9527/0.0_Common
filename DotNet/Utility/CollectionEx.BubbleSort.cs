@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Moyo
 {
-    public static partial class Util_Collections
+    public static partial class CollectionEx
     {
         /// <summary>
         /// 冒泡排序

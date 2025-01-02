@@ -38,7 +38,7 @@ namespace Moyo.SharedVariable
 
         public Type GetElementType()
         {
-            return typeof(T);
+            return TypeCache<T>.TYPE;
         }
 
         public IList GetList()

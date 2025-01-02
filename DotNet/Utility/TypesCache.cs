@@ -22,7 +22,7 @@ using System.Reflection;
 
 namespace Moyo
 {
-    public static class Util_TypeCache
+    public static class TypesCache
     {
         private static bool s_Initialized;
         private static List<Type> s_AllTypes;
@@ -68,7 +68,7 @@ namespace Moyo
 
         public static IEnumerable<Type> GetTypesWithAttribute<T>() where T : Attribute
         {
-            return GetTypesWithAttribute(typeof(T));
+            return GetTypesWithAttribute(TypeCache<T>.TYPE);
         }
 
         public static IEnumerable<Type> GetTypesDerivedFrom(Type parentType)
@@ -82,7 +82,7 @@ namespace Moyo
 
         public static IEnumerable<Type> GetTypesDerivedFrom<T>()
         {
-            return GetTypesDerivedFrom(typeof(T));
+            return GetTypesDerivedFrom(TypeCache<T>.TYPE);
         }
 
         public static IEnumerable<MethodInfo> GetMethodsWithAttribute(Type attributeType)
@@ -96,7 +96,7 @@ namespace Moyo
 
         public static IEnumerable<MethodInfo> GetMethodsWithAttribute<T>() where T : Attribute
         {
-            return GetMethodsWithAttribute(typeof(T));
+            return GetMethodsWithAttribute(TypeCache<T>.TYPE);
         }
 #else
         public static IEnumerable<Type> GetTypesWithAttribute(Type attributeType, bool inherit = true)
@@ -112,7 +112,7 @@ namespace Moyo
 
         public static IEnumerable<Type> GetTypesWithAttribute<T>(bool inherit = true) where T : Attribute
         {
-            return GetTypesWithAttribute(typeof(T), inherit);
+            return GetTypesWithAttribute(TypeCache<T>.TYPE, inherit);
         }
 
         public static IEnumerable<Type> GetTypesDerivedFrom(Type parentType)
@@ -130,7 +130,7 @@ namespace Moyo
 
         public static IEnumerable<Type> GetTypesDerivedFrom<T>()
         {
-            return GetTypesDerivedFrom(typeof(T));
+            return GetTypesDerivedFrom(TypeCache<T>.TYPE);
         }
 
         public static IEnumerable<MethodInfo> GetMethodsWithAttribute(Type attributeType, bool inherit = true)
@@ -149,7 +149,7 @@ namespace Moyo
 
         public static IEnumerable<MethodInfo> GetMethodsWithAttribute<T>(bool inherit = true) where T : Attribute
         {
-            return GetMethodsWithAttribute(typeof(T), inherit);
+            return GetMethodsWithAttribute(TypeCache<T>.TYPE, inherit);
         }
 #endif
     }

@@ -123,7 +123,7 @@ namespace MoyoEditor
 
             foreach (var type in TypeCache.GetTypesDerivedFrom<ObjectEditor>())
             {
-                foreach (var attr in Util_Reflection.GetTypeAttributes<CustomObjectEditorAttribute>(type, true))
+                foreach (var attr in ReflectionEx.GetTypeAttributes<CustomObjectEditorAttribute>(type, true))
                 {
                     ObjectEditorTypeCache[attr.type] = type;
                 }

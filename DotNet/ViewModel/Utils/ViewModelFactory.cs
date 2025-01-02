@@ -46,7 +46,7 @@ namespace Moyo
                 s_ViewModelTypes.Clear();
             }
 
-            foreach (var type in Util_TypeCache.GetTypesWithAttribute<ViewModelAttribute>())
+            foreach (var type in TypesCache.GetTypesWithAttribute<ViewModelAttribute>())
             {
                 if (type.IsAbstract)
                 {

@@ -98,7 +98,7 @@ namespace MoyoEditor
 
             var editorType = PropertyDrawer.GetEditorType(propertyType);
             var att = (PropertyAttribute)null;
-            if (editorType == null && Util_Reflection.TryGetTypeAttribute(propertyType, true, out att))
+            if (editorType == null && ReflectionEx.TryGetTypeAttribute(propertyType, true, out att))
                 editorType = PropertyDrawer.GetEditorType(propertyType);
             if (editorType != null)
                 drawer = PropertyDrawer.CreateEditor(this, att, editorType);
@@ -127,7 +127,7 @@ namespace MoyoEditor
 
             var editorType = PropertyDrawer.GetEditorType(propertyType);
             var att = (PropertyAttribute)null;
-            if (editorType == null && Util_Reflection.TryGetFieldAttribute<PropertyAttribute>(fieldInfo, false, out att))
+            if (editorType == null && ReflectionEx.TryGetFieldAttribute<PropertyAttribute>(fieldInfo, false, out att))
                 editorType = PropertyDrawer.GetEditorType(att.GetType());
             if (editorType != null)
                 drawer = PropertyDrawer.CreateEditor(this, att, editorType);
@@ -176,7 +176,7 @@ namespace MoyoEditor
                     if (hasChildren)
                     {
                         int id = 0;
-                        foreach (var childFieldInfo in Util_Reflection.GetFields(propertyType, BindingFlags.Instance))
+                        foreach (var childFieldInfo in ReflectionEx.GetFields(propertyType, BindingFlags.Instance))
                         {
                             if (childFieldInfo.Name.StartsWith("<"))
                                 continue;
@@ -185,18 +185,18 @@ namespace MoyoEditor
                             {
 #if UNITY_EDITOR
                                 // 如果不带有SerializeField特性
-                                if (!Util_Reflection.TryGetFieldAttribute<SerializeField>(childFieldInfo, false, out var serializeField))
+                                if (!ReflectionEx.TryGetFieldAttribute<SerializeField>(childFieldInfo, false, out var serializeField))
                                 {
                                     continue;
                                 }
 #endif
                                 // 若带有NonSerialized特性
-                                if (Util_Reflection.TryGetFieldAttribute<NonSerializedAttribute>(childFieldInfo, false, out var nonSerialized))
+                                if (ReflectionEx.TryGetFieldAttribute<NonSerializedAttribute>(childFieldInfo, false, out var nonSerialized))
                                 {
                                     continue;
                                 }
                                 // 若带有HideInInspector特性
-                                if (Util_Reflection.TryGetFieldAttribute<HideInInspector>(childFieldInfo, false, out var hideInInspector))
+                                if (ReflectionEx.TryGetFieldAttribute<HideInInspector>(childFieldInfo, false, out var hideInInspector))
                                 {
                                     continue;
                                 }

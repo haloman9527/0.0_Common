@@ -124,13 +124,13 @@ namespace Moyo
 
         public static T GetSingleton<T>()
         {
-            return (T)GetSingleton_Internal(typeof(T));
+            return (T)GetSingleton_Internal(TypeCache<T>.TYPE);
         }
 
         public static T AddSingleton<T>() where T : Singleton<T>, new()
         {
             T singleton = new T();
-            AddSingleton_Internal(singleton, typeof(T));
+            AddSingleton_Internal(singleton, TypeCache<T>.TYPE);
             return singleton;
         }
 

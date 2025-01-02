@@ -54,7 +54,7 @@ namespace Moyo.Unity
                 return;
             instance = GameObject.FindObjectOfType<T>();
             if (instance == null)
-                instance = new GameObject(typeof(T).Name).AddComponent<T>();
+                instance = new GameObject(TypeCache<T>.TYPE.Name).AddComponent<T>();
             Game.AddSingleton(instance);
         }
 

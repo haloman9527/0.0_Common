@@ -22,7 +22,7 @@ using System.Reflection;
 
 namespace Moyo
 {
-    public static class Util_Reflection
+    public static class ReflectionEx
     {
         // ----- Members -----
 

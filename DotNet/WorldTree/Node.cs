@@ -496,27 +496,27 @@ namespace Moyo
 
         public T AddComponent<T>() where T : Node, new()
         {
-            return (T)AddComponent(typeof(T));
+            return (T)AddComponent(TypeCache<T>.TYPE);
         }
 
         public T AddComponent<T, A>(A a) where T : Node, new()
         {
-            return (T)AddComponent(typeof(T), a);
+            return (T)AddComponent(TypeCache<T>.TYPE, a);
         }
 
         public T AddComponent<T, A, B>(A a, B b) where T : Node, new()
         {
-            return (T)AddComponent(typeof(T), a, b);
+            return (T)AddComponent(TypeCache<T>.TYPE, a, b);
         }
 
         public T AddComponent<T, A, B, C>(A a, B b, C c) where T : Node, new()
         {
-            return (T)AddComponent(typeof(T), a, b, c);
+            return (T)AddComponent(TypeCache<T>.TYPE, a, b, c);
         }
 
         public T AddComponent<T, A, B, C, D>(A a, B b, C c, D d) where T : Node, new()
         {
-            return (T)AddComponent(typeof(T), a, b, c, d);
+            return (T)AddComponent(TypeCache<T>.TYPE, a, b, c, d);
         }
 
         /// <summary>
@@ -526,7 +526,7 @@ namespace Moyo
         /// <returns></returns>
         public T GetComponent<T>() where T : Node, new()
         {
-            return (T)(GetComponent(typeof(T)));
+            return (T)(GetComponent(TypeCache<T>.TYPE));
         }
 
         /// <summary>
@@ -536,7 +536,7 @@ namespace Moyo
         /// <returns></returns>
         public T MatchComponent<T>()
         {
-            return (T)(GetComponent(typeof(T), true) as object);
+            return (T)(GetComponent(TypeCache<T>.TYPE, true) as object);
         }
 
         /// <summary>
@@ -594,7 +594,7 @@ namespace Moyo
 
         public void RemoveComponent<T>() where T : Node
         {
-            RemoveComponent(typeof(T));
+            RemoveComponent(TypeCache<T>.TYPE);
         }
 
         public void RemoveComponent(Node component)

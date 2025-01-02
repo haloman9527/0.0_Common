@@ -24,7 +24,7 @@ namespace Moyo.SharedVariable
         public static IEnumerable<SharedVariable> CollectionObjectSharedVariables(object obj)
         {
             Type sharedType = typeof(SharedVariable);
-            foreach (var fieldInfo in Util_Reflection.GetFields(obj.GetType(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            foreach (var fieldInfo in ReflectionEx.GetFields(obj.GetType(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
                 if (sharedType.IsAssignableFrom(fieldInfo.FieldType))
                 {

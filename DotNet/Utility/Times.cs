@@ -2,7 +2,7 @@
 
 namespace Moyo
 {
-    public static class Util_Time
+    public static class TimeEx
     {
         public static long ToFileTimeUtcMs(this DateTime dateTime)
         {

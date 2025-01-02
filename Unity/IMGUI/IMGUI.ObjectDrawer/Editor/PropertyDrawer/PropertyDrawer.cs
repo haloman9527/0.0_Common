@@ -103,7 +103,7 @@ namespace MoyoEditor
 
             foreach (var type in TypeCache.GetTypesDerivedFrom<PropertyDrawer>())
             {
-                foreach (var attr in Moyo.Util_Reflection.GetTypeAttributes<CustomPropertyDrawerAttribute>(type, false))
+                foreach (var attr in Moyo.ReflectionEx.GetTypeAttributes<CustomPropertyDrawerAttribute>(type, false))
                 {
                      ObjectEditorTypeCache[attr.type] = type;
                 }

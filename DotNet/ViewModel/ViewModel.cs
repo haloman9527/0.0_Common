@@ -25,6 +25,22 @@ namespace Moyo
 {
     public class ViewModel : INotifyPropertyChanged
     {
+        public class ValueChangedArg<T> : BaseEventArg
+        {
+            public T oldValue;
+            public T newValue;
+
+            public override void OnSpawn()
+            {
+            }
+
+            public override void OnRecycle()
+            {
+                oldValue = default;
+                newValue = default;
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private Events<string> Events { get; } = new Events<string>();
@@ -58,7 +74,12 @@ namespace Moyo
 
             var oldValue = field;
             field = value;
-            Events.Publish(propertyName, oldValue, value);
+            using (var e = ObjectPools.Spawn<ValueChangedArg<T>>())
+            {
+                e.oldValue = oldValue;
+                e.newValue = value;
+                Events.Publish(propertyName, e);
+            }
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             OnPropertyChanged(propertyName);
             return true;
@@ -68,12 +89,12 @@ namespace Moyo
         {
         }
 
-        public void RegisterValueChanged<T>(string name, Action<T, T> valueChangedCallback)
+        public void RegisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback)
         {
             Events.Subscribe(name, valueChangedCallback);
         }
 
-        public void UnregisterValueChanged<T>(string name, Action<T, T> valueChangedCallback)
+        public void UnregisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback)
         {
             Events.Unsubscribe(name, valueChangedCallback);
         }

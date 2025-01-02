@@ -24,13 +24,16 @@ using System.Reflection;
 
 namespace Moyo
 {
-    public interface IPoolableObject
+    public class CustomPoolAttribute : Attribute
     {
-        void OnSpawn();
+        public readonly Type unitType;
 
-        void OnRecycle();
+        public CustomPoolAttribute(Type unitType)
+        {
+            this.unitType = unitType;
+        }
     }
-
+    
     public static partial class ObjectPools
     {
         private class ObjectPool<T> : BaseObjectPool<T> where T : class, new()
@@ -45,7 +48,7 @@ namespace Moyo
     public static partial class ObjectPools
     {
         private static bool s_Initialized;
-        private static Dictionary<Type, IObjectPool> s_Pools = new Dictionary<Type, IObjectPool>(64);
+        private static Dictionary<int, IObjectPool> s_Pools = new Dictionary<int, IObjectPool>(64);
 
         static ObjectPools()
         {
@@ -62,7 +65,7 @@ namespace Moyo
             s_Pools.Clear();
 
             var baseType = typeof(IObjectPool);
-            foreach (var type in Util_TypeCache.AllTypes)
+            foreach (var type in TypesCache.AllTypes)
             {
                 if (!baseType.IsAssignableFrom(type))
                 {
@@ -76,16 +79,16 @@ namespace Moyo
                 }
 
                 var pool = Activator.CreateInstance(type);
-                s_Pools.Add(attribute.unitType, pool as IObjectPool);
+                s_Pools.Add(attribute.unitType.GetHashCode(), pool as IObjectPool);
             }
         }
 
         private static IObjectPool GetOrCreatePool(Type unitType)
         {
-            if (!s_Pools.TryGetValue(unitType, out var pool))
+            if (!s_Pools.TryGetValue(unitType.GetHashCode(), out var pool))
             {
                 var poolType = typeof(ObjectPool<>).MakeGenericType(unitType);
-                s_Pools[unitType] = pool = (IObjectPool)Activator.CreateInstance(poolType);
+                s_Pools[unitType.GetHashCode()] = pool = (IObjectPool)Activator.CreateInstance(poolType);
             }
 
             return pool;
@@ -93,10 +96,10 @@ namespace Moyo
 
         private static IObjectPool<T> GetOrCreatePool<T>() where T : class, new()
         {
-            var unitType = typeof(T);
-            if (!s_Pools.TryGetValue(unitType, out var pool))
+            var unitType = TypeCache<T>.TYPE;
+            if (!s_Pools.TryGetValue(TypeCache<T>.HASH, out var pool))
             {
-                s_Pools[unitType] = pool = new ObjectPool<T>();
+                s_Pools[unitType.GetHashCode()] = pool = new ObjectPool<T>();
             }
 
             return (IObjectPool<T>)pool;
@@ -104,12 +107,13 @@ namespace Moyo
 
         public static IObjectPool GetPool(Type unitType)
         {
-            return s_Pools.GetValueOrDefault(unitType);
+            s_Pools.TryGetValue(unitType.GetHashCode(), out var pool);
+            return pool;
         }
 
         public static void RegisterPool(IObjectPool pool)
         {
-            s_Pools.Add(pool.UnitType, pool);
+            s_Pools.Add(pool.UnitType.GetHashCode(), pool);
         }
 
         public static void ReleasePool(Type unitType)
@@ -119,7 +123,7 @@ namespace Moyo
                 return;
 
             pool.Dispose();
-            s_Pools.Remove(unitType);
+            s_Pools.Remove(unitType.GetHashCode());
         }
 
         public static T Spawn<T>() where T : class, new()
@@ -135,11 +139,6 @@ namespace Moyo
 
         public static object Spawn(Type unitType)
         {
-            if (!unitType.IsClass)
-            {
-                throw new TypeAccessException($"{unitType}不是引用类型");
-            }
-
             var unit = GetOrCreatePool(unitType).Spawn();
             if (unit is IPoolableObject poolableObject)
             {
@@ -151,11 +150,6 @@ namespace Moyo
 
         public static void Recycle(Type unitType, object unit)
         {
-            if (!unitType.IsClass)
-            {
-                throw new TypeAccessException($"{unitType}不是引用类型");
-            }
-
             var pool = GetPool(unitType);
             if (pool == null)
                 return;

@@ -27,8 +27,8 @@ namespace Moyo
                 return;
             }
 
-            var systemTypes = Util_TypeCache.GetTypesDerivedFrom<ISystem>();
-            var nodeTypes = Util_TypeCache.GetTypesDerivedFrom<Node>();
+            var systemTypes = TypesCache.GetTypesDerivedFrom<ISystem>();
+            var nodeTypes = TypesCache.GetTypesDerivedFrom<Node>();
 
             if (s_Systems == null)
             {

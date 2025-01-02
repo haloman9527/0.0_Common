@@ -19,7 +19,7 @@ namespace Moyo
 {
     public interface IBindableProperty : IDisposable
     {
-        event ValueChangedEvent<object> onBoxedValueChanged;
+        event Action<object, object> onBoxedValueChanged;
 
         object BoxedValue { get; set; }
         Type ValueType { get; }
@@ -32,13 +32,13 @@ namespace Moyo
 
     public interface IBindableProperty<T> : IDisposable
     {
-        event ValueChangedEvent<T> onValueChanged;
+        event Action<T, T> onValueChanged;
 
         T Value { get; set; }
 
         bool SetValue(T value);
         void SetValueWithoutNotify(T value);
-        void RegisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);
-        void UnregisterValueChangedEvent(ValueChangedEvent<T> onValueChanged);
+        void RegisterValueChangedEvent(Action<T, T> onValueChanged);
+        void UnregisterValueChangedEvent(Action<T, T> onValueChanged);
     }
 }

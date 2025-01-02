@@ -159,7 +159,7 @@ namespace Moyo.Blackboard
                 return default;
             }
 
-            var type = typeof(T);
+            var type = TypeCache<T>.TYPE;
             var isValueType = type.IsValueType;
             if (isValueType)
             {
@@ -177,7 +177,7 @@ namespace Moyo.Blackboard
                 return false;
             }
 
-            var type = typeof(T);
+            var type = TypeCache<T>.TYPE;
             var isValueType = type.IsValueType;
             if (isValueType)
             {
@@ -191,7 +191,7 @@ namespace Moyo.Blackboard
 
         public bool Set<T>(TKey key, T value)
         {
-            var type = typeof(T);
+            var type = TypeCache<T>.TYPE;
             var isValueType = type.IsValueType;
             if (!containerMap.TryGetValue(key, out var dataContainer))
             {

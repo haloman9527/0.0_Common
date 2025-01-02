@@ -43,7 +43,7 @@ namespace Moyo
         public void Register()
         {
             if (s_Instance != null)
-                throw new Exception($"singleton register twice! {typeof(T).Name}");
+                throw new Exception($"singleton register twice! {TypeCache<T>.TYPE.Name}");
 
             s_Instance = (T)this;
         }

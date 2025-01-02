@@ -100,7 +100,7 @@
 //             }
 //         }
 //
-//         public Type ValueType => typeof(T);
+//         public Type ValueType => TypeCache<T>.TYPE;
 //
 //         public BindableSharedVariable(Func<long> IDGetter)
 //         {

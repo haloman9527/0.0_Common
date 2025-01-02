@@ -29,15 +29,19 @@ namespace Moyo.Blackboard
         Remove
     }
 
-    public struct BBEventArg
+    public class BBEventArg : BaseEventArg
     {
         public object value;
         public NotifyType notifyType;
 
-        public BBEventArg(object value, NotifyType notifyType)
+        public override void OnSpawn()
         {
-            this.value = value;
-            this.notifyType = notifyType;
+            value = null;
+        }
+
+        public override void OnRecycle()
+        {
+            value = null;
         }
     }
 
@@ -126,7 +130,7 @@ namespace Moyo.Blackboard
 
         private void NotifyObservers(TKey key, object value, NotifyType notifyType)
         {
-            if (!events.ExistsEvent(key))
+            if (!events.Check(key))
                 return;
 
             addObservers.Clear();
@@ -135,7 +139,12 @@ namespace Moyo.Blackboard
             isNotifying = true;
             try
             {
-                events.Publish(key, new BBEventArg(value, notifyType));
+                using (var bbEvtArg = ObjectPools.Spawn<BBEventArg>())
+                {
+                    bbEvtArg.value = value;
+                    bbEvtArg.notifyType = notifyType;
+                    events.Publish(key, bbEvtArg);
+                }
             }
             finally
             {

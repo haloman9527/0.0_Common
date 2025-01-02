@@ -80,7 +80,7 @@ namespace Moyo
         /// <typeparam name="T"> SystemType </typeparam>
         public void Publish<T>() where T : ISystem
         {
-            var queue = GetQueue(typeof(T));
+            var queue = GetQueue(TypeCache<T>.TYPE);
             if (queue == null)
             {
                 return;
@@ -100,7 +100,7 @@ namespace Moyo
                     continue;
                 }
 
-                var systems = WorldTreeSystems.GetSystems(component.GetType(), typeof(T));
+                var systems = WorldTreeSystems.GetSystems(component.GetType(), TypeCache<T>.TYPE);
                 if (systems == null)
                 {
                     continue;

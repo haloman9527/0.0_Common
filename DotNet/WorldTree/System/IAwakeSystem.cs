@@ -31,7 +31,7 @@ namespace Moyo
     {
         public Type NodeType()
         {
-            return typeof(T);
+            return TypeCache<T>.TYPE;
         }
 
         public Type SystemType()
@@ -51,7 +51,7 @@ namespace Moyo
     {
         public Type NodeType()
         {
-            return typeof(T);
+            return TypeCache<T>.TYPE;
         }
 
         public Type SystemType()
@@ -71,7 +71,7 @@ namespace Moyo
     {
         public Type NodeType()
         {
-            return typeof(T);
+            return TypeCache<T>.TYPE;
         }
 
         public Type SystemType()
@@ -91,7 +91,7 @@ namespace Moyo
     {
         public Type NodeType()
         {
-            return typeof(T);
+            return TypeCache<T>.TYPE;
         }
 
         public Type SystemType()
@@ -111,7 +111,7 @@ namespace Moyo
     {
         public Type NodeType()
         {
-            return typeof(T);
+            return TypeCache<T>.TYPE;
         }
 
         public Type SystemType()

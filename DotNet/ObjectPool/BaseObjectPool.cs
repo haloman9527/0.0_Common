@@ -5,15 +5,15 @@ namespace Moyo
 {
     public abstract class BaseObjectPool<T> : IObjectPool, IObjectPool<T> where T : class
     {
-        protected Stack<T> unusedObjects;
+        protected Queue<T> unusedObjects;
 
-        public Type UnitType => typeof(T);
+        public Type UnitType => TypeCache<T>.TYPE;
 
         public int UnusedCount => unusedObjects.Count;
 
         public BaseObjectPool()
         {
-            this.unusedObjects = new Stack<T>();
+            this.unusedObjects = new Queue<T>();
         }
 
         object IObjectPool.Spawn()
@@ -26,7 +26,7 @@ namespace Moyo
         {
             T unit = null;
             if (unusedObjects.Count > 0)
-                unit = unusedObjects.Pop();
+                unit = unusedObjects.Dequeue();
             else
                 unit = Create();
             OnSpawn(unit);
@@ -41,7 +41,7 @@ namespace Moyo
         /// <summary> 回收 </summary>
         public void Recycle(T unit)
         {
-            unusedObjects.Push(unit);
+            unusedObjects.Enqueue(unit);
             OnRecycle(unit);
         }
 
@@ -49,7 +49,7 @@ namespace Moyo
         {
             while (unusedObjects.Count > 0)
             {
-                OnDestroy(unusedObjects.Pop());
+                OnDestroy(unusedObjects.Dequeue());
             }
         }
 
