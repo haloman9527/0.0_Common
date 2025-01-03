@@ -7,9 +7,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Moyo;
 
-namespace Moyo.GameFramework.DataNode
+namespace Moyo.GF.DataNode
 {
     public class DataNode : IDataNode
     {

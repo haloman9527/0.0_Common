@@ -29,7 +29,7 @@ namespace Moyo.Blackboard
         Remove
     }
 
-    public class BBEventArg : BaseEventArg
+    public class BBEventArg : EventArg
     {
         public object value;
         public NotifyType notifyType;

@@ -116,25 +116,30 @@ namespace Moyo
             this.IsDisposed = true;
             s_Instance = null;
         }
-        
+
         public void Update()
         {
-            
+            events.Update();
         }
-        
-        public void Subscribe<TArg>(string id, Action<TArg> handler) where TArg : BaseEventArg
+
+        public void Subscribe<TArg>(string id, Action<TArg> handler) where TArg : EventArg
         {
             events.Subscribe(id, handler);
         }
 
-        public void Unsubscribe<TArg>(string id, Action<TArg> handler) where TArg : BaseEventArg
+        public void Unsubscribe<TArg>(string id, Action<TArg> handler) where TArg : EventArg
         {
             events.Unsubscribe(id, handler);
         }
 
-        public void Publish<TArg>(string id, TArg e) where TArg : BaseEventArg
+        public void Publish<TArg>(string id, TArg e) where TArg : EventArg
         {
             events.Publish(id, e);
+        }
+
+        public void Dispatch<TArg>(string id, TArg e) where TArg : EventArg
+        {
+            events.Dispatch(id, e);
         }
 
         public bool Check(string id)

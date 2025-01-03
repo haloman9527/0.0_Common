@@ -25,7 +25,7 @@ namespace Moyo
 {
     public class ViewModel : INotifyPropertyChanged
     {
-        public class ValueChangedArg<T> : BaseEventArg
+        public class ValueChangedArg<T> : EventArg
         {
             public T oldValue;
             public T newValue;

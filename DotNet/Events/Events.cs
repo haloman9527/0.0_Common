@@ -62,17 +62,53 @@ namespace Moyo
                 handlers.Clear();
             }
         }
+
+        public abstract class EventTask
+        {
+            public abstract void Invoke(Events<TKey> events);
+        }
+
+        public class EventTask<T> : EventTask where T : EventArg
+        {
+            public TKey id;
+            public T e;
+
+            public override void Invoke(Events<TKey> events)
+            {
+                events.Publish(id, e);
+            }
+        }
     }
 
     public partial class Events<TKey>
     {
-        private readonly Dictionary<TKey, IEvent> events = new Dictionary<TKey, IEvent>();
-
-        public void Subscribe<TArg>(TKey key, Action<TArg> handler) where TArg : BaseEventArg
+        public bool Check(TKey key)
         {
-            if (!events.TryGetValue(key, out var evt))
+            return m_events.TryGetValue(key, out var evts) && !evts.IsNull;
+        }
+
+        public void Remove(TKey key)
+        {
+            m_events.Remove(key);
+        }
+
+        public void Clear()
+        {
+            m_events.Clear();
+            m_eventQueue.Clear();
+        }
+    }
+
+    public partial class Events<TKey>
+    {
+        private readonly Dictionary<TKey, IEvent> m_events = new Dictionary<TKey, IEvent>();
+        private readonly Queue<EventTask> m_eventQueue = new Queue<EventTask>(8);
+
+        public void Subscribe<TArg>(TKey key, Action<TArg> handler) where TArg : EventArg
+        {
+            if (!m_events.TryGetValue(key, out var evt))
             {
-                events[key] = evt = new Event<TArg>();
+                m_events[key] = evt = new Event<TArg>();
             }
 
             if (evt is Event<TArg> _evt)
@@ -87,7 +123,7 @@ namespace Moyo
 
         public void Unsubscribe<TArg>(TKey key, Action<TArg> handler)
         {
-            if (!events.TryGetValue(key, out var evt))
+            if (!m_events.TryGetValue(key, out var evt))
             {
                 return;
             }
@@ -104,7 +140,7 @@ namespace Moyo
 
         public void Publish<TArg>(TKey key, TArg e)
         {
-            if (!events.TryGetValue(key, out var evt))
+            if (!m_events.TryGetValue(key, out var evt))
             {
                 return;
             }
@@ -117,19 +153,20 @@ namespace Moyo
             ObjectPools.Recycle(e);
         }
 
-        public bool Check(TKey key)
+        public void Update()
         {
-            return events.TryGetValue(key, out var evts) && !evts.IsNull;
+            int count = m_eventQueue.Count;
+            while (count-- > 0)
+            {
+                var evtTask = m_eventQueue.Dequeue();
+                evtTask.Invoke(this);
+            }
         }
 
-        public void Remove(TKey key)
+        public void Dispatch<TArg>(string id, TArg e) where TArg : EventArg
         {
-            events.Remove(key);
-        }
-
-        public void Clear()
-        {
-            events.Clear();
+            var evtTask = ObjectPools.Spawn<EventTask<TArg>>();
+            m_eventQueue.Enqueue(evtTask);
         }
     }
 }

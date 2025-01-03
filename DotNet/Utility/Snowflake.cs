@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace Moyo
 {
@@ -109,22 +110,22 @@ namespace Moyo
         /// <param name="timeProvider"> 时间戳提供者，用以适配不同的时间戳规则 </param>
         public Snowflake(int workerId, ITimeProvider timeProvider)
         {
-            Init((byte)(workerId & 32), (byte)((workerId >> 5) & 32), timeProvider);
+            Init((byte)(workerId & 31), (byte)((workerId >> 5) & 31), timeProvider);
         }
 
         private void Init(byte workerId, byte datacenterId, ITimeProvider timeProvider)
         {
-            this.lastTimestamp = timeProvider.GetCurrentTime();
+            if (workerId > MAX_WORKER_ID)
+                throw new ArgumentException($"worker Id can't be greater than {MAX_WORKER_ID} or less than 0");
+
+            if (datacenterId > MAX_DATACENTER_ID)
+                throw new ArgumentException($"datacenter Id can't be greater than {MAX_DATACENTER_ID} or less than 0");
+            
+            this.lastTimestamp = -1L;
             this.sequence = 0;
             this.WorkerId = workerId;
             this.DatacenterId = datacenterId;
             this.TimeProvider = timeProvider;
-
-            if (WorkerId > MAX_WORKER_ID)
-                throw new ArgumentException($"worker Id can't be greater than {MAX_WORKER_ID} or less than 0");
-
-            if (DatacenterId > MAX_DATACENTER_ID)
-                throw new ArgumentException($"datacenter Id can't be greater than {MAX_DATACENTER_ID} or less than 0");
         }
 
         /// <summary>
@@ -134,9 +135,10 @@ namespace Moyo
         private long TilNextTimestamp()
         {
             var timestamp = TimeProvider.GetCurrentTime();
-            
+
             while (timestamp <= lastTimestamp)
             {
+                Thread.Sleep(1);
                 timestamp = TimeProvider.GetCurrentTime();
             }
 
@@ -152,11 +154,10 @@ namespace Moyo
             lock (this)
             {
                 var timestamp = TimeProvider.GetCurrentTime();
-                
+
                 if (timestamp < lastTimestamp)
                 {
-                    throw new Exception(
-                        $"Clock moved backwards or wrapped around. Refusing to generate id for {lastTimestamp - timestamp} ticks");
+                    throw new Exception($"Clock moved backwards. Refusing to generate id for {lastTimestamp - timestamp} ticks");
                 }
 
                 if (lastTimestamp == timestamp)
@@ -193,7 +194,6 @@ namespace Moyo
 
             public UtcMSDateTimeProvider(DateTime utcTime)
             {
-                GC.Collect();
                 epoch = utcTime.Ticks / 10000;
             }
 

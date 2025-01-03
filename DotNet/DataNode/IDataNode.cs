@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moyo;
 
-namespace Moyo.GameFramework.DataNode
+namespace Moyo.GF.DataNode
 {
     /// <summary>
     /// 数据结点接口。

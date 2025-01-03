@@ -2,7 +2,7 @@
 
 namespace Moyo
 {
-    public abstract class BaseEventArg : IPoolableObject, IDisposable
+    public abstract class EventArg : IPoolableObject, IDisposable
     {
         public abstract void OnSpawn();
 
@@ -14,7 +14,7 @@ namespace Moyo
         }
     }
 
-    public sealed class ValueEventArg<T> : BaseEventArg
+    public sealed class ValueEventArg<T> : EventArg
     {
         public T value;
         
@@ -29,7 +29,7 @@ namespace Moyo
         }
     }
 
-    public sealed class EmptyEventArg : BaseEventArg
+    public sealed class EmptyEventArg : EventArg
     {
         public static readonly EmptyEventArg Instance = new EmptyEventArg();
 

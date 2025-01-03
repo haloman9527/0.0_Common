@@ -24,11 +24,11 @@ using System.Reflection;
 
 namespace Moyo
 {
-    public class CustomPoolAttribute : Attribute
+    public class ObjectPoolAttribute : Attribute
     {
         public readonly Type unitType;
 
-        public CustomPoolAttribute(Type unitType)
+        public ObjectPoolAttribute(Type unitType)
         {
             this.unitType = unitType;
         }
@@ -72,7 +72,7 @@ namespace Moyo
                     continue;
                 }
 
-                var attribute = type.GetCustomAttribute<CustomPoolAttribute>();
+                var attribute = type.GetCustomAttribute<ObjectPoolAttribute>();
                 if (attribute == null)
                 {
                     continue;
@@ -139,7 +139,13 @@ namespace Moyo
 
         public static object Spawn(Type unitType)
         {
-            var unit = GetOrCreatePool(unitType).Spawn();
+            var pool = GetOrCreatePool(unitType);
+            if (pool == null)
+            {
+                return null;
+            }
+            
+            var unit = pool.Spawn();
             if (unit is IPoolableObject poolableObject)
             {
                 poolableObject.OnSpawn();
