@@ -691,7 +691,7 @@ namespace MoyoEditor.IMGUI.Controls
             IdGenerator.Reset();
         }
 
-        public class TreeViewItemPool : BaseObjectPool<T>
+        public class TreeViewItemPool : ObjectPool<T>
         {
             protected override T Create()
             {

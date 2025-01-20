@@ -36,7 +36,7 @@ namespace Moyo
     
     public static partial class ObjectPools
     {
-        private class ObjectPool<T> : BaseObjectPool<T> where T : class, new()
+        private class ObjectPool<T> : Moyo.ObjectPool<T> where T : class, new()
         {
             protected override T Create()
             {
@@ -85,10 +85,11 @@ namespace Moyo
 
         private static IObjectPool GetOrCreatePool(Type unitType)
         {
-            if (!s_Pools.TryGetValue(unitType.GetHashCode(), out var pool))
+            var hash = unitType.GetHashCode();
+            if (!s_Pools.TryGetValue(hash, out var pool))
             {
                 var poolType = typeof(ObjectPool<>).MakeGenericType(unitType);
-                s_Pools[unitType.GetHashCode()] = pool = (IObjectPool)Activator.CreateInstance(poolType);
+                s_Pools[hash] = pool = (IObjectPool)Activator.CreateInstance(poolType);
             }
 
             return pool;
@@ -97,9 +98,10 @@ namespace Moyo
         private static IObjectPool<T> GetOrCreatePool<T>() where T : class, new()
         {
             var unitType = TypeCache<T>.TYPE;
-            if (!s_Pools.TryGetValue(TypeCache<T>.HASH, out var pool))
+            var hash = unitType.GetHashCode();
+            if (!s_Pools.TryGetValue(hash, out var pool))
             {
-                s_Pools[unitType.GetHashCode()] = pool = new ObjectPool<T>();
+                s_Pools[hash] = pool = new ObjectPool<T>();
             }
 
             return (IObjectPool<T>)pool;

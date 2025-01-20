@@ -47,6 +47,11 @@ namespace Moyo.GF.DataNode
         {
             get;
         }
+        
+        /// <summary>
+        /// 所有子数据节点。
+        /// </summary>
+        IEnumerator<IDataNode> Children { get; }
 
         /// <summary>
         /// 根据类型获取数据结点的数据。
@@ -94,19 +99,7 @@ namespace Moyo.GF.DataNode
         /// <param name="name">子数据结点名称。</param>
         /// <returns>指定名称的子数据结点，如果对应名称的子数据结点已存在，则返回已存在的子数据结点，否则增加子数据结点。</returns>
         IDataNode GetOrAddChild(string name);
-
-        /// <summary>
-        /// 获取所有子数据结点。
-        /// </summary>
-        /// <returns>所有子数据结点。</returns>
-        IDataNode[] GetAllChild();
-
-        /// <summary>
-        /// 获取所有子数据结点。
-        /// </summary>
-        /// <param name="results">所有子数据结点。</param>
-        void GetAllChild(List<IDataNode> results);
-
+        
         /// <summary>
         /// 根据名称移除子数据结点。
         /// </summary>

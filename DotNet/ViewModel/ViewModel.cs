@@ -23,6 +23,11 @@ using System.Runtime.CompilerServices;
 
 namespace Moyo
 {
+    public interface IViewModelSource
+    {
+        ViewModel ViewModel { get; }
+    }
+    
     public class ViewModel : INotifyPropertyChanged
     {
         public class ValueChangedArg<T> : EventArg
@@ -52,7 +57,7 @@ namespace Moyo
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected ref T GetFieldValue<T>(ref T field)
+        public ref T GetFieldValue<T>(ref T field)
         {
             return ref field;
         }
@@ -65,7 +70,7 @@ namespace Moyo
         /// <param name="propertyName"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        protected bool SetFieldValue<T>(ref T field, T value, string propertyName)
+        public bool SetFieldValue<T>(ref T field, T value, string propertyName)
         {
             if (EqualityComparer<T>.Default.Equals(field, value))
             {
@@ -74,11 +79,11 @@ namespace Moyo
 
             var oldValue = field;
             field = value;
-            using (var e = ObjectPools.Spawn<ValueChangedArg<T>>())
+            using (var arg = ObjectPools.Spawn<ValueChangedArg<T>>())
             {
-                e.oldValue = oldValue;
-                e.newValue = value;
-                Events.Publish(propertyName, e);
+                arg.oldValue = oldValue;
+                arg.newValue = value;
+                Events.Publish(propertyName, arg);
             }
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             OnPropertyChanged(propertyName);

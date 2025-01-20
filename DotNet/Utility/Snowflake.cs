@@ -135,13 +135,11 @@ namespace Moyo
         private long TilNextTimestamp()
         {
             var timestamp = TimeProvider.GetCurrentTime();
-
             while (timestamp <= lastTimestamp)
             {
                 Thread.Sleep(1);
                 timestamp = TimeProvider.GetCurrentTime();
             }
-
             return timestamp;
         }
 

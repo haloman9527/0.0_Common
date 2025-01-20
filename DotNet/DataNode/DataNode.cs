@@ -26,6 +26,8 @@ namespace Moyo.GF.DataNode
         public IDataNode Parent => m_Parent;
         
         public int ChildCount => m_Children.Count;
+        
+        public IEnumerator<IDataNode> Children => m_Children.Values.GetEnumerator();
 
         public DataNode()
         {
@@ -86,20 +88,13 @@ namespace Moyo.GF.DataNode
             return dataNode;
         }
 
-        public IDataNode[] GetAllChild()
-        {
-            return m_Children.Values.ToArray();
-        }
-
-        public void GetAllChild(List<IDataNode> results)
-        {
-            results.Clear();
-            results.AddRange(m_Children.Values);
-        }
-
         public void RemoveChild(string name)
         {
-            m_Children.Remove(name);
+            if (m_Children.TryGetValue(name, out var dataNode))
+            {
+                m_Children.Remove(name);
+                ObjectPools.Recycle(typeof(DataNode), dataNode);
+            }
         }
 
         public void Clear()
