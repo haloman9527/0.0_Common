@@ -15,11 +15,11 @@
 #endregion
 #if UNITY_EDITOR
 using System.Collections;
-using Moyo.EditorCoroutine;
+using Moyo.UnityEditors.EditorCoroutine;
 using UnityEditor;
 using UnityEngine;
 
-namespace MoyoEditor
+namespace Moyo.UnityEditors
 {
     public abstract class BaseEditorWindow : EditorWindow
     {
@@ -105,12 +105,12 @@ namespace MoyoEditor
             CoroutineMachine.Update();
         }
 
-        public EditorCoroutine StartCoroutine(IEnumerator enumerator)
+        public EditorCoroutine.EditorCoroutine StartCoroutine(IEnumerator enumerator)
         {
             return CoroutineMachine.StartCoroutine(enumerator);
         }
 
-        public void StopCoroutine(EditorCoroutine coroutine)
+        public void StopCoroutine(EditorCoroutine.EditorCoroutine coroutine)
         {
             CoroutineMachine.StopCoroutine(coroutine);
         }

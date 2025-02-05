@@ -15,7 +15,7 @@
 #endregion
 using UnityEngine;
 
-namespace Moyo.Attributes
+namespace Moyo.Unity
 {
     public class HideLabelAttribute : UnityEngine.PropertyAttribute { }
 }

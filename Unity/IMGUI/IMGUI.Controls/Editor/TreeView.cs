@@ -26,7 +26,7 @@ using UnityEngine;
 using UnityTreeView = UnityEditor.IMGUI.Controls.TreeView;
 using UnityTreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem;
 
-namespace MoyoEditor.IMGUI.Controls
+namespace Moyo.UnityEditors.IMGUI.Controls
 {
     public class TreeViewItem : UnityTreeViewItem
     {

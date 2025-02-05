@@ -14,14 +14,14 @@
  */
 #endregion
 #if UNITY_EDITOR
-using System;
+using Moyo.Unity;
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.Attributes.Editors
+namespace Moyo.UnityEditors
 {
-    [CustomPropertyDrawer(typeof(PreviewObjectFieldAttribute), true)]
-    public class PreviewObjectFieldDrawer : PropertyDrawer
+    [global::UnityEditor.CustomPropertyDrawer(typeof(PreviewObjectFieldAttribute), true)]
+    public class PreviewObjectFieldDrawer : global::UnityEditor.PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

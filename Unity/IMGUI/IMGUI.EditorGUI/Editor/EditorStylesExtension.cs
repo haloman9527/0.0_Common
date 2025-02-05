@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace MoyoEditor
+namespace Moyo.UnityEditors
 {
     public static class EditorStylesExtension
     {

@@ -16,7 +16,7 @@
 #if UNITY_EDITOR
 using System.Collections;
 
-namespace Moyo.EditorCoroutine
+namespace Moyo.UnityEditors.EditorCoroutine
 {
     public partial class EditorCoroutineService : CoroutineService<EditorCoroutine>
     {

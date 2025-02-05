@@ -14,13 +14,14 @@
  */
 #endregion
 #if UNITY_EDITOR
+using Moyo.Unity;
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.Attributes.Editors
+namespace Moyo.UnityEditors
 {
-    [CustomPropertyDrawer(typeof(InlineEditorAttribute))]
-    public class InlineEditorDrawer : PropertyDrawer
+    [global::UnityEditor.CustomPropertyDrawer(typeof(InlineEditorAttribute))]
+    public class InlineEditorDrawer : global::UnityEditor.PropertyDrawer
     {
         Editor editor;
         bool foldout;

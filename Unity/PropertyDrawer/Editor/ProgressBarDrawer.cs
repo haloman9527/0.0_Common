@@ -14,14 +14,14 @@
  */
 #endregion
 #if UNITY_EDITOR
-using MoyoEditor;
+using Moyo.Unity;
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.Attributes.Editors
+namespace Moyo.UnityEditors
 {
-    [@CustomPropertyDrawer(typeof(ProgressBarAttribute))]
-    public class ProgressBarDrawer : UnityEditor.PropertyDrawer
+    [global::UnityEditor.CustomPropertyDrawer(typeof(ProgressBarAttribute))]
+    public class ProgressBarDrawer : global::UnityEditor.PropertyDrawer
     {
         ProgressBarAttribute progressBarAttribute;
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

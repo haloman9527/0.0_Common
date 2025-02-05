@@ -21,11 +21,11 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace MoyoEditor
+namespace Moyo.UnityEditors
 {
     public abstract class PropertyDrawer
     {
-        public PropertyAttribute Attribute
+        public UnityEngine.PropertyAttribute Attribute
         {
             get;
             private set;
@@ -47,7 +47,7 @@ namespace MoyoEditor
             Initialize(target, null);
         }
 
-        public PropertyDrawer(object target, PropertyAttribute attribute)
+        public PropertyDrawer(object target, UnityEngine.PropertyAttribute attribute)
         {
 
             Initialize(target, attribute);
@@ -58,19 +58,19 @@ namespace MoyoEditor
             Initialize(target, null);
         }
 
-        public PropertyDrawer(SerializedPropertyS target, PropertyAttribute attribute)
+        public PropertyDrawer(SerializedPropertyS target, UnityEngine.PropertyAttribute attribute)
         {
             Initialize(target, attribute);
         }
 
-        void Initialize(object target, PropertyAttribute attribute)
+        void Initialize(object target, UnityEngine.PropertyAttribute attribute)
         {
             Property = new SerializedPropertyS(target);
             Attribute = attribute;
             OnEnable();
         }
 
-        void Initialize(SerializedPropertyS target, PropertyAttribute attribute)
+        void Initialize(SerializedPropertyS target, UnityEngine.PropertyAttribute attribute)
         {
             Property = target;
             Attribute = attribute;
@@ -122,12 +122,12 @@ namespace MoyoEditor
 
         public static PropertyDrawer CreateEditor(object target)
         {
-            return CreateEditor(target, (PropertyAttribute)null);
+            return CreateEditor(target, (UnityEngine.PropertyAttribute)null);
         }
 
         public static PropertyDrawer CreateEditor(object target, Type editorType)
         {
-            return CreateEditor(target, (PropertyAttribute)null, editorType);
+            return CreateEditor(target, (UnityEngine.PropertyAttribute)null, editorType);
         }
 
         public static PropertyDrawer CreateEditor(SerializedPropertyS target, Type editorType)
@@ -135,13 +135,13 @@ namespace MoyoEditor
             return CreateEditor(target, null, editorType);
         }
 
-        public static PropertyDrawer CreateEditor(object target, PropertyAttribute attribute)
+        public static PropertyDrawer CreateEditor(object target, UnityEngine.PropertyAttribute attribute)
         {
             var editorType = GetEditorType(target.GetType());
             return CreateEditor(target, attribute, editorType);
         }
 
-        public static PropertyDrawer CreateEditor(object target, PropertyAttribute attribute, Type editorType)
+        public static PropertyDrawer CreateEditor(object target, UnityEngine.PropertyAttribute attribute, Type editorType)
         {
             if (editorType == null)
                 return null;
@@ -151,7 +151,7 @@ namespace MoyoEditor
             return drawer;
         }
 
-        public static PropertyDrawer CreateEditor(SerializedPropertyS target, PropertyAttribute attribute, Type editorType)
+        public static PropertyDrawer CreateEditor(SerializedPropertyS target, UnityEngine.PropertyAttribute attribute, Type editorType)
         {
             PropertyDrawer drawer = Activator.CreateInstance(editorType, true) as PropertyDrawer;
             if (drawer != null)

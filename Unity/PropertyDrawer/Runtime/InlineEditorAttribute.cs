@@ -16,7 +16,7 @@
 using UnityEngine;
 using System;
 
-namespace Moyo.Attributes
+namespace Moyo.Unity
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class InlineEditorAttribute : UnityEngine.PropertyAttribute { }

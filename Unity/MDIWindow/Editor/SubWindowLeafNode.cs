@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace MoyoEditor
+namespace Moyo.UnityEditors
 {
     [Serializable]
     public sealed class SubWindowLeafNode : SubWindowNode

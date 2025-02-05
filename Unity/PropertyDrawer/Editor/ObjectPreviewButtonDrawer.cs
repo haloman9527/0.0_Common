@@ -14,17 +14,17 @@
  */
 #endregion
 #if UNITY_EDITOR
-using MoyoEditor;
+using Moyo.Unity;
+using Moyo.UnityEditors;
 using UnityEditor;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Moyo.Attributes.Editors
+namespace Moyo.UnityEditors
 {
-
     [@CustomPropertyDrawer(typeof(ObjectPreviewButtonAttribute), true)]
-    public class ObjectPreviewButtonDrawer : UnityEditor.PropertyDrawer
+    public class ObjectPreviewButtonDrawer : global::UnityEditor.PropertyDrawer
     {
         public class ObjectPreviewPopupWindow : PopupWindowContent
         {

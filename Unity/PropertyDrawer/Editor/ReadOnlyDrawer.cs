@@ -14,13 +14,14 @@
  */
 #endregion
 #if UNITY_EDITOR
+using Moyo.Unity;
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.Attributes.Editors
+namespace Moyo.UnityEditors
 {
-    [CustomPropertyDrawer(typeof(ReadOnlyAttribute), true)]
-    public class ReadOnlyDrawer : PropertyDrawer
+    [global::UnityEditor.CustomPropertyDrawer(typeof(ReadOnlyAttribute), true)]
+    public class ReadOnlyDrawer : global::UnityEditor.PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

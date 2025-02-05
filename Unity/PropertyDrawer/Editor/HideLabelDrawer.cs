@@ -14,13 +14,14 @@
  */
 #endregion
 #if UNITY_EDITOR
+using Moyo.Unity;
 using UnityEngine;
 using UnityEditor;
 
-namespace Moyo.Attributes.Editors
+namespace Moyo.UnityEditors
 {
-    [CustomPropertyDrawer(typeof(HideLabelAttribute))]
-    public class HideLabelDrawer : PropertyDrawer
+    [global::UnityEditor.CustomPropertyDrawer(typeof(HideLabelAttribute))]
+    public class HideLabelDrawer : global::UnityEditor.PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

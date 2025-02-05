@@ -24,7 +24,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Moyo;
 
-namespace MoyoEditor
+namespace Moyo.UnityEditors
 {
     public class ObjectEditor
     {

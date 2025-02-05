@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace MoyoEditor
+namespace Moyo.UnityEditors
 {
     [Serializable]
     public abstract class SubWindowNode

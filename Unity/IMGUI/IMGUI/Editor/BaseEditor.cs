@@ -16,7 +16,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 
-namespace MoyoEditor
+namespace Moyo.UnityEditors
 {
     public abstract class BaseEditor : Editor
     {

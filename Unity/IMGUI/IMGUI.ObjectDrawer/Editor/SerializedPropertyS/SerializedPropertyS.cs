@@ -24,7 +24,7 @@ using UnityEngine;
 using UnityEditor;
 using PropertyAttribute = UnityEngine.PropertyAttribute;
 
-namespace MoyoEditor
+namespace Moyo.UnityEditors
 {
     public class SerializedPropertyS
     {
@@ -97,7 +97,7 @@ namespace MoyoEditor
             }
 
             var editorType = PropertyDrawer.GetEditorType(propertyType);
-            var att = (PropertyAttribute)null;
+            var att = (UnityEngine.PropertyAttribute)null;
             if (editorType == null && ReflectionEx.TryGetTypeAttribute(propertyType, true, out att))
                 editorType = PropertyDrawer.GetEditorType(propertyType);
             if (editorType != null)
@@ -126,8 +126,8 @@ namespace MoyoEditor
             }
 
             var editorType = PropertyDrawer.GetEditorType(propertyType);
-            var att = (PropertyAttribute)null;
-            if (editorType == null && ReflectionEx.TryGetFieldAttribute<PropertyAttribute>(fieldInfo, false, out att))
+            var att = (UnityEngine.PropertyAttribute)null;
+            if (editorType == null && ReflectionEx.TryGetFieldAttribute<UnityEngine.PropertyAttribute>(fieldInfo, false, out att))
                 editorType = PropertyDrawer.GetEditorType(att.GetType());
             if (editorType != null)
                 drawer = PropertyDrawer.CreateEditor(this, att, editorType);

@@ -20,7 +20,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace MoyoEditor
+namespace Moyo.UnityEditors
 {
     public class LayoutUtility
     {
@@ -83,7 +83,7 @@ namespace MoyoEditor
         {
             Vector2 screenPoint = parent.position.min + new Vector2(parent.position.width * .9f, 100f);
 
-            Assembly assembly = typeof(UnityEditor.EditorWindow).Assembly;
+            Assembly assembly = typeof(EditorWindow).Assembly;
             Type ew = assembly.GetType("UnityEditor.EditorWindow");
             Type da = assembly.GetType("UnityEditor.DockArea");
             Type sv = assembly.GetType("UnityEditor.SplitView");
