@@ -8,25 +8,15 @@ namespace Moyo
 
         public abstract void OnRecycle();
 
-        public virtual void Dispose()
+        public void Dispose()
         {
-            ObjectPools.Recycle(this);
+            ObjectPoolService.Recycle(this);
         }
     }
 
-    public sealed class ValueEventArg<T> : EventArg
+    public struct ValueEventArg<T>
     {
         public T value;
-        
-        public override void OnSpawn()
-        {
-            
-        }
-
-        public override void OnRecycle()
-        {
-            value = default;
-        }
     }
 
     public sealed class EmptyEventArg : EventArg
@@ -38,10 +28,6 @@ namespace Moyo
         }
 
         public override void OnRecycle()
-        {
-        }
-
-        public override void Dispose()
         {
         }
     }

@@ -37,7 +37,7 @@ namespace Moyo
 
         public static DataNode Create(string name, char seperator, DataNode parent)
         {
-            var dataNode = ObjectPools.Spawn<DataNode>();
+            var dataNode = ObjectPoolService.Spawn<DataNode>();
             dataNode.m_Name = name;
             dataNode.m_FullName = parent == null ? name : $"{parent.FullName}{seperator}{name}";
             dataNode.m_Parent = parent;
@@ -92,7 +92,7 @@ namespace Moyo
             if (m_Children.TryGetValue(name, out var dataNode))
             {
                 m_Children.Remove(name);
-                ObjectPools.Recycle(typeof(DataNode), dataNode);
+                ObjectPoolService.Recycle(typeof(DataNode), dataNode);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Moyo
             foreach (var pair in m_Children)
             {
                 pair.Value.Clear();
-                ObjectPools.Recycle(typeof(DataNode), pair.Value);
+                ObjectPoolService.Recycle(typeof(DataNode), pair.Value);
             }
 
             m_Children.Clear();

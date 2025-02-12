@@ -48,7 +48,7 @@ namespace Moyo
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private Events<string> Events { get; } = new Events<string>();
+        private EventService<string> Events { get; } = new EventService<string>();
 
         /// <summary>
         /// 只在属性中调用
@@ -79,7 +79,7 @@ namespace Moyo
 
             var oldValue = field;
             field = value;
-            using (var arg = ObjectPools.Spawn<ValueChangedArg<T>>())
+            using (var arg = ObjectPoolService.Spawn<ValueChangedArg<T>>())
             {
                 arg.oldValue = oldValue;
                 arg.newValue = value;

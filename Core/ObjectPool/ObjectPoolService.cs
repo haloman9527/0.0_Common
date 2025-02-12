@@ -14,7 +14,7 @@ namespace Moyo
         }
     }
     
-    public static partial class ObjectPools
+    public static partial class ObjectPoolService
     {
         private class ObjectPool<T> : Moyo.ObjectPool<T> where T : class, new()
         {
@@ -25,12 +25,12 @@ namespace Moyo
         }
     }
 
-    public static partial class ObjectPools
+    public static partial class ObjectPoolService
     {
         private static bool s_Initialized;
         private static Dictionary<int, IObjectPool> s_Pools = new Dictionary<int, IObjectPool>(64);
 
-        static ObjectPools()
+        static ObjectPoolService()
         {
             Init();
         }

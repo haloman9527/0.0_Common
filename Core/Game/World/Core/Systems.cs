@@ -125,24 +125,9 @@ namespace Moyo
             Invoke<IAwakeSystem>(n);
         }
 
-        public static void Awake<T0>(Node n, T0 arg0)
+        public static void Awake<TArg>(Node n, TArg arg)
         {
-            Invoke<IAwakeSystem<T0>, T0>(n, arg0);
-        }
-
-        public static void Awake<T0, T1>(Node n, T0 arg0, T1 arg1)
-        {
-            Invoke<IAwakeSystem<T0, T1>, T0, T1>(n, arg0, arg1);
-        }
-
-        public static void Awake<T0, T1, T2>(Node n, T0 arg0, T1 arg1, T2 arg2)
-        {
-            Invoke<IAwakeSystem<T0, T1, T2>, T0, T1, T2>(n, arg0, arg1, arg2);
-        }
-
-        public static void Awake<T0, T1, T2, T3>(Node n, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-        {
-            Invoke<IAwakeSystem<T0, T1, T2, T3>, T0, T1, T2, T3>(n, arg0, arg1, arg2, arg3);
+            Invoke<IAwakeSystem<TArg>, TArg>(n, arg);
         }
 
         public static void AddComponent(Node n, Node component)
@@ -166,47 +151,14 @@ namespace Moyo
             }
         }
 
-        public static void Invoke<S, A>(Node n, A a) where S : ISystem_EA<A>
+        public static void Invoke<S, TArg>(Node n, TArg arg) where S : ISystem_EA<TArg>
         {
             var type = n.GetType();
             var systems = GetSystems(type, TypeCache<S>.TYPE);
 
             for (int i = 0; i < systems.Count; i++)
             {
-                ((S)systems[i]).Execute(n, a);
-            }
-        }
-
-        public static void Invoke<S, A, B>(Node n, A a, B b) where S : ISystem_EAA<A, B>
-        {
-            var type = n.GetType();
-            var systems = GetSystems(type, TypeCache<S>.TYPE);
-
-            for (int i = 0; i < systems.Count; i++)
-            {
-                ((S)systems[i]).Execute(n, a, b);
-            }
-        }
-
-        public static void Invoke<S, A, B, C>(Node n, A a, B b, C c) where S : ISystem_EAAA<A, B, C>
-        {
-            var type = n.GetType();
-            var systems = GetSystems(type, TypeCache<S>.TYPE);
-
-            for (int i = 0; i < systems.Count; i++)
-            {
-                ((S)systems[i]).Execute(n, a, b, c);
-            }
-        }
-
-        public static void Invoke<S, A, B, C, D>(Node n, A a, B b, C c, D d) where S : ISystem_EAAAA<A, B, C, D>
-        {
-            var type = n.GetType();
-            var systems = GetSystems(type, TypeCache<S>.TYPE);
-
-            for (int i = 0; i < systems.Count; i++)
-            {
-                ((S)systems[i]).Execute(n, a, b, c, d);
+                ((S)systems[i]).Execute(n, arg);
             }
         }
     }

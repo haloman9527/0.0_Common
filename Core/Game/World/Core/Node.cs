@@ -17,7 +17,6 @@ namespace Moyo
         [NonSerialized] protected Dictionary<int, Node> children;
         [NonSerialized] protected Dictionary<Type, Node> components;
 
-        [NonSerialized] private HashSet<Node> childrenDB;
         [NonSerialized] private HashSet<Node> componentsDB;
 
         public int InstanceId
@@ -257,42 +256,6 @@ namespace Moyo
             return o;
         }
 
-        public T AddChild<T, A, B>(A a, B b) where T : Node, new()
-        {
-            var o = new T();
-            o.world = this.world;
-            o.InstanceId = World.GenerateInstanceId();
-            o.Parent = this;
-
-            Systems.Awake(o, a, b);
-
-            return o;
-        }
-
-        public T AddChild<T, A, B, C>(A a, B b, C c) where T : Node, new()
-        {
-            var o = new T();
-            o.world = this.world;
-            o.InstanceId = World.GenerateInstanceId();
-            o.Parent = this;
-
-            Systems.Awake(o, a, b, c);
-
-            return o;
-        }
-
-        public T AddChild<T, A, B, C, D>(A a, B b, C c, D d) where T : Node, new()
-        {
-            var o = new T();
-            o.world = this.world;
-            o.InstanceId = World.GenerateInstanceId();
-            o.Parent = this;
-
-            Systems.Awake(o, a, b, c, d);
-
-            return o;
-        }
-
         public Node GetChild(int instanceId)
         {
             if (children == null)
@@ -358,7 +321,6 @@ namespace Moyo
             if (autoInit)
             {
                 this.children = new Dictionary<int, Node>();
-                this.childrenDB = new HashSet<Node>();
                 return true;
             }
 
@@ -369,7 +331,6 @@ namespace Moyo
         {
             this.CheckChildren(true);
             this.children.Add(o.m_instanceId, o);
-            this.childrenDB.Add(o);
         }
 
         private void RemoveFromChildren(Node o, int instanceId)
@@ -380,7 +341,6 @@ namespace Moyo
             }
 
             this.children.Remove(instanceId);
-            this.childrenDB.Remove(o);
         }
 
         public void AddComponent(Node component)
@@ -404,7 +364,7 @@ namespace Moyo
             Systems.AddComponent(this, component);
         }
 
-        public Node AddComponent(Type type, int typeHash)
+        public Node AddComponent(Type type)
         {
             if (this.CheckComponents() && this.components.ContainsKey(type))
             {
@@ -422,7 +382,7 @@ namespace Moyo
             return component;
         }
 
-        public Node AddComponent<A>(Type type, int typeHash, A a)
+        public Node AddComponent<TArg>(Type type, TArg arg)
         {
             if (this.CheckComponents() && this.components.ContainsKey(type))
             {
@@ -434,114 +394,20 @@ namespace Moyo
             component.InstanceId = component.world.GenerateInstanceId();
             component.ComponentParent = this;
 
-            Systems.Awake(component, a);
+            Systems.Awake(component, arg);
             Systems.AddComponent(this, component);
 
             return component;
         }
 
-        public Node AddComponent<A, B>(Type type, int typeHash, A a, B b)
+        public N AddComponent<N>() where N : Node, new()
         {
-            if (this.CheckComponents() && this.components.ContainsKey(type))
-            {
-                throw new Exception($"already has component: {type.FullName}");
-            }
-
-            var component = Activator.CreateInstance(type) as Node;
-            component.world = this.world;
-            component.InstanceId = World.GenerateInstanceId();
-            component.ComponentParent = this;
-
-            Systems.Awake(component, a, b);
-            Systems.AddComponent(this, component);
-
-            return component;
+            return (N)AddComponent(TypeCache<N>.TYPE, TypeCache<N>.HASH);
         }
 
-        public Node AddComponent<A, B, C>(Type type, int typeHash, A a, B b, C c)
+        public N AddComponent<N, TArg>(TArg arg) where N : Node, new()
         {
-            if (this.CheckComponents() && this.components.ContainsKey(type))
-            {
-                throw new Exception($"already has component: {type.FullName}");
-            }
-
-            var component = Activator.CreateInstance(type) as Node;
-            component.world = this.world;
-            component.InstanceId = World.GenerateInstanceId();
-            component.ComponentParent = this;
-
-            Systems.Awake(component, a, b, c);
-            Systems.AddComponent(this, component);
-
-            return component;
-        }
-
-        public Node AddComponent<A, B, C, D>(Type type, int typeHash, A a, B b, C c, D d)
-        {
-            if (this.CheckComponents() && this.components.ContainsKey(type))
-            {
-                throw new Exception($"already has component: {type.FullName}");
-            }
-
-            var component = Activator.CreateInstance(type) as Node;
-            component.world = this.world;
-            component.InstanceId = World.GenerateInstanceId();
-            component.ComponentParent = this;
-
-            Systems.Awake(component, a, b, c, d);
-            Systems.AddComponent(this, component);
-
-            return component;
-        }
-
-        public Node AddComponent(Type type)
-        {
-            return AddComponent(type, type.GetHashCode());
-        }
-
-        public Node AddComponent<A>(Type type, A a)
-        {
-            return AddComponent(type, type.GetHashCode());
-        }
-
-        public Node AddComponent<A, B>(Type type, A a, B b)
-        {
-            return AddComponent(type, type.GetHashCode());
-        }
-
-        public Node AddComponent<A, B, C>(Type type, A a, B b, C c)
-        {
-            return AddComponent(type, type.GetHashCode());
-        }
-
-        public Node AddComponent<A, B, C, D>(Type type, A a, B b, C c, D d)
-        {
-            return AddComponent(type, type.GetHashCode());
-        }
-
-        public T AddComponent<T>() where T : Node, new()
-        {
-            return (T)AddComponent(TypeCache<T>.TYPE, TypeCache<T>.HASH);
-        }
-
-        public T AddComponent<T, A>(A a) where T : Node, new()
-        {
-            return (T)AddComponent(TypeCache<T>.TYPE, TypeCache<T>.HASH, a);
-        }
-
-        public T AddComponent<T, A, B>(A a, B b) where T : Node, new()
-        {
-            return (T)AddComponent(TypeCache<T>.TYPE, TypeCache<T>.HASH, a, b);
-        }
-
-        public T AddComponent<T, A, B, C>(A a, B b, C c) where T : Node, new()
-        {
-            return (T)AddComponent(TypeCache<T>.TYPE, TypeCache<T>.HASH, a, b, c);
-        }
-
-        public T AddComponent<T, A, B, C, D>(A a, B b, C c, D d) where T : Node, new()
-        {
-            return (T)AddComponent(TypeCache<T>.TYPE, TypeCache<T>.HASH, a, b, c, d);
+            return (N)AddComponent(TypeCache<N>.TYPE, arg);
         }
 
         /// <summary>
@@ -702,7 +568,6 @@ namespace Moyo
                 }
 
                 this.children.Clear();
-                this.childrenDB.Clear();
             }
 
             if (this.CheckComponents())

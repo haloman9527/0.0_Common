@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using Moyo;
 
 namespace Moyo
 {
@@ -29,39 +28,29 @@ namespace Moyo
         Remove
     }
 
-    public class BBEventArg : EventArg
+    public struct BBEventArg
     {
         public object value;
         public NotifyType notifyType;
-
-        public override void OnSpawn()
-        {
-            value = null;
-        }
-
-        public override void OnRecycle()
-        {
-            value = null;
-        }
     }
 
     public class BlackboardProcessor<TKey> : IBlackboard<TKey>
     {
         public Blackboard<TKey> blackboard;
-        public Events<TKey> events;
+        public EventService<TKey> events;
         private List<KeyValuePair<TKey, Action<BBEventArg>>> addObservers;
         private List<KeyValuePair<TKey, Action<BBEventArg>>> removeObservers;
         private bool isNotifying;
 
-        public BlackboardProcessor(Blackboard<TKey> blackboard) : this(blackboard, new Events<TKey>())
+        public BlackboardProcessor(Blackboard<TKey> blackboard) : this(blackboard, new EventService<TKey>())
         {
         }
 
-        public BlackboardProcessor(Blackboard<TKey> blackboard, Events<TKey> events)
+        public BlackboardProcessor(Blackboard<TKey> blackboard, EventService<TKey> events)
         {
             this.blackboard = blackboard;
             this.events = events;
-            this.events = new Events<TKey>();
+            this.events = new EventService<TKey>();
             this.addObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
             this.removeObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
         }
@@ -139,12 +128,7 @@ namespace Moyo
             isNotifying = true;
             try
             {
-                using (var bbEvtArg = ObjectPools.Spawn<BBEventArg>())
-                {
-                    bbEvtArg.value = value;
-                    bbEvtArg.notifyType = notifyType;
-                    events.Publish(key, bbEvtArg);
-                }
+                events.Publish(key, new BBEventArg() { value = value, notifyType = notifyType });
             }
             finally
             {
