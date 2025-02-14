@@ -23,12 +23,7 @@ using System.Runtime.CompilerServices;
 
 namespace Moyo
 {
-    public interface IViewModelSource
-    {
-        ViewModel ViewModel { get; }
-    }
-    
-    public class ViewModel : INotifyPropertyChanged
+    public abstract class ViewModel : INotifyPropertyChanged
     {
         public class ValueChangedArg<T> : EventArg
         {
@@ -57,10 +52,7 @@ namespace Moyo
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref T GetFieldValue<T>(ref T field)
-        {
-            return ref field;
-        }
+        public ref T GetFieldValue<T>(ref T field) => ref field;
 
         /// <summary>
         /// 只在属性中调用
@@ -85,28 +77,20 @@ namespace Moyo
                 arg.newValue = value;
                 Events.Publish(propertyName, arg);
             }
+
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             OnPropertyChanged(propertyName);
             return true;
         }
 
+        public void RegisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback) => Events.Subscribe(name, valueChangedCallback);
+
+        public void UnregisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback) => Events.Unsubscribe(name, valueChangedCallback);
+
+        public void UnregisterAllValueChanged(string name) => Events.Remove(name);
+
         protected virtual void OnPropertyChanged(string propertyName)
         {
-        }
-
-        public void RegisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback)
-        {
-            Events.Subscribe(name, valueChangedCallback);
-        }
-
-        public void UnregisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback)
-        {
-            Events.Unsubscribe(name, valueChangedCallback);
-        }
-
-        public void UnregisterAllValueChanged(string name)
-        {
-            Events.Remove(name);
         }
     }
 }

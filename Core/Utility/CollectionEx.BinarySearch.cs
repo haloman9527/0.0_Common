@@ -56,32 +56,24 @@ namespace Moyo
 
         public static int BinaryMatch<T>(this IList<T> original, int startIndex, int endIndex, T item, IComparer<T> comparer)
         {
-            if (original.Count == 0)
+            if (original == null || original.Count == 0)
                 return -1;
 
             while (startIndex <= endIndex)
             {
                 var mid = startIndex + (endIndex - startIndex) / 2;
                 var dir = comparer.Compare(item, original[mid]);
-                if (dir == 0)
-                    return mid;
 
-                if (startIndex == endIndex)
-                {
-                    if (dir < 0)
-                        return Math.Clamp(mid, 0, original.Count);
-                    else
-                        return Math.Clamp(mid + 1, 0, original.Count);
-                }
+                if (dir == 0)
+                    return mid; // 找到匹配项，返回索引
+
+                if (dir < 0)
+                    endIndex = mid - 1; // 继续在左半边查找
                 else
-                {
-                    if (dir < 0)
-                        endIndex = mid - 1;
-                    else
-                        startIndex = mid + 1;
-                }
+                    startIndex = mid + 1; // 继续在右半边查找
             }
 
+            // 如果没有找到，返回 -1
             return -1;
         }
 

@@ -19,13 +19,14 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Sirenix.Utilities;
 
 namespace Moyo
 {
     public static class ViewModelFactory
     {
         private static bool s_Initialized;
-        private static Dictionary<Type, Type> s_ViewModelTypes;
+        private static Dictionary<Type, IViewModelProducer> s_ViewModelProducers;
 
         static ViewModelFactory()
         {
@@ -37,13 +38,13 @@ namespace Moyo
             if (!force && s_Initialized)
                 return;
 
-            if (s_ViewModelTypes == null)
+            if (s_ViewModelProducers == null)
             {
-                s_ViewModelTypes = new Dictionary<Type, Type>();
+                s_ViewModelProducers = new Dictionary<Type, IViewModelProducer>();
             }
             else
             {
-                s_ViewModelTypes.Clear();
+                s_ViewModelProducers.Clear();
             }
 
             foreach (var type in TypesCache.GetTypesWithAttribute<ViewModelAttribute>())
@@ -58,53 +59,105 @@ namespace Moyo
                     continue;
                 }
 
-                var attribute = type.GetCustomAttribute<ViewModelAttribute>(true);
-                s_ViewModelTypes.Add(attribute.modelType, type);
+                var attribute = CustomAttributeExtensions.GetCustomAttribute<ViewModelAttribute>(type, true);
+                if (HasDefaultConstructor(type))
+                {
+                    var producerType = typeof(ViewModelProducerS<>).MakeGenericType(type);
+                    s_ViewModelProducers.Add(attribute.modelType, Activator.CreateInstance(producerType) as IViewModelProducer);
+                }
+                else
+                {
+                    var producerType = typeof(ViewModelProducerR<>).MakeGenericType(type);
+                    s_ViewModelProducers.Add(attribute.modelType, Activator.CreateInstance(producerType) as IViewModelProducer);
+                }
             }
 
             s_Initialized = true;
         }
 
-        public static Type GetViewModelType(Type modelType)
+        private static bool HasDefaultConstructor(Type type)
         {
-            if (!s_ViewModelTypes.TryGetValue(modelType, out var viewModelType))
+            return type == typeof(string) || type.IsArray || type.IsValueType || type.GetConstructor(System.Type.EmptyTypes) != (ConstructorInfo)null;
+        }
+
+        private static IViewModelProducer GetProducer(Type modelType)
+        {
+            if (!s_ViewModelProducers.TryGetValue(modelType, out var producer))
             {
                 var type = modelType;
                 do
                 {
                     type = type.BaseType;
-                } while (type != null && !s_ViewModelTypes.TryGetValue(type, out viewModelType));
+                } while (type != null && !s_ViewModelProducers.TryGetValue(type, out producer));
 
-                s_ViewModelTypes[modelType] = viewModelType;
+                s_ViewModelProducers[modelType] = producer;
             }
 
-            return viewModelType;
+            return producer;
         }
 
-        public static object CreateViewModel(object model)
+        public static Type GetViewModelType(Type modelType)
+        {
+            return GetProducer(modelType)?.ViewModelType;
+        }
+
+        public static ViewModel ProduceViewModel(object model)
         {
             var modelType = model.GetType();
-            
-            var viewModelType = GetViewModelType(modelType);
-            if (viewModelType != null)
+            var producer = GetProducer(modelType);
+            if (producer != null)
             {
-                var viewModel = Activator.CreateInstance(viewModelType, model);
-                return viewModel;
+                return Activator.CreateInstance(producer.ViewModelType, model) as ViewModel;
             }
-            
+
             return null;
         }
 
-        public static object CreateViewModel(Type modelType)
+        public static object ProduceViewModel(Type modelType)
         {
-            var viewModelType = GetViewModelType(modelType);
-            if (viewModelType != null)
+            var producer = GetProducer(modelType);
+            if (producer != null)
             {
-                var viewModel = Activator.CreateInstance(viewModelType);
-                return viewModel;
+                return producer.Produce();
             }
-            
+
             return null;
         }
+
+        public static object ProduceViewModel<TModel>()
+        {
+            var producer = GetProducer(TypeCache<TModel>.TYPE);
+            if (producer != null)
+            {
+                return producer.Produce();
+            }
+
+            return null;
+        }
+    }
+
+    public interface IViewModelProducer
+    {
+        Type ViewModelType { get; }
+
+        object Produce();
+    }
+
+    public sealed class ViewModelProducerR<T> : IViewModelProducer where T : class
+    {
+        public Type ViewModelType => typeof(T);
+
+        public T Produce() => Activator.CreateInstance<T>();
+
+        object IViewModelProducer.Produce() => Produce();
+    }
+
+    public sealed class ViewModelProducerS<T> : IViewModelProducer where T : class, new()
+    {
+        public Type ViewModelType => typeof(T);
+
+        public T Produce() => new T();
+
+        object IViewModelProducer.Produce() => Produce();
     }
 }
