@@ -12,7 +12,7 @@ namespace Moyo
 
         [NonSerialized] private int m_instanceId;
         [NonSerialized] internal World world;
-        [NonSerialized] protected Scene domain;
+        [NonSerialized] protected Scene scene;
         [NonSerialized] protected Node parent;
         [NonSerialized] protected Dictionary<int, Node> children;
         [NonSerialized] protected Dictionary<Type, Node> components;
@@ -66,30 +66,30 @@ namespace Moyo
         }
 
         /// <summary>
-        /// 其实就是Scene啦，只是为了规避和<see cref="Scene"/>的命名冲突
+        /// 节点所在的分支
         /// </summary>
-        public Scene Domain
+        public Scene IScene
         {
-            get { return domain; }
+            get { return scene; }
             protected set
             {
                 if (value == null)
                 {
-                    throw new Exception($"domain cant set null: {this.GetType().Name}");
+                    throw new Exception($"scene cant set null: {this.GetType().Name}");
                 }
 
-                if (this.domain == value)
+                if (this.scene == value)
                 {
                     return;
                 }
 
-                this.domain = value;
+                this.scene = value;
 
                 if (this.CheckChildren())
                 {
                     foreach (var o in this.children.Values)
                     {
-                        o.Domain = this.domain;
+                        o.IScene = this.scene;
                     }
                 }
 
@@ -97,7 +97,7 @@ namespace Moyo
                 {
                     foreach (var o in this.components.Values)
                     {
-                        o.Domain = this.domain;
+                        o.IScene = this.scene;
                     }
                 }
             }
@@ -138,9 +138,9 @@ namespace Moyo
                 this.parent.AddToChildren(this);
 
                 if (this is Scene scene)
-                    scene.Domain = this.parent.domain;
+                    scene.IScene = this.parent.scene;
                 else
-                    this.domain = this.parent.domain;
+                    this.scene = this.parent.scene;
 
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW
                 if (parent.viewGO.transform.Find("---------------") == null)
@@ -172,10 +172,10 @@ namespace Moyo
                     throw new Exception($"cant set parent be self: {this.GetType().Name}");
                 }
 
-                // 严格限制parent必须要有domain,也就是说parent必须在数据树上面
-                if (value.Domain == null)
+                // 严格限制parent必须要有scene,也就是说parent必须在数据树上面
+                if (value.IScene == null)
                 {
-                    throw new Exception($"cant set parent because parent domain is null: {this.GetType().Name} {value.GetType().Name}");
+                    throw new Exception($"cant set parent because parent scene is null: {this.GetType().Name} {value.GetType().Name}");
                 }
 
                 if (this.parent != null) // 之前有parent
@@ -194,9 +194,9 @@ namespace Moyo
                 this.parent.AddToComponents(this);
 
                 if (this.parent is Scene scene)
-                    this.domain = scene;
+                    this.scene = scene;
                 else
-                    this.domain = this.parent.domain;
+                    this.scene = this.parent.scene;
 
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW
                 if (parent.viewGO.transform.Find("---------------") == null)
@@ -588,7 +588,7 @@ namespace Moyo
             }
 
             this.parent = null;
-            this.domain = null;
+            this.scene = null;
             this.world = null;
         }
     }

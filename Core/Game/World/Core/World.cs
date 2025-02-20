@@ -8,24 +8,27 @@ namespace Moyo
         private Dictionary<int, Node> nodes;
         private Dictionary<Type, Queue<NodeRef<Node>>> systemNodes;
         private int lastInstanceId;
-        private Scene root;
+        private Scene rootScene;
 
-        public Scene Root
-        {
-            get { return root; }
-        }
+        public Scene RootScene => rootScene;
 
         public World()
         {
             this.nodes = new Dictionary<int, Node>(256);
             this.systemNodes = new Dictionary<Type, Queue<NodeRef<Node>>>();
-            this.root = new Scene("Root", this);
+            this.rootScene = new Scene("Root", this);
         }
 
         public void Dispose()
         {
-            root.Dispose();
-            nodes.Clear();
+            lock (this)
+            {
+                this.rootScene.Dispose();
+                this.nodes.Clear();
+                this.systemNodes.Clear();
+                this.rootScene = null;
+                lastInstanceId = 0;
+            }
         }
 
         public int GenerateInstanceId()
@@ -99,7 +102,7 @@ namespace Moyo
                 {
                     continue;
                 }
-                
+
                 queue.Enqueue(component);
 
                 var systems = Systems.GetSystems(component.GetType(), TypeCache<T>.TYPE);

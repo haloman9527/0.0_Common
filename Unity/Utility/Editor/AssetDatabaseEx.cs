@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 
@@ -6,6 +7,19 @@ namespace Moyo.UnityEditors
 {
     public static class AssetDatabaseEx
     {
+        public static void ValidAndCreateFolder(string folder)
+        {
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            if (!AssetDatabase.IsValidFolder(folder))
+            {
+                AssetDatabase.Refresh();
+            }
+        }
+
         public static string[] FindAssetsFromSelection<T>(string filter) where T : UnityEngine.Object
         {
             var guids = new HashSet<string>();

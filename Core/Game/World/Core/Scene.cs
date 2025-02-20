@@ -5,15 +5,15 @@ namespace Moyo
 {
     public class Scene : Node
     {
-        private Dictionary<string, Scene> childScenes;
+        private Dictionary<string, Scene> scenes;
 
         public string Name { get; private set; }
 
-        public IEnumerable<Scene> ChildScenes => childScenes == null ? Array.Empty<Scene>() : childScenes.Values;
+        public IEnumerable<Scene> Scenes => scenes == null ? Array.Empty<Scene>() : scenes.Values;
 
-        public new Scene Domain
+        public new Scene IScene
         {
-            get { return base.Domain; }
+            get { return base.IScene; }
             set
             {
                 if (value == null)
@@ -21,28 +21,28 @@ namespace Moyo
                     throw new Exception($"domain cant set null: {this.GetType().Name}");
                 }
 
-                var domainScene = value.As<Scene>();
-                if (domainScene.childScenes != null && domainScene.childScenes.ContainsKey(this.Name))
+                var domainBranch = value.As<Scene>();
+                if (domainBranch.scenes != null && domainBranch.scenes.ContainsKey(this.Name))
                 {
                     throw new Exception($"domain already exists {this.Name}");
                 }
 
-                if (this.Domain != null)
+                if (this.IScene != null)
                 {
-                    var oldDomainScene = this.Domain.As<Scene>();
-                    if (oldDomainScene != null && oldDomainScene != domainScene && oldDomainScene.childScenes.ContainsKey(this.Name))
+                    var oldDomainBranch = this.IScene.As<Scene>();
+                    if (oldDomainBranch != null && oldDomainBranch != domainBranch && oldDomainBranch.scenes.ContainsKey(this.Name))
                     {
-                        oldDomainScene.childScenes.Remove(this.Name);
+                        oldDomainBranch.scenes.Remove(this.Name);
                     }
                 }
 
-                if (domainScene.childScenes == null)
+                if (domainBranch.scenes == null)
                 {
-                    domainScene.childScenes = new Dictionary<string, Scene>();
+                    domainBranch.scenes = new Dictionary<string, Scene>();
                 }
 
-                base.Domain = value;
-                domainScene.childScenes.Add(this.Name, this);
+                base.IScene = value;
+                domainBranch.scenes.Add(this.Name, this);
             }
         }
 
@@ -55,7 +55,7 @@ namespace Moyo
         {
         }
 
-        public Scene(string name, Node parent) : this(name, parent, parent.Domain.World)
+        public Scene(string name, Node parent) : this(name, parent, parent.IScene.World)
         {
         }
 
@@ -66,12 +66,12 @@ namespace Moyo
             this.Name = n;
             if (p == null)
             {
-                this.Domain = this;
+                this.IScene = this;
             }
             else
             {
-                var domainScene = p.Domain.As<Scene>();
-                if (domainScene.childScenes != null && domainScene.childScenes.ContainsKey(this.Name))
+                var domainBranch = p.IScene.As<Scene>();
+                if (domainBranch.scenes != null && domainBranch.scenes.ContainsKey(this.Name))
                 {
                     throw new Exception($"domain already exists {this.Name}");
                 }
@@ -91,34 +91,34 @@ namespace Moyo
                 return;
             }
 
-            var oldDomain = this.Domain.As<Scene>();
+            var oldDomain = this.IScene.As<Scene>();
             base.Dispose();
-            childScenes?.Clear();
+            scenes?.Clear();
             if (!oldDomain.IsDisposed)
             {
-                oldDomain.childScenes?.Remove(Name);
+                oldDomain.scenes?.Remove(Name);
             }
         }
 
         public Scene GetChildScene(string name)
         {
-            if (childScenes == null)
+            if (scenes == null)
             {
                 return null;
             }
 
-            if (!childScenes.TryGetValue(name, out var scene))
+            if (!scenes.TryGetValue(name, out var _branch))
             {
                 return null;
             }
 
-            return scene;
+            return _branch;
         }
     }
 
-    public static class SceneSystems
+    public static class BranchSystems
     {
-        public static Scene AddScene(this Node self, string name)
+        public static Scene AddBranch(this Scene self, string name)
         {
             return new Scene(name, self);
         }

@@ -40,30 +40,5 @@ namespace Moyo
         {
             logger?.Error(e);
         }
-
-        public static void Trace(string msg, params object[] args)
-        {
-            logger?.Trace(msg, args);
-        }
-
-        public static void Warning(string msg, params object[] args)
-        {
-            logger?.Warning(msg, args);
-        }
-
-        public static void Info(string msg, params object[] args)
-        {
-            logger?.Info(msg, args);
-        }
-
-        public static void Debug(string msg, params object[] args)
-        {
-            logger?.Debug(msg, args);
-        }
-
-        public static void Error(string msg, params object[] args)
-        {
-            logger?.Error(msg, args);
-        }
     }
 }

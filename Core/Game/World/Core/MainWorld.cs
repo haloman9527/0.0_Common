@@ -1,14 +1,10 @@
-﻿
-namespace Moyo
+﻿namespace Moyo
 {
     public class MainWorld : Singleton<MainWorld>, ISingletonAwake, ISingletonDestory, ISingletonFixedUpdate, ISingletonUpdate, ISingletonLateUpdate
     {
         private World world;
-        
-        public Scene RootScene
-        {
-            get { return world.Root; }
-        }
+
+        public Scene RootScene => world.RootScene;
 
         public void Awake()
         {
