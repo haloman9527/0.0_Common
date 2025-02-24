@@ -1,22 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using Moyo.Internal;
 
 namespace Moyo
 {
-    public interface IGlobalEvent
-    {
-        public Type EventType { get; }
-    }
-
-    public abstract class GlobalEvent<E> : IGlobalEvent
-    {
-        public Type EventType => TypeCache<E>.TYPE;
-
-        public abstract void Invoke(E arg);
-    }
-
     public partial class GlobalEventService
     {
+        public static GlobalEventService Instance => s_Instance;
+
+        static GlobalEventService()
+        {
+            s_allGlobalEvents = new Dictionary<Type, List<IGlobalEvent>>(128);
+
+            foreach (var type in TypesCache.GetTypesDerivedFrom<IGlobalEvent>())
+            {
+                if (type.IsAbstract)
+                {
+                    continue;
+                }
+
+                if (!type.IsClass)
+                {
+                    continue;
+                }
+
+                var evt = Activator.CreateInstance(type) as IGlobalEvent;
+                if (evt == null)
+                {
+                    continue;
+                }
+
+                var evtType = evt.EventType;
+                if (!s_allGlobalEvents.TryGetValue(evtType, out var evts))
+                {
+                    s_allGlobalEvents[evtType] = evts = new List<IGlobalEvent>();
+                }
+
+                evts.Add(evt);
+            }
+        }
+
         private abstract class EventTask
         {
             public abstract void Invoke(EventService<Type> events);
@@ -43,10 +66,9 @@ namespace Moyo
     public partial class GlobalEventService : ISingleton, ISingletonAwake
     {
         private static GlobalEventService s_Instance;
+        private static Dictionary<Type, List<IGlobalEvent>> s_allGlobalEvents;
 
-        public static GlobalEventService Instance => s_Instance;
 
-        private Dictionary<Type, List<IGlobalEvent>> m_allGlobalEvents;
         private EventService<Type> m_eventService;
         // private Queue<EventTask> m_eventQueue;
 
@@ -64,34 +86,6 @@ namespace Moyo
         public void Awake()
         {
             m_eventService = new EventService<Type>();
-            m_allGlobalEvents = new Dictionary<Type, List<IGlobalEvent>>(128);
-
-            foreach (var type in TypesCache.GetTypesDerivedFrom<IGlobalEvent>())
-            {
-                if (type.IsAbstract)
-                {
-                    continue;
-                }
-
-                if (!type.IsClass)
-                {
-                    continue;
-                }
-
-                var evt = Activator.CreateInstance(type) as IGlobalEvent;
-                if (evt == null)
-                {
-                    continue;
-                }
-
-                var evtType = evt.EventType;
-                if (!m_allGlobalEvents.TryGetValue(evtType, out var evts))
-                {
-                    m_allGlobalEvents[evtType] = evts = new List<IGlobalEvent>();
-                }
-
-                evts.Add(evt);
-            }
         }
 
         public void Dispose()
@@ -128,17 +122,15 @@ namespace Moyo
         public void Publish<E>(E e)
         {
             var t = TypeCache<E>.TYPE;
-            if (m_allGlobalEvents.TryGetValue(t, out var evts))
+            if (s_allGlobalEvents.TryGetValue(t, out var evts))
             {
                 foreach (var evt in evts)
                 {
                     (evt as GlobalEvent<E>)?.Invoke(e);
                 }
             }
-            else
-            {
-                m_eventService.Publish(TypeCache<E>.TYPE, e);
-            }
+
+            m_eventService.Publish(TypeCache<E>.TYPE, e);
         }
 
         // public void Publish<E>(E e) where E : EventArg

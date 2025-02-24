@@ -25,20 +25,10 @@ namespace Moyo
 {
     public abstract class ViewModel : INotifyPropertyChanged
     {
-        public class ValueChangedArg<T> : EventArg
+        public struct ValueChangedArg<T>
         {
             public T oldValue;
             public T newValue;
-
-            public override void OnSpawn()
-            {
-            }
-
-            public override void OnRecycle()
-            {
-                oldValue = default;
-                newValue = default;
-            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -71,12 +61,7 @@ namespace Moyo
 
             var oldValue = field;
             field = value;
-            using (var arg = ObjectPoolService.Spawn<ValueChangedArg<T>>())
-            {
-                arg.oldValue = oldValue;
-                arg.newValue = value;
-                Events.Publish(propertyName, arg);
-            }
+            Events.Publish(propertyName, new ValueChangedArg<T>() { oldValue = oldValue, newValue = value });
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             OnPropertyChanged(propertyName);
