@@ -31,7 +31,7 @@ namespace Moyo.UnityEditors.IMGUI.Controls
     public class TreeViewItem : UnityTreeViewItem
     {
         public object userData;
-        private Dictionary<string, TreeViewItem> childrenMap;
+        private Dictionary<string, TreeViewItem> m_childrenMap;
 
         public new TreeViewItem parent
         {
@@ -39,7 +39,7 @@ namespace Moyo.UnityEditors.IMGUI.Controls
             set => base.parent = value;
         }
 
-        public override List<UnityTreeViewItem> children
+        public new List<UnityTreeViewItem> children
         {
             get
             {
@@ -47,18 +47,30 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                     base.children = new List<UnityTreeViewItem>();
                 return base.children;
             }
+            set => base.children = value;
         }
 
         public IReadOnlyDictionary<string, TreeViewItem> ChildrenMap
         {
             get
             {
-                if (childrenMap == null)
-                {
-                    childrenMap = new Dictionary<string, TreeViewItem>();
-                }
+                CheckChildrenMap();
+                return m_childrenMap;
+            }
+        }
 
-                return childrenMap;
+        private void CheckChildrenMap()
+        {
+            if (m_childrenMap == null)
+            {
+                m_childrenMap = new Dictionary<string, TreeViewItem>();
+                if (hasChildren)
+                {
+                    foreach (var child in children)
+                    {
+                        m_childrenMap[child.displayName] = (TreeViewItem)child;
+                    }
+                }
             }
         }
 
@@ -71,9 +83,9 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                 this.children.Clear();
             }
 
-            if (this.childrenMap != null)
+            if (this.m_childrenMap != null)
             {
-                this.childrenMap.Clear();
+                this.m_childrenMap.Clear();
             }
         }
 
@@ -89,9 +101,9 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                 this.children.Clear();
             }
 
-            if (this.childrenMap != null)
+            if (this.m_childrenMap != null)
             {
-                this.childrenMap.Clear();
+                this.m_childrenMap.Clear();
             }
         }
 
@@ -102,26 +114,18 @@ namespace Moyo.UnityEditors.IMGUI.Controls
 
         public void AddChild(TreeViewItem item)
         {
+            CheckChildrenMap();
             this.children.Add(item);
-            if (childrenMap == null)
-            {
-                childrenMap = new Dictionary<string, TreeViewItem>();
-            }
-
-            childrenMap[item.displayName] = item;
+            this.m_childrenMap[item.displayName] = item;
             item.parent = this;
             item.depth = this.depth + 1;
         }
 
         public void InsertChild(int index, TreeViewItem item)
         {
+            CheckChildrenMap();
             this.children.Insert(index, item);
-            if (childrenMap == null)
-            {
-                childrenMap = new Dictionary<string, TreeViewItem>();
-            }
-
-            childrenMap[item.displayName] = item;
+            this.m_childrenMap[item.displayName] = item;
             item.parent = this;
             item.depth = this.depth + 1;
         }
@@ -133,9 +137,9 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                 return;
             }
 
-            if (childrenMap != null && childrenMap.TryGetValue(item.displayName, out var child) && child == item)
+            if (m_childrenMap != null && m_childrenMap.TryGetValue(item.displayName, out var child) && child == item)
             {
-                childrenMap.Remove(item.displayName);
+                m_childrenMap.Remove(item.displayName);
             }
 
             item.parent = null;
@@ -158,57 +162,32 @@ namespace Moyo.UnityEditors.IMGUI.Controls
 
     public interface IIdGenerator
     {
-         int NextId(object userData);
+        int NextId();
 
-         void Reset();
+        void Reset();
     }
 
     public class IdGenerator : IIdGenerator
     {
-        private int startId;
         private int lastItemId;
 
-        public IdGenerator()
-        {
-            this.lastItemId = 0;
-            this.startId = 0;
-        }
-
-        public IdGenerator(int startId)
-        {
-            this.lastItemId = startId;
-            this.startId = startId;
-        }
-
-        public int NextId(object userData)
+        public int NextId()
         {
             return lastItemId++;
         }
 
         public void Reset()
         {
-            this.lastItemId = startId;
+            this.lastItemId = 0;
         }
     }
 
-    public abstract class TreeView<T> : UnityTreeView where T : TreeViewItem, new()
+    public abstract class TreeView : UnityTreeView
     {
-        private T root;
+        private TreeViewItem root;
         private TreeViewItemPool itemPool;
         private bool sharedItemPool;
-        private Dictionary<int, T> itemMap = new Dictionary<int, T>();
-
-        public Action<IList<int>> onSelectionChanged;
-        public Action onKeyEvent;
-        public Action onContextClicked;
-        public Action<T> onItemContextClicked;
-        public Action<T> onItemSingleClicked;
-        public Action<T> onItemDoubleClicked;
-        public Action<T, string, string> renameEnded;
-
-        public Func<T, bool> canRename;
-        public Func<T, bool> canMultiSelect;
-        public Func<T, bool> canBeParent;
+        private Dictionary<int, TreeViewItem> itemMap = new Dictionary<int, TreeViewItem>();
 
         public float RowHeight
         {
@@ -240,16 +219,16 @@ namespace Moyo.UnityEditors.IMGUI.Controls
             set => this.columnIndexForTreeFoldouts = value;
         }
 
-        public T Root
+        public TreeViewItem Root
         {
             get
             {
                 if (root == null)
                 {
-                    root = new T() { id = -1, depth = -1, displayName = "Root" };
+                    root = new TreeViewItem() { id = -1, depth = -1, displayName = "Root" };
                 }
 
-                if (root.children == null)
+                if (!root.hasChildren)
                 {
                     root.children = new List<UnityTreeViewItem>();
                 }
@@ -260,7 +239,7 @@ namespace Moyo.UnityEditors.IMGUI.Controls
 
         public int Count => itemMap.Count;
 
-        public abstract IIdGenerator IdGenerator { get; }
+        public virtual IIdGenerator IdGenerator { get; } = new IdGenerator();
 
         public TreeView(TreeViewState state) : base(state)
         {
@@ -290,7 +269,7 @@ namespace Moyo.UnityEditors.IMGUI.Controls
         {
             SortRecursive(Root);
 
-            void SortRecursive(T item)
+            void SortRecursive(TreeViewItem item)
             {
                 if (!item.hasChildren)
                     return;
@@ -298,93 +277,78 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                 item.children.QuickSort(comparer);
                 foreach (var child in item.children)
                 {
-                    SortRecursive(child as T);
+                    SortRecursive((TreeViewItem)child);
                 }
             }
         }
 
-        protected override UnityTreeViewItem BuildRoot()
+        protected override UnityTreeViewItem BuildRoot() => this.BuildRootItem();
+
+        protected virtual TreeViewItem BuildRootItem() => Root;
+
+        protected sealed override IList<UnityTreeViewItem> BuildRows(UnityTreeViewItem root) => base.BuildRows(root);
+
+        public sealed override IList<UnityTreeViewItem> GetRows() => base.GetRows();
+
+        protected sealed override bool DoesItemMatchSearch(UnityTreeViewItem item, string search) => DoesItemMatchSearch(item as TreeViewItem, search);
+
+        protected virtual bool DoesItemMatchSearch(TreeViewItem item, string search) => base.DoesItemMatchSearch(item, search);
+
+        protected sealed override bool CanMultiSelect(UnityTreeViewItem item) => CanMultiSelect((TreeViewItem)item);
+
+        protected virtual bool CanMultiSelect(TreeViewItem item) => false;
+
+        protected sealed override bool CanRename(UnityTreeViewItem item) => ItemCanRename((TreeViewItem)item);
+
+        protected virtual bool ItemCanRename(TreeViewItem item) => false;
+
+        protected sealed override bool CanBeParent(UnityTreeViewItem item) => ItemCanBeParent((TreeViewItem)item);
+
+        protected virtual bool ItemCanBeParent(TreeViewItem item) => true;
+
+        protected sealed override void RenameEnded(RenameEndedArgs args)
         {
-            return Root;
+            if (args.acceptedRename)
+            {
+                this.ItemRenameEnded(FindItem(args.itemID), args.originalName, args.newName);
+            }
         }
 
-        protected sealed override bool DoesItemMatchSearch(UnityTreeViewItem item, string search)
+        protected virtual void ItemRenameEnded(TreeViewItem item, string oldName, string newName)
         {
-            return DoesItemMatchSearch(item as T, search);
         }
 
-        protected virtual bool DoesItemMatchSearch(T item, string search)
-        {
-            return base.DoesItemMatchSearch(item, search);
-        }
-
-        protected sealed override bool CanMultiSelect(UnityTreeViewItem item)
-        {
-            return CanMultiSelect((T)item);
-        }
-
-        protected virtual bool CanMultiSelect(T item)
-        {
-            if (canMultiSelect == null)
-                return false;
-            return canMultiSelect(item);
-        }
-
-        protected override bool CanRename(UnityTreeViewItem item)
-        {
-            if (canRename == null)
-                return false;
-            return canRename(item as T);
-        }
-
-        protected override bool CanBeParent(UnityTreeViewItem item)
-        {
-            if (canBeParent == null)
-                return base.CanBeParent(item);
-            return canBeParent(item as T);
-        }
-
-        protected override void RenameEnded(RenameEndedArgs args)
-        {
-            var item = FindItem(args.itemID);
-
-            renameEnded?.Invoke(item, args.originalName, args.newName);
-        }
-
-        protected override void SelectionChanged(IList<int> selectedIds)
-        {
-            onSelectionChanged?.Invoke(selectedIds);
-        }
-
-        protected override void KeyEvent()
-        {
-            onKeyEvent?.Invoke();
-        }
-
-        protected override void SingleClickedItem(int id)
+        protected sealed override void SingleClickedItem(int id)
         {
             var item = FindItem(id);
-            onItemSingleClicked?.Invoke(item);
+            if (item != null)
+                ItemSingleClicked(item);
         }
 
-        protected override void DoubleClickedItem(int id)
+        protected virtual void ItemSingleClicked(TreeViewItem item)
+        {
+        }
+
+        protected sealed override void DoubleClickedItem(int id)
         {
             var item = FindItem(id);
-            onItemDoubleClicked?.Invoke(item);
+            if (item != null)
+                ItemDoubleClicked(item);
         }
 
-        protected override void ContextClicked()
+        protected virtual void ItemDoubleClicked(TreeViewItem item)
         {
-            onContextClicked?.Invoke();
         }
 
-        protected override void ContextClickedItem(int id)
+        protected sealed override void ContextClickedItem(int id)
         {
             var item = FindItem(id);
-            if (item == null)
-                return;
+            if (item != null)
+                ItemContextClicked(item);
+        }
 
-            onItemContextClicked?.Invoke(item);
+        protected virtual void ItemContextClicked(TreeViewItem item)
+        {
         }
 
         protected sealed override void RowGUI(RowGUIArgs args)
@@ -395,38 +359,33 @@ namespace Moyo.UnityEditors.IMGUI.Controls
             else
                 indentRect.xMin += args.item.depth * depthIndentWidth + depthIndentWidth;
 
-            ItemRowGUI(args.item as T, args, indentRect);
+            ItemRowGUI(args.item as TreeViewItem, args, indentRect);
         }
 
-        protected virtual void ItemRowGUI(T item, RowGUIArgs args, Rect indentRect)
-        {
-            DefaultRowGUI(args, indentRect);
-        }
-
-        protected void DefaultRowGUI(RowGUIArgs args, Rect indexRect)
+        protected virtual void ItemRowGUI(TreeViewItem item, RowGUIArgs args, Rect indentRect)
         {
             if (!args.isRenaming)
             {
-                GUI.Label(indexRect, EditorGUIUtility.TrTextContent(args.label, args.item.icon));
+                GUI.Label(indentRect, EditorGUIUtility.TrTextContent(args.label, args.item.icon));
             }
         }
 
-        public T AddMenuItem(string path, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem AddMenuItem(string path, char separator = '/', bool split = true)
         {
             return AddMenuItemTo(Root, path, null, separator, split);
         }
 
-        public T AddMenuItem(string path, Texture2D icon, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem AddMenuItem(string path, Texture2D icon, char separator = '/', bool split = true)
         {
             return AddMenuItemTo(Root, path, icon, separator, split);
         }
 
-        public T GetOrAddMenuItem(string path, Texture2D icon = null, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem GetOrAddMenuItem(string path, Texture2D icon = null, char separator = '/', bool split = true)
         {
             return GetOrAddMenuItemTo(Root, path, icon, separator, split);
         }
 
-        public T AddMenuItemTo(T parent, string path, Texture2D icon = null, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem AddMenuItemTo(TreeViewItem parent, string path, Texture2D icon = null, char separator = '/', bool split = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -442,27 +401,26 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                     if (!parent.ChildrenMap.TryGetValue(p[i], out var tmpParent))
                     {
                         tmpParent = itemPool.Spawn();
-                        tmpParent.id = IdGenerator.NextId(userData);
+                        tmpParent.id = IdGenerator.NextId();
                         tmpParent.displayName = p[i];
                         parent.AddChild(tmpParent);
-                        itemMap[tmpParent.id] = (T)tmpParent;
+                        itemMap[tmpParent.id] = tmpParent;
                     }
 
-                    parent = (T)tmpParent;
+                    parent = tmpParent;
                 }
             }
 
             var item = itemPool.Spawn();
             item.icon = icon;
-            item.id = IdGenerator.NextId(userData);
+            item.id = IdGenerator.NextId();
             item.displayName = name;
-            item.userData = userData;
             parent.AddChild(item);
             itemMap[item.id] = item;
             return item;
         }
 
-        public T GetOrAddMenuItemTo(T parent, string path, Texture2D icon = null, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem GetOrAddMenuItemTo(TreeViewItem parent, string path, Texture2D icon = null, char separator = '/', bool split = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -478,13 +436,13 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                     if (!parent.ChildrenMap.TryGetValue(p[i], out var tmpParent))
                     {
                         tmpParent = itemPool.Spawn();
-                        tmpParent.id = IdGenerator.NextId(userData);
+                        tmpParent.id = IdGenerator.NextId();
                         tmpParent.displayName = p[i];
                         parent.AddChild(tmpParent);
-                        itemMap[tmpParent.id] = (T)tmpParent;
+                        itemMap[tmpParent.id] = tmpParent;
                     }
 
-                    parent = (T)tmpParent;
+                    parent = tmpParent;
                 }
             }
 
@@ -492,32 +450,31 @@ namespace Moyo.UnityEditors.IMGUI.Controls
             {
                 child = itemPool.Spawn();
                 child.icon = icon;
-                child.id = IdGenerator.NextId(userData);
+                child.id = IdGenerator.NextId();
                 child.displayName = name;
-                child.userData = userData;
                 parent.AddChild(child);
-                itemMap[child.id] = (T)child;
+                itemMap[child.id] = child;
             }
 
-            return (T)child;
+            return child;
         }
 
-        public T InsertMenuItem(string path, int index, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem InsertMenuItem(string path, int index, char separator = '/', bool split = true)
         {
             return InsertMenuItemTo(Root, path, index, null, separator, split);
         }
 
-        public T InsertMenuItem(string path, int index, Texture2D icon, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem InsertMenuItem(string path, int index, Texture2D icon, char separator = '/', bool split = true)
         {
             return InsertMenuItemTo(Root, path, index, icon, separator, split);
         }
 
-        public T GetOrInsertMenuItem(string path, int index, Texture2D icon = null, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem GetOrInsertMenuItem(string path, int index, Texture2D icon = null, char separator = '/', bool split = true)
         {
             return GetOrInsertMenuItemTo(root, path, index, icon, separator, split);
         }
 
-        public T InsertMenuItemTo(T parent, string path, int index, Texture2D icon = null, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem InsertMenuItemTo(TreeViewItem parent, string path, int index, Texture2D icon = null, char separator = '/', bool split = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -533,27 +490,26 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                     if (!parent.ChildrenMap.TryGetValue(p[i], out var tmpParent))
                     {
                         tmpParent = itemPool.Spawn();
-                        tmpParent.id = IdGenerator.NextId(userData);
+                        tmpParent.id = IdGenerator.NextId();
                         tmpParent.displayName = p[i];
                         parent.AddChild(tmpParent);
-                        itemMap[tmpParent.id] = (T)tmpParent;
+                        itemMap[tmpParent.id] = tmpParent;
                     }
 
-                    parent = (T)tmpParent;
+                    parent = tmpParent;
                 }
             }
 
             var item = itemPool.Spawn();
             item.icon = icon;
-            item.id = IdGenerator.NextId(userData);
+            item.id = IdGenerator.NextId();
             item.displayName = name;
-            item.userData = userData;
             parent.InsertChild(index, item);
             itemMap[item.id] = item;
             return item;
         }
 
-        public T GetOrInsertMenuItemTo(T parent, string path, int index, Texture2D icon = null, char separator = '/', bool split = true, object userData = null)
+        public TreeViewItem GetOrInsertMenuItemTo(TreeViewItem parent, string path, int index, Texture2D icon = null, char separator = '/', bool split = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -569,13 +525,13 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                     if (!parent.ChildrenMap.TryGetValue(p[i], out var tmpParent))
                     {
                         tmpParent = itemPool.Spawn();
-                        tmpParent.id = IdGenerator.NextId(userData);
+                        tmpParent.id = IdGenerator.NextId();
                         tmpParent.displayName = p[i];
                         parent.AddChild(tmpParent);
-                        itemMap[tmpParent.id] = (T)tmpParent;
+                        itemMap[tmpParent.id] = tmpParent;
                     }
 
-                    parent = (T)tmpParent;
+                    parent = tmpParent;
                 }
             }
 
@@ -583,17 +539,16 @@ namespace Moyo.UnityEditors.IMGUI.Controls
             {
                 child = itemPool.Spawn();
                 child.icon = icon;
-                child.id = IdGenerator.NextId(userData);
+                child.id = IdGenerator.NextId();
                 child.displayName = name;
-                child.userData = userData;
                 parent.InsertChild(index, child);
-                itemMap[child.id] = (T)child;
+                itemMap[child.id] = child;
             }
 
-            return (T)child;
+            return child;
         }
 
-        public void Remove(T treeViewItem)
+        public void Remove(TreeViewItem treeViewItem)
         {
             if (treeViewItem == null || treeViewItem.parent == null)
                 return;
@@ -601,17 +556,17 @@ namespace Moyo.UnityEditors.IMGUI.Controls
             treeViewItem.parent.RemoveChild(treeViewItem);
         }
 
-        public T FindItem(int id)
+        public TreeViewItem FindItem(int id)
         {
             if (itemMap.TryGetValue(id, out var item))
             {
                 return item;
             }
 
-            return FindItem(id, rootItem) as T;
+            return FindItem(id, rootItem) as TreeViewItem;
         }
 
-        public T FindItem(string path, char separator = '/', bool split = true)
+        public TreeViewItem FindItem(string path, char separator = '/', bool split = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -628,7 +583,7 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                         break;
                     }
 
-                    parent = (T)result;
+                    parent = result;
                 }
             }
             else
@@ -636,19 +591,19 @@ namespace Moyo.UnityEditors.IMGUI.Controls
                 parent.ChildrenMap.TryGetValue(path, out result);
             }
 
-            return (T)result;
+            return result;
         }
 
-        public IEnumerable<T> Items()
+        public IEnumerable<TreeViewItem> Items()
         {
-            return Foreach(Root);
+            return Enumerate(Root);
 
-            IEnumerable<T> Foreach(T parent)
+            IEnumerable<TreeViewItem> Enumerate(TreeViewItem parent)
             {
                 foreach (var item in parent.children)
                 {
-                    yield return item as T;
-                    foreach (var child in Foreach(item as T))
+                    yield return (TreeViewItem)item;
+                    foreach (var child in Enumerate((TreeViewItem)item))
                     {
                         yield return child;
                     }
@@ -691,41 +646,98 @@ namespace Moyo.UnityEditors.IMGUI.Controls
             IdGenerator.Reset();
         }
 
-        public class TreeViewItemPool : ObjectPool<T>
+        public class TreeViewItemPool : ObjectPool<TreeViewItem>
         {
-            protected override T Create()
+            protected override TreeViewItem Create()
             {
-                return new T();
+                return new TreeViewItem();
             }
 
-            protected override void OnRecycle(T unit)
+            protected override void OnRecycle(TreeViewItem unit)
             {
                 unit.Reset();
                 base.OnRecycle(unit);
             }
         }
     }
+}
 
+public class SimpleTreeView : Moyo.UnityEditors.IMGUI.Controls.TreeView
+{
+    public Action<IList<int>> onSelectionChanged;
+    public Action onKeyEvent;
+    public Action onContextClicked;
+    public Action<Moyo.UnityEditors.IMGUI.Controls.TreeViewItem> onContextClickedItem;
+    public Action<Moyo.UnityEditors.IMGUI.Controls.TreeViewItem> onSingleClickedItem;
+    public Action<Moyo.UnityEditors.IMGUI.Controls.TreeViewItem> onDoubleClickedItem;
+    public Action<Moyo.UnityEditors.IMGUI.Controls.TreeViewItem, string, string> renameEnded;
 
-    public class TreeView : TreeView<TreeViewItem>
+    public Func<Moyo.UnityEditors.IMGUI.Controls.TreeViewItem, string, bool> doesItemMatchSearch;
+    public Func<Moyo.UnityEditors.IMGUI.Controls.TreeViewItem, bool> canRename;
+    public Func<Moyo.UnityEditors.IMGUI.Controls.TreeViewItem, bool> canMultiSelect;
+    public Func<Moyo.UnityEditors.IMGUI.Controls.TreeViewItem, bool> canBeParent;
+
+    public SimpleTreeView(TreeViewState state) : base(state)
     {
-        public override IIdGenerator IdGenerator { get; } = new IdGenerator(20000);
-        
-        public TreeView(TreeViewState state) : base(state)
-        {
-        }
+    }
 
-        public TreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
-        {
-        }
+    public SimpleTreeView(TreeViewState state, TreeViewItemPool itemPool) : base(state, itemPool)
+    {
+    }
 
-        public TreeView(TreeViewState state, TreeViewItemPool itemPool) : base(state, itemPool)
-        {
-        }
+    protected override void SelectionChanged(IList<int> selectedIds)
+    {
+        onSelectionChanged?.Invoke(selectedIds);
+    }
 
-        public TreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, TreeViewItemPool itemPool) : base(state, multiColumnHeader, itemPool)
-        {
-        }
+    protected override void KeyEvent()
+    {
+        onKeyEvent?.Invoke();
+    }
+
+    protected override void ContextClicked()
+    {
+        onContextClicked?.Invoke();
+    }
+
+    protected override void ItemContextClicked(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item)
+    {
+        onContextClickedItem?.Invoke(item);
+    }
+
+    protected override void ItemSingleClicked(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item)
+    {
+        onSingleClickedItem?.Invoke(item);
+    }
+
+    protected override void ItemDoubleClicked(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item)
+    {
+        onDoubleClickedItem?.Invoke(item);
+    }
+
+    protected override void ItemRenameEnded(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item, string oldName, string newName)
+    {
+        renameEnded?.Invoke(item, oldName, newName);
+    }
+
+    protected override bool DoesItemMatchSearch(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item, string search)
+    {
+        return doesItemMatchSearch == null ? base.DoesItemMatchSearch(item, search) : doesItemMatchSearch(item, search);
+    }
+
+    protected override bool ItemCanRename(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item)
+    {
+        return canRename == null ? base.ItemCanRename(item) : canRename(item);
+    }
+
+    protected override bool CanMultiSelect(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item)
+    {
+        return canMultiSelect == null ? base.CanMultiSelect(item) : canMultiSelect(item);
+    }
+
+    protected override bool ItemCanBeParent(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item)
+    {
+        return canBeParent == null ? base.ItemCanBeParent(item) : canBeParent(item);
     }
 }
 #endif
