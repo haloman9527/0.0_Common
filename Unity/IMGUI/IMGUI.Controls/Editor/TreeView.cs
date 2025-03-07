@@ -722,7 +722,7 @@ public class SimpleTreeView : Moyo.UnityEditors.IMGUI.Controls.TreeView
 
     protected override bool DoesItemMatchSearch(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item, string search)
     {
-        return doesItemMatchSearch == null ? base.DoesItemMatchSearch(item, search) : doesItemMatchSearch(item, search);
+        return base.DoesItemMatchSearch(item, search) || (doesItemMatchSearch != null && doesItemMatchSearch.Invoke(item, search));
     }
 
     protected override bool ItemCanRename(Moyo.UnityEditors.IMGUI.Controls.TreeViewItem item)
