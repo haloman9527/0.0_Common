@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System;
 using Moyo.UnityEditors.IMGUI.Controls;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -13,39 +14,62 @@ namespace Moyo.UnityEditors
     public abstract class MenuEditorWindow : EditorWindow
     {
         public bool showMenu = true;
-        public ResizableArea resizableArea;
+        [SerializeField] private ResizableArea resizableArea;
         private VisualElement rightContentVisualElement;
         private Vector2 leftScroll;
         private Rect rightRect;
         private Rect sideRect;
         private Rect contentRect;
-
         private SearchField menuTreeViewSearchField;
-        private TreeView menuTreeView;
-        private TreeViewState menuTreeViewState;
+
+        public ResizableArea ResizableArea
+        {
+            get
+            {
+                if (resizableArea == null)
+                {
+                    resizableArea = new ResizableArea
+                    {
+                        rect = new Rect(0, 0, 150, 150),
+                        minSize = this.minSize,
+                        side = 10
+                    };
+                    resizableArea.EnableSide(ResizableArea.UIDirection.Right);
+                }
+
+                return resizableArea;
+            }
+        }
+
+        public VisualElement RightContentVisualElement
+        {
+            get
+            {
+                if (rightContentVisualElement == null)
+                {
+                    rightContentVisualElement = new VisualElement();
+                    rightContentVisualElement.pickingMode = PickingMode.Ignore;
+                    rootVisualElement.Add(rightContentVisualElement);
+                }
+
+                return rightContentVisualElement;
+            }
+        }
+
+        private SearchField MenuTreeViewSearchField
+        {
+            get
+            {
+                if (menuTreeViewSearchField == null)
+                {
+                    menuTreeViewSearchField = new SearchField();
+                }
+
+                return menuTreeViewSearchField;
+            }
+        }
 
         public abstract TreeView MenuTreeView { get; }
-
-        public VisualElement RightContentVisualElement => rightContentVisualElement;
-
-        protected virtual void OnEnable()
-        {
-            menuTreeViewSearchField = new SearchField();
-            if (resizableArea == null)
-            {
-                resizableArea = new ResizableArea
-                {
-                    rect = new Rect(0, 0, 150, 150),
-                    minSize = this.minSize,
-                    side = 10
-                };
-                resizableArea.EnableSide(ResizableArea.UIDirection.Right);
-            }
-
-            rightContentVisualElement = new VisualElement();
-            rightContentVisualElement.pickingMode = PickingMode.Ignore;
-            rootVisualElement.Add(rightContentVisualElement);
-        }
 
         private void ShowButton(Rect rect)
         {
@@ -58,7 +82,7 @@ namespace Moyo.UnityEditors
             rect.x = 0;
             rect.y = 1;
             rect.height = 20;
-            rect.width = position.width - 60; 
+            rect.width = position.width - 60;
 #endif
             GUILayout.BeginArea(rect);
             GUILayout.BeginHorizontal();
@@ -82,27 +106,27 @@ namespace Moyo.UnityEditors
                 var r = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandHeight(true), GUILayout.ExpandHeight(true));
                 if (Event.current.type == EventType.Repaint)
                 {
-                    resizableArea.rect.position = r.position;
-                    resizableArea.maxSize = r.size;
-                    resizableArea.rect.height = r.height;
+                    ResizableArea.rect.position = r.position;
+                    ResizableArea.maxSize = r.size;
+                    ResizableArea.rect.height = r.height;
                 }
 
-                resizableArea.OnGUI();
+                ResizableArea.OnGUI();
 
-                sideRect = resizableArea.rect;
+                sideRect = ResizableArea.rect;
                 sideRect.x += sideRect.width;
                 sideRect.width = 1;
 
                 rightRect = sideRect;
                 rightRect.x += rightRect.width + 1;
-                rightRect.width = position.width - resizableArea.rect.width - sideRect.width - 2;
+                rightRect.width = position.width - ResizableArea.rect.width - sideRect.width - 2;
                 rightRect.width = Mathf.Max(rightRect.width, 100);
                 rightRect.xMin += 10;
                 rightRect.xMax -= 10;
 
-                using (new GUILayout.AreaScope(resizableArea.rect))
+                using (new GUILayout.AreaScope(ResizableArea.rect))
                 {
-                    OnLeftGUI(new Rect(Vector2.zero, resizableArea.rect.size));
+                    OnLeftGUI(new Rect(Vector2.zero, ResizableArea.rect.size));
                 }
 
                 EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
@@ -114,12 +138,12 @@ namespace Moyo.UnityEditors
                 rightRect.xMax -= 11;
             }
 
-            rightContentVisualElement.style.position = Position.Relative;
-            rightContentVisualElement.style.left = rightRect.x;
-            rightContentVisualElement.style.top = rightRect.y;
-            rightContentVisualElement.style.width = rightRect.width;
-            rightContentVisualElement.style.height = rightRect.height;
-            
+            RightContentVisualElement.style.position = Position.Relative;
+            RightContentVisualElement.style.left = rightRect.x;
+            RightContentVisualElement.style.top = rightRect.y;
+            RightContentVisualElement.style.width = rightRect.width;
+            RightContentVisualElement.style.height = rightRect.height;
+
             using (new GUILayout.AreaScope(rightRect))
             {
                 OnRightGUI(new Rect(Vector2.zero, rightRect.size));
@@ -130,11 +154,11 @@ namespace Moyo.UnityEditors
         {
             if (MenuTreeView != null)
             {
-                MenuTreeView.searchString = menuTreeViewSearchField.OnGUI(MenuTreeView.searchString);
+                MenuTreeView.searchString = MenuTreeViewSearchField.OnGUI(MenuTreeView.searchString);
                 leftScroll.y = 0;
                 leftScroll = GUILayout.BeginScrollView(leftScroll);
 
-                if (menuTreeViewSearchField.HasFocus() && (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return))
+                if (MenuTreeViewSearchField.HasFocus() && (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return))
                 {
                     MenuTreeView.SetFocusAndEnsureSelectedItem();
                     Event.current.Use();
