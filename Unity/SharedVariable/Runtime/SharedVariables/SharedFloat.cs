@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace Moyo.SharedVariable
+namespace Atom.SharedVariable
 {
     [Serializable]
     public class SharedFloat : SharedVariable<float>

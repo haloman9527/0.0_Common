@@ -14,7 +14,7 @@
  */
 #endregion
 
-namespace Moyo.UnityEditors.EditorCoroutine
+namespace Atom.UnityEditors.EditorCoroutine
 {
     public interface IYield
     {

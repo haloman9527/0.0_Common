@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Moyo
+namespace Atom
 {
     public delegate ref V RefFunc<V>();
 

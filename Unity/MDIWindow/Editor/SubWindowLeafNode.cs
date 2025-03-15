@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     [Serializable]
     public sealed class SubWindowLeafNode : SubWindowNode

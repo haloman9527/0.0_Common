@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     [Serializable]
     public abstract class SubWindow

@@ -1,13 +1,13 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     public static class MenuEx
     {
         
 #if HALOMAN
-        [MenuItem("Tools/Moyo/Path Print/DataPath")]
+        [MenuItem("Tools/Atom/Path Print/DataPath")]
 #endif
         public static void PrintDataPath()
         {
@@ -15,7 +15,7 @@ namespace Moyo.UnityEditors
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Moyo/Path Print/StreamingAssetsPath")]
+        [MenuItem("Tools/Atom/Path Print/StreamingAssetsPath")]
 #endif
         public static void PrintStreamingAssetsPath()
         {
@@ -23,7 +23,7 @@ namespace Moyo.UnityEditors
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Moyo/Path Print/PersistentDataPath")]
+        [MenuItem("Tools/Atom/Path Print/PersistentDataPath")]
 #endif
         public static void PrintPersistentDataPath()
         {
@@ -31,7 +31,7 @@ namespace Moyo.UnityEditors
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Moyo/Path Print/TemporaryCachePath")]
+        [MenuItem("Tools/Atom/Path Print/TemporaryCachePath")]
 #endif
         public static void PrintTemporaryCachePath()
         {
@@ -39,7 +39,7 @@ namespace Moyo.UnityEditors
         }
 
 #if HALOMAN
-        [MenuItem("Tools/Moyo/Path Print/ComsoleLogPath")]
+        [MenuItem("Tools/Atom/Path Print/ComsoleLogPath")]
 #endif
         public static void PrintComsoleLogPath()
         {

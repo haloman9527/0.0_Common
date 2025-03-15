@@ -15,7 +15,7 @@
 #endregion
 using System;
 
-namespace Moyo
+namespace Atom
 {
     public interface IBindableProperty : IDisposable
     {

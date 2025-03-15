@@ -18,7 +18,7 @@ using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.UnityEditors.EditorCoroutine
+namespace Atom.UnityEditors.EditorCoroutine
 {
     [InitializeOnLoad]
     public class GlobalEditorCoroutineService

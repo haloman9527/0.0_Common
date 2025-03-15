@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Moyo.Collections
+namespace Atom.Collections
 {
     /// <summary>游戏框架链表范围。</summary>
     /// <typeparam name="T">指定链表范围的元素类型。</typeparam>

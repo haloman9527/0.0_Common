@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Moyo
+namespace Atom
 {
     /// <summary>
     /// Snowflake 雪花算法

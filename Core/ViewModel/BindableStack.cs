@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Moyo
+namespace Atom
 {
     public class BindableStack<T> : BindableProperty<Stack<T>>, IEnumerable<T>
     {

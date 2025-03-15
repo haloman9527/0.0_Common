@@ -16,7 +16,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Moyo.UnityEditors.EditorCoroutine
+namespace Atom.UnityEditors.EditorCoroutine
 {
     public abstract class CoroutineService<T> where T : class, ICoroutine
     {

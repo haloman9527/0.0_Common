@@ -17,11 +17,11 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.AnimatedValues;
-using Moyo;
+using Atom;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     public static partial class EditorGUILayoutExtension
     {

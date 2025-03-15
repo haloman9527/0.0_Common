@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Moyo.Internal;
+using Atom.Internal;
 
-namespace Moyo
+namespace Atom
 {
     public class EventService<TKey>
     {
@@ -27,10 +27,10 @@ namespace Moyo
         {
             if (!m_events.TryGetValue(key, out var evt))
             {
-                m_events[key] = evt = new Moyo.Internal.Event<TArg>();
+                m_events[key] = evt = new Event<TArg>();
             }
 
-            if (evt is Moyo.Internal.Event<TArg> _evt)
+            if (evt is Event<TArg> _evt)
             {
                 _evt.Add(handler);
             }
@@ -47,7 +47,7 @@ namespace Moyo
                 return;
             }
 
-            if (evt is Moyo.Internal.Event<TArg> _evt)
+            if (evt is Event<TArg> _evt)
             {
                 _evt.Remove(handler);
             }
@@ -64,7 +64,7 @@ namespace Moyo
                 return;
             }
 
-            if (evt is Moyo.Internal.Event<TArg> _evt)
+            if (evt is Event<TArg> _evt)
             {
                 _evt.Invoke(arg);
             }
@@ -74,10 +74,10 @@ namespace Moyo
         {
             if (!m_events.TryGetValue(key, out var evt))
             {
-                m_events[key] = evt = new Moyo.Internal.Event();
+                m_events[key] = evt = new Event();
             }
 
-            if (evt is Moyo.Internal.Event _evt)
+            if (evt is Event _evt)
             {
                 _evt.Add(handler);
             }
@@ -94,7 +94,7 @@ namespace Moyo
                 return;
             }
 
-            if (evt is Moyo.Internal.Event _evt)
+            if (evt is Event _evt)
             {
                 _evt.Remove(handler);
             }
@@ -111,7 +111,7 @@ namespace Moyo
                 return;
             }
 
-            if (evt is Moyo.Internal.Event _evt)
+            if (evt is Event _evt)
             {
                 _evt.Invoke();
             }
@@ -154,7 +154,7 @@ namespace Moyo
                 m_events[TypeCache<E>.TYPE] = evt = new Event<E>();
             }
 
-            if (evt is Moyo.Internal.Event<E> _evt)
+            if (evt is Event<E> _evt)
             {
                 _evt.Add(handler);
             }
@@ -171,7 +171,7 @@ namespace Moyo
                 return;
             }
 
-            if (evt is Moyo.Internal.Event<E> _evt)
+            if (evt is Event<E> _evt)
             {
                 _evt.Remove(handler);
             }
@@ -188,7 +188,7 @@ namespace Moyo
                 return;
             }
 
-            if (evt is Moyo.Internal.Event<E> _evt)
+            if (evt is Event<E> _evt)
             {
                 _evt.Invoke(e);
             }

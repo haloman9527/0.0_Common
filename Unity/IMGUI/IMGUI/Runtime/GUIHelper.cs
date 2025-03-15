@@ -16,7 +16,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Moyo
+namespace Atom
 {
     public static class GUIHelper
     {

@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     public static class PlayerSettingsEx
     {

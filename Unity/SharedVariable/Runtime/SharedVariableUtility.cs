@@ -17,7 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Moyo.SharedVariable
+namespace Atom.SharedVariable
 {
     public static class SharedVariableUtility
     {

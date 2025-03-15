@@ -1,5 +1,5 @@
 
-namespace Moyo
+namespace Atom
 {
     public class AudioManager : Singleton<AudioManager>, IAudioManager
     {

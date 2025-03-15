@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Moyo.Internal;
+using Atom.Internal;
 
-namespace Moyo
+namespace Atom
 {
     public partial class GlobalEventService
     {

@@ -14,11 +14,11 @@
  */
 #endregion
 #if UNITY_EDITOR
-using Moyo.Unity;
+using Atom.Unity;
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     [global::UnityEditor.CustomPropertyDrawer(typeof(InlineEditorAttribute))]
     public class InlineEditorDrawer : global::UnityEditor.PropertyDrawer

@@ -18,13 +18,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using Moyo;
+using Atom;
 using UnityEditor;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     public static partial class EditorGUILayoutExtension
     {
@@ -285,7 +285,7 @@ namespace Moyo.UnityEditors
             return list;
         }
 
-        const string c_EditorPrefsFoldoutKey = "Moyo.Core.Editors.Foldout.";
+        const string c_EditorPrefsFoldoutKey = "Atom.Core.Editors.Foldout.";
 
         static int currentKeyboardControl = -1;
 

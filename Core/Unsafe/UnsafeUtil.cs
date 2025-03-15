@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
-namespace Moyo.UnsafeEx
+namespace Atom.UnsafeEx
 {
     public unsafe static class UnsafeUtil
     {

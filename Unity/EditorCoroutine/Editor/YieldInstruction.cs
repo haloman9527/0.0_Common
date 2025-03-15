@@ -17,7 +17,7 @@
 using System;
 using UnityEditor;
 
-namespace Moyo.UnityEditors.EditorCoroutine
+namespace Atom.UnityEditors.EditorCoroutine
 {
     public class EditorWaitForSeconds : IYield
     {

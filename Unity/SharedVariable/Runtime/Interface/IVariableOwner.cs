@@ -15,7 +15,7 @@
 #endregion
 using System.Collections.Generic;
 
-namespace Moyo.SharedVariable
+namespace Atom.SharedVariable
 {
     public interface IVariableOwner
     {

@@ -20,7 +20,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.UnityEditors.EditorCoroutine
+namespace Atom.UnityEditors.EditorCoroutine
 {
     public class EditorCoroutine : ICoroutine, IYield
     {

@@ -14,11 +14,11 @@
  */
 #endregion
 #if UNITY_EDITOR
-using Moyo.Unity;
+using Atom.Unity;
 using UnityEngine;
 using UnityEditor;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     [global::UnityEditor.CustomPropertyDrawer(typeof(HideLabelAttribute))]
     public class HideLabelDrawer : global::UnityEditor.PropertyDrawer

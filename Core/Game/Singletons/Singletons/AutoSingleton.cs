@@ -18,7 +18,7 @@
 
 using System;
 
-namespace Moyo
+namespace Atom
 {
     public abstract class AutoSingleton<T> : ISingleton where T : AutoSingleton<T>, new()
     {

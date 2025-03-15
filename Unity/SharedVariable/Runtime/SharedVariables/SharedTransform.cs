@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace Moyo.SharedVariable
+namespace Atom.SharedVariable
 {
     [Serializable]
     public class SharedTransform : SharedObject<Transform>

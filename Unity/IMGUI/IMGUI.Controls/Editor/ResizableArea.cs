@@ -23,7 +23,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
 
-namespace Moyo.UnityEditors.IMGUI.Controls
+namespace Atom.UnityEditors.IMGUI.Controls
 {
     [Serializable]
     public class ResizableArea

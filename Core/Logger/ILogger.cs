@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Moyo
+namespace Atom
 {
     public interface ILogger
     {

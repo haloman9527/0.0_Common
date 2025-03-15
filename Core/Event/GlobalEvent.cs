@@ -1,7 +1,7 @@
 ﻿using System;
-using Moyo.Internal;
+using Atom.Internal;
 
-namespace Moyo
+namespace Atom
 {
     public abstract class GlobalEvent<E> : IGlobalEvent
     {

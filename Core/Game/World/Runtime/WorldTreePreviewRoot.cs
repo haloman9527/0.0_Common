@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Moyo
+namespace Atom
 {
     public class WorldTreePreviewRoot : MonoBehaviour
     {

@@ -18,7 +18,7 @@
 
 using System;
 
-namespace Moyo
+namespace Atom
 {
     [Serializable]
     public abstract class Singleton<T> : ISingleton where T : Singleton<T>

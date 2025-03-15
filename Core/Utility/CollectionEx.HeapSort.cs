@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Moyo
+namespace Atom
 {
     public static partial class CollectionEx
     {

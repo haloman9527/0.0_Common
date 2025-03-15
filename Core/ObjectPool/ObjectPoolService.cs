@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Moyo
+namespace Atom
 {
     public class ObjectPoolAttribute : Attribute
     {
@@ -16,7 +16,7 @@ namespace Moyo
     
     public static partial class ObjectPoolService
     {
-        private class ObjectPool<T> : Moyo.ObjectPool<T> where T : class, new()
+        private class ObjectPool<T> : Atom.ObjectPool<T> where T : class, new()
         {
             protected override T Create()
             {

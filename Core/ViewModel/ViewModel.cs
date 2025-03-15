@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Moyo
+namespace Atom
 {
     public abstract class ViewModel : INotifyPropertyChanged
     {

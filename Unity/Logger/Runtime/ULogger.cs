@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace Moyo
+namespace Atom
 {
 //     public partial class ULogger : UnityEngine.ILogger
 //     {
@@ -217,7 +217,7 @@ namespace Moyo
 // #endif
 //     }
 
-    public partial class ULogger : Moyo.ILogger
+    public partial class ULogger : ILogger
     {
         public void Trace(string msg)
         {

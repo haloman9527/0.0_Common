@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Moyo
+namespace Atom
 {
     public enum NotifyType
     {

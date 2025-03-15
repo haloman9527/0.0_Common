@@ -1,4 +1,4 @@
-﻿namespace Moyo
+﻿namespace Atom
 {
     public class MainWorld : Singleton<MainWorld>, ISingletonAwake, ISingletonDestory, ISingletonFixedUpdate, ISingletonUpdate, ISingletonLateUpdate
     {

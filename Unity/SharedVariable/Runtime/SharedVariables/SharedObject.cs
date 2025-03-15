@@ -19,7 +19,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Moyo.SharedVariable
+namespace Atom.SharedVariable
 {
     public interface ISharedObject
     {

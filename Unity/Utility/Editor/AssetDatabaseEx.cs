@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     public static class AssetDatabaseEx
     {

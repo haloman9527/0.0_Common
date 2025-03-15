@@ -16,7 +16,7 @@
 using UnityEngine;
 using System;
 
-namespace Moyo.Unity
+namespace Atom.Unity
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class ObjectPreviewButtonAttribute : UnityEngine.PropertyAttribute { }

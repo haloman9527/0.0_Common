@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace Moyo
+namespace Atom
 {
     [DisallowMultipleComponent]
     public class ReferenceCollector : MonoBehaviour

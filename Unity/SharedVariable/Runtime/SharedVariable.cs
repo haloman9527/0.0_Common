@@ -19,7 +19,7 @@
 using System;
 using UnityEngine;
 
-namespace Moyo.SharedVariable
+namespace Atom.SharedVariable
 {
     [Serializable]
 #if ODIN_INSPECTOR

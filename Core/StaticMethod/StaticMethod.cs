@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace Moyo
+namespace Atom
 {
     public class StaticMethod : IStaticMethod
     {

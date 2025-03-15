@@ -17,7 +17,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Moyo.SharedVariable.Editors
+namespace Atom.SharedVariable.Editors
 {
     [CustomPropertyDrawer(typeof(SharedVariable), true)]
     public class SharedVariablePropertyDrawer : PropertyDrawer

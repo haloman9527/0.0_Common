@@ -1,7 +1,7 @@
 
 using System;
 
-namespace Moyo
+namespace Atom
 {
     public enum OctreeNodeType
     {

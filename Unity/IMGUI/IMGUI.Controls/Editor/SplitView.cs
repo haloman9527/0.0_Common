@@ -22,7 +22,7 @@ using System;
 using UnityEngine;
 using UnityEditor;
 
-namespace Moyo.UnityEditors.IMGUI.Controls
+namespace Atom.UnityEditors.IMGUI.Controls
 {
     [Serializable]
     public class SplitView

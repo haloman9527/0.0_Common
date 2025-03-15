@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Moyo
+namespace Atom
 {
     [Serializable]
     public class BindableProperty<T> : IBindableProperty<T>, IBindableProperty

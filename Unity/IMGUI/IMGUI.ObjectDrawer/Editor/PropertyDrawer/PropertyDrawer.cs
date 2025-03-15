@@ -21,7 +21,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     public abstract class PropertyDrawer
     {
@@ -103,7 +103,7 @@ namespace Moyo.UnityEditors
 
             foreach (var type in TypeCache.GetTypesDerivedFrom<PropertyDrawer>())
             {
-                foreach (var attr in Moyo.ReflectionEx.GetTypeAttributes<CustomPropertyDrawerAttribute>(type, false))
+                foreach (var attr in ReflectionEx.GetTypeAttributes<CustomPropertyDrawerAttribute>(type, false))
                 {
                      ObjectEditorTypeCache[attr.type] = type;
                 }

@@ -17,7 +17,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Moyo.Unity
+namespace Atom.Unity
 {
     public static class Util
     {

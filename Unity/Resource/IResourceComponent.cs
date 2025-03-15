@@ -1,6 +1,6 @@
 ﻿using UnityObject = UnityEngine.Object;
 
-namespace Moyo
+namespace Atom
 {
     public interface IResourceComponent
     {

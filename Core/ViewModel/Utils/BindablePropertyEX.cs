@@ -1,4 +1,4 @@
-﻿namespace Moyo
+﻿namespace Atom
 {
     public static class BindablePropertyEX
     {

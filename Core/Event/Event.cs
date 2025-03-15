@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Moyo.Internal
+namespace Atom.Internal
 {
     public interface IEvent
     {

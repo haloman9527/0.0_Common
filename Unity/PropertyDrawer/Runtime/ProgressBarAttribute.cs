@@ -16,7 +16,7 @@
 using System;
 using UnityEngine;
 
-namespace Moyo.Unity
+namespace Atom.Unity
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
     public class ProgressBarAttribute : UnityEngine.PropertyAttribute

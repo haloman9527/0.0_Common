@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Moyo
+namespace Atom
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class ViewModelAttribute : Attribute

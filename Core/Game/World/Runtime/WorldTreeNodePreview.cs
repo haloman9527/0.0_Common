@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 using UnityEditor;
 #endif
 
-namespace Moyo
+namespace Atom
 {
     public class WorldTreeNodePreview : MonoBehaviour
     {

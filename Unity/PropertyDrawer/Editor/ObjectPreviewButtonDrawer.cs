@@ -14,14 +14,14 @@
  */
 #endregion
 #if UNITY_EDITOR
-using Moyo.Unity;
-using Moyo.UnityEditors;
+using Atom.Unity;
+using Atom.UnityEditors;
 using UnityEditor;
 using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     [@CustomPropertyDrawer(typeof(ObjectPreviewButtonAttribute), true)]
     public class ObjectPreviewButtonDrawer : global::UnityEditor.PropertyDrawer

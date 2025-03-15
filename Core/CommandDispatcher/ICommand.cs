@@ -17,7 +17,7 @@
 
 #endregion
 
-namespace Moyo
+namespace Atom
 {
     public interface ICommand
     {

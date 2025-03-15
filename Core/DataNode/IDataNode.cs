@@ -7,7 +7,7 @@
 
 using System.Collections.Generic;
 
-namespace Moyo
+namespace Atom
 {
     /// <summary>
     /// 数据结点接口。

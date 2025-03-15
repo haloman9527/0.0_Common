@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Moyo
+namespace Atom
 {
     public static class ViewModelFactory
     {

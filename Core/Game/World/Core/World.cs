@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Moyo
+namespace Atom
 {
     public class World : IDisposable
     {

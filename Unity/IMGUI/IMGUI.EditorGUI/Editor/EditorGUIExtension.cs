@@ -20,7 +20,7 @@ using UnityEngine;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Moyo.UnityEditors
+namespace Atom.UnityEditors
 {
     public static partial class EditorGUIExtension
     {
