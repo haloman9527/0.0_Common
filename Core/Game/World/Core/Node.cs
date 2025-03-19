@@ -146,9 +146,9 @@ namespace Atom
                     this.scene = this.parent.scene;
 
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW
-                if (parent.viewGO.transform.Find("---------------") == null)
+                if (parent.viewGO.transform.Find("↑组件↑   ↓节点↓") == null)
                 {
-                    new UnityEngine.GameObject("---------------").transform.SetParent(parent.viewGO.transform, false);
+                    new UnityEngine.GameObject("↑组件↑   ↓节点↓").transform.SetParent(parent.viewGO.transform, false);
                 }
 
                 this.viewGO.transform.SetParent(parent.viewGO.transform, false);
@@ -202,9 +202,9 @@ namespace Atom
                     this.scene = this.parent.scene;
 
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW
-                if (parent.viewGO.transform.Find("---------------") == null)
+                if (parent.viewGO.transform.Find("↑组件↑   ↓节点↓") == null)
                 {
-                    new UnityEngine.GameObject("---------------").transform.SetParent(parent.viewGO.transform, false);
+                    new UnityEngine.GameObject("↑组件↑   ↓节点↓").transform.SetParent(parent.viewGO.transform, false);
                 }
 
                 this.viewGO.transform.SetParent(parent.viewGO.transform, false);
