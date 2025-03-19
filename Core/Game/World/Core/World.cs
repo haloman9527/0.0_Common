@@ -8,25 +8,25 @@ namespace Atom
         private Dictionary<int, Node> nodes;
         private Dictionary<Type, Queue<NodeRef<Node>>> systemNodes;
         private int lastInstanceId;
-        private Scene rootScene;
+        private Scene root;
 
-        public Scene RootScene => rootScene;
+        public Scene Root => root;
 
         public World()
         {
             this.nodes = new Dictionary<int, Node>(256);
             this.systemNodes = new Dictionary<Type, Queue<NodeRef<Node>>>();
-            this.rootScene = new Scene("Root", this);
+            this.root = new Scene("Root", this);
         }
 
         public void Dispose()
         {
             lock (this)
             {
-                this.rootScene.Dispose();
+                this.root.Dispose();
                 this.nodes.Clear();
                 this.systemNodes.Clear();
-                this.rootScene = null;
+                this.root = null;
                 lastInstanceId = 0;
             }
         }

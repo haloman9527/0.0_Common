@@ -4,7 +4,7 @@
     {
         private World world;
 
-        public Scene RootScene => world.RootScene;
+        public Scene Root => world.Root;
 
         public void Awake()
         {

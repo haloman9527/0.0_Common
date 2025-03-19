@@ -12,12 +12,14 @@ namespace Atom
 
         [NonSerialized] private int m_instanceId;
         [NonSerialized] internal World world;
-        [NonSerialized] protected Scene scene;
+        [NonSerialized] protected IScene scene;
         [NonSerialized] protected Node parent;
         [NonSerialized] protected Dictionary<int, Node> children;
         [NonSerialized] protected Dictionary<Type, Node> components;
 
         [NonSerialized] private HashSet<Node> componentsDB;
+
+        public virtual string ViewName => this.GetType().FullName;
 
         public int InstanceId
         {
@@ -43,7 +45,7 @@ namespace Atom
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW
                 if (m_instanceId != 0)
                 {
-                    this.viewGO = new UnityEngine.GameObject(this.GetType().Name);
+                    this.viewGO = new UnityEngine.GameObject(ViewName);
                     this.viewGO.AddComponent<WorldTreeNodePreview>().component = this;
                     this.viewGO.transform.SetParent(WorldTreePreviewRoot.Instance.transform);
                 }
@@ -55,20 +57,18 @@ namespace Atom
             }
         }
 
-        public bool IsDisposed
-        {
-            get { return m_instanceId == 0; }
-        }
+        public bool IsDisposed => m_instanceId == 0;
 
         public World World
         {
-            get { return world; }
+            get => world;
+            protected set => world = value;
         }
 
         /// <summary>
         /// 节点所在的分支
         /// </summary>
-        public Scene IScene
+        public IScene Scene
         {
             get { return scene; }
             protected set
@@ -85,19 +85,22 @@ namespace Atom
 
                 this.scene = value;
 
-                if (this.CheckChildren())
+                if (!(this is IScene))
                 {
-                    foreach (var o in this.children.Values)
+                    if (this.CheckChildren())
                     {
-                        o.IScene = this.scene;
+                        foreach (var o in this.children.Values)
+                        {
+                            o.Scene = this.scene;
+                        }
                     }
-                }
 
-                if (this.CheckComponents())
-                {
-                    foreach (var o in this.components.Values)
+                    if (this.CheckComponents())
                     {
-                        o.IScene = this.scene;
+                        foreach (var o in this.components.Values)
+                        {
+                            o.Scene = this.scene;
+                        }
                     }
                 }
             }
@@ -110,12 +113,12 @@ namespace Atom
             {
                 if (value == null)
                 {
-                    throw new Exception($"cant set parent null: {this.GetType().Name}");
+                    throw new Exception($"cant set parent null: {this.GetType().FullName}");
                 }
 
                 if (value == this)
                 {
-                    throw new Exception($"cant set parent self: {this.GetType().Name}");
+                    throw new Exception($"cant set parent self: {this.GetType().FullName}");
                 }
 
                 if (this.parent == value)
@@ -123,22 +126,22 @@ namespace Atom
                     return;
                 }
 
-                if (this.parent != null)
-                {
-                    this.parent.RemoveFromChildren(this, this.m_instanceId);
-                }
-
                 if (parent != null && CheckComponents() && parent.componentsDB.Contains(this))
                 {
                     ComponentParent = value;
                     return;
                 }
-
+                
+                if (this.parent != null)
+                {
+                    this.parent.RemoveFromChildren(this, this.m_instanceId);
+                }
+                
                 this.parent = value;
                 this.parent.AddToChildren(this);
 
-                if (this is Scene scene)
-                    scene.IScene = this.parent.scene;
+                if (parent is IScene scene)
+                    this.Scene = scene;
                 else
                     this.scene = this.parent.scene;
 
@@ -151,9 +154,9 @@ namespace Atom
                 this.viewGO.transform.SetParent(parent.viewGO.transform, false);
                 this.viewGO.transform.SetAsLastSibling();
                 if (parent.componentsDB != null && parent.componentsDB.Contains(this))
-                    this.viewGO.name = this.GetType().Name;
+                    this.viewGO.name = this.ViewName;
                 else
-                    this.viewGO.name = this.GetType().Name + $"({this.m_instanceId})";
+                    this.viewGO.name = this.ViewName + $"({this.m_instanceId})";
 #endif
             }
         }
@@ -173,7 +176,7 @@ namespace Atom
                 }
 
                 // 严格限制parent必须要有scene,也就是说parent必须在数据树上面
-                if (value.IScene == null)
+                if (value.Scene == null)
                 {
                     throw new Exception($"cant set parent because parent scene is null: {this.GetType().Name} {value.GetType().Name}");
                 }
@@ -193,7 +196,7 @@ namespace Atom
                 this.parent = value;
                 this.parent.AddToComponents(this);
 
-                if (this.parent is Scene scene)
+                if (this.parent is IScene scene)
                     this.scene = scene;
                 else
                     this.scene = this.parent.scene;

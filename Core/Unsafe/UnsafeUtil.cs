@@ -127,8 +127,6 @@ namespace Atom.UnsafeEx
             return Marshal.ReadInt32(ptr, offset);
         }
         
-        
-
         public static ref T AsRef<T>(void* ptr) where T : unmanaged
         {
             return ref *(T*)ptr;
@@ -164,12 +162,12 @@ namespace Atom.UnsafeEx
 
         public static void CopyBlock(void* destination, void* source, int byteCount)
         {
-            Buffer.MemoryCopy(source, destination, byteCount, byteCount);
+            UnsafeUtility.MemCpy(destination, source, byteCount);
         }
 
         public static void CopyBlock(void* destination, void* source, long byteCount)
         {
-            Buffer.MemoryCopy(source, destination, byteCount, byteCount);
+            UnsafeUtility.MemCpy(destination, source, byteCount);
         }
 
         public static void CopyStructureToPtr<T>(ref T input, void* ptr) where T : struct
