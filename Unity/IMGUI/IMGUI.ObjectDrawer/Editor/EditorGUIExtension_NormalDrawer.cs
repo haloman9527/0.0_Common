@@ -16,7 +16,6 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using Atom;
 using UnityEditor;
 using UnityEngine;
 
@@ -209,14 +208,29 @@ namespace Atom.UnityEditors
             {
                 return EditorGUI.Toggle(rect, label, value == null ? false : (bool)value);
             }
-            if (type.Equals(typeof(short)) || type.Equals(typeof(ushort))
-                || type.Equals(typeof(int)) || type.Equals(typeof(uint)))
+            if (type.Equals(typeof(short)))
             {
                 return EditorGUI.IntField(rect, label, value == null ? 0 : (int)value);
             }
-            if (type.Equals(typeof(long)) || type.Equals(typeof(ulong)))
+            if (type.Equals(typeof(ushort)))
+            {
+                return (ushort)EditorGUI.IntField(rect, label, value == null ? 0 : (ushort)value);
+            }
+            if (type.Equals(typeof(int)))
+            {
+                return EditorGUI.IntField(rect, label, value == null ? 0 : (int)value);
+            }
+            if (type.Equals(typeof(uint)))
+            {
+                return (uint)EditorGUI.IntField(rect, label, value == null ? 0 : (int)(uint)value);
+            }
+            if (type.Equals(typeof(long)))
             {
                 return EditorGUI.LongField(rect, label, value == null ? 0 : (long)value);
+            }
+            if (type.Equals(typeof(ulong)))
+            {
+                return (ulong)EditorGUI.LongField(rect, label, value == null ? 0 : (long)(ulong)value);
             }
             if (type.Equals(typeof(float)))
             {
@@ -276,7 +290,7 @@ namespace Atom.UnityEditors
             }
             if (typeof(UnityObject).IsAssignableFrom(type))
             {
-                return EditorGUI.ObjectField(rect, label, (UnityObject)value, type, true);
+                return EditorGUI.ObjectField(rect, label, value as GameObject, type, true);
             }
             if (type.IsEnum)
             {

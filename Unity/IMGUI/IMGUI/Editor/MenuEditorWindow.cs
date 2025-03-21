@@ -124,10 +124,9 @@ namespace Atom.UnityEditors
                 rightRect.xMin += 10;
                 rightRect.xMax -= 10;
 
-                using (new GUILayout.AreaScope(ResizableArea.rect))
-                {
-                    OnLeftGUI(new Rect(Vector2.zero, ResizableArea.rect.size));
-                }
+                GUILayout.BeginArea(ResizableArea.rect);
+                OnLeftGUI(new Rect(Vector2.zero, ResizableArea.rect.size));
+                GUILayout.EndArea();
 
                 EditorGUI.DrawRect(sideRect, new Color(0.5f, 0.5f, 0.5f, 1));
             }
@@ -144,10 +143,9 @@ namespace Atom.UnityEditors
             RightContentVisualElement.style.width = rightRect.width;
             RightContentVisualElement.style.height = rightRect.height;
 
-            using (new GUILayout.AreaScope(rightRect))
-            {
-                OnRightGUI(new Rect(Vector2.zero, rightRect.size));
-            }
+            GUILayout.BeginArea(rightRect);
+            OnRightGUI(new Rect(Vector2.zero, rightRect.size));
+            GUILayout.EndArea();
         }
 
         protected virtual void OnLeftGUI(Rect rect)
