@@ -1,5 +1,5 @@
 {
-    "name": "Atom.Common",
+    "name": "Atom.Core",
     "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
