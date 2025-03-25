@@ -10,18 +10,18 @@ namespace Atom
         protected UnityEngine.GameObject viewGO;
 #endif
 
-        [NonSerialized] private int m_instanceId;
+        [NonSerialized] private long m_instanceId;
         [NonSerialized] internal World world;
         [NonSerialized] protected IScene scene;
         [NonSerialized] protected Node parent;
-        [NonSerialized] protected Dictionary<int, Node> children;
-        [NonSerialized] protected Dictionary<Type, Node> components;
+        [NonSerialized] protected Dictionary<long, Node> children;
+        [NonSerialized] protected Dictionary<long, Node> components;
 
         [NonSerialized] private HashSet<Node> componentsDB;
 
         public virtual string ViewName => this.GetType().FullName;
 
-        public int InstanceId
+        public long InstanceId
         {
             get { return m_instanceId; }
             protected set
@@ -323,7 +323,7 @@ namespace Atom
 
             if (autoInit)
             {
-                this.children = new Dictionary<int, Node>();
+                this.children = new Dictionary<long, Node>();
                 return true;
             }
 
@@ -336,7 +336,7 @@ namespace Atom
             this.children.Add(o.m_instanceId, o);
         }
 
-        private void RemoveFromChildren(Node o, int instanceId)
+        private void RemoveFromChildren(Node o, long instanceId)
         {
             if (!CheckChildren())
             {
@@ -354,7 +354,7 @@ namespace Atom
             }
 
             var type = component.GetType();
-            if (this.CheckComponents() && this.components.ContainsKey(type))
+            if (this.CheckComponents() && this.components.ContainsKey(type.TypeHandle.Value.ToInt64()))
             {
                 throw new Exception($"already has component: {type.FullName}");
             }
@@ -369,7 +369,7 @@ namespace Atom
 
         public Node AddComponent(Type type)
         {
-            if (this.CheckComponents() && this.components.ContainsKey(type))
+            if (this.CheckComponents() && this.components.ContainsKey(type.TypeHandle.Value.ToInt64()))
             {
                 throw new Exception($"already has component: {type.FullName}");
             }
@@ -387,7 +387,7 @@ namespace Atom
 
         public Node AddComponent<TArg>(Type type, TArg arg)
         {
-            if (this.CheckComponents() && this.components.ContainsKey(type))
+            if (this.CheckComponents() && this.components.ContainsKey(type.TypeHandle.Value.ToInt64()))
             {
                 throw new Exception($"already has component: {type.FullName}");
             }
@@ -420,50 +420,37 @@ namespace Atom
         /// <returns></returns>
         public T GetComponent<T>() where T : Node, new()
         {
-            return (T)(GetComponent(TypeCache<T>.TYPE));
-        }
+            if (!CheckComponents())
+            {
+                return null;
+            }
 
-        /// <summary>
-        /// 匹配组件，如果没有则返回null
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T MatchComponent<T>()
-        {
-            return (T)(GetComponent(TypeCache<T>.TYPE, true) as object);
+            if (this.components.TryGetValue(TypeCache<T>.LONG_HASH, out var component))
+            {
+                return (T)component;
+            }
+
+            return default;
         }
 
         /// <summary>
         /// 获取组件，如果没有则返回null
         /// </summary>
         /// <param name="type"></param>
-        /// <param name="deriveMatch"> 是否匹配派生类 </param>
         /// <returns></returns>
-        public Node GetComponent(Type type, bool deriveMatch = false)
+        public Node GetComponent(Type type)
         {
             if (!CheckComponents())
             {
                 return null;
             }
 
-            if (this.components.TryGetValue(type, out var component))
+            if (this.components.TryGetValue(type.TypeHandle.Value.ToInt64(), out var component))
             {
                 return component;
             }
 
-            if (deriveMatch)
-            {
-                foreach (var pair in components)
-                {
-                    if (type.IsAssignableFrom(pair.Key))
-                    {
-                        component = pair.Value;
-                        break;
-                    }
-                }
-            }
-
-            return component;
+            return default;
         }
 
         public void RemoveComponent(Type type)
@@ -478,7 +465,7 @@ namespace Atom
                 return;
             }
 
-            if (!components.TryGetValue(type, out var component))
+            if (!components.TryGetValue(type.TypeHandle.Value.ToInt64(), out var component))
             {
                 return;
             }
@@ -525,7 +512,7 @@ namespace Atom
 
             if (autoInit)
             {
-                this.components = new Dictionary<Type, Node>();
+                this.components = new Dictionary<long, Node>();
                 this.componentsDB = new HashSet<Node>();
                 return true;
             }
@@ -536,7 +523,7 @@ namespace Atom
         private void AddToComponents(Node component)
         {
             this.CheckComponents(true);
-            this.components.Add(component.GetType(), component);
+            this.components.Add(component.GetType().TypeHandle.Value.ToInt64(), component);
             this.componentsDB.Add(component);
         }
 
@@ -547,7 +534,7 @@ namespace Atom
                 return;
             }
 
-            this.components.Remove(component.GetType());
+            this.components.Remove(component.GetType().TypeHandle.Value.ToInt64());
             this.componentsDB.Remove(component);
         }
 

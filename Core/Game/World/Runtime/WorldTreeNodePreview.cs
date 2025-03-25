@@ -38,7 +38,7 @@ namespace Atom
         {
             var node = target as WorldTreeNodePreview;
             EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.IntField("Instance Id", node.component.InstanceId);
+            EditorGUILayout.LongField("Instance Id", node.component.InstanceId);
             EditorGUI.EndDisabledGroup();
             base.OnInspectorGUI();
         }

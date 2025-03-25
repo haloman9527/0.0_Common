@@ -5,16 +5,16 @@ namespace Atom
 {
     public class World : IDisposable
     {
-        private Dictionary<int, Node> nodes;
+        private Dictionary<long, Node> nodes;
         private Dictionary<Type, Queue<NodeRef<Node>>> systemNodes;
-        private int lastInstanceId;
+        private IdGenerator idGenerator = new IdGenerator(2022, 1, 1);
         private Scene root;
 
         public Scene Root => root;
 
         public World()
         {
-            this.nodes = new Dictionary<int, Node>(256);
+            this.nodes = new Dictionary<long, Node>(256);
             this.systemNodes = new Dictionary<Type, Queue<NodeRef<Node>>>();
             this.root = new Scene("Root", this);
         }
@@ -27,13 +27,12 @@ namespace Atom
                 this.nodes.Clear();
                 this.systemNodes.Clear();
                 this.root = null;
-                lastInstanceId = 0;
             }
         }
 
-        public int GenerateInstanceId()
+        public long GenerateInstanceId()
         {
-            return ++lastInstanceId;
+            return idGenerator.GenerateId();
         }
 
         public Queue<NodeRef<Node>> GetQueue(Type type)
@@ -66,7 +65,7 @@ namespace Atom
             }
         }
 
-        public void Unregister(int instanceId)
+        public void Unregister(long instanceId)
         {
             this.nodes.Remove(instanceId);
         }
