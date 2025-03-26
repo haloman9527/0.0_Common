@@ -1,71 +1,81 @@
 ﻿using System;
 using System.Threading;
 
-public class IdGenerator
+namespace Atom
 {
-    private const int SEQUENCE_BITS = 12;
-    private const long SEQUENCE_MASK = -1L ^ (-1L << SEQUENCE_BITS);
-
-    private long baseTimestamp;
-    private long lastTimestamp;
-    private long sequence;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="year"> 基准年 </param>
-    /// <param name="month"> 基准月 </param>
-    /// <param name="day"> 基准日 </param>
-    public IdGenerator(int year, int month, int day)
+    public class IdGenerator
     {
-        this.baseTimestamp = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc).Ticks / 10000L;
-        this.lastTimestamp = this.baseTimestamp;
-        this.sequence = 0;
-    }
+        private const int SEQUENCE_BITS = 12;
+        private const long SEQUENCE_MASK = -1L ^ (-1L << SEQUENCE_BITS);
 
-    private long GetCurrentTime()
-    {
-        return (DateTime.UtcNow.Ticks / 10000L) - this.baseTimestamp;
-    }
+        private readonly long _baseTimestamp;
+        private long _lastTimestampSequence; // 合并时间戳和序列号
 
-    public long GenerateId()
-    {
-        lock (this)
+        public IdGenerator(int year, int month, int day)
         {
-            var timestamp = this.GetCurrentTime();
-            if (lastTimestamp == timestamp)
+            _baseTimestamp = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc).Ticks / 10000L;
+            _lastTimestampSequence = 0L; // 初始时间戳和序列号均为0
+        }
+
+        private long GetCurrentTime()
+        {
+            return (DateTime.UtcNow.Ticks / 10000L) - _baseTimestamp;
+        }
+
+        public long GenerateId()
+        {
+            int spinCount = 0;
+            while (spinCount++ < 1000) // 限制自旋次数防止死循环
             {
-                sequence = Interlocked.Add(ref this.sequence, 1) & SEQUENCE_MASK;
-                if (sequence == 0)
+                long currentTsSeq = Interlocked.Read(ref _lastTimestampSequence);
+                long currentTimestamp = currentTsSeq >> SEQUENCE_BITS;
+                long currentSequence = currentTsSeq & SEQUENCE_MASK;
+
+                long actualTimestamp = GetCurrentTime();
+
+                if (actualTimestamp < currentTimestamp)
                 {
-                    // 在锁内获取当前时间并等待下一个时间戳
-                    Thread.Sleep(1);
-                    timestamp += 1;
+                    throw new InvalidOperationException("Clock moved backwards.");
+                }
+
+                if (actualTimestamp == currentTimestamp)
+                {
+                    long newSequence = (currentSequence + 1) & SEQUENCE_MASK;
+                    if (newSequence != 0)
+                    {
+                        long newTsSeq = (currentTimestamp << SEQUENCE_BITS) | newSequence;
+                        if (Interlocked.CompareExchange(ref _lastTimestampSequence, newTsSeq, currentTsSeq) == currentTsSeq)
+                        {
+                            return (actualTimestamp << SEQUENCE_BITS) | newSequence;
+                        }
+                    }
+                    else
+                    {
+                        actualTimestamp = TilNextTimestamp(currentTimestamp);
+                    }
+                }
+
+                // 时间戳已变化，尝试更新
+                long newTsSeqForNewTimestamp = (actualTimestamp << SEQUENCE_BITS) | 0L;
+                if (Interlocked.CompareExchange(ref _lastTimestampSequence, newTsSeqForNewTimestamp, currentTsSeq) == currentTsSeq)
+                {
+                    return (actualTimestamp << SEQUENCE_BITS) | 0L;
                 }
             }
-            else
-            {
-                sequence = 0L;
-            }
 
-            lastTimestamp = timestamp;
-            return (timestamp << SEQUENCE_BITS) | sequence;
+            throw new InvalidOperationException("Failed to generate ID after maximum spins.");
         }
-    }
 
-    /// <summary>
-    /// 等待下个时间戳. 
-    /// </summary>
-    /// <returns></returns>
-    private long TilNextTimestamp(long currentTimeStamp)
-    {
-        var timestamp = GetCurrentTime();
-
-        while (timestamp <= currentTimeStamp)
+        private long TilNextTimestamp(long currentTimestamp)
         {
-            timestamp = GetCurrentTime();
-        }
+            long timestamp;
+            do
+            {
+                Thread.SpinWait(10);
+                timestamp = GetCurrentTime();
+            } while (timestamp <= currentTimestamp);
 
-        return timestamp;
+            return timestamp;
+        }
     }
 }
