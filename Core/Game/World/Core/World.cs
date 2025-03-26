@@ -58,7 +58,7 @@ namespace Atom
                 return;
             }
 
-            foreach (Type queueType in oneTypeSystems.nodeOriginSystems.Keys)
+            foreach (Type queueType in oneTypeSystems.nodeSystems.Keys)
             {
                 var queue = this.GetQueue(queueType);
                 queue.Enqueue(n);

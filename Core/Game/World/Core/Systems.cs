@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Atom
 {
@@ -27,8 +28,8 @@ namespace Atom
                 return;
             }
 
-            var systemTypes = TypesCache.GetTypesDerivedFrom<ISystem>();
-            var nodeTypes = TypesCache.GetTypesDerivedFrom<Node>();
+            var systemTypes = TypesCache.GetTypesDerivedFrom<ISystem>().ToArray();
+            var nodeTypes = TypesCache.GetTypesDerivedFrom<Node>().ToArray();
 
             if (s_Systems == null)
             {

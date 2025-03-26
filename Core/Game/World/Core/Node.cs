@@ -7,7 +7,7 @@ namespace Atom
     public class Node : IDisposable
     {
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW
-        protected UnityEngine.GameObject viewGO;
+        [NonSerialized] private UnityEngine.GameObject m_viewGO;
 #endif
 
         [NonSerialized] private long m_instanceId;
@@ -20,6 +20,10 @@ namespace Atom
         [NonSerialized] private HashSet<Node> componentsDB;
 
         public virtual string ViewName => this.GetType().FullName;
+        
+#if UNITY_EDITOR && WORLD_TREE_PREVIEW
+        public virtual UnityEngine.GameObject ViewGO => this.m_viewGO;
+#endif
 
         public long InstanceId
         {
@@ -45,13 +49,13 @@ namespace Atom
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW
                 if (m_instanceId != 0)
                 {
-                    this.viewGO = new UnityEngine.GameObject(ViewName);
-                    this.viewGO.AddComponent<WorldTreeNodePreview>().component = this;
-                    this.viewGO.transform.SetParent(WorldTreePreviewRoot.Instance.transform);
+                    this.m_viewGO = new UnityEngine.GameObject(ViewName);
+                    this.m_viewGO.AddComponent<WorldTreeNodePreview>().component = this;
+                    this.m_viewGO.transform.SetParent(WorldTreePreviewRoot.Instance.transform);
                 }
                 else if (parent == null || !parent.IsDisposed)
                 {
-                    UnityEngine.GameObject.Destroy(viewGO);
+                    UnityEngine.GameObject.Destroy(m_viewGO);
                 }
 #endif
             }
@@ -146,17 +150,17 @@ namespace Atom
                     this.scene = this.parent.scene;
 
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW
-                if (parent.viewGO.transform.Find("↑组件↑   ↓节点↓") == null)
+                if (parent.m_viewGO.transform.Find("↑组件↑   ↓节点↓") == null)
                 {
-                    new UnityEngine.GameObject("↑组件↑   ↓节点↓").transform.SetParent(parent.viewGO.transform, false);
+                    new UnityEngine.GameObject("↑组件↑   ↓节点↓").transform.SetParent(parent.m_viewGO.transform, false);
                 }
 
-                this.viewGO.transform.SetParent(parent.viewGO.transform, false);
-                this.viewGO.transform.SetAsLastSibling();
+                this.m_viewGO.transform.SetParent(parent.m_viewGO.transform, false);
+                this.m_viewGO.transform.SetAsLastSibling();
                 if (parent.componentsDB != null && parent.componentsDB.Contains(this))
-                    this.viewGO.name = this.ViewName;
+                    this.m_viewGO.name = this.ViewName;
                 else
-                    this.viewGO.name = this.ViewName + $"({this.m_instanceId})";
+                    this.m_viewGO.name = this.ViewName + $"({this.m_instanceId})";
 #endif
             }
         }
@@ -202,13 +206,13 @@ namespace Atom
                     this.scene = this.parent.scene;
 
 #if UNITY_EDITOR && WORLD_TREE_PREVIEW
-                if (parent.viewGO.transform.Find("↑组件↑   ↓节点↓") == null)
+                if (parent.m_viewGO.transform.Find("↑组件↑   ↓节点↓") == null)
                 {
-                    new UnityEngine.GameObject("↑组件↑   ↓节点↓").transform.SetParent(parent.viewGO.transform, false);
+                    new UnityEngine.GameObject("↑组件↑   ↓节点↓").transform.SetParent(parent.m_viewGO.transform, false);
                 }
 
-                this.viewGO.transform.SetParent(parent.viewGO.transform, false);
-                this.viewGO.transform.SetSiblingIndex(parent.components.Count - 1);
+                this.m_viewGO.transform.SetParent(parent.m_viewGO.transform, false);
+                this.m_viewGO.transform.SetSiblingIndex(parent.components.Count - 1);
 #endif
             }
         }
@@ -346,7 +350,7 @@ namespace Atom
             this.children.Remove(instanceId);
         }
 
-        public void AddComponent(Node component)
+        public T AddComponent<T>(T component) where T : Node
         {
             if (!component.IsDisposed)
             {
@@ -365,6 +369,7 @@ namespace Atom
 
             Systems.Awake(component);
             Systems.AddComponent(this, component);
+            return component;
         }
 
         public Node AddComponent(Type type)

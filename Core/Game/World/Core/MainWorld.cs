@@ -4,6 +4,8 @@
     {
         private World world;
 
+        public World World => world;
+        
         public Scene Root => world.Root;
 
         public void Awake()
