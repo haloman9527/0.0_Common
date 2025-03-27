@@ -128,5 +128,10 @@ namespace Atom
             GetProperty(propertyName)?.NotifyValueChanged();
             PropertyChanged?.Invoke(this, propertyName);
         }
+
+        public void Reset()
+        {
+            bindableProperties.Clear();
+        }
     }
 }
