@@ -120,7 +120,7 @@ namespace Atom
 
             if (datacenterId > MAX_DATACENTER_ID)
                 throw new ArgumentException($"datacenter Id can't be greater than {MAX_DATACENTER_ID} or less than 0");
-            
+
             this.lastTimestamp = -1L;
             this.sequence = 0;
             this.WorkerId = workerId;
@@ -140,6 +140,7 @@ namespace Atom
                 Thread.Sleep(1);
                 timestamp = TimeProvider.GetCurrentTime();
             }
+
             return timestamp;
         }
 
@@ -190,9 +191,9 @@ namespace Atom
         {
             private readonly long epoch;
 
-            public UtcMSDateTimeProvider(DateTime utcTime)
+            public UtcMSDateTimeProvider(int year, int month, int day)
             {
-                epoch = utcTime.Ticks / 10000;
+                epoch = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc).Ticks / 10000;
             }
 
             public long GetCurrentTime()
@@ -204,6 +205,6 @@ namespace Atom
 
     public partial class Snowflake
     {
-        public static Snowflake BaseUTC2020 = new Snowflake(0, new UtcMSDateTimeProvider(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+        public static Snowflake BaseUTC2020 = new Snowflake(0, new UtcMSDateTimeProvider(2020, 1, 1));
     }
 }
