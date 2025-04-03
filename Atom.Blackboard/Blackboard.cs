@@ -20,24 +20,24 @@ namespace Atom
             IEnumerable<KeyValuePair<TKey, object>> Values();
         }
 
-        private interface IDataContainer<T>
+        private interface IDataContainer<TValue>
         {
-            T Get(TKey key);
+            TValue Get(TKey key);
 
-            bool TryGet(TKey key, out T value);
+            bool TryGet(TKey key, out TValue value);
 
-            bool Set(TKey key, T value);
+            bool Set(TKey key, TValue value);
 
             bool Remove(TKey key);
 
             void Clear();
 
-            IEnumerable<KeyValuePair<TKey, T>> Values();
+            IEnumerable<KeyValuePair<TKey, TValue>> Values();
         }
 
-        private class DataContainer<T> : IDataContainer, IDataContainer<T>
+        private class DataContainer<TValue> : IDataContainer, IDataContainer<TValue>
         {
-            private Dictionary<TKey, T> data = new Dictionary<TKey, T>();
+            private Dictionary<TKey, TValue> data = new Dictionary<TKey, TValue>();
 
             object IDataContainer.Get(TKey key)
             {
@@ -60,7 +60,7 @@ namespace Atom
 
             bool IDataContainer.Set(TKey key, object value)
             {
-                var tmpValue = (T)value;
+                var tmpValue = (TValue)value;
                 if (this.data.TryGetValue(key, out var v) && v.GetHashCode() == tmpValue.GetHashCode())
                 {
                     return false;
@@ -78,7 +78,7 @@ namespace Atom
                 }
             }
 
-            public T Get(TKey key)
+            public TValue Get(TKey key)
             {
                 if (this.data.TryGetValue(key, out var value))
                 {
@@ -88,12 +88,12 @@ namespace Atom
                 return default;
             }
 
-            public bool TryGet(TKey key, out T value)
+            public bool TryGet(TKey key, out TValue value)
             {
                 return this.data.TryGetValue(key, out value);
             }
 
-            public bool Set(TKey key, T value)
+            public bool Set(TKey key, TValue value)
             {
                 if (this.data.TryGetValue(key, out var v) && v.GetHashCode() == value.GetHashCode())
                 {
@@ -104,11 +104,11 @@ namespace Atom
                 return true;
             }
 
-            public IEnumerable<KeyValuePair<TKey, T>> Values()
+            public IEnumerable<KeyValuePair<TKey, TValue>> Values()
             {
                 foreach (var pair in data)
                 {
-                    yield return new KeyValuePair<TKey, T>(pair.Key, pair.Value);
+                    yield return new KeyValuePair<TKey, TValue>(pair.Key, pair.Value);
                 }
             }
 
@@ -123,8 +123,8 @@ namespace Atom
             }
         }
 
-        private Dictionary<Type, IDataContainer> containers = new Dictionary<Type, IDataContainer>();
-        private Dictionary<TKey, IDataContainer> containerMap = new Dictionary<TKey, IDataContainer>();
+        private Dictionary<Type, object> containers = new Dictionary<Type, object>();
+        private Dictionary<TKey, object> containerMap = new Dictionary<TKey, object>();
 
         public object Get(TKey key)
         {
@@ -133,7 +133,7 @@ namespace Atom
                 return default;
             }
 
-            return dataContainer.Get(key);
+            return ((IDataContainer)dataContainer).Get(key);
         }
 
         public bool TryGet(TKey key, out object value)
@@ -144,7 +144,7 @@ namespace Atom
                 return false;
             }
 
-            return dataContainer.TryGet(key, out value);
+            return ((IDataContainer)dataContainer).TryGet(key, out value);
         }
 
         public bool Contains(TKey key)
@@ -152,24 +152,24 @@ namespace Atom
             return containerMap.ContainsKey(key);
         }
 
-        public T Get<T>(TKey key)
+        public TValue Get<TValue>(TKey key)
         {
             if (!this.containerMap.TryGetValue(key, out var dataContainer))
             {
                 return default;
             }
 
-            var type = TypeCache<T>.TYPE;
+            var type = TypeCache<TValue>.TYPE;
             var isValueType = type.IsValueType;
             if (isValueType)
             {
-                return ((DataContainer<T>)dataContainer).Get(key);
+                return ((DataContainer<TValue>)dataContainer).Get(key);
             }
 
-            return (T)((DataContainer<object>)dataContainer).Get(key);
+            return (TValue)((DataContainer<object>)dataContainer).Get(key);
         }
 
-        public bool TryGet<T>(TKey key, out T value)
+        public bool TryGet<TValue>(TKey key, out TValue value)
         {
             if (!this.containerMap.TryGetValue(key, out var dataContainer))
             {
@@ -177,21 +177,21 @@ namespace Atom
                 return false;
             }
 
-            var type = TypeCache<T>.TYPE;
+            var type = TypeCache<TValue>.TYPE;
             var isValueType = type.IsValueType;
             if (isValueType)
             {
-                return ((DataContainer<T>)dataContainer).TryGet(key, out value);
+                return ((DataContainer<TValue>)dataContainer).TryGet(key, out value);
             }
 
             var result = ((DataContainer<object>)dataContainer).TryGet(key, out var v);
-            value = (T)v;
+            value = (TValue)v;
             return result;
         }
 
-        public bool Set<T>(TKey key, T value)
+        public bool Set<TValue>(TKey key, TValue value)
         {
-            var type = TypeCache<T>.TYPE;
+            var type = TypeCache<TValue>.TYPE;
             var isValueType = type.IsValueType;
             if (!containerMap.TryGetValue(key, out var dataContainer))
             {
@@ -199,7 +199,7 @@ namespace Atom
                 {
                     if (!containers.TryGetValue(type, out dataContainer))
                     {
-                        containers[type] = dataContainer = new DataContainer<T>();
+                        containers[type] = dataContainer = new DataContainer<TValue>();
                     }
                 }
                 else
@@ -214,7 +214,7 @@ namespace Atom
             }
 
             if (isValueType)
-                return ((IDataContainer<T>)dataContainer).Set(key, value);
+                return ((IDataContainer<TValue>)dataContainer).Set(key, value);
             else
                 return ((IDataContainer<object>)dataContainer).Set(key, value);
         }
@@ -225,7 +225,7 @@ namespace Atom
                 return false;
 
             containerMap.Remove(key);
-            dataContainer.Remove(key);
+            ((IDataContainer)dataContainer).Remove(key);
             return true;
         }
 
@@ -233,7 +233,8 @@ namespace Atom
         {
             foreach (var pair in containers)
             {
-                pair.Value.Clear();
+                var dataContainer = pair.Value;
+                ((IDataContainer)dataContainer).Clear();
             }
 
             containers.Clear();
@@ -242,9 +243,9 @@ namespace Atom
 
         public IEnumerable<KeyValuePair<TKey, object>> EnumerateValues()
         {
-            foreach (var container in containers.Values)
+            foreach (var dataContainer in containers.Values)
             {
-                foreach (var pair in container.Values())
+                foreach (var pair in ((IDataContainer)dataContainer).Values())
                 {
                     yield return pair;
                 }
