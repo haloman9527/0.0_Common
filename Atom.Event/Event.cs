@@ -40,13 +40,13 @@ namespace Atom.Internal
 
         public void Invoke(TArg arg)
         {
-            for (int i = handlers.Count - 1; i >= 0; i--)
+            for (int i = 0; i < handlers.Count; i++)
             {
                 if (handlers[i].TryGetTarget(out var handler))
                 {
                     try
                     {
-                        handler?.Invoke(arg);
+                        handler.Invoke(arg);
                     }
                     catch (Exception e)
                     {
@@ -55,7 +55,7 @@ namespace Atom.Internal
                 }
                 else
                 {
-                    handlers.RemoveAt(i);
+                    handlers.RemoveAt(i--);
                 }
             }
         }
@@ -91,13 +91,13 @@ namespace Atom.Internal
 
         public void Invoke()
         {
-            for (int i = handlers.Count - 1; i >= 0; i--)
+            for (int i = 0; i < handlers.Count; i++)
             {
                 if (handlers[i].TryGetTarget(out var handler))
                 {
                     try
                     {
-                        handler?.Invoke();
+                        handler.Invoke();
                     }
                     catch (Exception e)
                     {
@@ -106,7 +106,7 @@ namespace Atom.Internal
                 }
                 else
                 {
-                    handlers.RemoveAt(i);
+                    handlers.RemoveAt(i--);
                 }
             }
         }

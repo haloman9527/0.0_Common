@@ -10,7 +10,7 @@ namespace Atom
 
         public StaticMethod(Assembly assembly, string typeName, string methodName)
         {
-            method = assembly.GetType(typeName).GetMethod(methodName, new Type[0]);
+            method = assembly.GetType(typeName).GetMethod(methodName, new Type[] { });
             param = new object[0];
         }
 
@@ -32,7 +32,7 @@ namespace Atom
 
         public StaticMethod(Assembly assembly, string typeName, string methodName)
         {
-            method = assembly.GetType(typeName).GetMethod(methodName, new Type[1] { TypeCache<A>.TYPE });
+            method = assembly.GetType(typeName).GetMethod(methodName, new Type[] { TypeCache<A>.TYPE });
             param = new object[2];
         }
 
@@ -58,7 +58,7 @@ namespace Atom
 
         public StaticMethod(Assembly assembly, string typeName, string methodName)
         {
-            method = assembly.GetType(typeName).GetMethod(methodName, new Type[2] { TypeCache<A>.TYPE, TypeCache<B>.TYPE });
+            method = assembly.GetType(typeName).GetMethod(methodName, new Type[] { TypeCache<A>.TYPE, TypeCache<B>.TYPE });
             param = new object[2];
         }
 
@@ -86,7 +86,7 @@ namespace Atom
 
         public StaticMethod(Assembly assembly, string typeName, string methodName)
         {
-            method = assembly.GetType(typeName).GetMethod(methodName, new Type[3] { TypeCache<A>.TYPE, TypeCache<B>.TYPE, TypeCache<C>.TYPE });
+            method = assembly.GetType(typeName).GetMethod(methodName, new Type[] { TypeCache<A>.TYPE, TypeCache<B>.TYPE, TypeCache<C>.TYPE });
             param = new object[3];
         }
 
@@ -116,7 +116,7 @@ namespace Atom
 
         public StaticMethod(Assembly assembly, string typeName, string methodName)
         {
-            method = assembly.GetType(typeName).GetMethod(methodName, new Type[4] { TypeCache<A>.TYPE, TypeCache<B>.TYPE, TypeCache<C>.TYPE, TypeCache<D>.TYPE });
+            method = assembly.GetType(typeName).GetMethod(methodName, new Type[] { TypeCache<A>.TYPE, TypeCache<B>.TYPE, TypeCache<C>.TYPE, TypeCache<D>.TYPE });
             param = new object[4];
         }
 
