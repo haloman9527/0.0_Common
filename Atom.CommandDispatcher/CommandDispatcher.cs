@@ -24,31 +24,31 @@ namespace Atom
 {
     public class CommandDispatcher
     {
-        private LinkedList<ICommand> undo = new LinkedList<ICommand>();
-        private Stack<ICommand> redo = new Stack<ICommand>();
+        private LinkedList<ICommand> undoList = new LinkedList<ICommand>();
+        private Stack<ICommand> redoList = new Stack<ICommand>();
         private CommandGroup group;
         private int recordLimit;
 
-        public CommandDispatcher()
-        {
-            recordLimit = -1;
-        }
-
-        public CommandDispatcher(int recordLimit)
+        public CommandDispatcher(int recordLimit = 0)
         {
             this.recordLimit = recordLimit;
         }
 
         public void BeginGroup()
         {
-            group = new CommandGroup();
-            undo.AddLast(group);
-            while (recordLimit >= 0 && undo.Count > recordLimit)
+            if (group != null)
             {
-                undo.RemoveFirst();
+                throw new Exception("Current is already in a group");
+            }
+            
+            group = new CommandGroup();
+            undoList.AddLast(group);
+            while (recordLimit >= 0 && undoList.Count > recordLimit)
+            {
+                undoList.RemoveFirst();
             }
 
-            if (undo.Count == 0)
+            if (undoList.Count == 0)
             {
                 group = null;
             }
@@ -56,6 +56,11 @@ namespace Atom
 
         public void EndGroup()
         {
+            if (group == null)
+            {
+                throw new Exception("Current is not in a group");
+            }
+            
             group = null;
         }
 
@@ -66,17 +71,17 @@ namespace Atom
 
         public void Do(ICommand command)
         {
-            redo.Clear();
+            redoList.Clear();
             if (group != null)
             {
                 group.commands.Add(command);
             }
             else
             {
-                undo.AddLast(command);
-                while (recordLimit >= 0 && undo.Count > recordLimit)
+                undoList.AddLast(command);
+                while (recordLimit > 0 && undoList.Count > recordLimit)
                 {
-                    undo.RemoveFirst();
+                    undoList.RemoveFirst();
                 }
             }
 
@@ -88,13 +93,13 @@ namespace Atom
 
         public virtual void Redo()
         {
-            if (redo.Count == 0)
+            if (redoList.Count == 0)
                 return;
-            var command = redo.Pop();
-            undo.AddLast(command);
-            while (recordLimit >= 0 && undo.Count > recordLimit)
+            var command = redoList.Pop();
+            undoList.AddLast(command);
+            while (recordLimit >= 0 && undoList.Count > recordLimit)
             {
-                undo.RemoveFirst();
+                undoList.RemoveFirst();
             }
 
             if (command != null)
@@ -105,11 +110,11 @@ namespace Atom
 
         public virtual void Undo()
         {
-            if (undo.Count == 0)
+            if (undoList.Count == 0)
                 return;
-            var command = undo.Last.Value;
-            undo.RemoveLast();
-            redo.Push(command);
+            var command = undoList.Last.Value;
+            undoList.RemoveLast();
+            redoList.Push(command);
 
             if (command != null)
             {
@@ -119,8 +124,8 @@ namespace Atom
 
         public virtual void Clear()
         {
-            undo.Clear();
-            redo.Clear();
+            undoList.Clear();
+            redoList.Clear();
         }
 
         internal class CommandGroup : ICommand
