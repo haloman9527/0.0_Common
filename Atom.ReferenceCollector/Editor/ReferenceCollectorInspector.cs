@@ -59,25 +59,25 @@ namespace Atom
 
         const int PageMaxCount = 20;
         const int LineHeight = 20;
+        
+        public static bool DrawWithList;
 
         private ReorderableList referencesList;
         public string searchText;
         public SearchField searchField;
         public float scrollPosition;
-        public bool drawWithList;
 
         protected void OnEnable()
         {
             var referenceCollector = (ReferenceCollector)target;
             searchField = new SearchField();
             referencesList = new ReorderableList(serializedObject, serializedObject.FindProperty("references"), true, true, true, false);
-            referencesList.elementHeight = 20;
-            referencesList.drawHeaderCallback = (headerRect) =>
+            referencesList.elementHeight = LineHeight;
+            referencesList.drawElementCallback += (rect, index, c, d) =>
             {
-                headerRect.xMax += 6;
-                DrawHeader(headerRect);
+                rect.xMax += 7;
+                DrawElement(rect, referencesList.serializedProperty, index);
             };
-            referencesList.drawElementCallback += (rect, index, c, d) => { DrawElement(rect, referencesList.serializedProperty, index); };
             referencesList.onAddCallback += (list) =>
             {
                 Undo.RecordObject(referenceCollector, "Add ReferenceData");
@@ -119,13 +119,42 @@ namespace Atom
                 serializedObject.Update();
             }
 
-            if (drawWithList)
+            var headerRect = EditorGUILayout.GetControlRect(false);
+            var headerControlWidth = DrawHeader(headerRect);
+            var foldoutRect = new Rect(headerRect.x, headerRect.y, headerRect.width - headerControlWidth, headerRect.height);
+            if (DrawWithList)
             {
-                referencesList.DoLayoutList();
+                references.isExpanded = EditorGUI.Foldout(foldoutRect, references.isExpanded, $"References - ({references.arraySize})", true);
+                if (references.isExpanded)
+                {
+                    referencesList.DoLayoutList();
+                }
             }
             else
             {
-                DrawScrollList(references, results);
+                var totalCount = references.arraySize;
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    totalCount = 0;
+                    for (int i = 0; i < references.arraySize; i++)
+                    {
+                        var element = references.GetArrayElementAtIndex(i);
+                        var key = element.FindPropertyRelative("key");
+                        var value = element.FindPropertyRelative("value");
+                        var keyMatched = key.stringValue.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                        var valueMatched = value.objectReferenceValue && value.objectReferenceValue.name.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                        if (keyMatched || valueMatched)
+                        {
+                            totalCount++;
+                        }
+                    }
+                }
+
+                references.isExpanded = EditorGUI.Foldout(foldoutRect, references.isExpanded, $"References - ({totalCount})", true);
+                if (references.isExpanded)
+                {
+                    DrawScrollList(references, totalCount, results);
+                }
             }
 
             if (serializedObject.hasModifiedProperties)
@@ -135,39 +164,21 @@ namespace Atom
             }
         }
 
-        private void DrawScrollList(SerializedProperty references, UnityEngine.Object[] dragResults)
+        private void DrawScrollList(SerializedProperty references, int totalCount, UnityEngine.Object[] dragResults)
         {
-            var totalCount = references.arraySize;
-            if (!string.IsNullOrEmpty(searchText))
-            {
-                totalCount = 0;
-                for (int i = 0; i < references.arraySize; i++)
-                {
-                    var element = references.GetArrayElementAtIndex(i);
-                    var key = element.FindPropertyRelative("key");
-                    var value = element.FindPropertyRelative("value");
-                    var keyMatched = key.stringValue.Contains(searchText, StringComparison.OrdinalIgnoreCase);
-                    var valueMatched = value.objectReferenceValue && value.objectReferenceValue.name.Contains(searchText, StringComparison.OrdinalIgnoreCase);
-                    if (keyMatched || valueMatched)
-                    {
-                        totalCount++;
-                    }
-                }
-            }
-
             if (dragResults != null && dragResults.Length > 0)
             {
                 scrollPosition = Mathf.Max(0, totalCount - PageMaxCount);
             }
 
-            GUILayout.Space(1);
-            var headerRect = EditorGUILayout.GetControlRect(false);
-            var headerControlWidth = DrawHeader(headerRect);
-            var foldoutRect = new Rect(headerRect.x, headerRect.y, headerRect.width - headerControlWidth, headerRect.height);
-            references.isExpanded = EditorGUI.Foldout(foldoutRect, references.isExpanded, $"References - ({totalCount})", true);
-            if (references.isExpanded)
             {
+                GUILayout.Space(2);
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(30);
                 searchText = searchField.OnGUI(searchText);
+                EditorGUILayout.EndHorizontal();
+                GUILayout.Space(2);
+                
                 var listRect = EditorGUILayout.BeginHorizontal();
                 GUILayout.BeginVertical();
                 if (string.IsNullOrEmpty(searchText))
@@ -382,7 +393,7 @@ namespace Atom
             var modeButtonRect = new Rect(headerRect.x + headerRect.width - 150, headerRect.y, 30, headerRect.height);
             if (GUI.Button(modeButtonRect, Styles.ModeLabel, EditorStyles.toolbarButton))
             {
-                drawWithList = !drawWithList;
+                DrawWithList = !DrawWithList;
             }
 
             return 150;
