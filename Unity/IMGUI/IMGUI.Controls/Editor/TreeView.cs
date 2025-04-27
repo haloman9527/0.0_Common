@@ -282,6 +282,23 @@ namespace Atom.UnityEditors.IMGUI.Controls
             }
         }
 
+        public void Sort(UnityTreeViewItem sortRoot, Func<UnityTreeViewItem, UnityTreeViewItem, int> comparer)
+        {
+            SortRecursive(sortRoot as TreeViewItem);
+
+            void SortRecursive(TreeViewItem item)
+            {
+                if (!item.hasChildren)
+                    return;
+
+                item.children.QuickSort(comparer);
+                foreach (var child in item.children)
+                {
+                    SortRecursive((TreeViewItem)child);
+                }
+            }
+        }
+
         protected override UnityTreeViewItem BuildRoot() => this.BuildRootItem();
 
         protected virtual TreeViewItem BuildRootItem() => Root;
@@ -682,6 +699,14 @@ public class SimpleTreeView : Atom.UnityEditors.IMGUI.Controls.TreeView
     }
 
     public SimpleTreeView(TreeViewState state, TreeViewItemPool itemPool) : base(state, itemPool)
+    {
+    }
+
+    public SimpleTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
+    {
+    }
+
+    public SimpleTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, TreeViewItemPool itemPool) : base(state, multiColumnHeader, itemPool)
     {
     }
 
