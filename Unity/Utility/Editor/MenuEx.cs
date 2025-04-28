@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 
 namespace Atom.UnityEditors
@@ -77,3 +78,4 @@ namespace Atom.UnityEditors
         }
     }
 }
+#endif

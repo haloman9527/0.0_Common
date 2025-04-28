@@ -13,6 +13,7 @@
  *
  */
 #endregion
+#if UNITY_EDITOR
 
 namespace Atom.UnityEditors.EditorCoroutine
 {
@@ -30,3 +31,4 @@ namespace Atom.UnityEditors.EditorCoroutine
         void Stop();
     }
 }
+#endif
