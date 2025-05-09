@@ -13,7 +13,6 @@
  *
  */
 #endregion
-#if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
 
@@ -45,4 +44,3 @@ namespace Atom.UnityEditors.EditorCoroutine
         public abstract void StopCoroutine(T coroutine);
     }
 }
-#endif

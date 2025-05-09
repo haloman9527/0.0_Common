@@ -3,9 +3,9 @@
 /***
  *
  *  Title:
- *  
+ *
  *  Description:
- *  
+ *
  *  Date:
  *  Version:
  *  Writer: 半只龙虾人
@@ -24,24 +24,15 @@ namespace Atom
     [Serializable]
     public class BindableProperty<T> : IBindableProperty<T>, IBindableProperty
     {
-        private event Func<T> getter;
-        private event Action<T> setter;
-        
-        public event Action<T, T> onValueChanged;
-        public event Action<object, object> onBoxedValueChanged;
+        private IBridgedValue<T> bridgedValue;
+
+        public event Action<T, T> ValueChanged;
+        public event Action<object, object> BoxedValueChanged;
 
         public T Value
         {
-            get
-            {
-                if (getter == null)
-                    throw new NotImplementedException("haven't get method");
-                return getter();
-            }
-            set
-            {
-                SetValue(value);
-            }
+            get => bridgedValue.Value;
+            set => SetValue(value);
         }
 
         public object BoxedValue
@@ -51,17 +42,30 @@ namespace Atom
         }
 
         public Type ValueType => TypeCache<T>.TYPE;
+        
+        public BindableProperty() : this(default(T))
+        {
+        }
+
+        public BindableProperty(T value)
+        {
+            this.bridgedValue = new BridgedValue<T>(value);
+        }
 
         public BindableProperty(Func<T> getter, Action<T> setter)
         {
-            this.getter = getter;
-            this.setter = setter;
+            this.bridgedValue = new BridgedValueGetterSetter<T>(getter, setter);
+        }
+
+        public BindableProperty(IBridgedValue<T> bridgedValue)
+        {
+            this.bridgedValue = bridgedValue;
         }
 
         private void NotifyValueChanged_Internal(T oldValue, T newValue)
         {
-            onValueChanged?.Invoke(oldValue, newValue);
-            onBoxedValueChanged?.Invoke(oldValue, newValue);
+            ValueChanged?.Invoke(oldValue, newValue);
+            BoxedValueChanged?.Invoke(oldValue, newValue);
         }
 
         public IBindableProperty<TOut> AsBindableProperty<TOut>()
@@ -71,29 +75,27 @@ namespace Atom
 
         public void RegisterValueChangedEvent(Action<T, T> onValueChanged)
         {
-            this.onValueChanged += onValueChanged;
+            this.ValueChanged += onValueChanged;
         }
 
         public void UnregisterValueChangedEvent(Action<T, T> onValueChanged)
         {
-            this.onValueChanged -= onValueChanged;
+            this.ValueChanged -= onValueChanged;
         }
 
         public bool SetValue(T value)
         {
-            if (setter == null)
-                throw new NotImplementedException("haven't set method");
             if (ValidEquals(Value, value))
                 return false;
             var oldValue = Value;
-            setter(value);
+            bridgedValue.Value = value;
             NotifyValueChanged_Internal(oldValue, value);
             return true;
         }
 
         public void SetValueWithoutNotify(T value)
         {
-            setter?.Invoke(value);
+            bridgedValue.Value = value;
         }
 
         public bool SetValue(object value)
@@ -103,31 +105,25 @@ namespace Atom
 
         public void SetValueWithoutNotify(object value)
         {
-            setter?.Invoke((T)value);
+            bridgedValue.Value = (T)value;
         }
 
         public void ClearValueChangedEvent()
         {
-            while (this.onValueChanged != null)
+            while (this.ValueChanged != null)
             {
-                this.onValueChanged -= this.onValueChanged;
+                this.ValueChanged -= this.ValueChanged;
             }
-            while (this.onBoxedValueChanged != null)
+
+            while (this.BoxedValueChanged != null)
             {
-                this.onBoxedValueChanged -= this.onBoxedValueChanged;
+                this.BoxedValueChanged -= this.BoxedValueChanged;
             }
         }
 
         public void NotifyValueChanged()
         {
             NotifyValueChanged_Internal(Value, Value);
-        }
-
-        public virtual void Dispose()
-        {
-            getter = null;
-            setter = null;
-            ClearValueChangedEvent();
         }
 
         public override string ToString()

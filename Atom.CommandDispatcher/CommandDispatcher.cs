@@ -22,7 +22,7 @@ using System.Collections.Generic;
 
 namespace Atom
 {
-    public class CommandDispatcher
+    public sealed class CommandDispatcher
     {
         private LinkedList<ICommand> undoList = new LinkedList<ICommand>();
         private Stack<ICommand> redoList = new Stack<ICommand>();
@@ -32,6 +32,16 @@ namespace Atom
         public CommandDispatcher(int recordLimit = 0)
         {
             this.recordLimit = recordLimit;
+        }
+
+        public bool CanUndo()
+        {
+            return undoList.Count > 0;
+        }
+
+        public bool CanRedo()
+        {
+            return redoList.Count > 0;
         }
 
         public void BeginGroup()
@@ -66,11 +76,22 @@ namespace Atom
 
         public void Do(Action @do, Action @undo)
         {
-            Do(new ActionCommand(@do, @do, @undo));
+            var command = new ActionCommand(@do, @do, @undo);
+            Register(command);
+            command.Do();
         }
 
         public void Do(ICommand command)
         {
+            Register(command);
+            command.Do();
+        }
+
+        public void Register(ICommand command)
+        {
+            if (command == null)
+                return;
+            
             redoList.Clear();
             if (group != null)
             {
@@ -84,23 +105,14 @@ namespace Atom
                     undoList.RemoveFirst();
                 }
             }
-
-            if (command != null)
-            {
-                command.Do();
-            }
         }
 
-        public virtual void Redo()
+        public void Redo()
         {
             if (redoList.Count == 0)
                 return;
             var command = redoList.Pop();
             undoList.AddLast(command);
-            while (recordLimit >= 0 && undoList.Count > recordLimit)
-            {
-                undoList.RemoveFirst();
-            }
 
             if (command != null)
             {
@@ -108,7 +120,7 @@ namespace Atom
             }
         }
 
-        public virtual void Undo()
+        public void Undo()
         {
             if (undoList.Count == 0)
                 return;
@@ -122,7 +134,7 @@ namespace Atom
             }
         }
 
-        public virtual void Clear()
+        public void Clear()
         {
             undoList.Clear();
             redoList.Clear();
@@ -169,7 +181,7 @@ namespace Atom
             }
         }
 
-        internal class ActionCommand : ICommand
+        public class ActionCommand : ICommand
         {
             Action @do, @redo, @undo;
 

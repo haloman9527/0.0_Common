@@ -17,9 +17,9 @@ using System;
 
 namespace Atom
 {
-    public interface IBindableProperty : IDisposable
+    public interface IBindableProperty
     {
-        event Action<object, object> onBoxedValueChanged;
+        event Action<object, object> BoxedValueChanged;
 
         object BoxedValue { get; set; }
         Type ValueType { get; }
@@ -30,9 +30,9 @@ namespace Atom
         void ClearValueChangedEvent();
     }
 
-    public interface IBindableProperty<T> : IDisposable
+    public interface IBindableProperty<T>
     {
-        event Action<T, T> onValueChanged;
+        event Action<T, T> ValueChanged;
 
         T Value { get; set; }
 

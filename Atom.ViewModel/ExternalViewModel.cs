@@ -103,7 +103,6 @@ namespace Atom
                 return;
             }
 
-            property.Dispose();
             bindableProperties.Remove(propertyName);
         }
 
