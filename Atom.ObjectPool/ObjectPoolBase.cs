@@ -3,18 +3,17 @@ using System.Collections.Generic;
 
 namespace Atom
 {
-    public abstract class ObjectPool<T> : IObjectPool, IObjectPool<T> where T : class
+    public abstract class ObjectPoolBase<T> : IObjectPool, IObjectPool<T> where T : class
     {
         protected Queue<T> unusedObjects;
         
         public Type UnitType => TypeCache<T>.TYPE;
 
         public int UnusedCount => unusedObjects.Count;
-        protected virtual int InitNum => 8;
 
-        public ObjectPool()
+        public ObjectPoolBase()
         {
-            this.unusedObjects = new Queue<T>(InitNum);
+            this.unusedObjects = new Queue<T>(16);
         }
 
         /// <summary> 生成 </summary>
@@ -46,7 +45,7 @@ namespace Atom
             Recycle(unit as T);
         }
 
-        public void Dispose()
+        public void Release()
         {
             while (unusedObjects.Count > 0)
             {

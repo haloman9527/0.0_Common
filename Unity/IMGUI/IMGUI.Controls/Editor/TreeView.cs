@@ -663,7 +663,7 @@ namespace Atom.UnityEditors.IMGUI.Controls
             IdGenerator.Reset();
         }
 
-        public class TreeViewItemPool : ObjectPool<TreeViewItem>
+        public class TreeViewItemPool : ObjectPoolBase<TreeViewItem>
         {
             protected override TreeViewItem Create()
             {

@@ -1,6 +1,6 @@
 ﻿namespace Atom
 {
-    public interface IPoolableObject
+    public interface IObject
     {
         void OnSpawn();
 

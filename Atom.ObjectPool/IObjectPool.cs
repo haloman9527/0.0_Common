@@ -2,7 +2,7 @@
 
 namespace Atom
 {
-    public interface IObjectPool : IDisposable
+    public interface IObjectPool
     {
         Type UnitType { get; }
         
@@ -11,9 +11,11 @@ namespace Atom
         object Spawn();
 
         void Recycle(object unit);
+
+        void Release();
     }
     
-    public interface IObjectPool<T> : IDisposable where T : class
+    public interface IObjectPool<T> where T : class
     {
         Type UnitType { get; }
         
@@ -22,5 +24,7 @@ namespace Atom
         T Spawn();
         
         void Recycle(T unit);
+
+        void Release();
     }
 }

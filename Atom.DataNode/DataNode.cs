@@ -37,7 +37,7 @@ namespace Atom
 
         public static DataNode Create(string name, char seperator, DataNode parent)
         {
-            var dataNode = ObjectPoolService.Spawn<DataNode>();
+            var dataNode = ObjectPoolManager.Spawn<DataNode>();
             dataNode.m_Name = name;
             dataNode.m_FullName = parent == null ? name : $"{parent.FullName}{seperator}{name}";
             dataNode.m_Parent = parent;
@@ -92,7 +92,7 @@ namespace Atom
             if (m_Children.TryGetValue(name, out var dataNode))
             {
                 m_Children.Remove(name);
-                ObjectPoolService.Recycle(typeof(DataNode), dataNode);
+                ObjectPoolManager.Recycle(typeof(DataNode), dataNode);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Atom
             foreach (var pair in m_Children)
             {
                 pair.Value.Clear();
-                ObjectPoolService.Recycle(typeof(DataNode), pair.Value);
+                ObjectPoolManager.Recycle(typeof(DataNode), pair.Value);
             }
 
             m_Children.Clear();
