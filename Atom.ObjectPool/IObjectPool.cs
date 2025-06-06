@@ -4,27 +4,81 @@ namespace Atom
 {
     public interface IObjectPool
     {
-        Type UnitType { get; }
-        
-        int UnusedCount { get; }
+        /// <summary>
+        /// 对象池对象类型
+        /// </summary>
+        Type ObjectType { get; }
 
+        /// <summary>
+        /// 对象池中缓存的对象数量
+        /// </summary>
+        int Count { get; }
+
+        /// <summary>
+        /// 对象池的容量
+        /// </summary>
+        int Capacity { get; set; }
+
+        /// <summary>
+        /// 获取对象
+        /// </summary>
+        /// <returns></returns>
         object Spawn();
 
-        void Recycle(object unit);
+        /// <summary>
+        /// 回收对象
+        /// </summary>
+        /// <param name="obj">要回收的对象</param>
+        void Recycle(object obj);
 
-        void Release();
+        /// <summary>
+        /// 尝试释放<see cref="toReleaseCount"/>数量的对象
+        /// </summary>
+        void Release(int toReleaseCount);
+
+        /// <summary>
+        /// 释放所有未使用的对象
+        /// </summary>
+        void ReleaseAll();
     }
-    
-    public interface IObjectPool<T> where T : class
+
+    public interface IObjectPool<T> : IObjectPool where T : class
     {
-        Type UnitType { get; }
-        
-        int UnusedCount { get; }
+        /// <summary>
+        /// 对象池对象类型
+        /// </summary>
+        Type ObjectType { get; }
 
+        /// <summary>
+        /// 对象池中缓存的对象数量
+        /// </summary>
+        int Count { get; }
+
+        /// <summary>
+        /// 对象池的容量
+        /// </summary>
+        int Capacity { get; set; }
+
+        /// <summary>
+        /// 获取对象
+        /// </summary>
+        /// <returns></returns>
         T Spawn();
-        
-        void Recycle(T unit);
 
-        void Release();
+        /// <summary>
+        /// 回收对象
+        /// </summary>
+        /// <param name="obj">要回收的对象</param>
+        void Recycle(T obj);
+
+        /// <summary>
+        /// 尝试释放<see cref="toReleaseCount"/>数量的对象
+        /// </summary>
+        void Release(int toReleaseCount);
+
+        /// <summary>
+        /// 释放所有未使用的对象
+        /// </summary>
+        void ReleaseAll();
     }
 }

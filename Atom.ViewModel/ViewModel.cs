@@ -33,7 +33,7 @@ namespace Atom
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private EventService<string> Events { get; } = new EventService<string>();
+        private EventStation<string> Events { get; } = new EventStation<string>();
 
         /// <summary>
         /// 只在属性中调用
@@ -72,7 +72,7 @@ namespace Atom
 
         public void UnregisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback) => Events.Unsubscribe(name, valueChangedCallback);
 
-        public void UnregisterAllValueChanged(string name) => Events.Remove(name);
+        public void UnregisterAllValueChanged(string name) => Events.UnRegisterEvent(name);
 
         protected virtual void OnPropertyChanged(string propertyName)
         {

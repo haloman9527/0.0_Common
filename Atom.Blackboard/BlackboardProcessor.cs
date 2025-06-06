@@ -37,20 +37,20 @@ namespace Atom
     public class BlackboardProcessor<TKey> : IBlackboard<TKey>
     {
         public Blackboard<TKey> blackboard;
-        public EventService<TKey> events;
+        public EventStation<TKey> events;
         private List<KeyValuePair<TKey, Action<BBEventArg>>> addObservers;
         private List<KeyValuePair<TKey, Action<BBEventArg>>> removeObservers;
         private bool isNotifying;
 
-        public BlackboardProcessor(Blackboard<TKey> blackboard) : this(blackboard, new EventService<TKey>())
+        public BlackboardProcessor(Blackboard<TKey> blackboard) : this(blackboard, new EventStation<TKey>())
         {
         }
 
-        public BlackboardProcessor(Blackboard<TKey> blackboard, EventService<TKey> events)
+        public BlackboardProcessor(Blackboard<TKey> blackboard, EventStation<TKey> events)
         {
             this.blackboard = blackboard;
             this.events = events;
-            this.events = new EventService<TKey>();
+            this.events = new EventStation<TKey>();
             this.addObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
             this.removeObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
         }
@@ -112,14 +112,14 @@ namespace Atom
         public void Clear()
         {
             blackboard.Clear();
-            events.Clear();
+            events.UnRegisterAllEvents();
             addObservers.Clear();
             removeObservers.Clear();
         }
 
         private void NotifyObservers(TKey key, object value, NotifyType notifyType)
         {
-            if (!events.Check(key))
+            if (!events.HasEvent(key))
                 return;
 
             addObservers.Clear();

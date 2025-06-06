@@ -12,12 +12,17 @@ namespace Atom
             s_ObjectPools = new Dictionary<int, IObjectPool>(64);
         }
 
-        public static void RegisterPool(IObjectPool pool)
+        /// <summary>
+        /// 注册一个对象池
+        /// </summary>
+        /// <param name="objectPool"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static void RegisterPool(IObjectPool objectPool)
         {
-            if (HasPool(pool.UnitType))
-                throw new InvalidOperationException($"already registered pool for type {pool.UnitType}");
+            if (HasPool(objectPool.ObjectType))
+                throw new InvalidOperationException($"already registered pool for type {objectPool.ObjectType}");
             
-            s_ObjectPools.Add(pool.UnitType.GetHashCode(), pool);
+            s_ObjectPools.Add(objectPool.ObjectType.GetHashCode(), objectPool);
         }
 
         public static void ReleasePool(Type unitType)
@@ -27,7 +32,7 @@ namespace Atom
                 throw new InvalidOperationException($"can not found pool for type {unitType}");
             
             s_ObjectPools.Remove(unitType.GetHashCode());
-            objectPool.Release();
+            objectPool.ReleaseAll();
         }
 
         public static bool HasPool(Type unitType)
@@ -49,10 +54,10 @@ namespace Atom
 
         public static T Spawn<T>() where T : class, new()
         {
-            var objectPool = GetPool<T>() as ObjectPoolBase<T>;
+            var objectPool = GetPool<T>() as IObjectPool<T>;
             if (objectPool == null)
             {
-                objectPool = new ObjectPool<T>();
+                objectPool = new ObjectPool<T>(DefaultCapacity);
                 RegisterPool(objectPool);
             }
             

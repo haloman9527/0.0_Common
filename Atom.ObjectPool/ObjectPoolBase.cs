@@ -3,36 +3,30 @@ using System.Collections.Generic;
 
 namespace Atom
 {
-    public abstract class ObjectPoolBase<T> : IObjectPool, IObjectPool<T> where T : class
+    public abstract class ObjectPoolBase<T> : IObjectPool<T> where T : class
     {
-        protected Queue<T> unusedObjects;
-        
-        public Type UnitType => TypeCache<T>.TYPE;
-
-        public int UnusedCount => unusedObjects.Count;
+        protected Queue<T> m_CachedObjects;
+        protected int m_Capacity;
 
         public ObjectPoolBase()
         {
-            this.unusedObjects = new Queue<T>(16);
+            m_CachedObjects = new Queue<T>(16);
         }
 
-        /// <summary> 生成 </summary>
-        public T Spawn()
+        public int Count
         {
-            T unit = null;
-            if (unusedObjects.Count > 0)
-                unit = unusedObjects.Dequeue();
-            else
-                unit = Create();
-            OnSpawn(unit);
-            return unit;
+            get { return m_CachedObjects.Count; }
         }
 
-        /// <summary> 回收 </summary>
-        public void Recycle(T unit)
+        public int Capacity
         {
-            unusedObjects.Enqueue(unit);
-            OnRecycle(unit);
+            get { return m_Capacity; }
+            set { m_Capacity = value; }
+        }
+
+        public Type ObjectType
+        {
+            get { return TypeCache<T>.TYPE; }
         }
 
         object IObjectPool.Spawn()
@@ -40,30 +34,51 @@ namespace Atom
             return Spawn();
         }
 
-        void IObjectPool.Recycle(object unit)
+        public T Spawn()
         {
-            Recycle(unit as T);
+            T obj = m_CachedObjects.Count > 0 ? m_CachedObjects.Dequeue() : Create();
+            OnSpawn(obj);
+            return obj;
         }
 
-        public void Release()
+        void IObjectPool.Recycle(object obj)
         {
-            while (unusedObjects.Count > 0)
+            Recycle((T)obj);
+        }
+
+        public void Recycle(T obj)
+        {
+            m_CachedObjects.Enqueue(obj);
+            OnRecycle(obj);
+        }
+
+        public void Release(int toReleaseCount)
+        {
+            while (toReleaseCount-- > 0 && m_CachedObjects.Count > 0)
             {
-                OnDestroy(unusedObjects.Dequeue());
+                OnRelease(m_CachedObjects.Dequeue());
+            }
+        }
+
+        public void ReleaseAll()
+        {
+            while (m_CachedObjects.Count > 0)
+            {
+                OnRelease(m_CachedObjects.Dequeue());
             }
         }
 
         protected abstract T Create();
 
-        protected virtual void OnDestroy(T unit)
+        protected virtual void OnSpawn(T obj)
         {
         }
 
-        protected virtual void OnSpawn(T unit)
+        protected virtual void OnRecycle(T obj)
         {
         }
 
-        protected virtual void OnRecycle(T unit)
+        protected virtual void OnRelease(T obj)
         {
         }
     }
