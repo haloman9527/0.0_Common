@@ -12,7 +12,6 @@ namespace Atom
             private Queue<T> m_CachedObjects;
             private int m_Capacity;
 
-
             public Type ObjectType
             {
                 get { return typeof(T); }
@@ -43,7 +42,7 @@ namespace Atom
             public T Spawn()
             {
                 T obj = m_CachedObjects.Count > 0 ? m_CachedObjects.Dequeue() : new T();
-                if (obj is IObject iObj)
+                if (obj is IObjectPoolable iObj)
                 {
                     iObj.OnSpawn();
                 }
@@ -69,7 +68,7 @@ namespace Atom
                 }
                 
                 m_CachedObjects.Enqueue(obj);
-                if (obj is IObject iObj)
+                if (obj is IObjectPoolable iObj)
                 {
                     iObj.OnRecycle();
                 }

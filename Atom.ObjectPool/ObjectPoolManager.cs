@@ -62,7 +62,7 @@ namespace Atom
             }
             
             var unit = objectPool.Spawn();
-            if (unit is IObject obj)
+            if (unit is IObjectPoolable obj)
                 obj.OnSpawn();
             
             return unit;
@@ -75,7 +75,7 @@ namespace Atom
                 throw new InvalidOperationException($"can not found pool for type {unitType}");
 
             var unit = objectPool.Spawn();
-            if (unit is IObject obj)
+            if (unit is IObjectPoolable obj)
                 obj.OnSpawn();
 
             return unit;
@@ -92,7 +92,7 @@ namespace Atom
             if (objectPool == null)
                 throw new InvalidOperationException($"can not found pool for type {unitType}");
 
-            if (unit is IObject poolableObject)
+            if (unit is IObjectPoolable poolableObject)
                 poolableObject.OnRecycle();
 
             objectPool.Recycle(unit);
