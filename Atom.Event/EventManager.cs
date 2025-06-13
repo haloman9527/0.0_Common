@@ -5,21 +5,15 @@ namespace Atom
     /// <summary>
     /// 固定事件
     /// </summary>
-    public class EventManager : Singleton<EventManager>, ISingletonAwake
+    public class EventManager : SingletonBase<EventManager>
     {
         private static EventStation<Type> s_GlobalEventStation;
-        private static EventStation<Type> s_EventStation;
 
-        static EventManager()
-        {
-            s_EventStation = new EventStation<Type>();
-        }
-
-        public static void InitGlobalEventStation(bool force = false)
+        private static void InitGlobalEventStation(bool force = false)
         {
             if (!force && s_GlobalEventStation != null)
                 return;
-            
+
             s_GlobalEventStation = new EventStation<Type>();
             foreach (var type in TypesCache.GetTypesDerivedFrom<GlobalEventBase>())
             {
@@ -35,9 +29,12 @@ namespace Atom
             }
         }
 
-        void ISingletonAwake.Awake()
+        private EventStation<Type> m_EventStation;
+
+        protected override void OnAwake()
         {
             InitGlobalEventStation();
+            m_EventStation = new EventStation<Type>();
         }
 
         public bool HasEvent<T>()
@@ -49,37 +46,40 @@ namespace Atom
         public void RegisterEvent<T>(EventBase evt)
         {
             var evtType = TypeCache<T>.TYPE;
-            s_EventStation.RegisterEvent(evtType, evt);
+            m_EventStation.RegisterEvent(evtType, evt);
         }
 
         public void UnRegisterEvent<T>()
         {
             var evtType = TypeCache<T>.TYPE;
-            s_EventStation.UnRegisterEvent(evtType);
+            m_EventStation.UnRegisterEvent(evtType);
         }
 
         public void UnRegisterAllEvents()
         {
-            s_EventStation.UnRegisterAllEvents();
+            m_EventStation.UnRegisterAllEvents();
         }
 
         public void Subscribe<T>(Action<T> handler)
         {
             var evtType = TypeCache<T>.TYPE;
-            s_EventStation.Subscribe(evtType, handler);
+            m_EventStation.Subscribe(evtType, handler);
         }
 
         public void Unsubscribe<T>(Action<T> handler)
         {
             var evtType = TypeCache<T>.TYPE;
-            s_EventStation.Unsubscribe(evtType, handler);
+            if (m_EventStation.HasEvent(evtType))
+                m_EventStation.Unsubscribe(evtType, handler);
         }
 
         public void Publish<T>(T evt)
         {
             var evtType = TypeCache<T>.TYPE;
-            s_GlobalEventStation?.Publish(evtType, evt);
-            s_EventStation.Publish(evtType, evt);
+            if (s_GlobalEventStation.HasEvent(evtType))
+                s_GlobalEventStation?.Publish(evtType, evt);
+            if (m_EventStation.HasEvent(evtType))
+                m_EventStation.Publish(evtType, evt);
         }
     }
 }

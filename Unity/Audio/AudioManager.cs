@@ -1,7 +1,7 @@
 
 namespace Atom
 {
-    public class AudioManager : Singleton<AudioManager>, IAudioManager
+    public class AudioManager : SingletonBase<AudioManager>, IAudioManager
     {
         private IAudioManager o;
 

@@ -55,7 +55,7 @@ namespace Atom.Unity
             instance = GameObject.FindObjectOfType<T>();
             if (instance == null)
                 instance = new GameObject(TypeCache<T>.TYPE.Name).AddComponent<T>();
-            Game.AddSingleton(instance);
+            SingletonEntry.RegisterSingleton(instance);
         }
 
         #endregion
@@ -76,7 +76,7 @@ namespace Atom.Unity
                 return;
 
             this.isDisposed = true;
-            if (instance is ISingletonDestory iSingletonDestory)
+            if (instance is ISingletonDestroy iSingletonDestory)
                 iSingletonDestory.Destroy();
             Destroy(gameObject);
             instance = null;
