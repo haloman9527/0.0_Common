@@ -1,5 +1,5 @@
 {
-    "name": "Atom.Core",
+    "name": "Atom.Lib",
     "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
