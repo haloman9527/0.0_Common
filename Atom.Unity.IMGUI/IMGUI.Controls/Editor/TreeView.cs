@@ -677,92 +677,100 @@ namespace Atom.UnityEditors.IMGUI.Controls
             }
         }
     }
+
+    public class SimpleTreeView : TreeView
+    {
+        public Action<IList<int>> onSelectionChanged;
+        public Action onKeyEvent;
+        public Action onContextClicked;
+        public Action<TreeViewItem, Rect> onItemGUI;
+        public Action<TreeViewItem> onContextClickedItem;
+        public Action<TreeViewItem> onSingleClickedItem;
+        public Action<TreeViewItem> onDoubleClickedItem;
+        public Action<TreeViewItem, string, string> renameEnded;
+
+        public Func<TreeViewItem, string, bool> doesItemMatchSearch;
+        public Func<TreeViewItem, bool> canRename;
+        public Func<TreeViewItem, bool> canMultiSelect;
+        public Func<TreeViewItem, bool> canBeParent;
+
+        public SimpleTreeView(TreeViewState state) : base(state)
+        {
+        }
+
+        public SimpleTreeView(TreeViewState state, TreeViewItemPool itemPool) : base(state, itemPool)
+        {
+        }
+
+        public SimpleTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
+        {
+        }
+
+        public SimpleTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, TreeViewItemPool itemPool) : base(state, multiColumnHeader, itemPool)
+        {
+        }
+
+        protected override void SelectionChanged(IList<int> selectedIds)
+        {
+            onSelectionChanged?.Invoke(selectedIds);
+        }
+
+        protected override void ItemRowGUI(TreeViewItem item, RowGUIArgs args, Rect indentRect)
+        {
+            base.ItemRowGUI(item, args, indentRect);
+            onItemGUI?.Invoke(item, args.rowRect);
+        }
+
+        protected override void KeyEvent()
+        {
+            onKeyEvent?.Invoke();
+        }
+
+        protected override void ContextClicked()
+        {
+            onContextClicked?.Invoke();
+        }
+
+        protected override void ItemContextClicked(TreeViewItem item)
+        {
+            onContextClickedItem?.Invoke(item);
+        }
+
+        protected override void ItemSingleClicked(TreeViewItem item)
+        {
+            onSingleClickedItem?.Invoke(item);
+        }
+
+        protected override void ItemDoubleClicked(TreeViewItem item)
+        {
+            onDoubleClickedItem?.Invoke(item);
+        }
+
+        protected override void ItemRenameEnded(TreeViewItem item, string oldName, string newName)
+        {
+            renameEnded?.Invoke(item, oldName, newName);
+        }
+
+        protected override bool DoesItemMatchSearch(TreeViewItem item, string search)
+        {
+            return base.DoesItemMatchSearch(item, search) || (doesItemMatchSearch != null && doesItemMatchSearch.Invoke(item, search));
+        }
+
+        protected override bool ItemCanRename(TreeViewItem item)
+        {
+            return canRename == null ? base.ItemCanRename(item) : canRename(item);
+        }
+
+        protected override bool CanMultiSelect(TreeViewItem item)
+        {
+            return canMultiSelect == null ? base.CanMultiSelect(item) : canMultiSelect(item);
+        }
+
+        protected override bool ItemCanBeParent(TreeViewItem item)
+        {
+            return canBeParent == null ? base.ItemCanBeParent(item) : canBeParent(item);
+        }
+    }
 }
 
-public class SimpleTreeView : Atom.UnityEditors.IMGUI.Controls.TreeView
-{
-    public Action<IList<int>> onSelectionChanged;
-    public Action onKeyEvent;
-    public Action onContextClicked;
-    public Action<Atom.UnityEditors.IMGUI.Controls.TreeViewItem> onContextClickedItem;
-    public Action<Atom.UnityEditors.IMGUI.Controls.TreeViewItem> onSingleClickedItem;
-    public Action<Atom.UnityEditors.IMGUI.Controls.TreeViewItem> onDoubleClickedItem;
-    public Action<Atom.UnityEditors.IMGUI.Controls.TreeViewItem, string, string> renameEnded;
-
-    public Func<Atom.UnityEditors.IMGUI.Controls.TreeViewItem, string, bool> doesItemMatchSearch;
-    public Func<Atom.UnityEditors.IMGUI.Controls.TreeViewItem, bool> canRename;
-    public Func<Atom.UnityEditors.IMGUI.Controls.TreeViewItem, bool> canMultiSelect;
-    public Func<Atom.UnityEditors.IMGUI.Controls.TreeViewItem, bool> canBeParent;
-
-    public SimpleTreeView(TreeViewState state) : base(state)
-    {
-    }
-
-    public SimpleTreeView(TreeViewState state, TreeViewItemPool itemPool) : base(state, itemPool)
-    {
-    }
-
-    public SimpleTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
-    {
-    }
-
-    public SimpleTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, TreeViewItemPool itemPool) : base(state, multiColumnHeader, itemPool)
-    {
-    }
-
-    protected override void SelectionChanged(IList<int> selectedIds)
-    {
-        onSelectionChanged?.Invoke(selectedIds);
-    }
-
-    protected override void KeyEvent()
-    {
-        onKeyEvent?.Invoke();
-    }
-
-    protected override void ContextClicked()
-    {
-        onContextClicked?.Invoke();
-    }
-
-    protected override void ItemContextClicked(Atom.UnityEditors.IMGUI.Controls.TreeViewItem item)
-    {
-        onContextClickedItem?.Invoke(item);
-    }
-
-    protected override void ItemSingleClicked(Atom.UnityEditors.IMGUI.Controls.TreeViewItem item)
-    {
-        onSingleClickedItem?.Invoke(item);
-    }
-
-    protected override void ItemDoubleClicked(Atom.UnityEditors.IMGUI.Controls.TreeViewItem item)
-    {
-        onDoubleClickedItem?.Invoke(item);
-    }
-
-    protected override void ItemRenameEnded(Atom.UnityEditors.IMGUI.Controls.TreeViewItem item, string oldName, string newName)
-    {
-        renameEnded?.Invoke(item, oldName, newName);
-    }
-
-    protected override bool DoesItemMatchSearch(Atom.UnityEditors.IMGUI.Controls.TreeViewItem item, string search)
-    {
-        return base.DoesItemMatchSearch(item, search) || (doesItemMatchSearch != null && doesItemMatchSearch.Invoke(item, search));
-    }
-
-    protected override bool ItemCanRename(Atom.UnityEditors.IMGUI.Controls.TreeViewItem item)
-    {
-        return canRename == null ? base.ItemCanRename(item) : canRename(item);
-    }
-
-    protected override bool CanMultiSelect(Atom.UnityEditors.IMGUI.Controls.TreeViewItem item)
-    {
-        return canMultiSelect == null ? base.CanMultiSelect(item) : canMultiSelect(item);
-    }
-
-    protected override bool ItemCanBeParent(Atom.UnityEditors.IMGUI.Controls.TreeViewItem item)
-    {
-        return canBeParent == null ? base.ItemCanBeParent(item) : canBeParent(item);
-    }
-}
 #endif
