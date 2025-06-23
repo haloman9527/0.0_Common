@@ -1,105 +1,127 @@
-#region 注 释
-/***
- *
- *  Title:
- *  
- *  Description:
- *  
- *  Date:
- *  Version:
- *  Writer: 半只龙虾人
- *  Github: https://github.com/haloman9527
- *  Blog: https://www.haloman.net/
- *
- */
-#endregion
 using System;
 
 namespace Atom
 {
-    public enum EasingType
-    {
-        Linear,
-        Clerp,
-        Spring,
-        EaseInQuad,
-        EaseOutQuad,
-        EaseInOutQuad,
-        EaseInCubic,
-        EaseOutCubic,
-        EaseInOutCubic,
-        EaseInQuart,
-        EaseOutQuart,
-        EaseInOutQuart,
-        EaseInQuint,
-        EaseOutQuint,
-        EaseInOutQuint,
-        EaseInSine,
-        EaseOutSine,
-        EaseInOutSine,
-        EaseInExpo,
-        EaseOutExpo,
-        EaseInOutExpo,
-        EaseInCirc,
-        EaseOutCirc,
-        EaseInOutCirc,
-        EaseInBounce,
-        EaseOutBounce,
-        EaseInOutBounce,
-        EaseInBack,
-        EaseOutBack,
-        EaseInOutBack,
-        EaseInElastic,
-        EaseOutElastic,
-        EaseInOutElastic
-    }
-
     public static class Easing
     {
-        public static Func<float, float, float, float>[] Tweens;
-
-        static Easing()
+        /// <summary>
+        /// 缓动类型枚举，定义各种常用曲线。
+        /// </summary>
+        public enum EasingType
         {
-            Tweens = new System.Func<float, float, float, float>[]{
-                Linear,
-                Clerp,
-                Spring,
-                EaseInQuad,
-                EaseOutQuad,
-                EaseInOutQuad,
-                EaseInCubic,
-                EaseOutCubic,
-                EaseInOutCubic,
-                EaseInQuart,
-                EaseOutQuart,
-                EaseInOutQuart,
-                EaseInQuint,
-                EaseOutQuint,
-                EaseInOutQuint,
-                EaseInSine,
-                EaseOutSine,
-                EaseInOutSine,
-                EaseInExpo,
-                EaseOutExpo,
-                EaseInOutExpo,
-                EaseInCirc,
-                EaseOutCirc,
-                EaseInOutCirc,
-                EaseInBounce,
-                EaseOutBounce,
-                EaseInOutBounce,
-                EaseInBack,
-                EaseOutBack,
-                EaseInOutBack,
-                EaseInElastic,
-                EaseOutElastic,
-                EaseInOutElastic
-            };
+            /// <summary>线性，匀速变化</summary>
+            Linear,
+            /// <summary>角度插值（360度环绕）</summary>
+            Clerp,
+            /// <summary>弹簧效果，带回弹</summary>
+            Spring,
+            /// <summary>二次缓入，加速</summary>
+            EaseInQuad,
+            /// <summary>二次缓出，减速</summary>
+            EaseOutQuad,
+            /// <summary>二次缓入缓出，先加速后减速</summary>
+            EaseInOutQuad,
+            /// <summary>三次缓入，加速更快</summary>
+            EaseInCubic,
+            /// <summary>三次缓出，减速更快</summary>
+            EaseOutCubic,
+            /// <summary>三次缓入缓出，先加速后减速</summary>
+            EaseInOutCubic,
+            /// <summary>四次缓入，极快加速</summary>
+            EaseInQuart,
+            /// <summary>四次缓出，极快减速</summary>
+            EaseOutQuart,
+            /// <summary>四次缓入缓出，先加速后减速</summary>
+            EaseInOutQuart,
+            /// <summary>五次缓入，超快加速</summary>
+            EaseInQuint,
+            /// <summary>五次缓出，超快减速</summary>
+            EaseOutQuint,
+            /// <summary>五次缓入缓出，先加速后减速</summary>
+            EaseInOutQuint,
+            /// <summary>正弦缓入，柔和加速</summary>
+            EaseInSine,
+            /// <summary>正弦缓出，柔和减速</summary>
+            EaseOutSine,
+            /// <summary>正弦缓入缓出，柔和加速减速</summary>
+            EaseInOutSine,
+            /// <summary>指数缓入，初始极慢后极快</summary>
+            EaseInExpo,
+            /// <summary>指数缓出，初始极快后极慢</summary>
+            EaseOutExpo,
+            /// <summary>指数缓入缓出，极端加速减速</summary>
+            EaseInOutExpo,
+            /// <summary>圆形缓入，圆弧加速</summary>
+            EaseInCirc,
+            /// <summary>圆形缓出，圆弧减速</summary>
+            EaseOutCirc,
+            /// <summary>圆形缓入缓出，圆弧加速减速</summary>
+            EaseInOutCirc,
+            /// <summary>弹跳缓入，先弹后到达</summary>
+            EaseInBounce,
+            /// <summary>弹跳缓出，弹跳到终点</summary>
+            EaseOutBounce,
+            /// <summary>弹跳缓入缓出，弹跳起止</summary>
+            EaseInOutBounce,
+            /// <summary>回退缓入，先回拉再前进</summary>
+            EaseInBack,
+            /// <summary>回退缓出，超出后回拉</summary>
+            EaseOutBack,
+            /// <summary>回退缓入缓出，前后回拉</summary>
+            EaseInOutBack,
+            /// <summary>弹性缓入，带弹性拉伸</summary>
+            EaseInElastic,
+            /// <summary>弹性缓出，带弹性回弹</summary>
+            EaseOutElastic,
+            /// <summary>弹性缓入缓出，弹性起止</summary>
+            EaseInOutElastic
         }
 
+        // 预先存储常用数学常量
+        private static readonly float PI = (float)Math.PI;
+        private static readonly float PI_HALF = (float)(Math.PI * 0.5f);
+        private static readonly float PI2 = (float)(Math.PI * 2.0f);
+        
         public static float Tween(float start, float end, float t, EasingType easingType)
         {
-            return Tweens[(int)easingType](start, end, t);
+            t = Math.Clamp(t, 0f, 1f);
+            switch (easingType)
+            {
+                case EasingType.Linear: return Linear(start, end, t);
+                case EasingType.Clerp: return Clerp(start, end, t);
+                case EasingType.Spring: return Spring(start, end, t);
+                case EasingType.EaseInQuad: return EaseInQuad(start, end, t);
+                case EasingType.EaseOutQuad: return EaseOutQuad(start, end, t);
+                case EasingType.EaseInOutQuad: return EaseInOutQuad(start, end, t);
+                case EasingType.EaseInCubic: return EaseInCubic(start, end, t);
+                case EasingType.EaseOutCubic: return EaseOutCubic(start, end, t);
+                case EasingType.EaseInOutCubic: return EaseInOutCubic(start, end, t);
+                case EasingType.EaseInQuart: return EaseInQuart(start, end, t);
+                case EasingType.EaseOutQuart: return EaseOutQuart(start, end, t);
+                case EasingType.EaseInOutQuart: return EaseInOutQuart(start, end, t);
+                case EasingType.EaseInQuint: return EaseInQuint(start, end, t);
+                case EasingType.EaseOutQuint: return EaseOutQuint(start, end, t);
+                case EasingType.EaseInOutQuint: return EaseInOutQuint(start, end, t);
+                case EasingType.EaseInSine: return EaseInSine(start, end, t);
+                case EasingType.EaseOutSine: return EaseOutSine(start, end, t);
+                case EasingType.EaseInOutSine: return EaseInOutSine(start, end, t);
+                case EasingType.EaseInExpo: return EaseInExpo(start, end, t);
+                case EasingType.EaseOutExpo: return EaseOutExpo(start, end, t);
+                case EasingType.EaseInOutExpo: return EaseInOutExpo(start, end, t);
+                case EasingType.EaseInCirc: return EaseInCirc(start, end, t);
+                case EasingType.EaseOutCirc: return EaseOutCirc(start, end, t);
+                case EasingType.EaseInOutCirc: return EaseInOutCirc(start, end, t);
+                case EasingType.EaseInBounce: return EaseInBounce(start, end, t);
+                case EasingType.EaseOutBounce: return EaseOutBounce(start, end, t);
+                case EasingType.EaseInOutBounce: return EaseInOutBounce(start, end, t);
+                case EasingType.EaseInBack: return EaseInBack(start, end, t);
+                case EasingType.EaseOutBack: return EaseOutBack(start, end, t);
+                case EasingType.EaseInOutBack: return EaseInOutBack(start, end, t);
+                case EasingType.EaseInElastic: return EaseInElastic(start, end, t);
+                case EasingType.EaseOutElastic: return EaseOutElastic(start, end, t);
+                case EasingType.EaseInOutElastic: return EaseInOutElastic(start, end, t);
+                default: return Linear(start, end, t);
+            }
         }
 
         public static float Linear(float start, float end, float t)
@@ -132,7 +154,7 @@ namespace Atom
         public static float Spring(float start, float end, float t)
         {
             t = Math.Clamp(t, 0, 1);
-            t = (float)(Math.Sin(t * Math.PI * (0.2f + 2.5f * t * t * t)) * Math.Pow(1f - t, 2.2f) + t) * (1f + (1.2f * (1f - t)));
+            t = (float)(Math.Sin(t * PI * (0.2f + 2.5f * t * t * t)) * Math.Pow(1f - t, 2.2f) + t) * (1f + (1.2f * (1f - t)));
             return start + (end - start) * t;
         }
 
@@ -226,19 +248,19 @@ namespace Atom
         public static float EaseInSine(float start, float end, float t)
         {
             end -= start;
-            return (float)(-end * Math.Cos(t * (Math.PI * 0.5f)) + end + start);
+            return (float)(-end * Math.Cos(t * PI_HALF) + end + start);
         }
 
         public static float EaseOutSine(float start, float end, float t)
         {
             end -= start;
-            return (float)(end * Math.Sin(t * (Math.PI * 0.5f)) + start);
+            return (float)(end * Math.Sin(t * PI_HALF) + start);
         }
 
         public static float EaseInOutSine(float start, float end, float t)
         {
             end -= start;
-            return (float)(-end * 0.5f * (Math.Cos(Math.PI * t) - 1) + start);
+            return (float)(-end * 0.5f * (Math.Cos(PI * t) - 1) + start);
         }
 
         public static float EaseInExpo(float start, float end, float t)
@@ -383,10 +405,10 @@ namespace Atom
             }
             else
             {
-                s = (float)(p / (2 * Math.PI) * Math.Asin(end / a));
+                s = (float)(p / PI2 * Math.Asin(end / a));
             }
 
-            return (float)(-(a * Math.Pow(2, 10 * (t -= 1)) * Math.Sin((t * d - s) * (2 * Math.PI) / p)) + start);
+            return (float)(-(a * Math.Pow(2, 10 * (t -= 1)) * Math.Sin((t * d - s) * PI2 / p)) + start);
         }
         /* GFX47 MOD END */
 
@@ -413,10 +435,10 @@ namespace Atom
             }
             else
             {
-                s = (float)(p / (2 * Math.PI) * Math.Asin(end / a));
+                s = (float)(p / PI2 * Math.Asin(end / a));
             }
 
-            return (float)(a * Math.Pow(2, -10 * t) * Math.Sin((t * d - s) * (2 * Math.PI) / p) + end + start);
+            return (float)(a * Math.Pow(2, -10 * t) * Math.Sin((t * d - s) * PI2 / p) + end + start);
         }
 
         /* GFX47 MOD START */
@@ -440,11 +462,11 @@ namespace Atom
             }
             else
             {
-                s = (float)(p / (2 * Math.PI) * Math.Asin(end / a));
+                s = (float)(p / PI2 * Math.Asin(end / a));
             }
 
-            if (t < 1) return (float)(-0.5f * (a * Math.Pow(2, 10 * (t -= 1)) * Math.Sin((t * d - s) * (2 * Math.PI) / p)) + start);
-            return (float)(a * Math.Pow(2, -10 * (t -= 1)) * Math.Sin((t * d - s) * (2 * Math.PI) / p) * 0.5f + end + start);
+            if (t < 1) return (float)(-0.5f * (a * Math.Pow(2, 10 * (t -= 1)) * Math.Sin((t * d - s) * PI2 / p)) + start);
+            return (float)(a * Math.Pow(2, -10 * (t -= 1)) * Math.Sin((t * d - s) * PI2 / p) * 0.5f + end + start);
         }
         /* GFX47 MOD END */
 
