@@ -36,11 +36,11 @@ namespace Atom
     {
         [NonSerialized] private object _syncRoot;
 
-        private IBridgedValue<T> bridgedItems;
+        private IBridgedValue<T> m_BridgedItems;
 
-        protected IBridgedValue<T> BridgedItems => this.bridgedItems;
+        protected IBridgedValue<T> BridgedItems => this.m_BridgedItems;
 
-        private T items => bridgedItems.Value;
+        private T items => m_BridgedItems.Value;
 
         public int Count => this.items.Count;
 
@@ -54,14 +54,14 @@ namespace Atom
         {
             if (list == null)
                 throw new ArgumentNullException(nameof(list));
-            this.bridgedItems = new BridgedValue<T>(list);
+            this.m_BridgedItems = new BridgedValue<T>(list);
         }
 
         public BridgedCollection(Func<T> listGetter, Action<T> listSetter)
         {
             if (listGetter == null)
                 throw new ArgumentNullException(nameof(listGetter));
-            this.bridgedItems = new BridgedValueGetterSetter<T>(listGetter, listSetter);
+            this.m_BridgedItems = new BridgedValueGetterSetter<T>(listGetter, listSetter);
         }
 
         public TE this[int index]

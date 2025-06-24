@@ -62,12 +62,12 @@ namespace Atom
                 if (HasDefaultConstructor(type))
                 {
                     var producerType = typeof(ViewModelProducerS<>).MakeGenericType(type);
-                    s_ViewModelProducers.Add(attribute.modelType, Activator.CreateInstance(producerType) as IViewModelProducer);
+                    s_ViewModelProducers.Add(attribute.m_ModelType, Activator.CreateInstance(producerType) as IViewModelProducer);
                 }
                 else
                 {
                     var producerType = typeof(ViewModelProducerR<>).MakeGenericType(type);
-                    s_ViewModelProducers.Add(attribute.modelType, Activator.CreateInstance(producerType) as IViewModelProducer);
+                    s_ViewModelProducers.Add(attribute.m_ModelType, Activator.CreateInstance(producerType) as IViewModelProducer);
                 }
             }
 

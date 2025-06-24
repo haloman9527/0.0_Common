@@ -5,11 +5,16 @@ namespace Atom
     [AttributeUsage(AttributeTargets.Class)]
     public class ViewModelAttribute : Attribute
     {
-        public Type modelType;
+        public Type m_ModelType;
 
+        public Type ModelType
+        {
+            get { return m_ModelType; }
+        }
+        
         public ViewModelAttribute(Type modelType)
         {
-            this.modelType = modelType;
+            this.m_ModelType = modelType;
         }
     }
 }

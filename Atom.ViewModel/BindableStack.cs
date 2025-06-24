@@ -21,14 +21,15 @@ namespace Atom
 {
     public class BindableStack<T> : BindableProperty<Stack<T>>, IEnumerable<T>
     {
-        public event Action onPushed;
-        public event Action onPoped;
-        public event Action onClear;
+        public event Action OnPushed;
+        public event Action OnPoped;
+        public event Action OnClear;
 
         public int Count
         {
             get { return Value.Count; }
         }
+        
         public bool IsReadOnly
         {
             get { return false; }
@@ -39,13 +40,13 @@ namespace Atom
         public void Push(T item)
         {
             Value.Push(item);
-            onPushed?.Invoke();
+            OnPushed?.Invoke();
         }
 
         public T Pop()
         {
             var t = Value.Pop();
-            onPoped?.Invoke();
+            OnPoped?.Invoke();
             return t;
         }
 
@@ -62,7 +63,7 @@ namespace Atom
         public void Clear()
         {
             Value.Clear();
-            onClear?.Invoke();
+            OnClear?.Invoke();
         }
 
         public IEnumerator<T> GetEnumerator()

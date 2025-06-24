@@ -30,65 +30,74 @@ namespace Atom
 
     public struct BBEventArg
     {
-        public object value;
-        public NotifyType notifyType;
+        public object Value;
+        public NotifyType NotifyType;
     }
 
     public class BlackboardProcessor<TKey> : IBlackboard<TKey>
     {
-        public Blackboard<TKey> blackboard;
-        public EventStation<TKey> events;
-        private List<KeyValuePair<TKey, Action<BBEventArg>>> addObservers;
-        private List<KeyValuePair<TKey, Action<BBEventArg>>> removeObservers;
-        private bool isNotifying;
+        private Blackboard<TKey> m_Blackboard;
+        private EventStation<TKey> m_Events;
+        private List<KeyValuePair<TKey, Action<BBEventArg>>> m_AddObservers;
+        private List<KeyValuePair<TKey, Action<BBEventArg>>> m_RemoveObservers;
+        private bool m_IsNotifying;
 
+        public Blackboard<TKey> Blackboard
+        {
+            get { return m_Blackboard; }
+        }
+
+        public EventStation<TKey> Events
+        {
+            get { return m_Events; }
+        }
+        
         public BlackboardProcessor(Blackboard<TKey> blackboard) : this(blackboard, new EventStation<TKey>())
         {
         }
 
         public BlackboardProcessor(Blackboard<TKey> blackboard, EventStation<TKey> events)
         {
-            this.blackboard = blackboard;
-            this.events = events;
-            this.events = new EventStation<TKey>();
-            this.addObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
-            this.removeObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
+            this.m_Blackboard = blackboard;
+            this.m_Events = events;
+            this.m_AddObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
+            this.m_RemoveObservers = new List<KeyValuePair<TKey, Action<BBEventArg>>>();
         }
 
         public bool Contains(TKey key)
         {
-            return blackboard.Contains(key);
+            return m_Blackboard.Contains(key);
         }
 
         public T Get<T>(TKey key)
         {
-            return blackboard.Get<T>(key);
+            return m_Blackboard.Get<T>(key);
         }
 
         public object Get(TKey key)
         {
-            return blackboard.Get(key);
+            return m_Blackboard.Get(key);
         }
 
         public bool TryGet<T>(TKey key, out T value)
         {
-            return blackboard.TryGet(key, out value);
+            return m_Blackboard.TryGet(key, out value);
         }
 
         public bool TryGet(TKey key, out object value)
         {
-            return blackboard.TryGet(key, out value);
+            return m_Blackboard.TryGet(key, out value);
         }
 
         public bool Set<T>(TKey key, T value)
         {
             var notifyType = NotifyType.Changed;
-            if (!blackboard.Contains(key))
+            if (!m_Blackboard.Contains(key))
             {
                 notifyType = NotifyType.Added;
             }
 
-            if (blackboard.Set(key, value))
+            if (m_Blackboard.Set(key, value))
             {
                 NotifyObservers(key, value, notifyType);
                 return true;
@@ -99,76 +108,76 @@ namespace Atom
 
         public bool Remove(TKey key)
         {
-            if (!blackboard.TryGet(key, out var value))
+            if (!m_Blackboard.TryGet(key, out var value))
             {
                 return false;
             }
 
-            blackboard.Remove(key);
+            m_Blackboard.Remove(key);
             NotifyObservers(key, value, NotifyType.Remove);
             return true;
         }
 
         public void Clear()
         {
-            blackboard.Clear();
-            events.UnRegisterAllEvents();
-            addObservers.Clear();
-            removeObservers.Clear();
+            m_Blackboard.Clear();
+            m_Events.UnRegisterAllEvents();
+            m_AddObservers.Clear();
+            m_RemoveObservers.Clear();
         }
 
         private void NotifyObservers(TKey key, object value, NotifyType notifyType)
         {
-            if (!events.HasEvent(key))
+            if (!m_Events.HasEvent(key))
                 return;
 
-            addObservers.Clear();
-            removeObservers.Clear();
+            m_AddObservers.Clear();
+            m_RemoveObservers.Clear();
 
-            isNotifying = true;
+            m_IsNotifying = true;
             try
             {
-                events.Publish(key, new BBEventArg() { value = value, notifyType = notifyType });
+                m_Events.Publish(key, new BBEventArg() { Value = value, NotifyType = notifyType });
             }
             finally
             {
-                isNotifying = false;
+                m_IsNotifying = false;
             }
 
-            foreach (var pair in removeObservers)
+            foreach (var pair in m_RemoveObservers)
             {
                 UnregisterObserver(pair.Key, pair.Value);
             }
 
-            foreach (var pair in addObservers)
+            foreach (var pair in m_AddObservers)
             {
                 RegisterObserver(pair.Key, pair.Value);
             }
 
-            addObservers.Clear();
-            removeObservers.Clear();
+            m_AddObservers.Clear();
+            m_RemoveObservers.Clear();
         }
 
         public void RegisterObserver(TKey key, Action<BBEventArg> observer)
         {
-            if (isNotifying)
+            if (m_IsNotifying)
             {
-                addObservers.Add(new KeyValuePair<TKey, Action<BBEventArg>>(key, observer));
+                m_AddObservers.Add(new KeyValuePair<TKey, Action<BBEventArg>>(key, observer));
                 return;
             }
 
-            events.Subscribe(key, observer);
+            m_Events.Subscribe(key, observer);
         }
 
         public void UnregisterObserver(TKey key, Action<BBEventArg> observer)
         {
-            if (isNotifying)
+            if (m_IsNotifying)
             {
-                removeObservers.Add(new KeyValuePair<TKey, Action<BBEventArg>>(key, observer));
+                m_RemoveObservers.Add(new KeyValuePair<TKey, Action<BBEventArg>>(key, observer));
                 return;
             }
 
-            events.Unsubscribe(key, observer);
+            m_Events.Unsubscribe(key, observer);
         }
     }
 }

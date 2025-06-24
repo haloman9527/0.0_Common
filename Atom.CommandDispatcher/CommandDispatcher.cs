@@ -24,54 +24,54 @@ namespace Atom
 {
     public sealed class CommandDispatcher
     {
-        private LinkedList<ICommand> undoList = new LinkedList<ICommand>();
-        private Stack<ICommand> redoList = new Stack<ICommand>();
-        private CommandGroup group;
-        private int recordLimit;
+        private LinkedList<ICommand> m_UndoList = new LinkedList<ICommand>();
+        private Stack<ICommand> m_RedoList = new Stack<ICommand>();
+        private CommandGroup m_CurrentGroup;
+        private int m_RecordLimit;
 
         public CommandDispatcher(int recordLimit = 0)
         {
-            this.recordLimit = recordLimit;
+            this.m_RecordLimit = recordLimit;
         }
 
         public bool CanUndo()
         {
-            return undoList.Count > 0;
+            return m_UndoList.Count > 0;
         }
 
         public bool CanRedo()
         {
-            return redoList.Count > 0;
+            return m_RedoList.Count > 0;
         }
 
         public void BeginGroup()
         {
-            if (group != null)
+            if (m_CurrentGroup != null)
             {
                 throw new Exception("Current is already in a group");
             }
-            
-            group = new CommandGroup();
-            undoList.AddLast(group);
-            while (recordLimit >= 0 && undoList.Count > recordLimit)
+
+            m_CurrentGroup = new CommandGroup();
+            m_UndoList.AddLast(m_CurrentGroup);
+            while (m_RecordLimit >= 0 && m_UndoList.Count > m_RecordLimit)
             {
-                undoList.RemoveFirst();
+                m_UndoList.RemoveFirst();
             }
 
-            if (undoList.Count == 0)
+            if (m_UndoList.Count == 0)
             {
-                group = null;
+                m_CurrentGroup = null;
             }
         }
 
         public void EndGroup()
         {
-            if (group == null)
+            if (m_CurrentGroup == null)
             {
                 throw new Exception("Current is not in a group");
             }
-            
-            group = null;
+
+            m_CurrentGroup = null;
         }
 
         public void Do(Action @do, Action @undo)
@@ -91,28 +91,31 @@ namespace Atom
         {
             if (command == null)
                 return;
-            
-            redoList.Clear();
-            if (group != null)
+
+            m_RedoList.Clear();
+            if (m_CurrentGroup != null)
             {
-                group.commands.Add(command);
+                m_CurrentGroup.m_Commands.Add(command);
             }
             else
             {
-                undoList.AddLast(command);
-                while (recordLimit > 0 && undoList.Count > recordLimit)
+                m_UndoList.AddLast(command);
+                while (m_RecordLimit > 0 && m_UndoList.Count > m_RecordLimit)
                 {
-                    undoList.RemoveFirst();
+                    m_UndoList.RemoveFirst();
                 }
             }
         }
 
         public void Redo()
         {
-            if (redoList.Count == 0)
+            if (m_RedoList.Count == 0)
+            {
                 return;
-            var command = redoList.Pop();
-            undoList.AddLast(command);
+            }
+
+            var command = m_RedoList.Pop();
+            m_UndoList.AddLast(command);
 
             if (command != null)
             {
@@ -122,11 +125,14 @@ namespace Atom
 
         public void Undo()
         {
-            if (undoList.Count == 0)
+            if (m_UndoList.Count == 0)
+            {
                 return;
-            var command = undoList.Last.Value;
-            undoList.RemoveLast();
-            redoList.Push(command);
+            }
+
+            var command = m_UndoList.Last.Value;
+            m_UndoList.RemoveLast();
+            m_RedoList.Push(command);
 
             if (command != null)
             {
@@ -136,19 +142,19 @@ namespace Atom
 
         public void Clear()
         {
-            undoList.Clear();
-            redoList.Clear();
+            m_UndoList.Clear();
+            m_RedoList.Clear();
         }
 
         internal class CommandGroup : ICommand
         {
-            internal List<ICommand> commands = new List<ICommand>();
+            internal List<ICommand> m_Commands = new List<ICommand>();
 
             public void Do()
             {
-                for (int i = 0; i < commands.Count; i++)
+                for (int i = 0; i < m_Commands.Count; i++)
                 {
-                    var command = commands[i];
+                    var command = m_Commands[i];
                     if (command == null)
                         continue;
 
@@ -158,9 +164,9 @@ namespace Atom
 
             public void Redo()
             {
-                for (int i = 0; i < commands.Count; i++)
+                for (int i = 0; i < m_Commands.Count; i++)
                 {
-                    var command = commands[i];
+                    var command = m_Commands[i];
                     if (command == null)
                         continue;
 
@@ -170,9 +176,9 @@ namespace Atom
 
             public void Undo()
             {
-                for (int i = commands.Count - 1; i >= 0; i--)
+                for (int i = m_Commands.Count - 1; i >= 0; i--)
                 {
-                    var command = commands[i];
+                    var command = m_Commands[i];
                     if (command == null)
                         continue;
 
@@ -183,28 +189,30 @@ namespace Atom
 
         public class ActionCommand : ICommand
         {
-            Action @do, @redo, @undo;
+            private Action m_Do;
+            private Action m_Redo;
+            private Action m_Undo;
 
             public ActionCommand(Action @do, Action @redo, Action @undo)
             {
-                this.@do = @do;
-                this.@redo = @redo;
-                this.@undo = @undo;
+                this.m_Do = @do;
+                this.m_Redo = @redo;
+                this.m_Undo = @undo;
             }
 
             public void Do()
             {
-                @do?.Invoke();
+                m_Do?.Invoke();
             }
 
             public void Redo()
             {
-                @redo?.Invoke();
+                m_Redo?.Invoke();
             }
 
             public void Undo()
             {
-                @undo?.Invoke();
+                m_Undo?.Invoke();
             }
         }
     }

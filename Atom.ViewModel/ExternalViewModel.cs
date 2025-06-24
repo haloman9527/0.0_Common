@@ -25,33 +25,38 @@ namespace Atom
 
     public class ExternalViewModel
     {
-        private readonly Dictionary<string, IBindableProperty> bindableProperties = new Dictionary<string, IBindableProperty>();
-
+        private readonly Dictionary<string, IBindableProperty> m_BindableProperties = new Dictionary<string, IBindableProperty>();
         public event Action<object, string> PropertyChanged;
 
-        public int Count => bindableProperties.Count;
-
-        public IReadOnlyDictionary<string, IBindableProperty> Properties => bindableProperties;
+        public IReadOnlyDictionary<string, IBindableProperty> Properties
+        {
+            get { return m_BindableProperties; }
+        }
+        
+        public int Count
+        {
+            get { return m_BindableProperties.Count; }
+        }
 
         public bool Contains(string propertyName)
         {
-            return bindableProperties.ContainsKey(propertyName);
+            return m_BindableProperties.ContainsKey(propertyName);
         }
 
         public bool TryGetProperty(string propertyName, out IBindableProperty property)
         {
-            if (bindableProperties == null)
+            if (m_BindableProperties == null)
             {
                 property = null;
                 return false;
             }
 
-            return bindableProperties.TryGetValue(propertyName, out property);
+            return m_BindableProperties.TryGetValue(propertyName, out property);
         }
 
         public bool TryGetProperty<T>(string propertyName, out IBindableProperty<T> property)
         {
-            if (!bindableProperties.TryGetValue(propertyName, out var tempProperty))
+            if (!m_BindableProperties.TryGetValue(propertyName, out var tempProperty))
             {
                 property = null;
                 return false;
@@ -63,7 +68,7 @@ namespace Atom
 
         public IBindableProperty GetProperty(string propertyName)
         {
-            if (!bindableProperties.TryGetValue(propertyName, out var property))
+            if (!m_BindableProperties.TryGetValue(propertyName, out var property))
             {
                 return null;
             }
@@ -73,7 +78,7 @@ namespace Atom
 
         public IBindableProperty<T> GetProperty<T>(string propertyName)
         {
-            if (!bindableProperties.TryGetValue(propertyName, out var property))
+            if (!m_BindableProperties.TryGetValue(propertyName, out var property))
             {
                 return null;
             }
@@ -83,27 +88,27 @@ namespace Atom
 
         public void RegisterProperty(string propertyName, IBindableProperty property)
         {
-            bindableProperties.Add(propertyName, property);
+            m_BindableProperties.Add(propertyName, property);
         }
 
         public void RegisterProperty<T>(string propertyName, Func<T> getter = null, Action<T> setter = null)
         {
-            bindableProperties.Add(propertyName, new BindableProperty<T>(getter, setter));
+            m_BindableProperties.Add(propertyName, new BindableProperty<T>(getter, setter));
         }
 
         public void RegisterProperty<T>(string propertyName, RefFunc<T> getter)
         {
-            bindableProperties.Add(propertyName, new BindableProperty<T>(() => getter(), v => getter() = v));
+            m_BindableProperties.Add(propertyName, new BindableProperty<T>(() => getter(), v => getter() = v));
         }
 
         public void UnregisterProperty(string propertyName)
         {
-            if (!bindableProperties.TryGetValue(propertyName, out var property))
+            if (!m_BindableProperties.TryGetValue(propertyName, out var property))
             {
                 return;
             }
 
-            bindableProperties.Remove(propertyName);
+            m_BindableProperties.Remove(propertyName);
         }
 
         public T GetPropertyValue<T>(string propertyName)
@@ -130,7 +135,7 @@ namespace Atom
 
         public void Reset()
         {
-            bindableProperties.Clear();
+            m_BindableProperties.Clear();
         }
     }
 }

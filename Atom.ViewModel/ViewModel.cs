@@ -31,9 +31,14 @@ namespace Atom
             public T newValue;
         }
 
+        private EventStation<string> m_Events = new EventStation<string>();
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private EventStation<string> Events { get; } = new EventStation<string>();
+        private EventStation<string> Events
+        {
+            get { return m_Events; }
+        }
 
         /// <summary>
         /// 只在属性中调用
@@ -42,7 +47,10 @@ namespace Atom
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref T GetFieldValue<T>(ref T field) => ref field;
+        public ref T GetFieldValue<T>(ref T field)
+        {
+            return ref field;
+        }
 
         /// <summary>
         /// 只在属性中调用
@@ -61,18 +69,26 @@ namespace Atom
 
             var oldValue = field;
             field = value;
-            Events.Publish(propertyName, new ValueChangedArg<T>() { oldValue = oldValue, newValue = value });
-
+            m_Events.Publish(propertyName, new ValueChangedArg<T>() { oldValue = oldValue, newValue = value });
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             OnPropertyChanged(propertyName);
             return true;
         }
 
-        public void RegisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback) => Events.Subscribe(name, valueChangedCallback);
+        public void RegisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback)
+        {
+            Events.Subscribe(name, valueChangedCallback);
+        }
 
-        public void UnregisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback) => Events.Unsubscribe(name, valueChangedCallback);
+        public void UnregisterValueChanged<T>(string name, Action<ValueChangedArg<T>> valueChangedCallback)
+        {
+            Events.Unsubscribe(name, valueChangedCallback);
+        }
 
-        public void UnregisterAllValueChanged(string name) => Events.UnRegisterEvent(name);
+        public void UnregisterAllValueChanged(string name)
+        {
+            Events.UnRegisterEvent(name);
+        }
 
         protected virtual void OnPropertyChanged(string propertyName)
         {

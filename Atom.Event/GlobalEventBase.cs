@@ -9,7 +9,10 @@ namespace Atom
 
     public abstract class GlobalEventBase<T> : GlobalEventBase, IEvent<T>
     {
-        public override Type EventType => TypeCache<T>.TYPE;
+        public override Type EventType
+        {
+            get { return TypeCache<T>.TYPE; }
+        }
 
         public abstract void Invoke(T arg);
     }

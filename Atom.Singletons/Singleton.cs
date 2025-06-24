@@ -10,55 +10,58 @@ namespace Atom
     {
         #region Static
 
-        private static object @lock = new object();
-        private bool isDisposed;
-
-        private static T instance;
+        private static object s_Lock = new object();
+        private static T s_Instance;
 
         public static T Instance
         {
             get
             {
-                if (instance != null)
-                    return instance;
+                if (s_Instance != null)
+                    return s_Instance;
                 
-                lock (@lock)
+                lock (@s_Lock)
                 {
-                    if (instance == null)
+                    if (s_Instance == null)
                         SingletonEntry.RegisterSingleton(new T());
                 }
 
-                return instance;
+                return s_Instance;
             }
         }
 
         public static bool IsInitialized()
         {
-            return instance != null;
+            return s_Instance != null;
         }
 
         #endregion
 
-        public bool IsDisposed => this.isDisposed;
+        private bool m_IsDisposed;
+
+        public bool IsDisposed
+        {
+            get { return m_IsDisposed; }
+        }
 
         public void Register()
         {
-            if (instance != null)
+            if (s_Instance != null)
                 throw new Exception($"singleton register twice! {TypeCache<T>.TYPE.Name}");
 
-            instance = (T)this;
+            s_Instance = (T)this;
         }
 
         public void Dispose()
         {
-            if (this.isDisposed)
+            if (this.m_IsDisposed)
                 return;
 
-            this.isDisposed = true;
+            this.m_IsDisposed = true;
             if (this is ISingletonDestroy iSingletonDestory)
                 iSingletonDestory.Destroy();
-            if (this == instance)
-                instance = null;
+            if (this == s_Instance)
+                s_Instance = null;
         }
     }
 }

@@ -24,19 +24,31 @@ namespace Atom
     public partial class BindableDictionary<TKey, TValue>
     {
         private SimpleMonitor _monitor = new SimpleMonitor();
-        private IBridgedValue<Dictionary<TKey, TValue>> bridgedDictionary;
+        private IBridgedValue<Dictionary<TKey, TValue>> m_BridgedDictionary;
 
         [field: NonSerialized] public event Action<BindableDictionaryChanged> DictionaryChanged;
         [field: NonSerialized] public event Action CountChanged;
         [field: NonSerialized] public event Action ItemsChanged;
 
-        public ICollection<TKey> Keys => Value.Keys;
+        public ICollection<TKey> Keys
+        {
+            get { return Value.Keys; }
+        }
 
-        public ICollection<TValue> Values => Value.Values;
+        public ICollection<TValue> Values
+        {
+            get { return Value.Values; }
+        }
 
-        public int Count => Value.Count;
+        public int Count
+        {
+            get { return Value.Count; }
+        }
 
-        public bool IsReadOnly => false;
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
 
         public TValue this[TKey key]
         {
@@ -50,14 +62,14 @@ namespace Atom
 
         public BindableDictionary(Dictionary<TKey, TValue> dictionary)
         {
-            this.bridgedDictionary = new BridgedValue<Dictionary<TKey, TValue>>(dictionary);
-            this.bindableProperty = new BindableProperty<Dictionary<TKey, TValue>>(this.bridgedDictionary);
+            this.m_BridgedDictionary = new BridgedValue<Dictionary<TKey, TValue>>(dictionary);
+            this.m_BindableProperty = new BindableProperty<Dictionary<TKey, TValue>>(this.m_BridgedDictionary);
         }
 
         public BindableDictionary(Func<Dictionary<TKey, TValue>> getter, Action<Dictionary<TKey, TValue>> setter)
         {
-            this.bridgedDictionary = new BridgedValueGetterSetter<Dictionary<TKey, TValue>>(getter, setter);
-            this.bindableProperty = new BindableProperty<Dictionary<TKey, TValue>>(this.bridgedDictionary);
+            this.m_BridgedDictionary = new BridgedValueGetterSetter<Dictionary<TKey, TValue>>(getter, setter);
+            this.m_BindableProperty = new BindableProperty<Dictionary<TKey, TValue>>(this.m_BridgedDictionary);
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => Value.GetEnumerator();
@@ -185,33 +197,36 @@ namespace Atom
 
     public partial class BindableDictionary<TKey, TValue> : IBindableProperty, IBindableProperty<Dictionary<TKey, TValue>>
     {
-        private BindableProperty<Dictionary<TKey, TValue>> bindableProperty;
+        private BindableProperty<Dictionary<TKey, TValue>> m_BindableProperty;
 
         public event Action<object, object> BoxedValueChanged
         {
-            add { this.bindableProperty.BoxedValueChanged += value; }
-            remove { this.bindableProperty.BoxedValueChanged -= value; }
+            add { this.m_BindableProperty.BoxedValueChanged += value; }
+            remove { this.m_BindableProperty.BoxedValueChanged -= value; }
         }
 
         public event Action<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> ValueChanged
         {
-            add { this.bindableProperty.ValueChanged += value; }
-            remove { this.bindableProperty.ValueChanged -= value; }
+            add { this.m_BindableProperty.ValueChanged += value; }
+            remove { this.m_BindableProperty.ValueChanged -= value; }
         }
 
         public object BoxedValue
         {
-            get => bindableProperty.BoxedValue;
-            set => bindableProperty.BoxedValue = value;
+            get => m_BindableProperty.BoxedValue;
+            set => m_BindableProperty.BoxedValue = value;
         }
 
         public Dictionary<TKey, TValue> Value
         {
-            get => bindableProperty.Value;
-            set => bindableProperty.Value = value;
+            get => m_BindableProperty.Value;
+            set => m_BindableProperty.Value = value;
         }
 
-        public Type ValueType => bindableProperty.ValueType;
+        public Type ValueType
+        {
+            get { return m_BindableProperty.ValueType; }
+        }
 
         public bool SetValue(Dictionary<TKey, TValue> value)
         {
@@ -226,20 +241,38 @@ namespace Atom
         public void SetValueWithoutNotify(Dictionary<TKey, TValue> value)
         {
             this.CheckReentrancy();
-            this.bindableProperty.SetValueWithoutNotify(value);
+            this.m_BindableProperty.SetValueWithoutNotify(value);
         }
 
-        public void ClearValueChangedEvent() => this.bindableProperty.ClearValueChangedEvent();
+        public void ClearValueChangedEvent()
+        {
+            this.m_BindableProperty.ClearValueChangedEvent();
+        }
 
-        public void NotifyValueChanged() => this.bindableProperty.NotifyValueChanged();
+        public void NotifyValueChanged()
+        {
+            this.m_BindableProperty.NotifyValueChanged();
+        }
 
-        public bool SetValue(object value) => this.bindableProperty.SetValue(value);
+        public bool SetValue(object value)
+        {
+            return this.m_BindableProperty.SetValue(value);
+        }
 
-        public void SetValueWithoutNotify(object value) => this.bindableProperty.SetValue(value);
+        public void SetValueWithoutNotify(object value)
+        {
+            this.m_BindableProperty.SetValue(value);
+        }
 
-        public void RegisterValueChangedEvent(Action<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> onValueChanged) => this.bindableProperty.RegisterValueChangedEvent(onValueChanged);
+        public void RegisterValueChangedEvent(Action<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> onValueChanged)
+        {
+            this.m_BindableProperty.RegisterValueChangedEvent(onValueChanged);
+        }
 
-        public void UnregisterValueChangedEvent(Action<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> onValueChanged) => this.bindableProperty.UnregisterValueChangedEvent(onValueChanged);
+        public void UnregisterValueChangedEvent(Action<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> onValueChanged)
+        {
+            this.m_BindableProperty.UnregisterValueChangedEvent(onValueChanged);
+        }
     }
 
     public enum BindableDictionaryAction
