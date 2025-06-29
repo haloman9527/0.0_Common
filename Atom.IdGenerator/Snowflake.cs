@@ -81,7 +81,7 @@ namespace Atom
         /// <summary>
         /// 单位时间内生成Id计数器. 
         /// </summary>
-        private long m_Sequence;
+        private long m_LastSequence;
 
         /// <summary>
         /// 10位的数据机器位中的高位(机器码). 
@@ -111,10 +111,13 @@ namespace Atom
         /// <summary>
         /// snowflake算法
         /// </summary>
-        /// <param name="workerId"> 10位的数据机器位中的低位, 默认不应该超过31(5位) </param>
-        /// <param name="dataCenterId"> 10位的数据机器位中的高位, 默认不应该超过31(5位) </param>
-        /// <param name="timeProvider"> 时间戳提供者，用以适配不同的时间戳规则 </param>
-        public Snowflake(byte workerId, byte dataCenterId, ITimeProvider timeProvider)
+        /// <param name="workerId">10位的数据机器位中的低位, 默认不应该超过31(5位)</param>
+        /// <param name="dataCenterId">10位的数据机器位中的高位, 默认不应该超过31(5位)</param>
+        /// <param name="timeProvider">时间戳提供者，用以适配不同的时间戳规则</param>
+        /// <param name="lastTimestamp">最后一次生成id的时间</param>
+        /// <param name="lastSequence">最后一次生成id时的seq</param>
+        /// <exception cref="ArgumentException"></exception>
+        public Snowflake(byte workerId, byte dataCenterId, ITimeProvider timeProvider, long lastTimestamp, int lastSequence)
         {
             if (workerId > MAX_WORKER_ID)
                 throw new ArgumentException($"worker Id can't be greater than {MAX_WORKER_ID} or less than 0");
@@ -126,19 +129,41 @@ namespace Atom
             this.m_DataCenterId = dataCenterId;
             this.m_CombinedId = (dataCenterId << DATA_CENTER_ID_SHIFT) | (workerId << WORKER_ID_SHIFT);
             this.m_TimeProvider = timeProvider;
-            this.m_LastTimestamp = timeProvider.GetCurrentTime();
-            this.m_Sequence = 0;
+            this.m_LastTimestamp = lastTimestamp;
+            this.m_LastSequence = lastSequence;
         }
 
         /// <summary>
         /// snowflake算法
         /// </summary>
-        /// <param name="workerId"> 不超过1023 </param>
-        /// <param name="timeProvider"> 时间戳提供者，用以适配不同的时间戳规则 </param>
-        public Snowflake(int workerId, ITimeProvider timeProvider) : this((byte)(workerId & 31), (byte)((workerId >> 5) & 31), timeProvider)
+        /// <param name="workerId">10位的数据机器位中的低位, 默认不应该超过31(5位)</param>
+        /// <param name="dataCenterId">10位的数据机器位中的高位, 默认不应该超过31(5位)</param>
+        /// <param name="timeProvider">时间戳提供者，用以适配不同的时间戳规则</param>
+        public Snowflake(byte workerId, byte dataCenterId, ITimeProvider timeProvider)
+            : this(workerId, dataCenterId, timeProvider, timeProvider.GetCurrentTime(), -1)
         {
         }
 
+        /// <summary>
+        /// snowflake算法
+        /// </summary>
+        /// <param name="workerId">不超过1023</param>
+        /// <param name="timeProvider">时间戳提供者，用以适配不同的时间戳规则 </param>
+        public Snowflake(int workerId, ITimeProvider timeProvider)
+            : this((byte)(workerId & 31), (byte)((workerId >> 5) & 31), timeProvider, timeProvider.GetCurrentTime(), -1)
+        {
+        }
+
+        public long LastTimestamp
+        {
+            get { return m_LastTimestamp; }
+        }
+
+        public long LastSequence
+        {
+            get { return m_LastSequence; }
+        }
+        
         /// <summary>
         /// 等待下个时间戳
         /// </summary>
@@ -193,21 +218,21 @@ namespace Atom
             {
                 // 同一单位时间中生成Id
                 // 用&运算计算该单位时间内产生的计数是否已经到达上限
-                m_Sequence = (m_Sequence + 1) & SEQUENCE_MASK;
+                m_LastSequence = (m_LastSequence + 1) & SEQUENCE_MASK;
                 // 一单位时间内产生的Id计数已达上限, 等待下一单位时间
-                if (m_Sequence == 0)
+                if (m_LastSequence == 0)
                     timestamp = TilNextTimestamp();
             }
             else
             {
-                m_Sequence = 0L;
+                m_LastSequence = 0L;
             }
 
             // 把当前时间戳保存为最后生成Id的时间戳
             m_LastTimestamp = timestamp;
 
             // 使用预计算的组合ID，减少位运算
-            return (timestamp << TIMESTAMP_LEFT_SHIFT) | m_CombinedId | m_Sequence;
+            return (timestamp << TIMESTAMP_LEFT_SHIFT) | m_CombinedId | m_LastSequence;
         }
     }
 

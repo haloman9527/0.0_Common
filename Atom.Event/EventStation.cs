@@ -75,7 +75,7 @@ namespace Atom
         {
             var evt = GetEvent(key);
             if (evt == null)
-                throw new InvalidOperationException($"can not found event '{key}'");
+                return;
 
             if (evt is not Event tmpEvt)
                 throw new InvalidOperationException("Event type mismatch.");
@@ -87,7 +87,7 @@ namespace Atom
         {
             var evt = GetEvent(key);
             if (evt == null)
-                throw new InvalidOperationException($"can not found event '{key}'");
+                return;
 
             if (evt is not Event<TArg> tmpEvt)
                 throw new InvalidOperationException("Event type mismatch.");
@@ -99,7 +99,7 @@ namespace Atom
         {
             var evt = GetEvent(key);
             if (evt == null)
-                throw new InvalidOperationException($"can not found event '{key}'");
+                return;
 
             if (evt is not IEvent<TArg> tmpEvt)
                 throw new InvalidOperationException("Event type mismatch.");
@@ -111,7 +111,7 @@ namespace Atom
         {
             var evt = GetEvent(key);
             if (evt == null)
-                throw new InvalidOperationException($"can not found event '{key}'");
+                return;
 
             if (evt is not Event tmpEvt)
                 throw new InvalidOperationException("Event type mismatch.");
