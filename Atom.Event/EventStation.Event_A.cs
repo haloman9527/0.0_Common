@@ -29,7 +29,7 @@ namespace Atom
                 m_Handlers.Clear();
             }
 
-            public void Invoke(TArg arg)
+            public void Invoke(in TArg arg)
             {
                 for (int i = 0; i < m_Handlers.Count; i++)
                 {

@@ -17,7 +17,7 @@ namespace Atom
             return m_Events.ContainsKey(key);
         }
 
-        public object GetEvent(TKey key)
+        public EventBase GetEvent(TKey key)
         {
             m_Events.TryGetValue(key, out var evt);
             return evt;
@@ -95,7 +95,7 @@ namespace Atom
             tmpEvt.Remove(handler);
         }
 
-        public void Publish<TArg>(TKey key, TArg arg)
+        public void Publish<TArg>(TKey key, in TArg arg)
         {
             var evt = GetEvent(key);
             if (evt == null)

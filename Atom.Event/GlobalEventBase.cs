@@ -14,6 +14,6 @@ namespace Atom
             get { return TypeCache<T>.TYPE; }
         }
 
-        public abstract void Invoke(T arg);
+        public abstract void Invoke(in T arg);
     }
 }
