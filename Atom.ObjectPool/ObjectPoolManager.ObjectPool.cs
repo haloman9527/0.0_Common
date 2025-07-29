@@ -5,12 +5,9 @@ namespace Atom
 {
     public static partial class ObjectPoolManager
     {
-        private const int DefaultCapacity = int.MaxValue;
-
-        private class ObjectPool<T> : IObjectPool<T> where T : class, new()
+        private sealed class ObjectPool<T> : IObjectPool<T> where T : class, new()
         {
             private Queue<T> m_CachedObjects;
-            private int m_Capacity;
 
             public Type ObjectType
             {
@@ -22,16 +19,9 @@ namespace Atom
                 get { return m_CachedObjects.Count; }
             }
 
-            public int Capacity
-            {
-                get => m_Capacity;
-                set => m_Capacity = value;
-            }
-
-            public ObjectPool(int capacity)
+            public ObjectPool()
             {
                 m_CachedObjects = new Queue<T>(8);
-                m_Capacity = capacity;
             }
 
             object IObjectPool.Spawn()

@@ -15,11 +15,6 @@ namespace Atom
         int Count { get; }
 
         /// <summary>
-        /// 对象池的容量
-        /// </summary>
-        int Capacity { get; set; }
-
-        /// <summary>
         /// 获取对象
         /// </summary>
         /// <returns></returns>
@@ -53,11 +48,6 @@ namespace Atom
         /// 对象池中缓存的对象数量
         /// </summary>
         int Count { get; }
-
-        /// <summary>
-        /// 对象池的容量
-        /// </summary>
-        int Capacity { get; set; }
 
         /// <summary>
         /// 获取对象

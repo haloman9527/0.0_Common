@@ -11,6 +11,17 @@ namespace Atom
         public ObjectPoolBase()
         {
             m_CachedObjects = new Queue<T>(16);
+            m_Capacity = int.MaxValue;
+        }
+
+        public ObjectPoolBase(int initialCapacity)
+        {
+            m_CachedObjects = new Queue<T>(16);
+            if (initialCapacity <= 0)
+            {
+                throw new ArgumentException("InitialCapacity must be greater than zero.");
+            }
+            m_Capacity = initialCapacity;
         }
 
         public int Count
@@ -21,7 +32,15 @@ namespace Atom
         public int Capacity
         {
             get { return m_Capacity; }
-            set { m_Capacity = value; }
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Capacity is invalid.");
+                if (m_Capacity == value)
+                    return;
+                m_Capacity = value;
+                Release();
+            }
         }
 
         public Type ObjectType
@@ -50,6 +69,11 @@ namespace Atom
         {
             m_CachedObjects.Enqueue(obj);
             OnRecycle(obj);
+        }
+
+        public void Release()
+        {
+            Release(Count - m_Capacity);
         }
 
         public void Release(int toReleaseCount)

@@ -57,7 +57,7 @@ namespace Atom
             var objectPool = GetPool<T>() as IObjectPool<T>;
             if (objectPool == null)
             {
-                objectPool = new ObjectPool<T>(DefaultCapacity);
+                objectPool = new ObjectPool<T>();
                 RegisterPool(objectPool);
             }
             
