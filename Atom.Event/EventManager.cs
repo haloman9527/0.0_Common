@@ -5,9 +5,15 @@ namespace Atom
     /// <summary>
     /// 固定事件
     /// </summary>
-    public class EventManager : SingletonBase<EventManager>
+    public class EventManager : GameModule
     {
+        private static EventManager s_Instance;
         private static EventStation<Type> s_GlobalEventStation;
+
+        public static EventManager Instance
+        {
+            get { return s_Instance; }
+        }
 
         private static void InitGlobalEventStation(bool force = false)
         {
@@ -31,10 +37,23 @@ namespace Atom
 
         private EventStation<Type> m_EventStation;
 
-        protected override void OnAwake()
+        public override void Init()
         {
             InitGlobalEventStation();
             m_EventStation = new EventStation<Type>();
+            if (s_Instance == null)
+            {
+                s_Instance = this;
+            }
+        }
+
+        public override void Shutdown()
+        {
+            base.Shutdown();
+            if (s_Instance == this)
+            {
+                s_Instance = null;
+            }
         }
 
         public bool HasEvent<T>()
