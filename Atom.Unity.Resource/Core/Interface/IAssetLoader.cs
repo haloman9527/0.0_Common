@@ -19,7 +19,5 @@ namespace Atom
         RawFileHandleBase LoadRawFile(string location);
         
         RawFileHandleBase LoadRawFileAsync(string location);
-
-        void UnloadUnusedAssets();
     }
 }

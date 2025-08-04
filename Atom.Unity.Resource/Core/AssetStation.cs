@@ -4,7 +4,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Atom
 {
-    public sealed class AssetStation
+    public sealed class AssetStation : IAssetLoader
     {
         private IAssetLoader m_Loader;
         private List<HandleBase> m_AssetHandles = new List<HandleBase>();
@@ -91,6 +91,11 @@ namespace Atom
             var handle = m_Loader.LoadRawFileAsync(location);
             m_AssetHandles.Add(handle);
             return handle;
+        }
+
+        public void UnloadUnusedAssets()
+        {
+            
         }
     }
 }
