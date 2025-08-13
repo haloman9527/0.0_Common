@@ -4,7 +4,7 @@ using System.Threading;
 namespace Atom
 {
     /// <summary>
-    /// Snowflake 雪花算法 - 性能优化版本
+    /// Snowflake 雪花算法
     /// </summary>
     public partial class Snowflake
     {
@@ -101,7 +101,7 @@ namespace Atom
         /// <summary>
         /// 预计算的组合ID，减少位运算
         /// </summary>
-        private readonly long m_CombinedId;
+        private readonly long m_CombinedNodeId;
 
         /// <summary>
         /// 时间戳提供者，用以适配不同的时间戳规则
@@ -116,13 +116,13 @@ namespace Atom
         /// <summary>
         /// snowflake算法
         /// </summary>
-        /// <param name="workerId">10位的数据机器位中的低位, 默认不应该超过31(5位)</param>
         /// <param name="dataCenterId">10位的数据机器位中的高位, 默认不应该超过31(5位)</param>
+        /// <param name="workerId">10位的数据机器位中的低位, 默认不应该超过31(5位)</param>
         /// <param name="timeProvider">时间戳提供者，用以适配不同的时间戳规则</param>
-        /// <param name="lastTimestamp">最后一次生成id的时间</param>
+        /// <param name="lastTimestamp">最后一次生成id的时间戳</param>
         /// <param name="lastSequence">最后一次生成id时的seq</param>
         /// <exception cref="ArgumentException"></exception>
-        public Snowflake(byte workerId, byte dataCenterId, ITimeProvider timeProvider, long lastTimestamp, int lastSequence)
+        public Snowflake(byte dataCenterId, byte workerId, ITimeProvider timeProvider, long lastTimestamp, int lastSequence)
         {
             if (workerId > MAX_WORKER_ID)
                 throw new ArgumentException($"worker Id can't be greater than {MAX_WORKER_ID} or less than 0");
@@ -132,7 +132,7 @@ namespace Atom
 
             this.m_WorkerId = workerId;
             this.m_DataCenterId = dataCenterId;
-            this.m_CombinedId = (dataCenterId << DATA_CENTER_ID_SHIFT) | (workerId << WORKER_ID_SHIFT);
+            this.m_CombinedNodeId = (dataCenterId << DATA_CENTER_ID_SHIFT) | (workerId << WORKER_ID_SHIFT);
             this.m_TimeProvider = timeProvider;
             this.m_LastTimestamp = lastTimestamp;
             this.m_LastSequence = lastSequence;
@@ -141,21 +141,34 @@ namespace Atom
         /// <summary>
         /// snowflake算法
         /// </summary>
-        /// <param name="workerId">10位的数据机器位中的低位, 默认不应该超过31(5位)</param>
-        /// <param name="dataCenterId">10位的数据机器位中的高位, 默认不应该超过31(5位)</param>
+        /// <param name="nodeId">节点id，不超过1023</param>
         /// <param name="timeProvider">时间戳提供者，用以适配不同的时间戳规则</param>
-        public Snowflake(byte workerId, byte dataCenterId, ITimeProvider timeProvider)
-            : this(workerId, dataCenterId, timeProvider, timeProvider.GetCurrentTime(), -1)
+        /// <param name="lastTimestamp">最后一次生成id的时间戳</param>
+        /// <param name="lastSequence">最后一次生成id时的seq</param>
+        /// <exception cref="ArgumentException"></exception>
+        public Snowflake(int nodeId, ITimeProvider timeProvider, long lastTimestamp, int lastSequence)
+            : this((byte)((nodeId >> 5) & 31), (byte)(nodeId & 31), timeProvider, lastTimestamp, lastSequence)
         {
         }
 
         /// <summary>
         /// snowflake算法
         /// </summary>
-        /// <param name="workerId">不超过1023</param>
+        /// <param name="dataCenterId">10位的数据机器位中的高位, 默认不应该超过31(5位)</param>
+        /// <param name="workerId">10位的数据机器位中的低位, 默认不应该超过31(5位)</param>
+        /// <param name="timeProvider">时间戳提供者，用以适配不同的时间戳规则</param>
+        public Snowflake(byte dataCenterId, byte workerId, ITimeProvider timeProvider)
+            : this(dataCenterId, workerId, timeProvider, timeProvider.GetCurrentTime(), 0)
+        {
+        }
+
+        /// <summary>
+        /// snowflake算法
+        /// </summary>
+        /// <param name="nodeId">节点id，不超过1023</param>
         /// <param name="timeProvider">时间戳提供者，用以适配不同的时间戳规则 </param>
-        public Snowflake(int workerId, ITimeProvider timeProvider)
-            : this((byte)(workerId & 31), (byte)((workerId >> 5) & 31), timeProvider, timeProvider.GetCurrentTime(), -1)
+        public Snowflake(int nodeId, ITimeProvider timeProvider)
+            : this((byte)((nodeId >> 5) & 31), (byte)(nodeId & 31), timeProvider, timeProvider.GetCurrentTime(), 0)
         {
         }
 
@@ -242,7 +255,7 @@ namespace Atom
             m_LastTimestamp = timestamp;
 
             // 使用预计算的组合ID，减少位运算
-            return ((timestamp << TIMESTAMP_LEFT_SHIFT) | m_CombinedId | m_LastSequence);
+            return ((timestamp << TIMESTAMP_LEFT_SHIFT) | m_CombinedNodeId | m_LastSequence);
         }
     }
 
