@@ -65,6 +65,11 @@ namespace Atom
         /// 最大数据Id(5位:0-31). 
         /// </summary>
         private const long MAX_DATACENTER_ID = -1L ^ (-1L << DATACENTER_ID_BITS);
+        
+        /// <summary>
+        /// 无符号时间戳最大值(41位)
+        /// </summary>
+        private const long MAX_TIMESTAMP = 0x1FFFFFFFFFF;
 
         /// <summary>
         /// 预分配的异常消息，避免字符串分配
@@ -227,12 +232,17 @@ namespace Atom
             {
                 m_LastSequence = 0L;
             }
+            
+            if (timestamp > MAX_TIMESTAMP)
+            {
+                throw new Exception($"timestamp exceeds max timestamp, max timestamp {MAX_TIMESTAMP}");
+            }
 
             // 把当前时间戳保存为最后生成Id的时间戳
             m_LastTimestamp = timestamp;
 
             // 使用预计算的组合ID，减少位运算
-            return (timestamp << TIMESTAMP_LEFT_SHIFT) | m_CombinedId | m_LastSequence;
+            return ((timestamp << TIMESTAMP_LEFT_SHIFT) | m_CombinedId | m_LastSequence);
         }
     }
 
