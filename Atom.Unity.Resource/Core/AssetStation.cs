@@ -7,11 +7,12 @@ namespace Atom
     public sealed class AssetStation : IAssetLoader
     {
         private IAssetLoader m_Loader;
-        private List<HandleBase> m_AssetHandles = new List<HandleBase>();
+        private List<HandleBase> m_AssetHandles;
 
         public AssetStation(IAssetLoader loader)
         {
             m_Loader = loader;
+            m_AssetHandles =  new List<HandleBase>();
         }
 
         public void Release(HandleBase handle)
@@ -91,11 +92,6 @@ namespace Atom
             var handle = m_Loader.LoadRawFileAsync(location);
             m_AssetHandles.Add(handle);
             return handle;
-        }
-
-        public void UnloadUnusedAssets()
-        {
-            
         }
     }
 }
