@@ -65,7 +65,7 @@ namespace Atom
         /// 最大数据Id(5位:0-31). 
         /// </summary>
         private const long MAX_DATACENTER_ID = -1L ^ (-1L << DATACENTER_ID_BITS);
-        
+
         /// <summary>
         /// 无符号时间戳最大值(41位)
         /// </summary>
@@ -181,7 +181,7 @@ namespace Atom
         {
             get { return m_LastSequence; }
         }
-        
+
         /// <summary>
         /// 等待下个时间戳
         /// </summary>
@@ -226,10 +226,12 @@ namespace Atom
         private long GenerateIdInternal()
         {
             var timestamp = m_TimeProvider.GetCurrentTime();
-
+            
+            var clockBackward = false;
             if (timestamp < m_LastTimestamp)
             {
-                throw new Exception(string.Format(CLOCK_BACKWARDS_MESSAGE, m_LastTimestamp - timestamp));
+                clockBackward = true;
+                timestamp = m_LastTimestamp;
             }
 
             if (m_LastTimestamp == timestamp)
@@ -239,13 +241,13 @@ namespace Atom
                 m_LastSequence = (m_LastSequence + 1) & SEQUENCE_MASK;
                 // 一单位时间内产生的Id计数已达上限, 等待下一单位时间
                 if (m_LastSequence == 0)
-                    timestamp = TilNextTimestamp();
+                    timestamp = clockBackward ? timestamp + 1 : TilNextTimestamp();
             }
             else
             {
                 m_LastSequence = 0L;
             }
-            
+
             if (timestamp > MAX_TIMESTAMP)
             {
                 throw new Exception($"timestamp exceeds max timestamp, max timestamp {MAX_TIMESTAMP}");
