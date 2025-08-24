@@ -5,16 +5,16 @@ namespace Atom
 {
     public static class GameModuleEntry
     {
-        private static readonly List<GameModule> s_GameModules = new List<GameModule>();
-        private static readonly Dictionary<string, GameModule>  s_GameModulesByName = new Dictionary<string, GameModule>();
+        private static readonly List<IGameModule> s_GameModules = new List<IGameModule>();
+        private static readonly Dictionary<string, IGameModule>  s_GameModulesByName = new Dictionary<string, IGameModule>();
 
-        public static GameModule GetGameModule(string name)
+        public static IGameModule GetGameModule(string name)
         {
             s_GameModulesByName.TryGetValue(name, out var module);
             return module;
         }
         
-        public static void RegisterGameModule<T>(string name, T module)  where T : GameModule
+        public static void RegisterGameModule<T>(string name, T module)  where T : IGameModule
         {
             if (s_GameModulesByName.ContainsKey(name))
             {

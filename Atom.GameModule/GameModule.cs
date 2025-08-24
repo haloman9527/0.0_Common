@@ -1,6 +1,6 @@
 ﻿namespace Atom
 {
-    public abstract class GameModule
+    public abstract class GameModule : IGameModule
     {
         public virtual void Init()
         {
