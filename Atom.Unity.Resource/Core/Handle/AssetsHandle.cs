@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityObject = UnityEngine.Object;
 
 namespace Atom
 {
     public abstract class AssetsHandleBase : HandleBase
     {
-        public abstract UnityObject[] Assets { get; }
+        public abstract IReadOnlyList<UnityObject> Assets { get; }
 
         public abstract event Action<AssetsHandleBase> OnCompleted;
 
