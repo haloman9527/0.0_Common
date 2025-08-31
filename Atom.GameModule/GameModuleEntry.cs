@@ -13,8 +13,14 @@ namespace Atom
             s_GameModulesByName.TryGetValue(name, out var module);
             return module;
         }
+
+        public static void GetAllGameModules(List<IGameModule> modules)
+        {
+            modules.Clear();
+            modules.AddRange(s_GameModules);
+        }
         
-        public static void RegisterGameModule<T>(string name, T module)  where T : IGameModule
+        public static void RegisterGameModule<T>(string name, T module)  where T : class, IGameModule
         {
             if (s_GameModulesByName.ContainsKey(name))
             {
