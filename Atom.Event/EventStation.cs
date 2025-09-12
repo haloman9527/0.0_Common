@@ -6,12 +6,13 @@ namespace Atom
     public partial class EventStation<TKey>
     {
         private readonly Dictionary<TKey, EventBase> m_Events;
+        private readonly object m_GateLock = new();
 
         public EventStation()
         {
             m_Events = new Dictionary<TKey, EventBase>();
         }
-        
+
         public bool HasEvent(TKey key)
         {
             return m_Events.ContainsKey(key);
@@ -22,12 +23,12 @@ namespace Atom
             m_Events.TryGetValue(key, out var evt);
             return evt;
         }
-        
+
         public void RegisterEvent(TKey key, EventBase evt)
         {
             if (HasEvent(key))
                 throw new InvalidOperationException($"Event '{key}' already registered");
-            
+
             m_Events.Add(key, evt);
         }
 
@@ -48,9 +49,9 @@ namespace Atom
             {
                 if (evt != null)
                     throw new InvalidOperationException($"Event '{key}' type mismatch, type '{evt.GetType()}'");
-                
+
                 tmpEvt = new Event();
-                RegisterEvent(key, tmpEvt);
+                m_Events.Add(key, tmpEvt);
             }
 
             tmpEvt.Add(handler);
@@ -63,7 +64,7 @@ namespace Atom
             {
                 if (evt != null)
                     throw new InvalidOperationException($"Event '{key}' type mismatch, type '{evt.GetType()}'");
-                
+
                 tmpEvt = new Event<TArg>();
                 RegisterEvent(key, tmpEvt);
             }
@@ -82,7 +83,7 @@ namespace Atom
 
             tmpEvt.Remove(handler);
         }
-        
+
         public void Unsubscribe<TArg>(TKey key, Action<TArg> handler)
         {
             var evt = GetEvent(key);
@@ -91,7 +92,7 @@ namespace Atom
 
             if (evt is not Event<TArg> tmpEvt)
                 throw new InvalidOperationException("Event type mismatch.");
-            
+
             tmpEvt.Remove(handler);
         }
 
@@ -103,7 +104,7 @@ namespace Atom
 
             if (evt is not IEvent<TArg> tmpEvt)
                 throw new InvalidOperationException("Event type mismatch.");
-            
+
             tmpEvt.Invoke(arg);
         }
 
