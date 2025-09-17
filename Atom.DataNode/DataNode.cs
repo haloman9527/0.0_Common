@@ -35,7 +35,12 @@ namespace Atom
             this.m_Parent = null;
         }
 
-        public static DataNode Create(string name, char seperator, DataNode parent)
+        public static DataNode Create(string name, char seperator)
+        {
+            return Create(name, seperator, null);
+        }
+
+        private static DataNode Create(string name, char seperator, DataNode parent)
         {
             var dataNode = ObjectPoolManager.Spawn<DataNode>();
             dataNode.m_Name = name;
