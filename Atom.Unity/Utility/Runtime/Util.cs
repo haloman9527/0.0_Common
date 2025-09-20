@@ -66,15 +66,18 @@ namespace Atom.Unity
             return path;
         }
         
-        public static void FindComponents<T>(this UnityEngine.SceneManagement.Scene scene, List<T> components, bool includeInactive = false) where T : Component
+        public static void FindComponents<T>(this UnityEngine.SceneManagement.Scene scene, List<T> components, List<T> buffer, bool includeInactive = false) where T : Component
         {
-            var buffer = new List<T>();
+            components.Clear();
             var rootGameObjects = scene.GetRootGameObjects();
             foreach (var rootGameObject in rootGameObjects)
             {
+                buffer.Clear();
                 rootGameObject.transform.GetComponentsInChildren(includeInactive, buffer);
                 components.AddRange(buffer);
             }
+
+            buffer.Clear();
         }
 
         public static List<T> FindComponents<T>(this UnityEngine.SceneManagement.Scene scene, bool includeInactive = false) where T : Component

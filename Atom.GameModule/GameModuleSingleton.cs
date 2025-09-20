@@ -1,14 +1,24 @@
 ﻿namespace Atom
 {
-    public abstract class GameModule : IGameModule
+    public abstract class GameModuleSingleton<TGameModule> : IGameModule where TGameModule : GameModuleSingleton<TGameModule>
     {
+        private static TGameModule s_Instance;
+
+        public static TGameModule Instance => s_Instance;
+
         public void Init()
         {
+            if (s_Instance == null)
+                s_Instance = this as TGameModule;
+
             this.OnInit();
         }
 
         public void UnInit()
         {
+            if (s_Instance == this)
+                s_Instance = null;
+
             this.OnUnInit();
         }
 

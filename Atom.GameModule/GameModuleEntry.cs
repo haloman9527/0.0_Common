@@ -6,7 +6,7 @@ namespace Atom
     public static class GameModuleEntry
     {
         private static readonly List<IGameModule> s_GameModules = new List<IGameModule>();
-        private static readonly Dictionary<string, IGameModule>  s_GameModulesByName = new Dictionary<string, IGameModule>();
+        private static readonly Dictionary<string, IGameModule> s_GameModulesByName = new Dictionary<string, IGameModule>();
 
         public static IGameModule GetGameModule(string name)
         {
@@ -19,26 +19,27 @@ namespace Atom
             modules.Clear();
             modules.AddRange(s_GameModules);
         }
-        
-        public static void RegisterGameModule<T>(string name, T module)  where T : class, IGameModule
+
+        public static void RegisterGameModule<T>(string name, T module) where T : class, IGameModule
         {
             if (s_GameModulesByName.ContainsKey(name))
             {
                 throw new Exception($"GameModule {name} already exists");
             }
-            
+
             s_GameModules.Add(module);
             s_GameModulesByName.Add(name, module);
             module.Init();
         }
-        
+
         public static void Shutdown()
         {
             var count = s_GameModules.Count;
             for (var i = 0; i < count; i++)
             {
-                s_GameModules[i].Shutdown();
+                s_GameModules[i].UnInit();
             }
+
             s_GameModules.Clear();
             s_GameModulesByName.Clear();
         }

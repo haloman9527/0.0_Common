@@ -4,7 +4,7 @@
     {
         void Init();
 
-        void Shutdown();
+        void UnInit();
 
         void FixedUpdate();
 
