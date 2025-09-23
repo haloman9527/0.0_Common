@@ -124,6 +124,9 @@ namespace Atom
         /// <exception cref="ArgumentException"></exception>
         public Snowflake(byte dataCenterId, byte workerId, ITimeProvider timeProvider, long lastTimestamp, int lastSequence)
         {
+            if (lastSequence < 0)
+                throw new ArgumentOutOfRangeException("lastSequence", "lastSequence can not less than zero.");
+
             if (workerId > MAX_WORKER_ID)
                 throw new ArgumentException($"worker Id can't be greater than {MAX_WORKER_ID} or less than 0");
 
@@ -226,12 +229,10 @@ namespace Atom
         private long GenerateIdInternal()
         {
             var timestamp = m_TimeProvider.GetCurrentTime();
-            
-            var clockBackward = false;
+
             if (timestamp < m_LastTimestamp)
             {
-                clockBackward = true;
-                timestamp = m_LastTimestamp;
+                throw new InvalidOperationException("Cannot generate id because last timestamp is less than current timestamp");
             }
 
             if (m_LastTimestamp == timestamp)
@@ -241,16 +242,11 @@ namespace Atom
                 m_LastSequence = (m_LastSequence + 1) & SEQUENCE_MASK;
                 // 一单位时间内产生的Id计数已达上限, 等待下一单位时间
                 if (m_LastSequence == 0)
-                    timestamp = clockBackward ? timestamp + 1 : TilNextTimestamp();
+                    timestamp = TilNextTimestamp();
             }
             else
             {
                 m_LastSequence = 0L;
-            }
-
-            if (timestamp > MAX_TIMESTAMP)
-            {
-                throw new Exception($"timestamp exceeds max timestamp, max timestamp {MAX_TIMESTAMP}");
             }
 
             // 把当前时间戳保存为最后生成Id的时间戳
