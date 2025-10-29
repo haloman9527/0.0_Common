@@ -121,7 +121,7 @@ namespace Atom
         public void Clear()
         {
             m_Blackboard.Clear();
-            m_Events.UnRegisterAllEvents();
+            m_Events.UnregisterAll();
             m_AddObservers.Clear();
             m_RemoveObservers.Clear();
         }

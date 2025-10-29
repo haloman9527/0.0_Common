@@ -6,7 +6,6 @@ namespace Atom
     public partial class EventStation<TKey>
     {
         private readonly Dictionary<TKey, EventBase> m_Events;
-        private readonly object m_GateLock = new();
 
         public EventStation()
         {
@@ -24,7 +23,7 @@ namespace Atom
             return evt;
         }
 
-        public void RegisterEvent(TKey key, EventBase evt)
+        public void Register(TKey key, EventBase evt)
         {
             if (HasEvent(key))
                 throw new InvalidOperationException($"Event '{key}' already registered");
@@ -32,12 +31,12 @@ namespace Atom
             m_Events.Add(key, evt);
         }
 
-        public void UnRegisterEvent(TKey key)
+        public void Unregister(TKey key)
         {
             m_Events.Remove(key);
         }
 
-        public void UnRegisterAllEvents()
+        public void UnregisterAll()
         {
             m_Events.Clear();
         }
@@ -66,7 +65,7 @@ namespace Atom
                     throw new InvalidOperationException($"Event '{key}' type mismatch, type '{evt.GetType()}'");
 
                 tmpEvt = new Event<TArg>();
-                RegisterEvent(key, tmpEvt);
+                Register(key, tmpEvt);
             }
 
             tmpEvt.Add(handler);

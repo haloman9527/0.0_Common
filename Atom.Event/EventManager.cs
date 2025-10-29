@@ -9,9 +9,11 @@ namespace Atom
     {
         private static EventStation<Type> s_GlobalEventStation;
 
-        private static void InitGlobalEventStation(bool force = false)
+        private EventStation<Type> m_EventStation;
+
+        protected override void OnInit()
         {
-            if (!force && s_GlobalEventStation != null)
+            if (s_GlobalEventStation != null)
                 return;
 
             s_GlobalEventStation = new EventStation<Type>();
@@ -25,15 +27,9 @@ namespace Atom
                     continue;
 
                 var eventType = eventHandler.EventType;
-                s_GlobalEventStation.RegisterEvent(eventType, eventHandler);
+                s_GlobalEventStation.Register(eventType, eventHandler);
             }
-        }
-
-        private EventStation<Type> m_EventStation;
-
-        protected override void OnInit()
-        {
-            InitGlobalEventStation();
+            
             m_EventStation = new EventStation<Type>();
         }
 
@@ -43,21 +39,21 @@ namespace Atom
             return s_GlobalEventStation.HasEvent(evtType);
         }
 
-        public void RegisterEvent<T>(EventBase evt)
+        public void Register<T>(EventBase evt)
         {
             var evtType = TypeCache<T>.TYPE;
-            m_EventStation.RegisterEvent(evtType, evt);
+            m_EventStation.Register(evtType, evt);
         }
 
-        public void UnRegisterEvent<T>()
+        public void Unregister<T>()
         {
             var evtType = TypeCache<T>.TYPE;
-            m_EventStation.UnRegisterEvent(evtType);
+            m_EventStation.Unregister(evtType);
         }
 
-        public void UnRegisterAllEvents()
+        public void UnregisterAll()
         {
-            m_EventStation.UnRegisterAllEvents();
+            m_EventStation.UnregisterAll();
         }
 
         public void Subscribe<T>(Action<T> handler)

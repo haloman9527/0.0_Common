@@ -82,7 +82,7 @@ namespace Atom
 
         public void UnregisterAllValueChanged(string name)
         {
-            m_ValueChangedEvents.UnRegisterEvent(name);
+            m_ValueChangedEvents.Unregister(name);
         }
 
         protected virtual void OnPropertyChanged(string propertyName)
