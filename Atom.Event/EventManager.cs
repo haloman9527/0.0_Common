@@ -7,16 +7,13 @@ namespace Atom
     /// </summary>
     public class EventManager : GameModuleSingleton<EventManager>
     {
-        private static EventStation<Type> s_GlobalEventStation;
-
+        private EventStation<Type> m_GlobalEventStation;
         private EventStation<Type> m_EventStation;
 
         protected override void OnInit()
         {
-            if (s_GlobalEventStation != null)
-                return;
-
-            s_GlobalEventStation = new EventStation<Type>();
+            m_EventStation = new EventStation<Type>();
+            m_GlobalEventStation = new EventStation<Type>();
             foreach (var type in TypesCache.GetTypesDerivedFrom<GlobalEventBase>())
             {
                 if (type.IsAbstract)
@@ -27,16 +24,14 @@ namespace Atom
                     continue;
 
                 var eventType = eventHandler.EventType;
-                s_GlobalEventStation.Register(eventType, eventHandler);
+                m_GlobalEventStation.Register(eventType, eventHandler);
             }
-            
-            m_EventStation = new EventStation<Type>();
         }
 
         public bool HasEvent<T>()
         {
             var evtType = TypeCache<T>.TYPE;
-            return s_GlobalEventStation.HasEvent(evtType);
+            return m_GlobalEventStation.HasEvent(evtType);
         }
 
         public void Register<T>(EventBase evt)
@@ -72,8 +67,8 @@ namespace Atom
         public void Publish<T>(T evt)
         {
             var evtType = TypeCache<T>.TYPE;
-            if (s_GlobalEventStation.HasEvent(evtType))
-                s_GlobalEventStation?.Publish(evtType, evt);
+            if (m_GlobalEventStation.HasEvent(evtType))
+                m_GlobalEventStation.Publish(evtType, evt);
             if (m_EventStation.HasEvent(evtType))
                 m_EventStation.Publish(evtType, evt);
         }

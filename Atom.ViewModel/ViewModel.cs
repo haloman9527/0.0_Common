@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace Atom
 {
@@ -55,7 +56,7 @@ namespace Atom
         /// <param name="propertyName"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public bool SetFieldValue<T>(ref T field, T value, string propertyName)
+        protected bool SetFieldValue<T>(ref T field, T value, string propertyName)
         {
             if (EqualityComparer<T>.Default.Equals(field, value))
             {
