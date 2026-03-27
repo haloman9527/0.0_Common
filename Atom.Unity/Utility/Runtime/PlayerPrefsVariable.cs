@@ -7,6 +7,7 @@ namespace Atom
     public class PlayerPrefsVariable<T>
     {
         private string key;
+        private bool initialized;
         private T value;
         public event Action<T> onValueChanged;
 
@@ -14,23 +15,34 @@ namespace Atom
         {
             this.key = key;
             this.value = defaultValue;
-            this.LoadValue();
         }
 
         public T Value
         {
-            get { return value; }
+            get
+            {
+                TryInitialize();
+                return value;
+            }
             set
             {
+                TryInitialize();
                 if (EqualityComparer<T>.Default.Equals(this.value, value))
-                {
                     return;
-                }
 
                 this.value = value;
                 this.SaveValue();
                 this.onValueChanged?.Invoke(this.value);
             }
+        }
+
+        private void TryInitialize()
+        {
+            if (initialized)
+                return;
+            
+            initialized = true;
+            LoadValue();
         }
 
         private void LoadValue()
