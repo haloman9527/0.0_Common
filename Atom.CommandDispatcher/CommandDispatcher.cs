@@ -24,6 +24,7 @@ namespace Atom
 {
     public sealed class CommandDispatcher
     {
+        private object m_Lock = new object();
         private LinkedList<ICommand> m_UndoList = new LinkedList<ICommand>();
         private Stack<ICommand> m_RedoList = new Stack<ICommand>();
         private CommandGroup m_CurrentGroup;
@@ -34,60 +35,7 @@ namespace Atom
             this.m_RecordLimit = recordLimit;
         }
 
-        public bool CanUndo()
-        {
-            return m_UndoList.Count > 0;
-        }
-
-        public bool CanRedo()
-        {
-            return m_RedoList.Count > 0;
-        }
-
-        public void BeginGroup()
-        {
-            if (m_CurrentGroup != null)
-            {
-                throw new Exception("Current is already in a group");
-            }
-
-            m_CurrentGroup = new CommandGroup();
-            m_UndoList.AddLast(m_CurrentGroup);
-            while (m_RecordLimit >= 0 && m_UndoList.Count > m_RecordLimit)
-            {
-                m_UndoList.RemoveFirst();
-            }
-
-            if (m_UndoList.Count == 0)
-            {
-                m_CurrentGroup = null;
-            }
-        }
-
-        public void EndGroup()
-        {
-            if (m_CurrentGroup == null)
-            {
-                throw new Exception("Current is not in a group");
-            }
-
-            m_CurrentGroup = null;
-        }
-
-        public void Do(Action @do, Action @undo)
-        {
-            var command = new ActionCommand(@do, @do, @undo);
-            Register(command);
-            command.Do();
-        }
-
-        public void Do(ICommand command)
-        {
-            Register(command);
-            command.Do();
-        }
-
-        public void Register(ICommand command)
+        private void Register(ICommand command)
         {
             if (command == null)
                 return;
@@ -107,43 +55,112 @@ namespace Atom
             }
         }
 
+        public bool CanUndo()
+        {
+            return m_UndoList.Count > 0;
+        }
+
+        public bool CanRedo()
+        {
+            return m_RedoList.Count > 0;
+        }
+
+        public void BeginGroup()
+        {
+            lock (m_Lock)
+            {
+                if (m_CurrentGroup != null)
+                {
+                    throw new Exception("Current is already in a group");
+                }
+
+                m_CurrentGroup = new CommandGroup();
+            }
+        }
+
+        public void EndGroup()
+        {
+            lock (m_Lock)
+            {
+                if (m_CurrentGroup == null)
+                {
+                    throw new Exception("Current is not in a group");
+                }
+
+                if (m_CurrentGroup.m_Commands.Count != 0)
+                {
+                    Register(m_CurrentGroup);
+                }
+
+                m_CurrentGroup = null;
+            }
+        }
+
+        public void Do(Action @do, Action @undo)
+        {
+            lock (m_Lock)
+            {
+                var command = new ActionCommand(@do, @do, @undo);
+                Register(command);
+                command.Do();
+            }
+        }
+
+        public void Do(ICommand command)
+        {
+            lock (m_Lock)
+            {
+                Register(command);
+                command.Do();
+            }
+        }
+
         public void Redo()
         {
-            if (m_RedoList.Count == 0)
+            lock (m_Lock)
             {
-                return;
-            }
+                if (m_RedoList.Count == 0)
+                {
+                    return;
+                }
 
-            var command = m_RedoList.Pop();
-            m_UndoList.AddLast(command);
+                var command = m_RedoList.Pop();
+                m_UndoList.AddLast(command);
 
-            if (command != null)
-            {
-                command.Redo();
+                if (command != null)
+                {
+                    command.Redo();
+                }
             }
         }
 
         public void Undo()
         {
-            if (m_UndoList.Count == 0)
+            lock (m_Lock)
             {
-                return;
-            }
+                if (m_UndoList.Count == 0)
+                {
+                    return;
+                }
 
-            var command = m_UndoList.Last.Value;
-            m_UndoList.RemoveLast();
-            m_RedoList.Push(command);
+                var command = m_UndoList.Last.Value;
+                m_UndoList.RemoveLast();
+                m_RedoList.Push(command);
 
-            if (command != null)
-            {
-                command.Undo();
+                if (command != null)
+                {
+                    command.Undo();
+                }
             }
         }
 
         public void Clear()
         {
-            m_UndoList.Clear();
-            m_RedoList.Clear();
+            lock (m_Lock)
+            {
+                m_UndoList.Clear();
+                m_RedoList.Clear();
+            }
         }
 
         internal class CommandGroup : ICommand
