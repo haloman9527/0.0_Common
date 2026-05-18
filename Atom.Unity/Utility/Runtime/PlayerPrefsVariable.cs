@@ -4,17 +4,17 @@ using UnityEngine;
 
 namespace Atom
 {
-    public class PlayerPrefsVariable<T>
+    public class PrefsVariable<T>
     {
-        private string key;
-        private bool initialized;
-        private T value;
-        public event Action<T> onValueChanged;
+        private string m_Key;
+        private T      m_Value;
+        private bool   m_Initialized;
+        public event Action<T> OnValueChanged;
 
-        public PlayerPrefsVariable(string key, T defaultValue = default(T))
+        public PrefsVariable(string key, T defaultValue = default(T))
         {
-            this.key = key;
-            this.value = defaultValue;
+            this.m_Key = key;
+            this.m_Value = defaultValue;
         }
 
         public T Value
@@ -22,82 +22,111 @@ namespace Atom
             get
             {
                 TryInitialize();
-                return value;
+                return m_Value;
             }
             set
             {
                 TryInitialize();
-                if (EqualityComparer<T>.Default.Equals(this.value, value))
+                if (EqualityComparer<T>.Default.Equals(this.m_Value, value))
+                {
                     return;
+                }   
 
-                this.value = value;
+                this.m_Value = value;
                 this.SaveValue();
-                this.onValueChanged?.Invoke(this.value);
+                this.OnValueChanged?.Invoke(this.m_Value);
             }
         }
 
         private void TryInitialize()
         {
-            if (initialized)
+            if (m_Initialized)
                 return;
-            
-            initialized = true;
+
+            m_Initialized = true;
             LoadValue();
         }
 
         private void LoadValue()
         {
-            if (typeof(T) == typeof(int))
+            switch (this)
             {
-                var v = this as PlayerPrefsVariable<int>;
-                v!.value = PlayerPrefs.GetInt(key, v.value);
-            }
-            else if (typeof(T) == typeof(float))
-            {
-                var v = this as PlayerPrefsVariable<float>;
-                v!.value = PlayerPrefs.GetFloat(key, v.value);
-            }
-            else if (typeof(T) == typeof(bool))
-            {
-                var v = this as PlayerPrefsVariable<bool>;
-                v!.value = PlayerPrefs.GetInt(key, v.value ? 1 : 0) != 0;
-            }
-            else if (typeof(T) == typeof(string))
-            {
-                var v = this as PlayerPrefsVariable<string>;
-                v!.value = PlayerPrefs.GetString(key, v.value);
-            }
-            else
-            {
-                throw new ArgumentException($"variable type {typeof(T).Name} is not supported, Only [int|float|bool|string] types are supported.");
+                case PrefsVariable<int> v:
+                {
+                    v!.m_Value = PlayerPrefs.GetInt(m_Key, v.m_Value);
+                    break;
+                }
+                case PrefsVariable<float> v:
+                {
+                    v!.m_Value = PlayerPrefs.GetFloat(m_Key, v.m_Value);
+                    break;
+                }
+                case PrefsVariable<bool> v:
+                {
+                    v!.m_Value = PlayerPrefs.GetInt(m_Key, v.m_Value ? 1 : 0) != 0;
+                    break;
+                }
+                case PrefsVariable<string> v:
+                {
+                    v!.m_Value = PlayerPrefs.GetString(m_Key, v.m_Value);
+                    break;
+                }
+                default:
+                {
+                    var valueType = typeof(T);
+                    if (valueType.IsEnum)
+                    {
+                        int intValue = PlayerPrefs.GetInt(m_Key, (int)(object)m_Value);
+                        m_Value = (T)Enum.ToObject(valueType, intValue);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"variable type {typeof(T).Name} is not supported, Only [int|float|bool|string] types are supported.");
+                    }
+
+                    break;
+                }
             }
         }
 
         private void SaveValue()
         {
-            if (typeof(T) == typeof(int))
+            switch (this)
             {
-                var v = this as PlayerPrefsVariable<int>;
-                PlayerPrefs.SetInt(key, v!.value);
-            }
-            else if (typeof(T) == typeof(float))
-            {
-                var v = this as PlayerPrefsVariable<float>;
-                PlayerPrefs.SetFloat(key, v!.value);
-            }
-            else if (typeof(T) == typeof(bool))
-            {
-                var v = this as PlayerPrefsVariable<bool>;
-                PlayerPrefs.SetInt(key, v!.value ? 1 : 0);
-            }
-            else if (typeof(T) == typeof(string))
-            {
-                var v = this as PlayerPrefsVariable<string>;
-                PlayerPrefs.SetString(key, v!.value);
-            }
-            else
-            {
-                throw new ArgumentException($"variable type {typeof(T).Name} is not supported, Only [int|float|bool|string] types are supported.");
+                case PrefsVariable<int> v:
+                {
+                    PlayerPrefs.SetInt(m_Key, v.m_Value);
+                    break;
+                }
+                case PrefsVariable<float> v:
+                {
+                    PlayerPrefs.SetFloat(m_Key, v.m_Value);
+                    break;
+                }
+                case PrefsVariable<bool> v:
+                {
+                    PlayerPrefs.SetInt(m_Key, v.m_Value ? 1 : 0);
+                    break;
+                }
+                case PrefsVariable<string> v:
+                {
+                    PlayerPrefs.SetString(m_Key, v.m_Value);
+                    break;
+                }
+                default:
+                {
+                    var valueType = typeof(T);
+                    if (valueType.IsEnum)
+                    {
+                        PlayerPrefs.SetInt(m_Key, (int)(object)m_Value);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"variable type {typeof(T).Name} is not supported, Only [int|float|bool|string] types are supported.");
+                    }
+
+                    break;
+                }
             }
         }
     }

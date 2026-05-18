@@ -7,86 +7,127 @@ namespace Atom.UnityEditors
 {
     public class EditorPrefsVariable<T>
     {
-        private string key;
-        private T value;
-        public event Action<T> onValueChanged;
+        private string m_Key;
+        private T      m_Value;
+        private bool   m_Initialized;
+        public event Action<T> OnValueChanged;
 
         public EditorPrefsVariable(string key, T defaultValue = default(T))
         {
-            this.key = key;
-            this.value = defaultValue;
-            this.LoadValue();
+            this.m_Key = key;
+            this.m_Value = defaultValue;
         }
 
         public T Value
         {
-            get { return value; }
+            get
+            {
+                TryInitialize();
+                return m_Value;
+            }
             set
             {
-                if (EqualityComparer<T>.Default.Equals(this.value, value))
+                TryInitialize();
+                if (EqualityComparer<T>.Default.Equals(this.m_Value, value))
                 {
                     return;
                 }
 
-                this.value = value;
+                this.m_Value = value;
                 this.SaveValue();
-                this.onValueChanged?.Invoke(this.value);
+                this.OnValueChanged?.Invoke(this.m_Value);
             }
+        }
+
+        private void TryInitialize()
+        {
+            if (m_Initialized)
+                return;
+
+            m_Initialized = true;
+            LoadValue();
         }
 
         private void LoadValue()
         {
-            if (typeof(T) == typeof(int))
+            switch (this)
             {
-                var v = this as EditorPrefsVariable<int>;
-                v!.value = EditorPrefs.GetInt(key, v.value);
-            }
-            else if (typeof(T) == typeof(float))
-            {
-                var v = this as EditorPrefsVariable<float>;
-                v!.value = EditorPrefs.GetFloat(key, v.value);
-            }
-            else if (typeof(T) == typeof(bool))
-            {
-                var v = this as EditorPrefsVariable<bool>;
-                v!.value = EditorPrefs.GetBool(key, v.value);
-            }
-            else if (typeof(T) == typeof(string))
-            {
-                var v = this as EditorPrefsVariable<string>;
-                v!.value = EditorPrefs.GetString(key, v.value);
-            }
-            else
-            {
-                throw new ArgumentException($"variable type {typeof(T).Name} is not supported, Only [int|float|bool|string] types are supported.");
+                case EditorPrefsVariable<int> v:
+                {
+                    v!.m_Value = EditorPrefs.GetInt(m_Key, v.m_Value);
+                    break;
+                }
+                case EditorPrefsVariable<float> v:
+                {
+                    v!.m_Value = EditorPrefs.GetFloat(m_Key, v.m_Value);
+                    break;
+                }
+                case EditorPrefsVariable<bool> v:
+                {
+                    v!.m_Value = EditorPrefs.GetBool(m_Key, v.m_Value);
+                    break;
+                }
+                case EditorPrefsVariable<string> v:
+                {
+                    v!.m_Value = EditorPrefs.GetString(m_Key, v.m_Value);
+                    break;
+                }
+                default:
+                {
+                    var valueType = typeof(T);
+                    if (valueType.IsEnum)
+                    {
+                        int intValue = EditorPrefs.GetInt(m_Key, (int)(object)m_Value);
+                        m_Value = (T)Enum.ToObject(valueType, intValue);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"variable type {typeof(T).Name} is not supported, Only [int|float|bool|string] types are supported.");
+                    }
+
+                    break;
+                }
             }
         }
 
         private void SaveValue()
         {
-            if (typeof(T) == typeof(int))
+            switch (this)
             {
-                var v = this as EditorPrefsVariable<int>;
-                EditorPrefs.SetInt(key, v!.value);
-            }
-            else if (typeof(T) == typeof(float))
-            {
-                var v = this as EditorPrefsVariable<float>;
-                EditorPrefs.SetFloat(key, v!.value);
-            }
-            else if (typeof(T) == typeof(bool))
-            {
-                var v = this as EditorPrefsVariable<bool>;
-                EditorPrefs.SetBool(key, v!.value);
-            }
-            else if (typeof(T) == typeof(string))
-            {
-                var v = this as EditorPrefsVariable<string>;
-                EditorPrefs.SetString(key, v!.value);
-            }
-            else
-            {
-                throw new ArgumentException($"variable type {typeof(T).Name} is not supported, Only [int|float|bool|string] types are supported.");
+                case EditorPrefsVariable<int> v:
+                {
+                    EditorPrefs.SetInt(m_Key, v.m_Value);
+                    break;
+                }
+                case EditorPrefsVariable<float> v:
+                {
+                    EditorPrefs.SetFloat(m_Key, v.m_Value);
+                    break;
+                }
+                case EditorPrefsVariable<bool> v:
+                {
+                    EditorPrefs.SetBool(m_Key, v.m_Value);
+                    break;
+                }
+                case EditorPrefsVariable<string> v:
+                {
+                    EditorPrefs.SetString(m_Key, v.m_Value);
+                    break;
+                }
+                default:
+                {
+                    var valueType = typeof(T);
+                    if (valueType.IsEnum)
+                    {
+                        EditorPrefs.SetInt(m_Key, (int)(object)m_Value);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"variable type {typeof(T).Name} is not supported, Only [int|float|bool|string] types are supported.");
+                    }
+
+                    break;
+                }
             }
         }
     }
