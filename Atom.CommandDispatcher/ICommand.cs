@@ -21,10 +21,13 @@ namespace Atom
 {
     public interface ICommand
     {
-        void Do();
+        /// <summary>
+        /// 命令描述
+        /// </summary>
+        string Description { get; }
         
-        void Redo();
+        CommandResult Execute();
         
-        void Undo();
+        CommandResult Undo();
     }
 }
