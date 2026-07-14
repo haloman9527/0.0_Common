@@ -2,6 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 namespace Atom.UnityEditors.IMGUI.Controls
 {
     /// <summary>
@@ -217,3 +218,4 @@ namespace Atom.UnityEditors.IMGUI.Controls
         }
     }
 }
+#endif
