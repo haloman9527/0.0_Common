@@ -10,7 +10,7 @@ namespace Atom
         private EventStation<Type> m_GlobalEventStation;
         private EventStation<Type> m_EventStation;
 
-        protected override void OnInit()
+        protected override void Init()
         {
             m_EventStation = new EventStation<Type>();
             m_GlobalEventStation = new EventStation<Type>();

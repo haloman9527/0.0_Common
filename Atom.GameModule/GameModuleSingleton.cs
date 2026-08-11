@@ -6,54 +6,54 @@
 
         public static TGameModule Instance => s_Instance;
 
-        public void Init()
+        void IGameModule.Init()
         {
             if (s_Instance == null)
                 s_Instance = this as TGameModule;
 
-            this.OnInit();
+            this.Init();
         }
 
-        public void UnInit()
+        void IGameModule.UnInit()
         {
             if (s_Instance == this)
                 s_Instance = null;
 
-            this.OnUnInit();
+            this.UnInit();
         }
 
-        public void FixedUpdate()
+        void IGameModule.FixedUpdate()
         {
-            this.OnFixedUpdate();
+            this.FixedUpdate();
         }
 
-        public void Update()
+        void IGameModule.Update()
         {
-            this.OnUpdate();
+            this.Update();
         }
 
-        public void LateUpdate()
+        void IGameModule.LateUpdate()
         {
-            this.OnLateUpdate();
+            this.LateUpdate();
         }
 
-        protected virtual void OnInit()
-        {
-        }
-
-        protected virtual void OnUnInit()
+        protected virtual void Init()
         {
         }
 
-        protected virtual void OnFixedUpdate()
+        protected virtual void UnInit()
         {
         }
 
-        protected virtual void OnUpdate()
+        protected virtual void FixedUpdate()
         {
         }
 
-        protected virtual void OnLateUpdate()
+        protected virtual void Update()
+        {
+        }
+
+        protected virtual void LateUpdate()
         {
         }
     }
