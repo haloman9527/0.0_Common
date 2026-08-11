@@ -11,6 +11,6 @@ namespace Atom
     {
         public override Type EventType => TypeCache<T>.TYPE;
 
-        public abstract void Invoke(in T arg);
+        public abstract void Invoke(T arg);
     }
 }

@@ -25,7 +25,7 @@ namespace Atom
                 m_Handlers.Clear();
             }
 
-            public void Invoke(in TArg arg)
+            public void Invoke(TArg arg)
             {
                 m_HandlerQueue.Clear();
                 for (int i = 0; i < m_Handlers.Count; i++)

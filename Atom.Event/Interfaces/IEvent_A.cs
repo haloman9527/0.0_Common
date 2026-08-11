@@ -2,6 +2,6 @@
 {
     public interface IEvent<T>
     {
-        void Invoke(in T arg);
+        void Invoke(T arg);
     }
 }
